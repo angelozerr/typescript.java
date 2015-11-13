@@ -10,7 +10,7 @@ public interface ITSClient {
 
 	CompletionInfo getCompletionsAtPosition(String fileName, int position) throws TSException;
 
-	CompletionInfo getCompletionsAtLineOfsset(String fileName, int line, int offset) throws TSException;
+	CompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset) throws TSException;
 
 	NavigationBarItem[] getNavigationBarItems(String fileName) throws TSException;
 

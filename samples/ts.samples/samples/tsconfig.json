@@ -7,8 +7,6 @@
         "sourceMap": true
     },
     "files": [
-        "lib.d.ts",
-        "sample2.ts",
         "sample.ts"
     ]
 }

@@ -1,11 +1,15 @@
 package ts.server.protocol;
 
+import java.util.concurrent.Callable;
+
 import com.eclipsesource.json.JsonObject;
 
 /**
  * Client-initiated request message
  */
-public class Request extends Message {
+public class Request extends Message implements Callable<JsonObject> {
+
+	private JsonObject response;
 
 	public Request(CommandNames command, FileRequestArgs args, ISequenceProvider provider) {
 		this(command.getName(), args, provider);
@@ -17,6 +21,21 @@ public class Request extends Message {
 		if (args != null) {
 			super.add("arguments", args);
 		}
+	}
+
+	public void setResponse(JsonObject response) {
+		this.response = response;
+		synchronized (this) {
+			notify();
+		}
+	}
+
+	@Override
+	public JsonObject call() throws Exception {
+		synchronized (this) {
+			wait();
+		}
+		return response;
 	}
 
 }
