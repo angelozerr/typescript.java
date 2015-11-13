@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Bundle-SymbolicName: ts.core
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ts.internal.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: com.eclipsesource.json;version="0.9.4",
+ org.osgi.framework;version="1.3.0"
+Bundle-ActivationPolicy: lazy
+Export-Package: ts,
+ ts.server,
+ ts.server.protocol
