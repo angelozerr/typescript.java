@@ -15,4 +15,6 @@ public interface ITSClient {
 	INavigationBarItem[] getNavigationBarItems(String fileName) throws TSException;
 
 	void join() throws InterruptedException;
+
+	void dispose();
 }

@@ -62,4 +62,9 @@ public class NodeJSTSClient extends AbstractTSClient {
 		this.process.join();
 	}
 
+	@Override
+	public void dispose() {
+		this.process.kill();
+	}
+
 }
