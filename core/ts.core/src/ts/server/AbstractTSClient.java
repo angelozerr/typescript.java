@@ -12,6 +12,7 @@ import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.INavigationBarItem;
 import ts.TSException;
+import ts.server.protocol.ChangeRequest;
 import ts.server.protocol.CompletionsRequest;
 import ts.server.protocol.ISequenceProvider;
 import ts.server.protocol.NavBarRequest;
@@ -25,6 +26,23 @@ public abstract class AbstractTSClient implements ITSClient, ISequenceProvider {
 	@Override
 	public void openFile(String fileName) throws TSException {
 		Request request = new OpenRequest(fileName, this);
+		processVoidRequest(request);
+	}
+
+	@Override
+	public void changeFile(String fileName, int start, int end, String newText) throws TSException {
+		// TODO : implement that?
+		int line = 0;
+		int offset = 0;
+		int endLine = 0;
+		int endOffset = 0;
+		changeFile(fileName, line, offset, endLine, endOffset, newText);
+	}
+
+	@Override
+	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
+			throws TSException {
+		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText, this);
 		processVoidRequest(request);
 	}
 

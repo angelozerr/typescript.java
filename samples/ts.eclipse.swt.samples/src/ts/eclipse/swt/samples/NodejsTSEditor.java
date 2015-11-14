@@ -67,8 +67,8 @@ public class NodejsTSEditor {
 
 		// Tu cr�es ton text
 		Text text = new Text(shell, SWT.MULTI | SWT.BORDER);
-		text.setText("var a = [];\na.");
-		IJSDocument document = new JSDocumentText("sample.ts", client, text);
+		text.setText("var s = \"\";s.");
+		IJSDocument document = new JSDocumentText("sample2.ts", client, text);
 
 		// Les charact�res qui d�clenchent l'autocompl�tion
 		char[] autoActivationCharacters = new char[] { '.' };

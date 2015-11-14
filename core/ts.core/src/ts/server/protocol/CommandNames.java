@@ -2,7 +2,7 @@ package ts.server.protocol;
 
 public enum CommandNames {
 
-	Open("open"), NavBar("navbar"), Completions("completions");
+	Open("open"), Change("change"), NavBar("navbar"), Completions("completions");
 
 	private final String name;
 

@@ -24,31 +24,35 @@ public class TSContentProposalProvider implements IContentProposalProvider {
 	public IContentProposal[] getProposals(String contents, int position) {
 		ITSClient client = doc.getClient();
 		try {
-			ICompletionInfo completion = client.getCompletionsAtLineOffset(doc.getName(), 0, position);
+
+			String newText = doc.getValue();
+			client.changeFile(doc.getName(), 0, 0, 0, newText.length(), newText);
+
+			ICompletionInfo completion = client.getCompletionsAtLineOffset(doc.getName(), 0, position + 1);
 			List<IContentProposal> proposals = new ArrayList<IContentProposal>();
 			ICompletionEntry[] entries = completion.getEntries();
 			for (int i = 0; i < entries.length; i++) {
 				final ICompletionEntry entry = entries[i];
 				proposals.add(new IContentProposal() {
-					
+
 					@Override
 					public String getLabel() {
 						// TODO Auto-generated method stub
 						return entry.getName();
 					}
-					
+
 					@Override
 					public String getDescription() {
 						// TODO Auto-generated method stub
 						return null;
 					}
-					
+
 					@Override
 					public int getCursorPosition() {
 						// TODO Auto-generated method stub
 						return 0;
 					}
-					
+
 					@Override
 					public String getContent() {
 						// TODO Auto-generated method stub
