@@ -2,7 +2,7 @@ package test;
 
 import java.io.File;
 
-import ts.CompletionInfo;
+import ts.ICompletionInfo;
 import ts.TSException;
 import ts.server.ITSClient;
 import ts.server.nodejs.NodeJSTSClient;
@@ -15,7 +15,7 @@ public class Main {
 		ITSClient client = new NodeJSTSClient(new File("./samples"), new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
 		client.openFile(fileName);
 		
-		CompletionInfo completionInfo = client.getCompletionsAtLineOffset(fileName, 0, 14);
+		ICompletionInfo completionInfo = client.getCompletionsAtLineOffset(fileName, 0, 14);
 		System.out.println(completionInfo);
 		
 		completionInfo = client.getCompletionsAtLineOffset(fileName, 0, 14);

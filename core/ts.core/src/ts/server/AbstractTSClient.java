@@ -2,10 +2,15 @@ package ts.server;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
+import ts.CompletionEntry;
 import ts.CompletionInfo;
-import ts.NavigationBarItem;
+import ts.ICompletionEntry;
+import ts.ICompletionInfo;
+import ts.INavigationBarItem;
 import ts.TSException;
 import ts.server.protocol.CompletionsRequest;
 import ts.server.protocol.ISequenceProvider;
@@ -24,7 +29,7 @@ public abstract class AbstractTSClient implements ITSClient, ISequenceProvider {
 	}
 
 	@Override
-	public CompletionInfo getCompletionsAtPosition(String fileName, int position) throws TSException {
+	public ICompletionInfo getCompletionsAtPosition(String fileName, int position) throws TSException {
 		// var lineOffset = this.positionToOneBasedLineOffset(fileName,
 		// position);
 		// TODO : implement that?
@@ -34,14 +39,14 @@ public abstract class AbstractTSClient implements ITSClient, ISequenceProvider {
 	}
 
 	@Override
-	public CompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset) throws TSException {
+	public ICompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset) throws TSException {
 		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, null, this);
 		JsonObject response = processRequest(request);
 		return createCompletionInfo(response);
 	}
 
 	@Override
-	public NavigationBarItem[] getNavigationBarItems(String fileName) throws TSException {
+	public INavigationBarItem[] getNavigationBarItems(String fileName) throws TSException {
 		NavBarRequest request = new NavBarRequest(fileName, this);
 		JsonObject response = this.processRequest(request);
 		return null;
@@ -56,8 +61,17 @@ public abstract class AbstractTSClient implements ITSClient, ISequenceProvider {
 
 	protected abstract JsonObject processRequest(Request request) throws TSException;
 
-	private CompletionInfo createCompletionInfo(JsonObject response) {
-System.err.println(response);
-		return null;
+	private ICompletionInfo createCompletionInfo(JsonObject response) {
+		JsonArray items = response.get("body").asArray();
+		ICompletionEntry[] entries = new ICompletionEntry[items.size()];
+		int i = 0;
+		JsonObject obj = null;
+		for (JsonValue item : items) {
+			obj = (JsonObject) item;
+			entries[i++] = new CompletionEntry(obj.getString("name", ""), obj.getString("kind", ""),
+					obj.getString("kindModifiers", ""), obj.getString("sortText", ""));
+		}
+		CompletionInfo completion = new CompletionInfo(false, false, entries);
+		return completion;
 	}
 }

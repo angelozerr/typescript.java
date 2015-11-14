@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 
 import com.eclipsesource.json.JsonObject;
 
+import ts.TSException;
+
 /**
  * Client-initiated request message
  */
@@ -34,6 +36,9 @@ public class Request extends Message implements Callable<JsonObject> {
 	public JsonObject call() throws Exception {
 		synchronized (this) {
 			wait();
+		}
+		if (!response.getBoolean("success", true)) {
+			throw new TSException(response.getString("message", ""));
 		}
 		return response;
 	}

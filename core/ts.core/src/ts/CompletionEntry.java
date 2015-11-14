@@ -1,12 +1,37 @@
 package ts;
 
-public interface CompletionEntry {
+public class CompletionEntry implements ICompletionEntry {
 
-	String getName();
+	private final String name;
+	private final String kind;
+	private final String kindModifiers;
+	private final String sortText;
 
-	String getKind();
+	public CompletionEntry(String name, String kind, String kindModifiers, String sortText) {
+		this.name = name;
+		this.kind = kind;
+		this.kindModifiers = kindModifiers;
+		this.sortText = sortText;
+	}
 
-	String getKindModifiers();
+	@Override
+	public String getName() {
+		return name;
+	}
 
-	String getSortText();
+	@Override
+	public String getKind() {
+		return kind;
+	}
+
+	@Override
+	public String getKindModifiers() {
+		return kindModifiers;
+	}
+
+	@Override
+	public String getSortText() {
+		return sortText;
+	}
+
 }

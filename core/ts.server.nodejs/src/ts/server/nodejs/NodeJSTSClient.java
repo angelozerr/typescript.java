@@ -1,7 +1,6 @@
 package ts.server.nodejs;
 
 import java.io.File;
-import java.io.IOException;
 
 import com.eclipsesource.json.JsonObject;
 
@@ -28,7 +27,13 @@ public class NodeJSTSClient extends AbstractTSClient {
 		try {
 			System.out.println(request);
 			process.sendRequest(request);
-		} catch (IOException e) {
+		} catch (Exception e) {
+			if (e instanceof TSException) {
+				throw (TSException) e;
+			}
+			if (e.getCause() instanceof TSException) {
+				throw (TSException) e.getCause();
+			}
 			throw new TSException(e);
 		}
 	}
@@ -39,6 +44,12 @@ public class NodeJSTSClient extends AbstractTSClient {
 			System.out.println(request);
 			return process.sendRequestSyncResponse(request);
 		} catch (Exception e) {
+			if (e instanceof TSException) {
+				throw (TSException) e;
+			}
+			if (e.getCause() instanceof TSException) {
+				throw (TSException) e.getCause();
+			}
 			throw new TSException(e);
 		}
 	}

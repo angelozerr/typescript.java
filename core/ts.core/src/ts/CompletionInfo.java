@@ -1,17 +1,30 @@
 package ts;
 
-/**
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/services/services.ts
- *
- */
-public interface CompletionInfo {
+public class CompletionInfo implements ICompletionInfo {
 
-	boolean isMemberCompletion();
-	/**
-	 * Returns true when the current location also allows for a new identifier
-	 * @return true when the current location also allows for a new identifier
-	 */
-	boolean isNewIdentifierLocation();  
-	
-	CompletionEntry[] getEntries();
+	private final boolean memberCompletion;
+	private final boolean newIdentifierLocation;
+	private final ICompletionEntry[] entries;
+
+	public CompletionInfo(boolean memberCompletion, boolean newIdentifierLocation, ICompletionEntry[] entries) {
+		this.memberCompletion = memberCompletion;
+		this.newIdentifierLocation = newIdentifierLocation;
+		this.entries = entries;
+	}
+
+	@Override
+	public boolean isMemberCompletion() {
+		return memberCompletion;
+	}
+
+	@Override
+	public boolean isNewIdentifierLocation() {
+		return newIdentifierLocation;
+	}
+
+	@Override
+	public ICompletionEntry[] getEntries() {
+		return entries;
+	}
+
 }
