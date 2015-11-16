@@ -14,6 +14,8 @@ public interface ITSClient {
 
 	void openFile(String fileName) throws TSException;
 
+	void updateFile(String fileName, String newText) throws TSException;
+	
 	void changeFile(String fileName, int start, int end, String newText) throws TSException;
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)

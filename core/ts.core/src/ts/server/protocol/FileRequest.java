@@ -8,12 +8,12 @@ package ts.server.protocol;
  */
 public class FileRequest extends Request {
 
-	public FileRequest(CommandNames command, FileRequestArgs args, ISequenceProvider provider) {
-		super(command, args, provider);
+	public FileRequest(CommandNames command, FileRequestArgs args, Integer seq) {
+		super(command, args, seq);
 	}
 
-	public FileRequest(String command, FileRequestArgs args, ISequenceProvider provider) {
-		super(command, args, provider);
+	public FileRequest(String command, FileRequestArgs args, Integer seq) {
+		super(command, args, seq);
 	}
 
 }

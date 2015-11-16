@@ -10,8 +10,8 @@ package ts.server.protocol;
  */
 public class CompletionsRequest extends FileLocationRequest {
 
-	public CompletionsRequest(String fileName, int line, int offset, String prefix, ISequenceProvider provider) {
-		super(CommandNames.Completions, new CompletionsRequestArgs(fileName, line, offset, prefix), provider);
+	public CompletionsRequest(String fileName, int line, int offset, String prefix) {
+		super(CommandNames.Completions, new CompletionsRequestArgs(fileName, line, offset, prefix));
 	}
 
 }

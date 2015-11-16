@@ -1,5 +1,8 @@
 package ts.eclipse.jface.fieldassist;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +14,7 @@ import ts.ICompletionInfo;
 import ts.TSException;
 import ts.doc.IJSDocument;
 import ts.server.ITSClient;
+import ts.utils.StringUtils;
 
 public class TSContentProposalProvider implements IContentProposalProvider {
 
@@ -24,11 +28,26 @@ public class TSContentProposalProvider implements IContentProposalProvider {
 	public IContentProposal[] getProposals(String contents, int position) {
 		ITSClient client = doc.getClient();
 		try {
+			// Update file content
+			client.updateFile(doc.getName(), contents);
+			// Total
+			List<Integer> lines = readLines(contents);
+			int offset = position;
+			int current = 0;
+			int line = 0;
+			for (Integer lineOffset : lines) {
+				if (line > 0) {
+					current += "\r\n".length();
+				}
+				current += lineOffset;
+				if (position <= current) {
+					offset = lineOffset + (current - position);
+					break;
+				}
+				line++;
+			}
 
-			String newText = doc.getValue();
-			client.changeFile(doc.getName(), 0, 0, 0, newText.length(), newText);
-
-			ICompletionInfo completion = client.getCompletionsAtLineOffset(doc.getName(), 0, position + 1);
+			ICompletionInfo completion = client.getCompletionsAtLineOffset(doc.getName(), line + 1, offset + 1);
 			List<IContentProposal> proposals = new ArrayList<IContentProposal>();
 			ICompletionEntry[] entries = completion.getEntries();
 			for (int i = 0; i < entries.length; i++) {
@@ -68,4 +87,22 @@ public class TSContentProposalProvider implements IContentProposalProvider {
 		return null;
 	}
 
+	public static List<Integer> readLines(final String input) {
+		final List<Integer> list = new ArrayList<Integer>();
+		try {
+			final BufferedReader reader = new BufferedReader(new StringReader(input));
+			String line = reader.readLine();
+			while (line != null) {
+				if (list.size() > 0) {
+					list.add(line.length());// "\r\n".length());
+				} else {
+					list.add(line.length());
+				}
+				line = reader.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 }

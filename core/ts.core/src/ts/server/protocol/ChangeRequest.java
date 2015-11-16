@@ -10,10 +10,8 @@ package ts.server.protocol;
  */
 public class ChangeRequest extends FileLocationRequest {
 
-	public ChangeRequest(String fileName, int line, int offset, int endLine, int endOffset, String insertString,
-			ISequenceProvider provider) {
-		super(CommandNames.Change, new ChangeRequestArgs(fileName, line, offset, endLine, endOffset, insertString),
-				provider);
+	public ChangeRequest(String fileName, int line, int offset, int endLine, int endOffset, String insertString) {
+		super(CommandNames.Change, new ChangeRequestArgs(fileName, line, offset, endLine, endOffset, insertString));
 	}
 
 }

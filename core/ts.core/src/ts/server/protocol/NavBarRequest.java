@@ -6,8 +6,8 @@ package ts.server.protocol;
  */
 public class NavBarRequest extends FileRequest {
 
-	public NavBarRequest(String fileName, ISequenceProvider provider) {
-		super(CommandNames.NavBar.getName(), new FileRequestArgs(fileName), provider);
+	public NavBarRequest(String fileName) {
+		super(CommandNames.NavBar.getName(), new FileRequestArgs(fileName), null);
 	}
 
 }

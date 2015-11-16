@@ -12,20 +12,26 @@ import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.INavigationBarItem;
 import ts.TSException;
+import ts.internal.FileTempHelper;
+import ts.internal.SequenceHelper;
 import ts.server.protocol.ChangeRequest;
 import ts.server.protocol.CompletionsRequest;
-import ts.server.protocol.ISequenceProvider;
 import ts.server.protocol.NavBarRequest;
 import ts.server.protocol.OpenRequest;
+import ts.server.protocol.ReloadRequest;
 import ts.server.protocol.Request;
 
-public abstract class AbstractTSClient implements ITSClient, ISequenceProvider {
+public abstract class AbstractTSClient implements ITSClient {
 
-	private AtomicInteger requestCount = new AtomicInteger();
+	private final AtomicInteger requestCount;
+
+	public AbstractTSClient() {
+		this.requestCount = new AtomicInteger();
+	}
 
 	@Override
 	public void openFile(String fileName) throws TSException {
-		Request request = new OpenRequest(fileName, this);
+		Request request = new OpenRequest(fileName);
 		processVoidRequest(request);
 	}
 
@@ -42,7 +48,7 @@ public abstract class AbstractTSClient implements ITSClient, ISequenceProvider {
 	@Override
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException {
-		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText, this);
+		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText);
 		processVoidRequest(request);
 	}
 
@@ -58,21 +64,41 @@ public abstract class AbstractTSClient implements ITSClient, ISequenceProvider {
 
 	@Override
 	public ICompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset) throws TSException {
-		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, null, this);
+		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, null);
 		JsonObject response = processRequest(request);
 		return createCompletionInfo(response);
 	}
 
 	@Override
 	public INavigationBarItem[] getNavigationBarItems(String fileName) throws TSException {
-		NavBarRequest request = new NavBarRequest(fileName, this);
+		NavBarRequest request = new NavBarRequest(fileName);
 		JsonObject response = this.processRequest(request);
 		return null;
 	}
 
+	/**
+	 * Write the buffer of editor content to a temporary file and have the
+	 * server reload it
+	 * 
+	 * @param fileName
+	 * @param newText
+	 */
 	@Override
-	public int getSequence() {
-		return requestCount.getAndIncrement();
+	public void updateFile(String fileName, String newText) throws TSException {
+		int seq = SequenceHelper.getRequestSeq();
+		String tempFileName = null;
+		int requestSeq = -1;
+		try {
+			tempFileName = FileTempHelper.updateTempFile(newText, seq);
+			Request request = new ReloadRequest(fileName, tempFileName, seq);
+			JsonObject response = this.processRequest(request);
+			requestSeq = response.getInt("request_seq", -1);
+		} finally {
+			if (requestSeq != -1) {
+				FileTempHelper.freeTempFile(requestSeq);
+			}
+		}
+
 	}
 
 	protected abstract void processVoidRequest(Request request) throws TSException;

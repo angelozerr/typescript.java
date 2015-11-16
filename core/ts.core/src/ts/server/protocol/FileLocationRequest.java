@@ -8,12 +8,12 @@ package ts.server.protocol;
  */
 public class FileLocationRequest extends FileRequest {
 
-	public FileLocationRequest(CommandNames command, FileLocationRequestArgs args, ISequenceProvider provider) {
-		super(command, args, provider);
+	public FileLocationRequest(CommandNames command, FileLocationRequestArgs args) {
+		super(command, args, null);
 	}
 
-	public FileLocationRequest(String command, FileLocationRequestArgs args, ISequenceProvider provider) {
-		super(command, args, provider);
+	public FileLocationRequest(String command, FileLocationRequestArgs args) {
+		super(command, args, null);
 	}
 
 }

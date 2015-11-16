@@ -13,4 +13,5 @@ Bundle-ActivationPolicy: lazy
 Export-Package: ts,
  ts.doc,
  ts.server,
- ts.server.protocol
+ ts.server.protocol,
+ ts.utils
