@@ -197,6 +197,9 @@ public class NodeJSProcess {
 			errThread.interrupt();
 			errThread = null;
 		}
+		if (pool != null) {
+			pool.shutdown();
+		}
 	}
 
 	/**
@@ -215,15 +218,17 @@ public class NodeJSProcess {
 		out.flush();
 	}
 
-	public JsonObject sendRequestSyncResponse(Request request) throws IOException, InterruptedException, ExecutionException {
-		//long start = System.currentTimeMillis();
+	public JsonObject sendRequestSyncResponse(Request request)
+			throws IOException, InterruptedException, ExecutionException {
+		// long start = System.currentTimeMillis();
 		sendRequest(request);
 		synchronized (requestsMap) {
 			requestsMap.put(request.getSeq(), request);
 		}
 		Future<JsonObject> f = pool.submit(request);
 		JsonObject response = f.get();
-		//System.err.println("time seq="  + request.getSeq() + ": " + (System.currentTimeMillis() - start + "ms"));
+		// System.err.println("time seq=" + request.getSeq() + ": " +
+		// (System.currentTimeMillis() - start + "ms"));
 		return response;
 	}
 

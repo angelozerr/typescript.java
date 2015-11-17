@@ -27,9 +27,10 @@ public class Request extends Message implements Callable<JsonObject> {
 	}
 
 	public void setResponse(JsonObject response) {
+		System.out.println(response);
 		this.response = response;
 		synchronized (this) {
-			notify();
+			notifyAll();
 		}
 	}
 

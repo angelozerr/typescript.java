@@ -23,10 +23,7 @@ import ts.server.protocol.Request;
 
 public abstract class AbstractTSClient implements ITSClient {
 
-	private final AtomicInteger requestCount;
-
 	public AbstractTSClient() {
-		this.requestCount = new AtomicInteger();
 	}
 
 	@Override
@@ -53,18 +50,19 @@ public abstract class AbstractTSClient implements ITSClient {
 	}
 
 	@Override
-	public ICompletionInfo getCompletionsAtPosition(String fileName, int position) throws TSException {
+	public ICompletionInfo getCompletionsAtPosition(String fileName, int position, String prefix) throws TSException {
 		// var lineOffset = this.positionToOneBasedLineOffset(fileName,
 		// position);
 		// TODO : implement that?
 		int line = 0;
 		int offset = 0;
-		return getCompletionsAtLineOffset(fileName, line, offset);
+		return getCompletionsAtLineOffset(fileName, line, offset, prefix);
 	}
 
 	@Override
-	public ICompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset) throws TSException {
-		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, null);
+	public ICompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset, String prefix)
+			throws TSException {
+		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
 		JsonObject response = processRequest(request);
 		return createCompletionInfo(response);
 	}

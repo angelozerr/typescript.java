@@ -14,7 +14,7 @@ import ts.ICompletionInfo;
 import ts.TSException;
 import ts.doc.IJSDocument;
 import ts.server.ITSClient;
-import ts.utils.StringUtils;
+import ts.utils.TSHelper;
 
 public class TSContentProposalProvider implements IContentProposalProvider {
 
@@ -47,7 +47,8 @@ public class TSContentProposalProvider implements IContentProposalProvider {
 				line++;
 			}
 
-			ICompletionInfo completion = client.getCompletionsAtLineOffset(doc.getName(), line + 1, offset + 1);
+			String prefix = TSHelper.getPrefix(contents, position);
+			ICompletionInfo completion = client.getCompletionsAtLineOffset(doc.getName(), line + 1, offset + 1, prefix);
 			List<IContentProposal> proposals = new ArrayList<IContentProposal>();
 			ICompletionEntry[] entries = completion.getEntries();
 			for (int i = 0; i < entries.length; i++) {

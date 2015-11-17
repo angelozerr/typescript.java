@@ -27,7 +27,9 @@ public class FileTempHelper {
 			throw new TSException(e);
 		} finally {
 			try {
-				writer.close();
+				if (writer != null) {
+					writer.close();
+				}
 			} catch (IOException e) {
 				throw new TSException(e);
 			}
@@ -46,7 +48,7 @@ public class FileTempHelper {
 			if (!availableTempFileList.isEmpty()) {
 				tempFile = availableTempFileList.pop();
 			} else {
-				tempFile = File.createTempFile("typescript.java/" + SequenceHelper.getTempSeq(), null);
+				tempFile = File.createTempFile("tmptsjava." + SequenceHelper.getTempSeq(), null);
 			}
 			seq_to_tempfile_name.put(seq, tempFile);
 		}
