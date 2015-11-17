@@ -49,6 +49,7 @@ public class FileTempHelper {
 				tempFile = availableTempFileList.pop();
 			} else {
 				tempFile = File.createTempFile("tmptsjava." + SequenceHelper.getTempSeq(), null);
+				tempFile.deleteOnExit();
 			}
 			seq_to_tempfile_name.put(seq, tempFile);
 		}
