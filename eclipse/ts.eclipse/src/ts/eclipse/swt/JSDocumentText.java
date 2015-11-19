@@ -6,13 +6,13 @@ import org.eclipse.swt.widgets.Text;
 
 import ts.TSException;
 import ts.doc.AbstractJSDocument;
-import ts.server.ITSClient;
+import ts.server.ITypeScriptServiceClient;
 
 public class JSDocumentText extends AbstractJSDocument {
 
 	private final Text text;
 
-	public JSDocumentText(String name, ITSClient client, Text text) {
+	public JSDocumentText(String name, ITypeScriptServiceClient client, Text text) {
 		super(name, client, false);
 		this.text = text;
 		text.addModifyListener(new ModifyListener() {

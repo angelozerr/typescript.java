@@ -16,19 +16,18 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
-public class JSDTTSCorePlugin extends Plugin {
+public class JSDTTypeScriptCorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "ts.eclipse.ide.jsdt.core"; //$NON-NLS-1$
 
 	// The shared instance
-	private static JSDTTSCorePlugin plugin;
+	private static JSDTTypeScriptCorePlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public JSDTTSCorePlugin() {
+	public JSDTTypeScriptCorePlugin() {
 	}
 
 	/*
@@ -58,7 +57,7 @@ public class JSDTTSCorePlugin extends Plugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static JSDTTSCorePlugin getDefault() {
+	public static JSDTTypeScriptCorePlugin getDefault() {
 		return plugin;
 	}
 

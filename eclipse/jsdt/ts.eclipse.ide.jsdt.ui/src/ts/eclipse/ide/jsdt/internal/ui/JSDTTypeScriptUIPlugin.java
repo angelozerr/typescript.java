@@ -17,20 +17,20 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class JSDTTSUIPlugin extends AbstractUIPlugin {
+public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "ts.eclipse.ide.jsdt.ui"; //$NON-NLS-1$
 
 	// The shared instance
-	private static JSDTTSUIPlugin plugin;
+	private static JSDTTypeScriptUIPlugin plugin;
 
 	//private static ITernContextProvider contextProvider = new JSDTTernContextProvider();
 
 	/**
 	 * The constructor
 	 */
-	public JSDTTSUIPlugin() {
+	public JSDTTypeScriptUIPlugin() {
 	}
 
 	/*
@@ -62,7 +62,7 @@ public class JSDTTSUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static JSDTTSUIPlugin getDefault() {
+	public static JSDTTypeScriptUIPlugin getDefault() {
 		return plugin;
 	}
 	

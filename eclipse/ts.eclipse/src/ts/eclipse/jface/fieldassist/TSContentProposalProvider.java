@@ -13,7 +13,7 @@ import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.TSException;
 import ts.doc.IJSDocument;
-import ts.server.ITSClient;
+import ts.server.ITypeScriptServiceClient;
 import ts.utils.TSHelper;
 
 public class TSContentProposalProvider implements IContentProposalProvider {
@@ -26,23 +26,24 @@ public class TSContentProposalProvider implements IContentProposalProvider {
 
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
-		ITSClient client = doc.getClient();
+		ITypeScriptServiceClient client = doc.getClient();
 		try {
 			// Update file content
 			client.updateFile(doc.getName(), contents);
 			// Total
 			List<Integer> lines = readLines(contents);
 			int offset = position;
-			int current = 0;
+			int current = position;
 			int line = 0;
 			for (Integer lineOffset : lines) {
 				if (line > 0) {
-					current += "\r\n".length();
+					current -= "\r\n".length();
 				}
-				current += lineOffset;
-				if (position <= current) {
-					offset = lineOffset + (current - position);
+				if (current <= lineOffset) {
+					offset = current;
 					break;
+				} else {
+					current -= lineOffset;
 				}
 				line++;
 			}

@@ -16,5 +16,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.xml.core,
  org.eclipse.wst.sse.ui
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: ts.eclipse.ide.jsdt.internal.core.JSDTTSCorePlugin
+Bundle-Activator: ts.eclipse.ide.jsdt.internal.core.JSDTTypeScriptCorePlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"

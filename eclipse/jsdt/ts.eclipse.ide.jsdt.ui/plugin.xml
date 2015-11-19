@@ -17,22 +17,22 @@
 	<!-- Completion Proposal for JavaScript (inside JavaScript file) -->
 	
 	<extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
-	   id="TSCompletionProposalCategory"
-	   name="%TSCompletionProposalCategory.name">
+	   id="TypeScriptCompletionProposalCategory"
+	   name="%TypeScriptCompletionProposalCategory.name">
 	   <proposalCategory icon="icons/full/obj16/logo.png" />
 	 </extension>
 
 	<extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
-	   id="TSCompletionProposalComputer">
+	   id="TypeScriptCompletionProposalComputer">
 	   <javaCompletionProposalComputer
-	      class="ts.eclipse.ide.jsdt.internal.ui.contentassist.TSCompletionProposalComputer"
-	      categoryId="ts.eclipse.ide.jsdt.ui.TSCompletionProposalCategory">
+	      class="ts.eclipse.ide.jsdt.internal.ui.contentassist.TypeScriptCompletionProposalComputer"
+	      categoryId="ts.eclipse.ide.jsdt.ui.TypeScriptCompletionProposalCategory">
 	   </javaCompletionProposalComputer>
 	 </extension>
 
-	 <!-- I don't know why, but startup should be done, otherwise TernCompletionProposalComputer is not registered? -->
+	 <!-- I don't know why, but startup should be done, otherwise TypeScriptCompletionProposalComputer is not registered? -->
 	 <extension
 	       point="org.eclipse.ui.startup">	
-	       <startup class="ts.eclipse.ide.jsdt.internal.ui.JSDTTSStartup" />       
+	       <startup class="ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptStartup" />       
 	 </extension>
 </plugin>        

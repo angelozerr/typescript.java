@@ -5,7 +5,7 @@ import java.io.File;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TSException;
-import ts.server.AbstractTSClient;
+import ts.server.AbstractTypeScriptServiceClient;
 import ts.server.nodejs.process.NodeJSProcess;
 import ts.server.protocol.Request;
 
@@ -13,7 +13,7 @@ import ts.server.protocol.Request;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/client.ts
  *
  */
-public class NodeJSTSClient extends AbstractTSClient {
+public class NodeJSTSClient extends AbstractTypeScriptServiceClient {
 
 	private final NodeJSProcess process;
 

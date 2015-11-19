@@ -9,6 +9,8 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>ts.eclipse</module>
+		<module>ts.eclipse.ide.core</module>
+		<module>ts.eclipse.ide.ui</module>
 		<module>jsdt</module>
 	</modules>
 </project>

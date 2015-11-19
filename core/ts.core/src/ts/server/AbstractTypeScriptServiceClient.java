@@ -21,15 +21,20 @@ import ts.server.protocol.OpenRequest;
 import ts.server.protocol.ReloadRequest;
 import ts.server.protocol.Request;
 
-public abstract class AbstractTSClient implements ITSClient {
+public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServiceClient {
 
-	public AbstractTSClient() {
+	public AbstractTypeScriptServiceClient() {
 	}
 
 	@Override
 	public void openFile(String fileName) throws TSException {
 		Request request = new OpenRequest(fileName);
 		processVoidRequest(request);
+	}
+	
+	@Override
+	public void closeFile(String name) {
+		
 	}
 
 	@Override

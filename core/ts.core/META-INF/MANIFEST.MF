@@ -12,6 +12,7 @@ Import-Package: com.eclipsesource.json;version="0.9.4",
 Bundle-ActivationPolicy: lazy
 Export-Package: ts,
  ts.doc,
+ ts.resources,
  ts.server,
  ts.server.protocol,
  ts.utils

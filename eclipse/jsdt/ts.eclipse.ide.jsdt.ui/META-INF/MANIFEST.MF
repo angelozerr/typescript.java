@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.search,
  org.eclipse.ui.navigator,
  org.eclipse.ui.ide,
- ts.server.nodejs;bundle-version="1.0.0"
+ ts.server.nodejs,
+ ts.eclipse.ide.core
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: ts.eclipse.ide.jsdt.internal.ui.JSDTTSUIPlugin
+Bundle-Activator: ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"

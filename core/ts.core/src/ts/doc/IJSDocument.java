@@ -1,6 +1,6 @@
 package ts.doc;
 
-import ts.server.ITSClient;
+import ts.server.ITypeScriptServiceClient;
 
 public interface IJSDocument {
 
@@ -8,5 +8,5 @@ public interface IJSDocument {
 	
 	String getValue();
 	
-	ITSClient getClient();
+	ITypeScriptServiceClient getClient();
 }

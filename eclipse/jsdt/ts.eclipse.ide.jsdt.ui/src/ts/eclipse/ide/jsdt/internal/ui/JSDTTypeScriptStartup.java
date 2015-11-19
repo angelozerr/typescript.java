@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-public class JSDTTSStartup implements IStartup {
+public class JSDTTypeScriptStartup implements IStartup {
 
 	@Override
 	public void earlyStartup() {

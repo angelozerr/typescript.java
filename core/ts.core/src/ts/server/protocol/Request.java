@@ -27,17 +27,22 @@ public class Request extends Message implements Callable<JsonObject> {
 	}
 
 	public void setResponse(JsonObject response) {
-		System.out.println(response);
 		this.response = response;
 		synchronized (this) {
-			notifyAll();
+			this.notifyAll();
 		}
 	}
 
 	@Override
 	public JsonObject call() throws Exception {
-		synchronized (this) {
-			wait();
+		while (response == null) {
+			synchronized (this) {
+				// wait for 200ms otherwise if we don't set ms, if completion is
+				// executed several times
+				// quickly (do Ctrl+Space every time), the Thread could be
+				// blocked? Why?
+				this.wait(200);
+			}
 		}
 		if (!response.getBoolean("success", true)) {
 			throw new TSException(response.getString("message", ""));

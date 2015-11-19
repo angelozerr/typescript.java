@@ -22,7 +22,7 @@ import ts.doc.IJSDocument;
 import ts.eclipse.jface.fieldassist.TSContentProposalProvider;
 import ts.eclipse.jface.viewers.TSLabelProvider;
 import ts.eclipse.swt.JSDocumentText;
-import ts.server.ITSClient;
+import ts.server.ITypeScriptServiceClient;
 import ts.server.nodejs.NodeJSTSClient;
 
 public class NodejsTSEditor {
@@ -40,7 +40,7 @@ public class NodejsTSEditor {
 	private void createUI() throws TSException, IOException,
 			InterruptedException {
 
-		ITSClient client = new NodeJSTSClient(new File("./samples"), new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
+		ITypeScriptServiceClient client = new NodeJSTSClient(new File("./samples"), new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
 //		ITSProject project = TSProjectFactory.create();
 //		project.addLib(TSDef.browser);
 //		project.save();

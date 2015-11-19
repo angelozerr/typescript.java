@@ -10,19 +10,19 @@
  */
 package ts.doc;
 
-import ts.server.ITSClient;
+import ts.server.ITypeScriptServiceClient;
 
 public abstract class AbstractJSDocument implements IJSDocument {
 
-	private final ITSClient client;
+	private final ITypeScriptServiceClient client;
 	private final String name;
 	private boolean changed;
 
-	public AbstractJSDocument(String name, ITSClient client) {
+	public AbstractJSDocument(String name, ITypeScriptServiceClient client) {
 		this(name, client, false);
 	}
 
-	public AbstractJSDocument(String name, ITSClient client, boolean register) {
+	public AbstractJSDocument(String name, ITypeScriptServiceClient client, boolean register) {
 		this.name = name;
 		this.client = client;
 		this.changed = false;
@@ -45,7 +45,7 @@ public abstract class AbstractJSDocument implements IJSDocument {
 	}
 
 	@Override
-	public ITSClient getClient() {
+	public ITypeScriptServiceClient getClient() {
 		return client;
 	}
 }
