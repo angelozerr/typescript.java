@@ -20,8 +20,9 @@ public class ContentProposalCollector extends AbstractCompletionCollector {
 
 	@Override
 	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
-		int cursorPosition = name.length();
-		ContentProposal proposal = new ContentProposal(name, name, "", cursorPosition);
+		String content = name.substring(getPrefix().length(), name.length());
+		int cursorPosition = content.length();
+		ContentProposal proposal = new ContentProposal(content, name, "", cursorPosition);
 		proposals.add(proposal);
 	}
 
