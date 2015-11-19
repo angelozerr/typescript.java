@@ -11,7 +11,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 
 	public AbstractTypeScriptFile(String name) {
 		this.name = name;
-		this.setDirty(true);
+		this.setDirty(false);
 	}
 
 	@Override
