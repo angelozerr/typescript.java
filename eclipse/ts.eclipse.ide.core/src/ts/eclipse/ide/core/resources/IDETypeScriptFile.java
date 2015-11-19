@@ -1,41 +1,23 @@
 package ts.eclipse.ide.core.resources;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 
+import ts.LineOffset;
 import ts.TSException;
-import ts.resources.ITypeScriptFile;
+import ts.resources.AbstractTypeScriptFile;
 
-public class IDETypeScriptFile implements ITypeScriptFile, IDocumentListener {
+public class IDETypeScriptFile extends AbstractTypeScriptFile implements IDocumentListener {
 
 	private final IDocument document;
-	private final IResource file;
-	private boolean dirty;
 
 	public IDETypeScriptFile(IResource file, IDocument document) {
-		this.file = file;
+		super(getFileName(file));
 		this.document = document;
-		this.dirty = true;
 		this.document.addDocumentListener(this);
-	}
-
-	@Override
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	@Override
-	public void setDirty(boolean dirty) {
-		this.dirty = dirty;
-	}
-
-	@Override
-	public String getName() {
-		return getFileName(file);
 	}
 
 	public static String getFileName(IResource file) {
@@ -59,23 +41,15 @@ public class IDETypeScriptFile implements ITypeScriptFile, IDocumentListener {
 
 	@Override
 	public String getPrefix(int position) {
-		return null;
+		return null; // TSHelper.getPrefix(getContents(), position);
 	}
 
 	@Override
-	public int getOffset(int position) throws TSException {
+	public LineOffset getLineOffset(int position) throws TSException {
 		try {
 			int line = document.getLineOfOffset(position);
-			return position - document.getLineOffset(line) + 1;
-		} catch (BadLocationException e) {
-			throw new TSException(e);
-		}
-	}
-
-	@Override
-	public int getLine(int position) throws TSException {
-		try {
-			return document.getLineOfOffset(position) + 1;
+			int offset = position - document.getLineOffset(line);
+			return new LineOffset(line + 1, offset + 1);
 		} catch (BadLocationException e) {
 			throw new TSException(e);
 		}

@@ -57,7 +57,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 					}
 				}
 				return tsProject;
-			} catch (CoreException ex) {
+			} catch (Exception ex) {
 				Trace.trace(Trace.SEVERE, "Error creating " + project.getName() + ": " + ex.getMessage(), ex);
 			}
 		}

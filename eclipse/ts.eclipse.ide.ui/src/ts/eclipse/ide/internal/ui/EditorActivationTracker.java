@@ -89,7 +89,7 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 							@Override
 							protected IStatus run(IProgressMonitor monitor) {
 								monitor.beginTask("", -1); //$NON-NLS-1$
-								if (project.getFile(file.getProjectRelativePath().toString()) == null) {
+								if (project.getOpenedFile(file.getProjectRelativePath().toString()) == null) {
 									try {
 										project.getFile(file, document);
 									} catch (TSException e) {

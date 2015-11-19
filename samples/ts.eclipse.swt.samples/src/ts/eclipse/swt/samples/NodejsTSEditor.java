@@ -18,12 +18,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import ts.TSException;
-import ts.doc.IJSDocument;
-import ts.eclipse.jface.fieldassist.TSContentProposalProvider;
+import ts.eclipse.jface.fieldassist.TypeScriptContentProposalProvider;
 import ts.eclipse.jface.viewers.TSLabelProvider;
-import ts.eclipse.swt.JSDocumentText;
-import ts.server.ITypeScriptServiceClient;
-import ts.server.nodejs.NodeJSTSClient;
+import ts.eclipse.swt.SWTTextTypeScriptFile;
+import ts.resources.ITypeScriptFile;
+import ts.resources.ITypeScriptProject;
+import ts.resources.TypeScriptProject;
+import ts.server.ITypeScriptServiceClientFactory;
+import ts.server.nodejs.NodeJSTypeScriptServiceClientFactory;
 
 public class NodejsTSEditor {
 
@@ -32,27 +34,16 @@ public class NodejsTSEditor {
 		try {
 			editor.createUI();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private void createUI() throws TSException, IOException,
-			InterruptedException {
+	private void createUI() throws TSException, IOException, InterruptedException {
 
-		ITypeScriptServiceClient client = new NodeJSTSClient(new File("./samples"), new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
-//		ITSProject project = TSProjectFactory.create();
-//		project.addLib(TSDef.browser);
-//		project.save();
-//		
-//		File nodejsTSBaseDir = new File("../../core/ternjs/node_modules/tern");
-//		NodejsProcessManager.getInstance().init(nodejsTSBaseDir);
-//
-//		ITSServer server = new NodejsTSServer(project);
-//		((NodejsTSServer) server).addInterceptor(LoggingInterceptor
-//				.getInstance());
-//		((NodejsTSServer) server)
-//				.addProcessListener(PrintNodejsProcessListener.getInstance());
+		ITypeScriptServiceClientFactory factory = new NodeJSTypeScriptServiceClientFactory(
+				new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
+		File projectDir = new File("./samples");
+		ITypeScriptProject project = new TypeScriptProject(projectDir, factory);
 
 		Display display = new Display();
 		Shell shell = new Shell(display);
@@ -68,20 +59,19 @@ public class NodejsTSEditor {
 		// Tu cr�es ton text
 		Text text = new Text(shell, SWT.MULTI | SWT.BORDER);
 		text.setText("var s = \"\";s.");
-		IJSDocument document = new JSDocumentText("sample2.ts", client, text);
 
-		// Les charact�res qui d�clenchent l'autocompl�tion
+		ITypeScriptFile file = new SWTTextTypeScriptFile("sample2.ts", text);
+		project.openFile(file);
+
 		char[] autoActivationCharacters = new char[] { '.' };
-		// La combinaison de touches qui d�clenche l'autocompl�tion
 		KeyStroke keyStroke = null;
 		try {
 			keyStroke = KeyStroke.getInstance("Ctrl+Space");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		ContentProposalAdapter adapter = new ContentProposalAdapter(text,
-				new TextContentAdapter(), new TSContentProposalProvider(
-						document), keyStroke, autoActivationCharacters);
+		ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(),
+				new TypeScriptContentProposalProvider(file.getName(), project), keyStroke, autoActivationCharacters);
 		adapter.setLabelProvider(TSLabelProvider.getInstance());
 		text.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -97,7 +87,7 @@ public class NodejsTSEditor {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-		client.dispose();
+		project.dispose();
 		display.dispose();
 	}
 

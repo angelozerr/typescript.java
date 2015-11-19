@@ -32,7 +32,7 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 		// cache projects for the particular path
 		ITypeScriptProject result = projectCache.get(path);
 		if (result == null) {
-			result = new TypeScriptProject(projectDir);
+			result = new TypeScriptProject(projectDir, null);
 			projectCache.put(path, result);
 		}
 		return result;

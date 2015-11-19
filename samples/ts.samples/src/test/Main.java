@@ -6,7 +6,7 @@ import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
-import ts.server.nodejs.NodeJSTSClient;
+import ts.server.nodejs.NodeJSTypeScriptServiceClient;
 
 public class Main {
 
@@ -17,7 +17,7 @@ public class Main {
 		String fileName = "sample2.ts";
 		
 		// Create TypeScript client
-		ITypeScriptServiceClient client = new NodeJSTSClient(new File("./samples"), new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
+		ITypeScriptServiceClient client = new NodeJSTypeScriptServiceClient(new File("./samples"), new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
 		
 		// Open "sample2.ts" in an editor
 		client.openFile(fileName);

@@ -13,11 +13,11 @@ import ts.server.protocol.Request;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/client.ts
  *
  */
-public class NodeJSTSClient extends AbstractTypeScriptServiceClient {
+public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClient {
 
 	private final NodeJSProcess process;
 
-	public NodeJSTSClient(File projectDir, File tsserverFile, File nodeFile) {
+	public NodeJSTypeScriptServiceClient(File projectDir, File tsserverFile, File nodeFile) {
 		this.process = new NodeJSProcess(projectDir, tsserverFile, nodeFile);
 		process.start();
 	}

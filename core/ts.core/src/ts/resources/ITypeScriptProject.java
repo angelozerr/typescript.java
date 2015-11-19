@@ -10,6 +10,7 @@
  */
 package ts.resources;
 
+import ts.ICompletionCollector;
 import ts.ICompletionInfo;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
@@ -28,8 +29,11 @@ public interface ITypeScriptProject {
 	void openFile(ITypeScriptFile file) throws TSException;
 	
 	void closeFile(String fileName) throws TSException;
+
+	void completions(ITypeScriptFile file, int position, ICompletionCollector collector) throws TSException;
 	
-	ICompletionInfo getCompletionsAtPosition(ITypeScriptFile file, int position) throws TSException;
-	
-	ITypeScriptFile getFile(String fileName);
+	ITypeScriptFile getOpenedFile(String fileName);
+
+	void dispose() throws TSException;
+
 }

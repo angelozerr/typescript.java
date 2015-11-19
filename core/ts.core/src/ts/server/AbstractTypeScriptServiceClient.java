@@ -1,13 +1,12 @@
 package ts.server;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import ts.CompletionEntry;
 import ts.CompletionInfo;
+import ts.ICompletionCollector;
 import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.INavigationBarItem;
@@ -15,6 +14,7 @@ import ts.TSException;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
 import ts.server.protocol.ChangeRequest;
+import ts.server.protocol.CloseRequest;
 import ts.server.protocol.CompletionsRequest;
 import ts.server.protocol.NavBarRequest;
 import ts.server.protocol.OpenRequest;
@@ -33,8 +33,27 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	}
 	
 	@Override
-	public void closeFile(String name) {
+	public void closeFile(String fileName) throws TSException {
+		Request request = new CloseRequest(fileName);
+		processVoidRequest(request);		
+	}
+
+	@Override
+	public void completions(String fileName, int line, int offset, String prefix, ICompletionCollector collector) throws TSException {
+		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
+		JsonObject response = processRequest(request);
+		collectCompletions(response, collector);
 		
+	}
+	
+	private void collectCompletions(JsonObject response, ICompletionCollector collector) {
+		JsonArray items = response.get("body").asArray();
+		JsonObject obj = null;
+		for (JsonValue item : items) {
+			obj = (JsonObject) item;
+			collector.addCompletionEntry(obj.getString("name", ""), obj.getString("kind", ""),
+					obj.getString("kindModifiers", ""), obj.getString("sortText", ""));
+		}
 	}
 
 	@Override

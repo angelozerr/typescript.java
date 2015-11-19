@@ -10,6 +10,7 @@
  */
 package ts.server;
 
+import ts.ICompletionCollector;
 import ts.ICompletionInfo;
 import ts.INavigationBarItem;
 import ts.TSException;
@@ -24,10 +25,13 @@ public interface ITypeScriptServiceClient {
 
 	void openFile(String fileName) throws TSException;
 
-	void closeFile(String name);
-	
+	void closeFile(String fileName) throws TSException;
+
 	void updateFile(String fileName, String newText) throws TSException;
-	
+
+	void completions(String fileName, int line, int offset, String prefix, ICompletionCollector collector)
+			throws TSException;
+
 	void changeFile(String fileName, int start, int end, String newText) throws TSException;
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
@@ -42,4 +46,5 @@ public interface ITypeScriptServiceClient {
 	void join() throws InterruptedException;
 
 	void dispose();
+
 }

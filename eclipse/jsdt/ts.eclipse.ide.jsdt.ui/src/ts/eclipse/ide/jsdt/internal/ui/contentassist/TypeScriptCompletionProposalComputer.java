@@ -34,11 +34,12 @@ import ts.ICompletionInfo;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
+import ts.eclipse.jface.text.contentassist.CompletionProposalCollector;
 import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.resources.TypeScriptResourcesManager;
 import ts.server.ITypeScriptServiceClient;
-import ts.server.nodejs.NodeJSTSClient;
+import ts.server.nodejs.NodeJSTypeScriptServiceClient;
 
 /**
  * JSDT completion proposal computer manage completion Proposal for Javascript
@@ -56,17 +57,15 @@ public class TypeScriptCompletionProposalComputer
 				IProject project = javaContext.getProject().getProject();
 				IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
 				if (tsProject != null) {
+
 					int position = javaContext.getInvocationOffset();
 					IResource resource = javaContext.getCompilationUnit().getResource();
 					IDocument document = javaContext.getDocument();
-					ITypeScriptFile tsFile = tsProject.getFile(resource, document);;
-					ICompletionInfo completion = tsProject.getCompletionsAtPosition(tsFile, position);
+					ITypeScriptFile tsFile = tsProject.getFile(resource, document);
 
-					List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-					for (ICompletionEntry entry : completion.getEntries()) {
-						proposals.add(new CompletionProposal(entry.getName(), 0, 0, 0));
-					}
-					return proposals;
+					CompletionProposalCollector collector = new CompletionProposalCollector(position);
+					tsProject.completions(tsFile, position, collector);
+					return collector;
 				}
 			} catch (Exception e) {
 				Trace.trace(Trace.SEVERE, "Error while TypeScript completion", e);
