@@ -6,13 +6,13 @@ import com.eclipsesource.json.JsonValue;
 
 import ts.CompletionEntry;
 import ts.CompletionInfo;
-import ts.ICompletionCollector;
 import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.INavigationBarItem;
 import ts.TSException;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
+import ts.server.collectors.ICompletionCollector;
 import ts.server.protocol.ChangeRequest;
 import ts.server.protocol.CloseRequest;
 import ts.server.protocol.CompletionsRequest;

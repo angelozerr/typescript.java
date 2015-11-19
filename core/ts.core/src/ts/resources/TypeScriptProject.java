@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import ts.ICompletionCollector;
 import ts.LineOffset;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
+import ts.server.collectors.ICompletionCollector;
 
 public class TypeScriptProject implements ITypeScriptProject, ITypeScriptServiceClientFactory {
 

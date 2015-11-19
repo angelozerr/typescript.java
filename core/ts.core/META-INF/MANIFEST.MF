@@ -13,5 +13,6 @@ Bundle-ActivationPolicy: lazy
 Export-Package: ts,
  ts.resources,
  ts.server,
+ ts.server.collectors,
  ts.server.protocol,
  ts.utils

@@ -10,10 +10,10 @@
  */
 package ts.resources;
 
-import ts.ICompletionCollector;
 import ts.ICompletionInfo;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
+import ts.server.collectors.ICompletionCollector;
 
 public interface ITypeScriptProject {
 

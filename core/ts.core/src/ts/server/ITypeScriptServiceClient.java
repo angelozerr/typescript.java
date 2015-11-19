@@ -10,10 +10,10 @@
  */
 package ts.server;
 
-import ts.ICompletionCollector;
 import ts.ICompletionInfo;
 import ts.INavigationBarItem;
 import ts.TSException;
+import ts.server.collectors.ICompletionCollector;
 
 /**
  * TypeScript client API which communicates with tsserver.

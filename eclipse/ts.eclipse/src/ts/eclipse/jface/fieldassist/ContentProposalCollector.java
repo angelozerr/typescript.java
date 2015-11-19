@@ -1,20 +1,31 @@
 package ts.eclipse.jface.fieldassist;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.fieldassist.ContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposal;
 
-import ts.ICompletionCollector;
+import ts.server.collectors.AbstractCompletionCollector;
 
-public class ContentProposalCollector extends ArrayList<IContentProposal>implements ICompletionCollector {
+public class ContentProposalCollector extends AbstractCompletionCollector {
 
 	public static final IContentProposal[] EMPTY_PROPOSAL = new IContentProposal[0];
-	
+	private final List<IContentProposal> proposals;
+
+	public ContentProposalCollector(String prefix) {
+		super(prefix);
+		this.proposals = new ArrayList<IContentProposal>();
+	}
+
 	@Override
-	public void addCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
+	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
 		int cursorPosition = name.length();
 		ContentProposal proposal = new ContentProposal(name, name, "", cursorPosition);
-		super.add(proposal);
+		proposals.add(proposal);
+	}
+
+	public List<IContentProposal> getProposals() {
+		return proposals;
 	}
 }

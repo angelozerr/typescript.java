@@ -40,6 +40,7 @@ import ts.resources.ITypeScriptProject;
 import ts.resources.TypeScriptResourcesManager;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.nodejs.NodeJSTypeScriptServiceClient;
+import ts.utils.TSHelper;
 
 /**
  * JSDT completion proposal computer manage completion Proposal for Javascript
@@ -63,9 +64,12 @@ public class TypeScriptCompletionProposalComputer
 					IDocument document = javaContext.getDocument();
 					ITypeScriptFile tsFile = tsProject.getFile(resource, document);
 
-					CompletionProposalCollector collector = new CompletionProposalCollector(position);
+					javaContext.computeIdentifierPrefix();
+					CharSequence prefix = javaContext.computeIdentifierPrefix(); //TSHelper.getPrefix(document.get(), position);
+					
+					CompletionProposalCollector collector = new CompletionProposalCollector(position, prefix != null ? prefix.toString() : null);
 					tsProject.completions(tsFile, position, collector);
-					return collector;
+					return collector.getProposals();
 				}
 			} catch (Exception e) {
 				Trace.trace(Trace.SEVERE, "Error while TypeScript completion", e);

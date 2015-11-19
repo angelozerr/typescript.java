@@ -12,6 +12,7 @@ import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import ts.TSException;
 import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
+import ts.utils.TSHelper;
 
 public class TypeScriptContentProposalProvider implements IContentProposalProvider {
 
@@ -26,13 +27,14 @@ public class TypeScriptContentProposalProvider implements IContentProposalProvid
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
 		ITypeScriptFile file = project.getOpenedFile(fileName);
-		ContentProposalCollector collector = new ContentProposalCollector();
+		String prefix = TSHelper.getPrefix(contents, position);
+		ContentProposalCollector collector = new ContentProposalCollector(prefix);
 		try {
 			project.completions(file, position, collector);
 		} catch (TSException e) {
 			e.printStackTrace();
 		}
-		return collector.toArray(ContentProposalCollector.EMPTY_PROPOSAL);
+		return collector.getProposals().toArray(ContentProposalCollector.EMPTY_PROPOSAL);
 
 		// ITypeScriptServiceClient client = doc.getClient();
 		// try {
