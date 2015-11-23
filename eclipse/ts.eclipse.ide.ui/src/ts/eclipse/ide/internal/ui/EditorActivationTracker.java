@@ -91,7 +91,7 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 								monitor.beginTask("", -1); //$NON-NLS-1$
 								if (project.getOpenedFile(file.getProjectRelativePath().toString()) == null) {
 									try {
-										project.getFile(file, document);
+										project.getOpenedFile(file, document);
 									} catch (TSException e) {
 										return new Status(IStatus.ERROR, TypeScriptUIPlugin.PLUGIN_ID, e.getMessage(),
 												e);

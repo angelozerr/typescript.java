@@ -53,7 +53,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	@Override
 	public void completions(ITypeScriptFile file, int position, ICompletionCollector collector) throws TSException {
 		ITypeScriptServiceClient client = getClient();
-		updateFileIfNeeded(file, client);
+		synchFileContent(file, client);
 		LineOffset lineOffset = file.getLineOffset(position);
 		int line = lineOffset.getLine();
 		int offset = lineOffset.getOffset();
@@ -61,7 +61,18 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		client.completions(file.getName(), line, offset, prefix, collector);
 	}
 
-	private void updateFileIfNeeded(ITypeScriptFile file, ITypeScriptServiceClient client) throws TSException {
+	@Override
+	public void changeFile(ITypeScriptFile file, int start, int end, String newText) throws TSException {
+		LineOffset lineOffset = file.getLineOffset(start);
+		int line = lineOffset.getLine();
+		int offset = lineOffset.getOffset();
+		LineOffset endLineOffset = file.getLineOffset(end);
+		int endLine = endLineOffset.getLine();
+		int endOffset = endLineOffset.getOffset();
+		getClient().changeFile(file.getName(), line, offset, endLine, endOffset, newText);
+	}
+
+	private void synchFileContent(ITypeScriptFile file, ITypeScriptServiceClient client) throws TSException {
 		if (file.isDirty()) {
 			client.updateFile(file.getName(), file.getContents());
 			file.setDirty(false);

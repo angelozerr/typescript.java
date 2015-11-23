@@ -59,7 +59,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 	}
 
 	@Override
-	public ITypeScriptFile getFile(IResource file, IDocument document) throws TSException {
+	public ITypeScriptFile getOpenedFile(IResource file, IDocument document) throws TSException {
 		String fileName = IDETypeScriptFile.getFileName(file);
 		ITypeScriptFile tsFile = super.getOpenedFile(fileName);
 		if (tsFile == null) {

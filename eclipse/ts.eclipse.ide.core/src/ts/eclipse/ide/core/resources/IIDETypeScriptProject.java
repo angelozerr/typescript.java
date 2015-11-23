@@ -17,5 +17,6 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 */
 	IProject getProject();
 
-	ITypeScriptFile getFile(IResource file, IDocument document) throws TSException;
+	ITypeScriptFile getOpenedFile(IResource file, IDocument document) throws TSException;
+
 }

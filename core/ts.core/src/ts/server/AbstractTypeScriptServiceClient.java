@@ -31,21 +31,24 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 		Request request = new OpenRequest(fileName);
 		processVoidRequest(request);
 	}
-	
+
 	@Override
 	public void closeFile(String fileName) throws TSException {
 		Request request = new CloseRequest(fileName);
-		processVoidRequest(request);		
+		processVoidRequest(request);
 	}
 
+	// ---------------- Completions
+
 	@Override
-	public void completions(String fileName, int line, int offset, String prefix, ICompletionCollector collector) throws TSException {
+	public void completions(String fileName, int line, int offset, String prefix, ICompletionCollector collector)
+			throws TSException {
 		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
 		JsonObject response = processRequest(request);
 		collectCompletions(response, collector);
-		
+
 	}
-	
+
 	private void collectCompletions(JsonObject response, ICompletionCollector collector) {
 		JsonArray items = response.get("body").asArray();
 		JsonObject obj = null;
@@ -54,16 +57,6 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 			collector.addCompletionEntry(obj.getString("name", ""), obj.getString("kind", ""),
 					obj.getString("kindModifiers", ""), obj.getString("sortText", ""));
 		}
-	}
-
-	@Override
-	public void changeFile(String fileName, int start, int end, String newText) throws TSException {
-		// TODO : implement that?
-		int line = 0;
-		int offset = 0;
-		int endLine = 0;
-		int endOffset = 0;
-		changeFile(fileName, line, offset, endLine, endOffset, newText);
 	}
 
 	@Override

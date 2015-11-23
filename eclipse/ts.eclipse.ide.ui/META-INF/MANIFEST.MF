@@ -4,7 +4,7 @@ Bundle-Name: %pluginName
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-SymbolicName: ts.eclipse.ide.ui;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -24,3 +24,5 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.ui.TypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
+Export-Package: ts.eclipse.ide.ui,
+ ts.eclipse.ide.ui.utils

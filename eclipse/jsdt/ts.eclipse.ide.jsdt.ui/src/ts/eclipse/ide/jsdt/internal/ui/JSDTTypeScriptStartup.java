@@ -15,6 +15,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import ts.eclipse.ide.jsdt.internal.ui.validation.JSDTEditorTracker;
+
 public class JSDTTypeScriptStartup implements IStartup {
 
 	@Override
@@ -25,7 +27,7 @@ public class JSDTTypeScriptStartup implements IStartup {
 				// Java Editor tracker
 				IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 				if (window != null) {
-					//JavaEditorTracker.getInstance();
+					JSDTEditorTracker.getInstance();
 				}
 			}
 		});

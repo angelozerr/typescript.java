@@ -1,1 +1,1 @@
-var s = "";s.c
+require("a")

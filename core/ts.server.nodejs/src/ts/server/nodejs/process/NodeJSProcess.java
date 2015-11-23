@@ -138,7 +138,7 @@ public class NodeJSProcess {
 		public void run() {
 			Process process = NodeJSProcess.this.process;
 			if (process != null) {
-				process.destroy();
+				kill();
 			}
 		}
 	}
@@ -243,7 +243,9 @@ public class NodeJSProcess {
 			if (seq != -1) {
 				synchronized (requestsMap) {
 					Request c = requestsMap.remove(seq);
-					c.setResponse(response);
+					if (c != null) {
+						c.setResponse(response);
+					}
 				}
 			}
 		}

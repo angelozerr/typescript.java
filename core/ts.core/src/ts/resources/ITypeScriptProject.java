@@ -10,7 +10,6 @@
  */
 package ts.resources;
 
-import ts.ICompletionInfo;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.collectors.ICompletionCollector;
@@ -31,6 +30,8 @@ public interface ITypeScriptProject {
 	void closeFile(String fileName) throws TSException;
 
 	void completions(ITypeScriptFile file, int position, ICompletionCollector collector) throws TSException;
+	
+	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TSException;
 	
 	ITypeScriptFile getOpenedFile(String fileName);
 
