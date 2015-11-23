@@ -6,6 +6,7 @@ import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
+import ts.server.collectors.CompletionInfo;
 import ts.server.nodejs.NodeJSTypeScriptServiceClient;
 
 public class Main {
@@ -23,20 +24,17 @@ public class Main {
 		client.openFile(fileName);
 		
 		// Do completion after the last dot of "s" variable which is a String (charAt, ....)
-		ICompletionInfo completionInfo = client.getCompletionsAtLineOffset(fileName, 1, 14, null);
+		CompletionInfo completionInfo = new CompletionInfo(null);
+		client.completions(fileName, 1, 14, null, completionInfo);
 		display(completionInfo);
 
 		// Update the editor content to set s as number
 		client.updateFile(fileName, "var s = 1;s.");
 				
 		// Do completion after the last dot of "s" variable which is a Number (toExponential, ....)
-		completionInfo = client.getCompletionsAtLineOffset(fileName, 0, 14, null);
+		completionInfo = new CompletionInfo(null);
+		client.completions(fileName, 1, 14, null, completionInfo);
 		display(completionInfo);
-		
-		completionInfo = client.getCompletionsAtLineOffset("angular2.d.ts", 0, 14, null);
-		System.out.println(completionInfo);
-		
-		client.getNavigationBarItems(fileName);
 		
 		client.join();
 		client.dispose();

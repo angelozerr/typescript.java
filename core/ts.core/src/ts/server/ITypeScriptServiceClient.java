@@ -10,8 +10,6 @@
  */
 package ts.server;
 
-import ts.ICompletionInfo;
-import ts.INavigationBarItem;
 import ts.TSException;
 import ts.server.collectors.ICompletionCollector;
 
@@ -34,12 +32,6 @@ public interface ITypeScriptServiceClient {
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException;
-
-	ICompletionInfo getCompletionsAtPosition(String fileName, int position, String prefix) throws TSException;
-
-	ICompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset, String prefix) throws TSException;
-
-	INavigationBarItem[] getNavigationBarItems(String fileName) throws TSException;
 
 	void join() throws InterruptedException;
 

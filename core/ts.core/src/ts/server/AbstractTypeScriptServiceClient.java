@@ -4,19 +4,17 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import ts.CompletionEntry;
-import ts.CompletionInfo;
 import ts.ICompletionEntry;
 import ts.ICompletionInfo;
-import ts.INavigationBarItem;
 import ts.TSException;
+import ts.internal.CompletionEntry;
+import ts.internal.CompletionInfo;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
 import ts.server.collectors.ICompletionCollector;
 import ts.server.protocol.ChangeRequest;
 import ts.server.protocol.CloseRequest;
 import ts.server.protocol.CompletionsRequest;
-import ts.server.protocol.NavBarRequest;
 import ts.server.protocol.OpenRequest;
 import ts.server.protocol.ReloadRequest;
 import ts.server.protocol.Request;
@@ -64,31 +62,6 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 			throws TSException {
 		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText);
 		processVoidRequest(request);
-	}
-
-	@Override
-	public ICompletionInfo getCompletionsAtPosition(String fileName, int position, String prefix) throws TSException {
-		// var lineOffset = this.positionToOneBasedLineOffset(fileName,
-		// position);
-		// TODO : implement that?
-		int line = 0;
-		int offset = 0;
-		return getCompletionsAtLineOffset(fileName, line, offset, prefix);
-	}
-
-	@Override
-	public ICompletionInfo getCompletionsAtLineOffset(String fileName, int line, int offset, String prefix)
-			throws TSException {
-		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
-		JsonObject response = processRequest(request);
-		return createCompletionInfo(response);
-	}
-
-	@Override
-	public INavigationBarItem[] getNavigationBarItems(String fileName) throws TSException {
-		NavBarRequest request = new NavBarRequest(fileName);
-		JsonObject response = this.processRequest(request);
-		return null;
 	}
 
 	/**
