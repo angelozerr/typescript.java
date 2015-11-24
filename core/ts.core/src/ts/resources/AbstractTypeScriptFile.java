@@ -1,8 +1,8 @@
 package ts.resources;
 
-import ts.LineOffset;
+import ts.Location;
 import ts.TSException;
-import ts.internal.LineOffsetReader;
+import ts.internal.LocationReader;
 
 public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 
@@ -30,7 +30,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public LineOffset getLineOffset(int position) throws TSException {
-		return new LineOffsetReader(getContents(), position).getLineOffset();
+	public Location getLocation(int position) throws TSException {
+		return new LocationReader(getContents(), position).getLineOffset();
 	}
 }

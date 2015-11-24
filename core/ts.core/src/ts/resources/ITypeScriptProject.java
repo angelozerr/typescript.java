@@ -12,7 +12,8 @@ package ts.resources;
 
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
-import ts.server.collectors.ICompletionCollector;
+import ts.server.completions.ITypeScriptCompletionCollector;
+import ts.server.definition.ITypeScriptDefinitionCollector;
 
 public interface ITypeScriptProject {
 
@@ -21,18 +22,20 @@ public interface ITypeScriptProject {
 	 * if it hasn't been created already.
 	 * 
 	 * @return
-	 * @throws TSException 
+	 * @throws TSException
 	 */
 	ITypeScriptServiceClient getClient() throws TSException;
 
 	void openFile(ITypeScriptFile file) throws TSException;
-	
+
 	void closeFile(String fileName) throws TSException;
 
-	void completions(ITypeScriptFile file, int position, ICompletionCollector collector) throws TSException;
-	
+	void completions(ITypeScriptFile file, int position, ITypeScriptCompletionCollector collector) throws TSException;
+
+	void definition(ITypeScriptFile file, int position, ITypeScriptDefinitionCollector collector) throws TSException;
+
 	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TSException;
-	
+
 	ITypeScriptFile getOpenedFile(String fileName);
 
 	void dispose() throws TSException;

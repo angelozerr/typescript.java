@@ -30,6 +30,19 @@
 	   </javaCompletionProposalComputer>
 	 </extension>
 
+	<!-- Hyperlink for JavaScript (inside TypeScript file) -->
+        
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            class="ts.eclipse.ide.ui.hyperlink.TypeScriptHyperLinkDetector"
+            id="ts.eclipse.ide.ui.hyperlink.TypeScriptHyperLinkDetector"
+            name="%TypeScriptHyperLinkDetector"
+            activate="true"
+            targetId="org.eclipse.wst.jsdt.ui.javaCode">
+      </hyperlinkDetector>
+   </extension>
+   
 	 <!-- I don't know why, but startup should be done, otherwise TypeScriptCompletionProposalComputer is not registered? -->
 	 <extension
 	       point="org.eclipse.ui.startup">	

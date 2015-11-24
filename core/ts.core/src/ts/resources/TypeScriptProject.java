@@ -4,11 +4,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import ts.LineOffset;
+import ts.Location;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
-import ts.server.collectors.ICompletionCollector;
+import ts.server.completions.ITypeScriptCompletionCollector;
+import ts.server.definition.ITypeScriptDefinitionCollector;
 
 public class TypeScriptProject implements ITypeScriptProject, ITypeScriptServiceClientFactory {
 
@@ -51,10 +52,11 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void completions(ITypeScriptFile file, int position, ICompletionCollector collector) throws TSException {
+	public void completions(ITypeScriptFile file, int position, ITypeScriptCompletionCollector collector)
+			throws TSException {
 		ITypeScriptServiceClient client = getClient();
 		synchFileContent(file, client);
-		LineOffset lineOffset = file.getLineOffset(position);
+		Location lineOffset = file.getLocation(position);
 		int line = lineOffset.getLine();
 		int offset = lineOffset.getOffset();
 		String prefix = null;
@@ -62,13 +64,24 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void changeFile(ITypeScriptFile file, int start, int end, String newText) throws TSException {
-		LineOffset lineOffset = file.getLineOffset(start);
+	public void definition(ITypeScriptFile file, int position, ITypeScriptDefinitionCollector collector)
+			throws TSException {
+		ITypeScriptServiceClient client = getClient();
+		synchFileContent(file, client);
+		Location lineOffset = file.getLocation(position);
 		int line = lineOffset.getLine();
 		int offset = lineOffset.getOffset();
-		LineOffset endLineOffset = file.getLineOffset(end);
-		int endLine = endLineOffset.getLine();
-		int endOffset = endLineOffset.getOffset();
+		client.definition(file.getName(), line, offset, collector);
+	}
+
+	@Override
+	public void changeFile(ITypeScriptFile file, int start, int end, String newText) throws TSException {
+		Location loc = file.getLocation(start);
+		int line = loc.getLine();
+		int offset = loc.getOffset();
+		Location endLoc = file.getLocation(end);
+		int endLine = endLoc.getLine();
+		int endOffset = endLoc.getOffset();
 		getClient().changeFile(file.getName(), line, offset, endLine, endOffset, newText);
 	}
 

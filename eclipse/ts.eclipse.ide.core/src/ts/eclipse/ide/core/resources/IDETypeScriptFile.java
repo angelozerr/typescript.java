@@ -6,7 +6,7 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 
-import ts.LineOffset;
+import ts.Location;
 import ts.TSException;
 import ts.resources.AbstractTypeScriptFile;
 
@@ -45,11 +45,11 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IDocume
 	}
 
 	@Override
-	public LineOffset getLineOffset(int position) throws TSException {
+	public Location getLocation(int position) throws TSException {
 		try {
 			int line = document.getLineOfOffset(position);
 			int offset = position - document.getLineOffset(line);
-			return new LineOffset(line + 1, offset + 1);
+			return new Location(line + 1, offset + 1);
 		} catch (BadLocationException e) {
 			throw new TSException(e);
 		}

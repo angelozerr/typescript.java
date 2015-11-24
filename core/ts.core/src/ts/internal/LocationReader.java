@@ -6,13 +6,13 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import ts.LineOffset;
+import ts.Location;
 
-public class LineOffsetReader {
+public class LocationReader {
 
-	private LineOffset lineOffset;
+	private Location loc;
 
-	public LineOffsetReader(String contents, int position) {
+	public LocationReader(String contents, int position) {
 		List<Integer> lines = readLines(contents);
 		int offset = position;
 		int current = position;
@@ -29,11 +29,11 @@ public class LineOffsetReader {
 			}
 			line++;
 		}
-		this.lineOffset = new LineOffset(line + 1, offset + 1);
+		this.loc = new Location(line + 1, offset + 1);
 	}
 
-	public LineOffset getLineOffset() {
-		return lineOffset;
+	public Location getLineOffset() {
+		return loc;
 	}
 
 	private List<Integer> readLines(final String input) {

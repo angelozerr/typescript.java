@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
-import ts.server.collectors.AbstractCompletionCollector;
+import ts.server.completions.AbstractCompletionCollector;
 
 public class CompletionProposalCollector extends AbstractCompletionCollector {
 

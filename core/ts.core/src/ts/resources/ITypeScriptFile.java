@@ -1,6 +1,6 @@
 package ts.resources;
 
-import ts.LineOffset;
+import ts.Location;
 import ts.TSException;
 
 public interface ITypeScriptFile {
@@ -15,7 +15,7 @@ public interface ITypeScriptFile {
 
 	String getPrefix(int position);
 
-	LineOffset getLineOffset(int position) throws TSException;
+	Location getLocation(int position) throws TSException;
 
 	String getContents();
 

@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.jface.fieldassist.ContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposal;
 
-import ts.server.collectors.AbstractCompletionCollector;
+import ts.server.completions.AbstractCompletionCollector;
 
 public class ContentProposalCollector extends AbstractCompletionCollector {
 

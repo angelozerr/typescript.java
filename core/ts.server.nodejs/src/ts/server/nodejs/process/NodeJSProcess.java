@@ -110,7 +110,6 @@ public class NodeJSProcess {
 		try {
 			List<String> commands = createCommands();
 			ProcessBuilder builder = new ProcessBuilder(commands);
-			// builder.redirectErrorStream(true);
 			builder.directory(getProjectDir());
 
 			this.process = builder.start();
@@ -236,7 +235,29 @@ public class NodeJSProcess {
 		JsonObject response = Json.parse(message).asObject();
 		String type = response.getString("type", "");
 
-		if ("event".equals(type) && response.getString("event", null) != null) {
+		if ("event".equals(type)) {
+			String event = response.getString("event", null);
+			if ("syntaxDiag".equals(event)) {
+				/*DiagnosticEventBody o = new com.google.gson.Gson().fromJson(root.get("body"),
+						DiagnosticEventBodyPojo.class);
+				java.util.List<java.util.function.Consumer<DiagnosticEventBody>> l;
+
+				synchronized (syntaxDiagConsumerList) {
+					l = new java.util.ArrayList<>(syntaxDiagConsumerList);
+				}
+				l.stream().forEach(c -> c.accept(o));
+				break;*/
+			} else if ("semanticDiag".equals(event)) {
+				/*DiagnosticEventBody o = new com.google.gson.Gson().fromJson(root.get("body"),
+						DiagnosticEventBodyPojo.class);
+				java.util.List<java.util.function.Consumer<DiagnosticEventBody>> l;
+
+				synchronized (semanticDiagConsumerList) {
+					l = new java.util.ArrayList<>(semanticDiagConsumerList);
+				}
+				l.stream().forEach(c -> c.accept(o));
+				break;*/
+			}
 
 		} else if ("response".equals(type)) {
 			int seq = response.getInt("request_seq", -1);

@@ -6,7 +6,8 @@ import ts.ICompletionEntry;
 import ts.ICompletionInfo;
 import ts.TSException;
 import ts.server.ITypeScriptServiceClient;
-import ts.server.collectors.CompletionInfo;
+import ts.server.completions.CompletionInfo;
+import ts.server.definition.DefinitionsInfo;
 import ts.server.nodejs.NodeJSTypeScriptServiceClient;
 
 public class Main {
@@ -35,9 +36,18 @@ public class Main {
 		completionInfo = new CompletionInfo(null);
 		client.completions(fileName, 1, 14, null, completionInfo);
 		display(completionInfo);
+
+		DefinitionsInfo definitionInfo = new DefinitionsInfo();
+		client.definition(fileName, 1,12, definitionInfo);
+		display(definitionInfo);
 		
 		client.join();
 		client.dispose();
+		
+	}
+
+	private static void display(DefinitionsInfo definitionInfo) {
+		// TODO Auto-generated method stub
 		
 	}
 

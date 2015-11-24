@@ -1,4 +1,4 @@
-package ts.server.collectors;
+package ts.server.completions;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,10 +11,12 @@ import ts.internal.CompletionEntry;
 import ts.internal.CompletionInfo;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
-import ts.server.collectors.ICompletionCollector;
+import ts.server.completions.ITypeScriptCompletionCollector;
+import ts.server.definition.ITypeScriptDefinitionCollector;
 import ts.server.protocol.ChangeRequest;
 import ts.server.protocol.CloseRequest;
 import ts.server.protocol.CompletionsRequest;
+import ts.server.protocol.DefinitionRequest;
 import ts.server.protocol.OpenRequest;
 import ts.server.protocol.ReloadRequest;
 import ts.server.protocol.Request;
@@ -39,15 +41,14 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	// ---------------- Completions
 
 	@Override
-	public void completions(String fileName, int line, int offset, String prefix, ICompletionCollector collector)
+	public void completions(String fileName, int line, int offset, String prefix, ITypeScriptCompletionCollector collector)
 			throws TSException {
 		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
 		JsonObject response = processRequest(request);
 		collectCompletions(response, collector);
-
 	}
 
-	private void collectCompletions(JsonObject response, ICompletionCollector collector) {
+	private void collectCompletions(JsonObject response, ITypeScriptCompletionCollector collector) {
 		JsonArray items = response.get("body").asArray();
 		JsonObject obj = null;
 		for (JsonValue item : items) {
@@ -56,6 +57,29 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 					obj.getString("kindModifiers", ""), obj.getString("sortText", ""));
 		}
 	}
+
+	// ---------------- Definition
+
+	@Override
+	public void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TSException {
+		DefinitionRequest request = new DefinitionRequest(fileName, line, offset);
+		JsonObject response = processRequest(request);
+		collectDefinition(response, collector);
+	}
+	
+	private void collectDefinition(JsonObject response, ITypeScriptDefinitionCollector collector) throws TSException {
+		JsonArray items = response.get("body").asArray();
+		JsonObject def = null;
+		JsonObject start = null;
+		JsonObject end = null;
+		for (JsonValue item : items) {
+			def = (JsonObject) item;
+			start = def.get("start").asObject();
+			end = def.get("end").asObject();
+			collector.addDefinition(def.getString("file", null), start.getInt("line", -1),
+					start.getInt("offset", -1), end.getInt("line", -1),
+					end.getInt("offset", -1));
+		}	}
 
 	@Override
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
@@ -93,17 +117,4 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 
 	protected abstract JsonObject processRequest(Request request) throws TSException;
 
-	private ICompletionInfo createCompletionInfo(JsonObject response) {
-		JsonArray items = response.get("body").asArray();
-		ICompletionEntry[] entries = new ICompletionEntry[items.size()];
-		int i = 0;
-		JsonObject obj = null;
-		for (JsonValue item : items) {
-			obj = (JsonObject) item;
-			entries[i++] = new CompletionEntry(obj.getString("name", ""), obj.getString("kind", ""),
-					obj.getString("kindModifiers", ""), obj.getString("sortText", ""));
-		}
-		CompletionInfo completion = new CompletionInfo(false, false, entries);
-		return completion;
-	}
 }

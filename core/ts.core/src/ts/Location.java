@@ -1,11 +1,11 @@
 package ts;
 
-public class LineOffset {
+public class Location {
 
 	private final int line;
 	private final int offset;
 
-	public LineOffset(int line, int offset) {
+	public Location(int line, int offset) {
 		this.line = line;
 		this.offset = offset;
 	}

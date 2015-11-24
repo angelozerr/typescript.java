@@ -11,7 +11,8 @@
 package ts.server;
 
 import ts.TSException;
-import ts.server.collectors.ICompletionCollector;
+import ts.server.completions.ITypeScriptCompletionCollector;
+import ts.server.definition.ITypeScriptDefinitionCollector;
 
 /**
  * TypeScript client API which communicates with tsserver.
@@ -27,12 +28,15 @@ public interface ITypeScriptServiceClient {
 
 	void updateFile(String fileName, String newText) throws TSException;
 
-	void completions(String fileName, int line, int offset, String prefix, ICompletionCollector collector)
+	void completions(String fileName, int line, int offset, String prefix, ITypeScriptCompletionCollector collector)
 			throws TSException;
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException;
 
+	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+			throws TSException;
+	
 	void join() throws InterruptedException;
 
 	void dispose();

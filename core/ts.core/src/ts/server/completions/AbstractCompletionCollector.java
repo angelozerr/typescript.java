@@ -1,6 +1,8 @@
-package ts.server.collectors;
+package ts.server.completions;
 
-public abstract class AbstractCompletionCollector extends AbstractTypeScriptCollector implements ICompletionCollector {
+import ts.server.AbstractTypeScriptCollector;
+
+public abstract class AbstractCompletionCollector extends AbstractTypeScriptCollector implements ITypeScriptCompletionCollector {
 
 	private final String prefix;
 

@@ -1,4 +1,4 @@
-package ts.server.collectors;
+package ts.server;
 
 public interface ITypeScriptCollector {
 
