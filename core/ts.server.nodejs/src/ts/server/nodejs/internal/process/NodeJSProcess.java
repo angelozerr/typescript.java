@@ -1,4 +1,4 @@
-package ts.server.nodejs.process;
+package ts.server.nodejs.internal.process;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -18,13 +17,13 @@ import java.util.concurrent.Future;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
+import ts.TSException;
+import ts.server.nodejs.process.AbstractNodejsProcess;
 import ts.server.protocol.Request;
 
-public class NodeJSProcess {
+public class NodeJSProcess extends AbstractNodejsProcess {
 
-	private final File projectDir;
 	private final File tsserverFile;
-	private final File nodejsFile;
 
 	/**
 	 * node.js process.
@@ -95,10 +94,9 @@ public class NodeJSProcess {
 		}
 	}
 
-	public NodeJSProcess(File projectDir, File tsserverFile, File nodejsFile) {
-		this.projectDir = projectDir;
+	public NodeJSProcess(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
+		super(nodejsFile, projectDir);
 		this.tsserverFile = tsserverFile;
-		this.nodejsFile = nodejsFile;
 		this.requestsMap = new HashMap<Integer, Request>();
 	}
 
@@ -106,6 +104,7 @@ public class NodeJSProcess {
 		System.err.println(line);
 	}
 
+	@Override
 	public void start() {
 		try {
 			List<String> commands = createCommands();
@@ -130,6 +129,11 @@ public class NodeJSProcess {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public boolean isStarted() {
+		return process != null;
 	}
 
 	private class ShutdownHookThread extends Thread {
@@ -212,22 +216,28 @@ public class NodeJSProcess {
 		}
 	}
 
-	public void sendRequest(Request request) throws IOException {
+	@Override
+	public void sendRequest(Request request) throws TSException {
 		out.println(request); // add \n for "readline" used by tsserver
 		out.flush();
 	}
 
-	public JsonObject sendRequestSyncResponse(Request request)
-			throws IOException, InterruptedException, ExecutionException {
-		// long start = System.currentTimeMillis();
+	@Override
+	public JsonObject sendRequestSyncResponse(Request request) throws TSException {
 		sendRequest(request);
 		synchronized (requestsMap) {
 			requestsMap.put(request.getSeq(), request);
 		}
 		Future<JsonObject> f = pool.submit(request);
-		JsonObject response = f.get();
-		// System.err.println("time seq=" + request.getSeq() + ": " +
-		// (System.currentTimeMillis() - start + "ms"));
+		JsonObject response = null;
+		try {
+			response = f.get();
+		} catch (Exception e) {
+			if (e instanceof TSException) {
+				throw (TSException) e;
+			}
+			throw new TSException(e);
+		}
 		return response;
 	}
 
@@ -238,25 +248,29 @@ public class NodeJSProcess {
 		if ("event".equals(type)) {
 			String event = response.getString("event", null);
 			if ("syntaxDiag".equals(event)) {
-				/*DiagnosticEventBody o = new com.google.gson.Gson().fromJson(root.get("body"),
-						DiagnosticEventBodyPojo.class);
-				java.util.List<java.util.function.Consumer<DiagnosticEventBody>> l;
-
-				synchronized (syntaxDiagConsumerList) {
-					l = new java.util.ArrayList<>(syntaxDiagConsumerList);
-				}
-				l.stream().forEach(c -> c.accept(o));
-				break;*/
+				/*
+				 * DiagnosticEventBody o = new
+				 * com.google.gson.Gson().fromJson(root.get("body"),
+				 * DiagnosticEventBodyPojo.class);
+				 * java.util.List<java.util.function.Consumer<
+				 * DiagnosticEventBody>> l;
+				 * 
+				 * synchronized (syntaxDiagConsumerList) { l = new
+				 * java.util.ArrayList<>(syntaxDiagConsumerList); }
+				 * l.stream().forEach(c -> c.accept(o)); break;
+				 */
 			} else if ("semanticDiag".equals(event)) {
-				/*DiagnosticEventBody o = new com.google.gson.Gson().fromJson(root.get("body"),
-						DiagnosticEventBodyPojo.class);
-				java.util.List<java.util.function.Consumer<DiagnosticEventBody>> l;
-
-				synchronized (semanticDiagConsumerList) {
-					l = new java.util.ArrayList<>(semanticDiagConsumerList);
-				}
-				l.stream().forEach(c -> c.accept(o));
-				break;*/
+				/*
+				 * DiagnosticEventBody o = new
+				 * com.google.gson.Gson().fromJson(root.get("body"),
+				 * DiagnosticEventBodyPojo.class);
+				 * java.util.List<java.util.function.Consumer<
+				 * DiagnosticEventBody>> l;
+				 * 
+				 * synchronized (semanticDiagConsumerList) { l = new
+				 * java.util.ArrayList<>(semanticDiagConsumerList); }
+				 * l.stream().forEach(c -> c.accept(o)); break;
+				 */
 			}
 
 		} else if ("response".equals(type)) {

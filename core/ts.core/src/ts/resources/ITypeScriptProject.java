@@ -11,6 +11,7 @@
 package ts.resources;
 
 import ts.TSException;
+import ts.server.ITypeScriptServerListener;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
@@ -39,5 +40,19 @@ public interface ITypeScriptProject {
 	ITypeScriptFile getOpenedFile(String fileName);
 
 	void dispose() throws TSException;
+
+	<T> T getData(String key);
+
+	void setData(String key, Object value);
+
+	// -------------- TypeScript server.
+
+	void addServerListener(ITypeScriptServerListener listener);
+
+	void removeServerListener(ITypeScriptServerListener listener);
+
+	void disposeServer();
+
+	boolean isServerDisposed();
 
 }

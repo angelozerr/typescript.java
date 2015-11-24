@@ -13,8 +13,14 @@ package ts.eclipse.ide.ui;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.internal.ui.console.TypeScriptConsole;
+import ts.eclipse.ide.internal.ui.console.TypeScriptConsoleHelper;
+import ts.eclipse.ide.ui.console.ITypeScriptConsole;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -71,6 +77,18 @@ public class TypeScriptUIPlugin extends AbstractUIPlugin {
 	 */
 	public static IWorkbenchPage getActivePage() {
 		return getActiveWorkbenchWindow().getActivePage();
+	}
+
+	public ITypeScriptConsole getConsole(IIDETypeScriptProject project) {
+		if (project.isServerDisposed()) {
+			return null;
+		}
+		if (!PlatformUI.isWorkbenchRunning()) {
+			return null;
+		}
+		TypeScriptConsole console = TypeScriptConsole.getOrCreateConsole(project);
+		TypeScriptConsoleHelper.showConsole(console);
+		return console;
 	}
 
 }

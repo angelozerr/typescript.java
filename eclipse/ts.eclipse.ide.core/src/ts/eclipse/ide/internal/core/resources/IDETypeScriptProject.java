@@ -13,8 +13,11 @@ import org.eclipse.jface.text.IDocument;
 
 import ts.TSException;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.internal.core.Trace;
+import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.resources.ITypeScriptFile;
 import ts.resources.TypeScriptProject;
 import ts.server.ITypeScriptServiceClient;
@@ -80,4 +83,43 @@ public class IDETypeScriptProject extends TypeScriptProject
 			throw new TSException(e);
 		}
 	}
+
+	@Override
+	protected void onCreateClient(ITypeScriptServiceClient client) {
+		configureConsole();
+	}
+
+	@Override
+	public void configureConsole() {
+		synchronized (serverLock) {
+			if (hasClient()) {
+				// There is a TypeScript client instance., Retrieve the well
+				// connector
+				// the
+				// the eclipse console.
+				try {
+					ITypeScriptServiceClient client = getClient();
+					ITypeScriptConsoleConnector connector = TypeScriptConsoleConnectorManager.getManager()
+							.getConnector(client);
+					if (connector != null) {
+						if (isTraceOnConsole()) {
+							// connect the tern server to the eclipse console.
+							connector.connectToConsole(client, this);
+						} else {
+							// disconnect the tern server to the eclipse
+							// console.
+							connector.disconnectToConsole(client, this);
+						}
+					}
+				} catch (TSException e) {
+					Trace.trace(Trace.SEVERE, "Error while getting TypeScript client", e);
+				}
+			}
+		}
+	}
+
+	private boolean isTraceOnConsole() {
+		return true;
+	}
+
 }

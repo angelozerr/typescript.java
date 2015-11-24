@@ -34,11 +34,20 @@ public interface ITypeScriptServiceClient {
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException;
 
-	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
-			throws TSException;
-	
+	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TSException;
+
 	void join() throws InterruptedException;
 
+	void addServerListener(ITypeScriptServerListener listener);
+
+	void removeServerListener(ITypeScriptServerListener listener);
+
+	void addInterceptor(IInterceptor interceptor);
+	
+	void removeInterceptor(IInterceptor interceptor);
+	
 	void dispose();
+	
+	boolean isDisposed();
 
 }

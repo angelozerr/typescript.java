@@ -8,9 +8,11 @@
 	<artifactId>eclipse</artifactId>
 	<packaging>pom</packaging>
 	<modules>
+		<module>jsdt</module>
 		<module>ts.eclipse</module>
 		<module>ts.eclipse.ide.core</module>
 		<module>ts.eclipse.ide.ui</module>
-		<module>jsdt</module>
+		<module>ts.eclipse.ide.server.nodejs.core</module>
+		<module>ts.eclipse.ide.server.nodejs.ui</module>
 	</modules>
 </project>

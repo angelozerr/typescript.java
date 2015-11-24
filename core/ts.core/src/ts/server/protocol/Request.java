@@ -25,6 +25,10 @@ public class Request extends Message implements Callable<JsonObject> {
 			super.add("arguments", args);
 		}
 	}
+	
+	public String getCommand() {
+		return super.getString("command", null);
+	}
 
 	public void setResponse(JsonObject response) {
 		this.response = response;

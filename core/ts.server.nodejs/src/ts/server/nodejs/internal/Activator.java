@@ -3,6 +3,8 @@ package ts.server.nodejs.internal;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import ts.server.nodejs.process.NodejsProcessManager;
+
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
@@ -24,6 +26,7 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
+		NodejsProcessManager.getInstance().dispose();
 		Activator.context = null;
 	}
 

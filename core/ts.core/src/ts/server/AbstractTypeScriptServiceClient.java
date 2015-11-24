@@ -1,14 +1,14 @@
 package ts.server;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import ts.ICompletionEntry;
-import ts.ICompletionInfo;
 import ts.TSException;
-import ts.internal.CompletionEntry;
-import ts.internal.CompletionInfo;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
 import ts.server.completions.ITypeScriptCompletionCollector;
@@ -23,28 +23,34 @@ import ts.server.protocol.Request;
 
 public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServiceClient {
 
+	private boolean dispose;
+	private final List<ITypeScriptServerListener> listeners;
+	private ReentrantReadWriteLock stateLock = new ReentrantReadWriteLock();
+	private List<IInterceptor> interceptors;
+
 	public AbstractTypeScriptServiceClient() {
+		this.listeners = new ArrayList<ITypeScriptServerListener>();
 	}
 
 	@Override
 	public void openFile(String fileName) throws TSException {
 		Request request = new OpenRequest(fileName);
-		processVoidRequest(request);
+		internalProcessVoidRequest(request);
 	}
 
 	@Override
 	public void closeFile(String fileName) throws TSException {
 		Request request = new CloseRequest(fileName);
-		processVoidRequest(request);
+		internalProcessVoidRequest(request);
 	}
 
 	// ---------------- Completions
 
 	@Override
-	public void completions(String fileName, int line, int offset, String prefix, ITypeScriptCompletionCollector collector)
-			throws TSException {
+	public void completions(String fileName, int line, int offset, String prefix,
+			ITypeScriptCompletionCollector collector) throws TSException {
 		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
-		JsonObject response = processRequest(request);
+		JsonObject response = internalProcessRequest(request);
 		collectCompletions(response, collector);
 	}
 
@@ -61,12 +67,13 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	// ---------------- Definition
 
 	@Override
-	public void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TSException {
+	public void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+			throws TSException {
 		DefinitionRequest request = new DefinitionRequest(fileName, line, offset);
-		JsonObject response = processRequest(request);
+		JsonObject response = internalProcessRequest(request);
 		collectDefinition(response, collector);
 	}
-	
+
 	private void collectDefinition(JsonObject response, ITypeScriptDefinitionCollector collector) throws TSException {
 		JsonArray items = response.get("body").asArray();
 		JsonObject def = null;
@@ -76,16 +83,16 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 			def = (JsonObject) item;
 			start = def.get("start").asObject();
 			end = def.get("end").asObject();
-			collector.addDefinition(def.getString("file", null), start.getInt("line", -1),
-					start.getInt("offset", -1), end.getInt("line", -1),
-					end.getInt("offset", -1));
-		}	}
+			collector.addDefinition(def.getString("file", null), start.getInt("line", -1), start.getInt("offset", -1),
+					end.getInt("line", -1), end.getInt("offset", -1));
+		}
+	}
 
 	@Override
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException {
 		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText);
-		processVoidRequest(request);
+		internalProcessVoidRequest(request);
 	}
 
 	/**
@@ -103,7 +110,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 		try {
 			tempFileName = FileTempHelper.updateTempFile(newText, seq);
 			Request request = new ReloadRequest(fileName, tempFileName, seq);
-			JsonObject response = this.processRequest(request);
+			JsonObject response = this.internalProcessRequest(request);
 			requestSeq = response.getInt("request_seq", -1);
 		} finally {
 			if (requestSeq != -1) {
@@ -113,8 +120,158 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 
 	}
 
+	@Override
+	public void addServerListener(ITypeScriptServerListener listener) {
+		synchronized (listeners) {
+			listeners.add(listener);
+		}
+	}
+
+	@Override
+	public void removeServerListener(ITypeScriptServerListener listener) {
+		synchronized (listeners) {
+			listeners.remove(listener);
+		}
+	}
+
+	protected void fireStartServer() {
+		synchronized (listeners) {
+			for (ITypeScriptServerListener listener : listeners) {
+				listener.onStart(this);
+			}
+		}
+	}
+
+	protected void fireEndServer() {
+		synchronized (listeners) {
+			for (ITypeScriptServerListener listener : listeners) {
+				listener.onStop(this);
+			}
+		}
+	}
+
+	public void addInterceptor(IInterceptor interceptor) {
+		beginWriteState();
+		try {
+			if (interceptors == null) {
+				interceptors = new ArrayList<IInterceptor>();
+			}
+			interceptors.add(interceptor);
+		} finally {
+			endWriteState();
+		}
+	}
+
+	public void removeInterceptor(IInterceptor interceptor) {
+		beginWriteState();
+		try {
+			if (interceptors != null) {
+				interceptors.remove(interceptor);
+			}
+		} finally {
+			endWriteState();
+		}
+	}
+
+	protected void beginReadState() {
+		stateLock.readLock().lock();
+	}
+
+	protected void endReadState() {
+		stateLock.readLock().unlock();
+	}
+
+	protected void beginWriteState() {
+		stateLock.writeLock().lock();
+	}
+
+	protected void endWriteState() {
+		stateLock.writeLock().unlock();
+	}
+
+	@Override
+	public final void dispose() {
+		beginWriteState();
+		try {
+			if (!isDisposed()) {
+				this.dispose = true;
+				doDispose();
+			}
+		} finally {
+			endWriteState();
+		}
+	}
+
+	@Override
+	public boolean isDisposed() {
+		return dispose;
+	}
+
+	private void internalProcessVoidRequest(Request request) throws TSException {
+		if (interceptors == null) {
+			processVoidRequest(request);
+		} else {
+			long startTime = System.nanoTime();
+			try {
+				handleRequest(request);
+				processVoidRequest(request);
+			} catch (Throwable e) {
+				handleError(request, e, startTime);
+				if (e instanceof TSException) {
+					throw (TSException) e;
+				}
+				throw new TSException(e);
+			}
+		}
+	}
+
+	private JsonObject internalProcessRequest(Request request) throws TSException {
+		if (interceptors == null) {
+			return processRequest(request);
+		} else {
+			long startTime = System.nanoTime();
+			try {
+				handleRequest(request);
+				JsonObject response = processRequest(request);
+				handleResponse(request, response, startTime);
+				return response;
+			} catch (Throwable e) {
+				handleError(request, e, startTime);
+				if (e instanceof TSException) {
+					throw (TSException) e;
+				}
+				throw new TSException(e);
+			}
+		}
+	}
+
+	private void handleRequest(Request request) {
+		for (IInterceptor interceptor : interceptors) {
+			interceptor.handleRequest(request, this, request.getCommand());
+		}
+	}
+
+	private void handleResponse(Request request, JsonObject response, long startTime) {
+		long ellapsedTime = getElapsedTimeInMs(startTime);
+		for (IInterceptor interceptor : interceptors) {
+			interceptor.handleResponse(response, this, request.getCommand(), ellapsedTime);
+		}
+	}
+
+	private void handleError(Request request, Throwable e, long startTime) {
+		long ellapsedTime = getElapsedTimeInMs(startTime);
+		for (IInterceptor interceptor : interceptors) {
+			interceptor.handleError(e, this, request.getCommand(), ellapsedTime);
+		}
+	}
+
+	private static long getElapsedTimeInMs(long startTime) {
+		return ((System.nanoTime() - startTime) / 1000000L);
+	}
+
 	protected abstract void processVoidRequest(Request request) throws TSException;
 
 	protected abstract JsonObject processRequest(Request request) throws TSException;
 
+	protected abstract void doDispose();
 }

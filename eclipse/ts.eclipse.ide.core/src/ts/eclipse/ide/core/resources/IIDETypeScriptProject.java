@@ -19,4 +19,6 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 
 	ITypeScriptFile getOpenedFile(IResource file, IDocument document) throws TSException;
 
+	void configureConsole();
+
 }

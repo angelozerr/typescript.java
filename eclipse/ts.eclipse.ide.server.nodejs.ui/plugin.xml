@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+		
+	<extension point="ts.eclipse.ide.core.typeScriptConsoleConnectors" >
+		<connector class="ts.eclipse.ide.server.nodejs.internal.ui.console.TypeScriptConsoleNodejsConnector" />
+	 </extension>
+		
+</plugin>

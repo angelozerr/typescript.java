@@ -66,7 +66,6 @@ public class TypeScriptCorePlugin extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		// NodejsProcessManager.getInstance().dispose();
 		// TSServerTypeManager.getManager().destroy();
 		// TSNatureAdaptersManager.getManager().destroy();
 		// TSFileConfigurationManager.getManager().destroy();

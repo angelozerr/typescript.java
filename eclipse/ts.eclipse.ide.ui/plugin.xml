@@ -13,6 +13,19 @@
 ###############################################################################
  -->
 <plugin>
+	
+	<!-- TypeScript Console -->
+ 	<extension
+       point="org.eclipse.ui.console.consolePageParticipants">
+	    <consolePageParticipant
+	          class="ts.eclipse.ide.internal.ui.console.TypeScriptConsolePageParticipant"
+	          id="ts.eclipse.ide.internal.ui.console.TypeScriptConsolePageParticipant">
+	       <enablement>
+	          <instanceof
+	                value="ts.eclipse.ide.internal.ui.console.TypeScriptConsole">
+	          </instanceof></enablement>
+	    </consolePageParticipant>
+	 </extension>
 			
     <extension point="org.eclipse.ui.startup">
         <startup

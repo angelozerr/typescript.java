@@ -11,8 +11,13 @@ public class TypeScriptUIMessages extends NLS {
 
 	private static ResourceBundle fResourceBundle;
 
+	// Hyperlink
 	public static String TypeScriptHyperlink_typeLabel;
 	public static String TypeScriptHyperlink_text;
+
+	// Console
+	public static String TypeScriptConsoleJob_name;
+	public static String ConsoleTerminateAction_tooltipText;
 
 	public static ResourceBundle getResourceBundle() {
 		try {
