@@ -224,10 +224,10 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	@Override
 	public JsonObject sendRequestSyncResponse(Request request) throws TSException {
-		sendRequest(request);
 		synchronized (requestsMap) {
 			requestsMap.put(request.getSeq(), request);
 		}
+		sendRequest(request);
 		Future<JsonObject> f = pool.submit(request);
 		JsonObject response = null;
 		try {

@@ -13,6 +13,7 @@ import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public class TypeScriptProject implements ITypeScriptProject, ITypeScriptServiceClientFactory {
 
@@ -81,6 +82,17 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		int line = lineOffset.getLine();
 		int offset = lineOffset.getOffset();
 		client.definition(file.getName(), line, offset, collector);
+	}
+
+	@Override
+	public void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
+			throws TSException {
+		ITypeScriptServiceClient client = getClient();
+		synchFileContent(file, client);
+		Location lineOffset = file.getLocation(position);
+		int line = lineOffset.getLine();
+		int offset = lineOffset.getOffset();
+		client.signatureHelp(file.getName(), line, offset, collector);
 	}
 
 	@Override

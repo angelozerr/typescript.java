@@ -20,6 +20,8 @@ import ts.server.protocol.DefinitionRequest;
 import ts.server.protocol.OpenRequest;
 import ts.server.protocol.ReloadRequest;
 import ts.server.protocol.Request;
+import ts.server.protocol.SignatureHelpRequest;
+import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServiceClient {
 
@@ -86,6 +88,21 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 			collector.addDefinition(def.getString("file", null), start.getInt("line", -1), start.getInt("offset", -1),
 					end.getInt("line", -1), end.getInt("offset", -1));
 		}
+	}
+
+	// ---------------- Signature Help
+
+	@Override
+	public void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
+			throws TSException {
+		SignatureHelpRequest request = new SignatureHelpRequest(fileName, line, offset);
+		JsonObject response = internalProcessRequest(request);
+		collectSignatureHelp(response, collector);
+	}
+
+	private void collectSignatureHelp(JsonObject response, ITypeScriptSignatureHelpCollector collector) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override

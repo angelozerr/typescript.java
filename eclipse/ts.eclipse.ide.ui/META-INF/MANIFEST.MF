@@ -26,5 +26,6 @@ Bundle-Activator: ts.eclipse.ide.ui.TypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
 Export-Package: ts.eclipse.ide.ui,
  ts.eclipse.ide.ui.console,
+ ts.eclipse.ide.ui.hover,
  ts.eclipse.ide.ui.hyperlink,
  ts.eclipse.ide.ui.utils

@@ -15,6 +15,7 @@ import ts.server.ITypeScriptServerListener;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public interface ITypeScriptProject {
 
@@ -34,6 +35,9 @@ public interface ITypeScriptProject {
 	void completions(ITypeScriptFile file, int position, ITypeScriptCompletionCollector collector) throws TSException;
 
 	void definition(ITypeScriptFile file, int position, ITypeScriptDefinitionCollector collector) throws TSException;
+
+	void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
+			throws TSException;
 
 	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TSException;
 

@@ -13,6 +13,7 @@ package ts.server;
 import ts.TSException;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 /**
  * TypeScript client API which communicates with tsserver.
@@ -31,10 +32,13 @@ public interface ITypeScriptServiceClient {
 	void completions(String fileName, int line, int offset, String prefix, ITypeScriptCompletionCollector collector)
 			throws TSException;
 
-	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
+	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TSException;
+
+	void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
 			throws TSException;
 
-	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TSException;
+	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
+			throws TSException;
 
 	void join() throws InterruptedException;
 
@@ -43,11 +47,11 @@ public interface ITypeScriptServiceClient {
 	void removeServerListener(ITypeScriptServerListener listener);
 
 	void addInterceptor(IInterceptor interceptor);
-	
+
 	void removeInterceptor(IInterceptor interceptor);
-	
+
 	void dispose();
-	
+
 	boolean isDisposed();
 
 }
