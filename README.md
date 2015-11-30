@@ -26,7 +26,7 @@ Those plugins provide a lot of advanced features for TypeScript (debug, refactor
 
 Here my idea:
 
- * use JSDT JavaScript Editor instead of developping custom editor (DONE for completion).
+ * use JSDT JavaScript Editor instead of developping custom editor (DONE for completion, hyperlink).
  * use WTP Validator instead of Builder for validation (TODO).
  * consume "official" tsserver instead of consumming custom bridge language service like Eclipse TypeScript/TypeEcs have done:
   * user will able to update the tsserver just with "npm install typescript".
