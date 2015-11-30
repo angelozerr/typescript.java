@@ -31,9 +31,9 @@ Here my idea:
  * consume "official" tsserver instead of consumming custom bridge language service like Eclipse TypeScript/TypeEcs have done:
   * user will able to update the tsserver just with "npm install typescript".
   * other editors consumes "tsserver", so there are a big community which uses "tsserver":
-   * [Visual Studio Code](https://code.visualstudio.com/) (Microsoft)
-   * [Typescript-Sublime-plugin](https://github.com/Microsoft/Typescript-Sublime-plugin) (Microsoft)
-   * [A Vim plugin for TypeScript](https://github.com/Quramy/tsuquyomi)
+    * [Visual Studio Code](https://code.visualstudio.com/) (Microsoft)
+    * [Typescript-Sublime-plugin](https://github.com/Microsoft/Typescript-Sublime-plugin) (Microsoft)
+    * [A Vim plugin for TypeScript](https://github.com/Quramy/tsuquyomi)
  * use async "event" of tsserver to improve performance for validation for instance.
  * use async completion, etc
 
