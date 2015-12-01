@@ -13,6 +13,7 @@ import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public class TypeScriptProject implements ITypeScriptProject, ITypeScriptServiceClientFactory {
@@ -66,9 +67,9 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 			throws TSException {
 		ITypeScriptServiceClient client = getClient();
 		synchFileContent(file, client);
-		Location lineOffset = file.getLocation(position);
-		int line = lineOffset.getLine();
-		int offset = lineOffset.getOffset();
+		Location location = file.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
 		String prefix = null;
 		client.completions(file.getName(), line, offset, prefix, collector);
 	}
@@ -78,9 +79,9 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 			throws TSException {
 		ITypeScriptServiceClient client = getClient();
 		synchFileContent(file, client);
-		Location lineOffset = file.getLocation(position);
-		int line = lineOffset.getLine();
-		int offset = lineOffset.getOffset();
+		Location location = file.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
 		client.definition(file.getName(), line, offset, collector);
 	}
 
@@ -89,10 +90,21 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 			throws TSException {
 		ITypeScriptServiceClient client = getClient();
 		synchFileContent(file, client);
-		Location lineOffset = file.getLocation(position);
-		int line = lineOffset.getLine();
-		int offset = lineOffset.getOffset();
+		Location location = file.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
 		client.signatureHelp(file.getName(), line, offset, collector);
+	}
+	
+	@Override
+	public void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
+			throws TSException {
+		ITypeScriptServiceClient client = getClient();
+		synchFileContent(file, client);
+		Location location = file.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
+		client.quickInfo(file.getName(), line, offset, collector);
 	}
 
 	@Override

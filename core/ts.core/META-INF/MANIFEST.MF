@@ -16,5 +16,6 @@ Export-Package: ts,
  ts.server.completions,
  ts.server.definition,
  ts.server.protocol,
+ ts.server.quickinfo,
  ts.server.signaturehelp,
  ts.utils

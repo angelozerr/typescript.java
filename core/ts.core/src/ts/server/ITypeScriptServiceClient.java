@@ -13,6 +13,7 @@ package ts.server;
 import ts.TSException;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 /**
@@ -36,6 +37,8 @@ public interface ITypeScriptServiceClient {
 
 	void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
 			throws TSException;
+
+	void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector) throws TSException;
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException;

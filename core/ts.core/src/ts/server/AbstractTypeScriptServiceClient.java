@@ -18,9 +18,11 @@ import ts.server.protocol.CloseRequest;
 import ts.server.protocol.CompletionsRequest;
 import ts.server.protocol.DefinitionRequest;
 import ts.server.protocol.OpenRequest;
+import ts.server.protocol.QuickInfoRequest;
 import ts.server.protocol.ReloadRequest;
 import ts.server.protocol.Request;
 import ts.server.protocol.SignatureHelpRequest;
+import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServiceClient {
@@ -103,6 +105,30 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	private void collectSignatureHelp(JsonObject response, ITypeScriptSignatureHelpCollector collector) {
 		// TODO Auto-generated method stub
 
+	}
+
+	// ---------------- Signature Help
+
+	@Override
+	public void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
+			throws TSException {
+		QuickInfoRequest request = new QuickInfoRequest(fileName, line, offset);
+		JsonObject response = internalProcessRequest(request);
+		collectQuickInfo(response, collector);
+	}
+
+	private void collectQuickInfo(JsonObject response, ITypeScriptQuickInfoCollector collector) {
+		JsonObject body = response.get("body").asObject();
+		if (body != null) {
+			String kind = body.getString("kind", null);
+			String kindModifiers = body.getString("kindModifiers", null);
+			JsonObject start = body.get("start").asObject();
+			JsonObject end = body.get("end").asObject();
+			String displayString = body.getString("displayString", null);
+			String documentation = body.getString("documentation", null);
+			collector.setInfo(kind, kindModifiers, start.getInt("line", -1), start.getInt("offset", -1),
+					end.getInt("line", -1), end.getInt("offset", -1), displayString, documentation);
+		}
 	}
 
 	@Override

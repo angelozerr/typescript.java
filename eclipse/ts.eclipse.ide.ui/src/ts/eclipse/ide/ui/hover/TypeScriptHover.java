@@ -64,8 +64,8 @@ public class TypeScriptHover extends AbstractTextHover implements ITextHoverExte
 				int position = hoverRegion.getOffset();
 				ITypeScriptFile tsFile = tsProject.getOpenedFile(scriptFile, textViewer.getDocument());
 
-				HTMLTypeScriptSignatureHelpCollector collector = new HTMLTypeScriptSignatureHelpCollector();
-				tsProject.signatureHelp(tsFile, position, collector);
+				HTMLTypeScriptQuickInfoCollector collector = new HTMLTypeScriptQuickInfoCollector();
+				tsProject.quickInfo(tsFile, position, collector);
 
 				String text = collector.getInfo();
 				return StringUtils.isEmpty(text) ? null : new TypeScriptBrowserInformationControlInput(null, text, 20);

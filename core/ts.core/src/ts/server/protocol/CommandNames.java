@@ -3,7 +3,7 @@ package ts.server.protocol;
 public enum CommandNames {
 
 	Open("open"), Close("close"), Change("change"), NavBar("navbar"), Completions("completions"), Reload(
-			"reload"), Definition("definition"), SignatureHelp("signatureHelp");
+			"reload"), Definition("definition"), SignatureHelp("signatureHelp"), QuickInfo("quickinfo");
 
 	private final String name;
 

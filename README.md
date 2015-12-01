@@ -26,7 +26,7 @@ Those plugins provide a lot of advanced features for TypeScript (debug, refactor
 
 Here my idea:
 
- * use JSDT JavaScript Editor instead of developping custom editor (DONE for completion, hyperlink).
+ * use JSDT JavaScript Editor instead of developping custom editor (DONE for completion, hyperlink, hover).
  * use WTP Validator instead of Builder for validation (TODO).
  * consume "official" tsserver instead of consumming custom bridge language service like Eclipse TypeScript/TypeEcs have done:
   * user will able to update the tsserver just with "npm install typescript".
@@ -36,4 +36,3 @@ Here my idea:
     * [A Vim plugin for TypeScript](https://github.com/Quramy/tsuquyomi)
  * use async "event" of tsserver to improve performance for validation for instance.
  * use async completion, etc
-
