@@ -11,7 +11,7 @@ This integration looks like [tern.java](https://github.com/angelozerr/tern.java)
 
 Here a screenshot with TypeScript completion inside JSDT Editor:
 
-![JSDT TypeScript Completion](https://github.com/angelozerr/typescript.java/wiki/images/JSDTTypeScriptCompletion)  
+![JSDT TypeScript Completion](https://github.com/angelozerr/typescript.java/wiki/images/JSDTTypeScriptCompletion.png)  
 
 # Similar Project
 
