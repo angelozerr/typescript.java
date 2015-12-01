@@ -5,7 +5,13 @@ Goal of typescript.java is to provide the capability to consume TypeScript langu
 typescript.java provides :
 
  * a simple SWT/JFace integration.
- * an Eclipse IDE with JSDT integration. 
+ * an Eclipse IDE with JSDT integration and WTP Validator.
+ 
+This integration looks like [tern.java](https://github.com/angelozerr/tern.java); JSDT was extended (completion, hyperlink, hover, etc) to consumme the official TypeScript server [tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver).
+
+Here a screenshot with TypeScript completion inside JSDT Editor:
+
+![JSDT TypeScript Completion](https://github.com/angelozerr/typescript.java/wiki/images/JSDTTypeScriptCompletion)  
 
 # Similar Project
 
