@@ -13,10 +13,12 @@ import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.geterr.ITypeScriptGeterrCollector;
 import ts.server.protocol.ChangeRequest;
 import ts.server.protocol.CloseRequest;
 import ts.server.protocol.CompletionsRequest;
 import ts.server.protocol.DefinitionRequest;
+import ts.server.protocol.GeterrRequest;
 import ts.server.protocol.OpenRequest;
 import ts.server.protocol.QuickInfoRequest;
 import ts.server.protocol.ReloadRequest;
@@ -39,13 +41,13 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	@Override
 	public void openFile(String fileName) throws TSException {
 		Request request = new OpenRequest(fileName);
-		internalProcessVoidRequest(request);
+		internalProcessVoidRequest(request, false);
 	}
 
 	@Override
 	public void closeFile(String fileName) throws TSException {
 		Request request = new CloseRequest(fileName);
-		internalProcessVoidRequest(request);
+		internalProcessVoidRequest(request, false);
 	}
 
 	// ---------------- Completions
@@ -107,7 +109,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 
 	}
 
-	// ---------------- Signature Help
+	// ---------------- QuickInfo
 
 	@Override
 	public void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
@@ -135,7 +137,13 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException {
 		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText);
-		internalProcessVoidRequest(request);
+		internalProcessVoidRequest(request, false);
+	}
+
+	@Override
+	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TSException {
+		Request request = new GeterrRequest(files, delay, collector);
+		internalProcessVoidRequest(request, true);
 	}
 
 	/**
@@ -250,14 +258,14 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 		return dispose;
 	}
 
-	private void internalProcessVoidRequest(Request request) throws TSException {
+	private void internalProcessVoidRequest(Request request, boolean async) throws TSException {
 		if (interceptors == null) {
-			processVoidRequest(request);
+			processVoidRequest(request, async);
 		} else {
 			long startTime = System.nanoTime();
 			try {
 				handleRequest(request);
-				processVoidRequest(request);
+				processVoidRequest(request, async);
 			} catch (Throwable e) {
 				handleError(request, e, startTime);
 				if (e instanceof TSException) {
@@ -267,7 +275,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 			}
 		}
 	}
-
+	
 	private JsonObject internalProcessRequest(Request request) throws TSException {
 		if (interceptors == null) {
 			return processRequest(request);
@@ -312,7 +320,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 		return ((System.nanoTime() - startTime) / 1000000L);
 	}
 
-	protected abstract void processVoidRequest(Request request) throws TSException;
+	protected abstract void processVoidRequest(Request request, boolean async) throws TSException;
 
 	protected abstract JsonObject processRequest(Request request) throws TSException;
 

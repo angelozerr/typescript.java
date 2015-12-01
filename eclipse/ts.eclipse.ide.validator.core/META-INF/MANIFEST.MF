@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Bundle-SymbolicName: ts.eclipse.ide.validator.core;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ ts.core,
+ ts.eclipse,
+ org.eclipse.jface.text,
+ org.eclipse.core.commands,
+ org.eclipse.core.expressions,
+ org.eclipse.wst.validation
+Export-Package: ts.eclipse.ide.validator.core,
+ ts.eclipse.ide.validator.core.validation
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: ts.eclipse.ide.validator.core.TypeScriptValidationCorePlugin
+Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
+

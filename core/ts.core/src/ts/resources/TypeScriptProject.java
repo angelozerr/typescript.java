@@ -13,6 +13,7 @@ import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.geterr.ITypeScriptGeterrCollector;
 import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
@@ -95,7 +96,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		int offset = location.getOffset();
 		client.signatureHelp(file.getName(), line, offset, collector);
 	}
-	
+
 	@Override
 	public void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
 			throws TSException {
@@ -116,6 +117,12 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		int endLine = endLoc.getLine();
 		int endOffset = endLoc.getOffset();
 		getClient().changeFile(file.getName(), line, offset, endLine, endOffset, newText);
+	}
+
+	@Override
+	public void geterr(ITypeScriptFile file, int delay, ITypeScriptGeterrCollector collector) throws TSException {
+		synchFileContent(file, client);
+		getClient().geterr(new String[] { file.getName() }, delay, collector);
 	}
 
 	private void synchFileContent(ITypeScriptFile file, ITypeScriptServiceClient client) throws TSException {

@@ -13,6 +13,7 @@ package ts.server;
 import ts.TSException;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.geterr.ITypeScriptGeterrCollector;
 import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
@@ -42,6 +43,8 @@ public interface ITypeScriptServiceClient {
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException;
+
+	void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TSException;
 
 	void join() throws InterruptedException;
 

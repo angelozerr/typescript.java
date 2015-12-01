@@ -15,6 +15,7 @@ import ts.server.ITypeScriptServerListener;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.server.geterr.ITypeScriptGeterrCollector;
 import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
@@ -45,6 +46,8 @@ public interface ITypeScriptProject {
 	
 	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TSException;
 
+	void geterr(ITypeScriptFile tsFile, int delay, ITypeScriptGeterrCollector collector) throws TSException;
+	
 	ITypeScriptFile getOpenedFile(String fileName);
 
 	void dispose() throws TSException;

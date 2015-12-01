@@ -59,4 +59,13 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IDocume
 	public String getContents() {
 		return document.get();
 	}
+
+	@Override
+	public int getPosition(int line, int offset) throws TSException {
+		try {
+			return document.getLineOffset(line - 1) + offset - 1;
+		} catch (BadLocationException e) {
+			throw new TSException(e);
+		}
+	}
 }

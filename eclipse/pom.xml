@@ -12,6 +12,8 @@
 		<module>ts.eclipse</module>
 		<module>ts.eclipse.ide.core</module>
 		<module>ts.eclipse.ide.ui</module>
+		<module>ts.eclipse.ide.validator.core</module>
+		<module>ts.eclipse.ide.validator.ui</module>
 		<module>ts.eclipse.ide.server.nodejs.core</module>
 		<module>ts.eclipse.ide.server.nodejs.ui</module>
 	</modules>

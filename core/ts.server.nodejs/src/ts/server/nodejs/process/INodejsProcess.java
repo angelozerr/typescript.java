@@ -9,6 +9,8 @@ public interface INodejsProcess {
 
 	void sendRequest(Request request) throws TSException;
 
+	void sendRequestAsyncResponse(Request request) throws TSException;
+
 	JsonObject sendRequestSyncResponse(Request request) throws TSException;
 
 	/**

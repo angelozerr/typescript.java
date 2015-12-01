@@ -42,7 +42,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	private PrintStream out;
 
-	private final Map<Integer, Request> requestsMap;
+	private final Map<Object, Request> requestsMap;
 	private final ExecutorService pool = Executors.newFixedThreadPool(1);
 
 	/**
@@ -97,7 +97,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 	public NodeJSProcess(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
 		super(nodejsFile, projectDir);
 		this.tsserverFile = tsserverFile;
-		this.requestsMap = new HashMap<Integer, Request>();
+		this.requestsMap = new HashMap<Object, Request>();
 	}
 
 	public void notifyErrorProcess(String line) {
@@ -217,6 +217,22 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 	}
 
 	@Override
+	public void sendRequestAsyncResponse(Request request) throws TSException {
+		synchronized (requestsMap) {
+			Object key = request.getResponseKey();
+			if (key instanceof Object[]) {
+				Object[] iter = (Object[]) key;
+				for (Object k : iter) {
+					requestsMap.put(k, request);
+				}
+			} else {
+				requestsMap.put(key, request);
+			}
+		}
+		sendRequest(request);
+	}
+
+	@Override
 	public void sendRequest(Request request) throws TSException {
 		out.println(request); // add \n for "readline" used by tsserver
 		out.flush();
@@ -224,10 +240,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	@Override
 	public JsonObject sendRequestSyncResponse(Request request) throws TSException {
-		synchronized (requestsMap) {
-			requestsMap.put(request.getSeq(), request);
-		}
-		sendRequest(request);
+		sendRequestAsyncResponse(request);
 		Future<JsonObject> f = pool.submit(request);
 		JsonObject response = null;
 		try {
@@ -243,34 +256,24 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	private void dispatch(String message) {
 		JsonObject response = Json.parse(message).asObject();
-		String type = response.getString("type", "");
+		String type = response.getString("type", null);
 
 		if ("event".equals(type)) {
 			String event = response.getString("event", null);
-			if ("syntaxDiag".equals(event)) {
-				/*
-				 * DiagnosticEventBody o = new
-				 * com.google.gson.Gson().fromJson(root.get("body"),
-				 * DiagnosticEventBodyPojo.class);
-				 * java.util.List<java.util.function.Consumer<
-				 * DiagnosticEventBody>> l;
-				 * 
-				 * synchronized (syntaxDiagConsumerList) { l = new
-				 * java.util.ArrayList<>(syntaxDiagConsumerList); }
-				 * l.stream().forEach(c -> c.accept(o)); break;
-				 */
-			} else if ("semanticDiag".equals(event)) {
-				/*
-				 * DiagnosticEventBody o = new
-				 * com.google.gson.Gson().fromJson(root.get("body"),
-				 * DiagnosticEventBodyPojo.class);
-				 * java.util.List<java.util.function.Consumer<
-				 * DiagnosticEventBody>> l;
-				 * 
-				 * synchronized (semanticDiagConsumerList) { l = new
-				 * java.util.ArrayList<>(semanticDiagConsumerList); }
-				 * l.stream().forEach(c -> c.accept(o)); break;
-				 */
+			if ("syntaxDiag".equals(event) || "semanticDiag".equals(event)) {
+				JsonObject body = response.get("body").asObject();
+				if (body != null) {
+					String file = body.getString("file", null);
+					if (file != null) {
+						Request request = null;
+						synchronized (requestsMap) {
+							request = requestsMap.remove(file);
+						}
+						if (request != null) {
+							request.setResponse(response);
+						}
+					}
+				}
 			}
 
 		} else if ("response".equals(type)) {

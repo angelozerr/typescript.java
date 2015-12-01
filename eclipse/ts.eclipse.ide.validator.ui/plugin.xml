@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!--
+###############################################################################
+# Copyright (c) 2013-2015 Angelo Zerr and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#     Angelo Zerr <angelo.zerr@gmail.com> - Initial API and implementation 
+###############################################################################
+ -->
+<plugin>
+   
+   	<!-- As you type TypeScript WTP validator --> 
+	<extension point="org.eclipse.wst.sse.ui.sourcevalidation">
+		<validator
+			scope="total"
+			class="ts.eclipse.ide.validator.internal.ui.validation.TypeScriptSourceValidator"
+			id="ts.eclipse.ide.validator.ui.validation.TypeScriptSourceValidator">
+			<contentTypeIdentifier id="ts.eclipse.ide.jsdt.core.tsSource">
+				<partitionType id="___java_partitioning"/>
+				<partitionType id="__java_singleline_comment"/>
+				<partitionType id="__java_multiline_comment"/>
+				<partitionType id="__java_javadoc"/>
+				<partitionType id="__java_string"/>
+				<partitionType id="__java_character"/>				
+			    <partitionType id="__dftl_partition_content_type"/>
+			</contentTypeIdentifier>			
+		</validator>
+	</extension>
+	       
+</plugin>        

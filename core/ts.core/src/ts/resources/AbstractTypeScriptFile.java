@@ -33,4 +33,10 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	public Location getLocation(int position) throws TSException {
 		return new LocationReader(getContents(), position).getLineOffset();
 	}
+	
+	@Override
+	public int getPosition(int line, int offset) throws TSException {
+		// TODO: implement that
+		throw new UnsupportedOperationException();
+	}
 }

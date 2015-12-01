@@ -16,6 +16,8 @@ public interface ITypeScriptFile {
 	String getPrefix(int position);
 
 	Location getLocation(int position) throws TSException;
+	
+	int getPosition(int line, int offset) throws TSException;
 
 	String getContents();
 

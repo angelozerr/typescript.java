@@ -24,7 +24,7 @@ public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClie
 	private final File projectDir;
 	private INodejsProcess process;
 	private List<INodejsProcessListener> listeners;
-	
+
 	private final INodejsProcessListener listener = new NodejsProcessAdapter() {
 
 		@Override
@@ -67,9 +67,14 @@ public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClie
 	}
 
 	@Override
-	protected void processVoidRequest(Request request) throws TSException {
+	protected void processVoidRequest(Request request, boolean async) throws TSException {
 		try {
-			getProcess().sendRequest(request);
+			if (async) {
+				getProcess().sendRequestAsyncResponse(request);
+			} else {
+				getProcess().sendRequest(request);
+			}
+
 		} catch (Exception e) {
 			if (e instanceof TSException) {
 				throw (TSException) e;
@@ -95,7 +100,7 @@ public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClie
 			throw new TSException(e);
 		}
 	}
-	
+
 	public void addProcessListener(INodejsProcessListener listener) {
 		beginWriteState();
 		try {

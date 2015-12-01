@@ -49,7 +49,7 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 
 	@Override
 	protected String getContentType(IDocument doc) {
-		return "ts.eclipse.ide.core.tsSource";
+		return "ts.eclipse.ide.jsdt.core.tsSource";
 	}
 
 	@Override
