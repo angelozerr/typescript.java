@@ -5,7 +5,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TSException;
-import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 
 public interface IIDETypeScriptProject extends ITypeScriptProject {
@@ -17,7 +16,7 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 */
 	IProject getProject();
 
-	ITypeScriptFile getOpenedFile(IResource file, IDocument document) throws TSException;
+	IIDETypeScriptFile getOpenedFile(IResource file, IDocument document) throws TSException;
 
 	void configureConsole();
 

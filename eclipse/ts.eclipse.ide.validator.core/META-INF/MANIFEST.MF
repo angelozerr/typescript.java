@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.core.commands,
  org.eclipse.core.expressions,
- org.eclipse.wst.validation
+ org.eclipse.wst.validation,
+ ts.eclipse.ide.core
 Export-Package: ts.eclipse.ide.validator.core,
  ts.eclipse.ide.validator.core.validation
 Bundle-ActivationPolicy: lazy

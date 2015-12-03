@@ -1,4 +1,4 @@
-package ts.eclipse.ide.core.resources;
+package ts.eclipse.ide.internal.core.resources;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.BadLocationException;
@@ -8,14 +8,17 @@ import org.eclipse.jface.text.IDocumentListener;
 
 import ts.Location;
 import ts.TSException;
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.resources.AbstractTypeScriptFile;
 
-public class IDETypeScriptFile extends AbstractTypeScriptFile implements IDocumentListener {
+public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETypeScriptFile, IDocumentListener {
 
+	private final IResource file;
 	private final IDocument document;
 
 	public IDETypeScriptFile(IResource file, IDocument document) {
 		super(getFileName(file));
+		this.file = file;
 		this.document = document;
 		this.document.addDocumentListener(this);
 	}
@@ -67,5 +70,10 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IDocume
 		} catch (BadLocationException e) {
 			throw new TSException(e);
 		}
+	}
+
+	@Override
+	public IResource getResource() {
+		return file;
 	}
 }

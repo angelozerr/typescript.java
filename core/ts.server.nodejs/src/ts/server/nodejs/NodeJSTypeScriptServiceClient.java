@@ -147,7 +147,6 @@ public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClie
 		} finally {
 			endWriteState();
 		}
-		this.process.kill();
 	}
 
 	public File getProjectDir() {

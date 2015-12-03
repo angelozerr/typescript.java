@@ -11,11 +11,11 @@ import org.eclipse.wst.validation.internal.provisional.core.IValidationContext;
 import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.eclipse.ide.validator.core.validation.TypeScriptValidationHelper;
 import ts.eclipse.ide.validator.internal.ui.Trace;
-import ts.resources.ITypeScriptFile;
 
 /**
  * WTP TypeScript Validator "as-you-type" to validate TypeScript when user type
@@ -49,7 +49,7 @@ public class TypeScriptSourceValidator implements IValidator, ISourceValidator {
 
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(file.getProject());
-			ITypeScriptFile tsFile = tsProject.getOpenedFile(file, document);
+			IIDETypeScriptFile tsFile = tsProject.getOpenedFile(file, document);
 			TypeScriptValidationHelper.validate(tsFile, tsProject, reporter, this);
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while TypeScript validation.", e);

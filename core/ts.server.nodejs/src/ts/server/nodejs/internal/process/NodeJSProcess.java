@@ -172,6 +172,12 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 		} catch (IOException e) {
 			commands.add(tsserverFile.getPath());
 		}
+		commands.add("-p");
+		try {
+			commands.add(getProjectDir().getCanonicalPath());
+		} catch (IOException e) {
+			commands.add(getProjectDir().getPath());
+		}
 		// commands.addAll(createTernServerArgs());
 		return commands;
 	}

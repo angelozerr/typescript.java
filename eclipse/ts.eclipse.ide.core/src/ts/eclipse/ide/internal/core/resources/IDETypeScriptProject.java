@@ -14,11 +14,10 @@ import org.eclipse.jface.text.IDocument;
 import ts.TSException;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
-import ts.eclipse.ide.core.resources.IDETypeScriptFile;
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
-import ts.resources.ITypeScriptFile;
 import ts.resources.TypeScriptProject;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
@@ -62,9 +61,9 @@ public class IDETypeScriptProject extends TypeScriptProject
 	}
 
 	@Override
-	public ITypeScriptFile getOpenedFile(IResource file, IDocument document) throws TSException {
+	public IIDETypeScriptFile getOpenedFile(IResource file, IDocument document) throws TSException {
 		String fileName = IDETypeScriptFile.getFileName(file);
-		ITypeScriptFile tsFile = super.getOpenedFile(fileName);
+		IIDETypeScriptFile tsFile = (IIDETypeScriptFile) super.getOpenedFile(fileName);
 		if (tsFile == null) {
 			tsFile = new IDETypeScriptFile(file, document);
 			super.openFile(tsFile);

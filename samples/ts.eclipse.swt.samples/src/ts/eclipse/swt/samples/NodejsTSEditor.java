@@ -25,6 +25,7 @@ import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.resources.TypeScriptProject;
 import ts.server.ITypeScriptServiceClientFactory;
+import ts.server.LoggingInterceptor;
 import ts.server.nodejs.NodeJSTypeScriptServiceClientFactory;
 
 public class NodejsTSEditor {
@@ -44,6 +45,7 @@ public class NodejsTSEditor {
 				new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
 		File projectDir = new File("./samples");
 		ITypeScriptProject project = new TypeScriptProject(projectDir, factory);
+		project.getClient().addInterceptor(new LoggingInterceptor());
 
 		Display display = new Display();
 		Shell shell = new Shell(display);

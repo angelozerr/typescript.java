@@ -7,8 +7,13 @@ import com.eclipsesource.json.JsonObject;
  */
 public class FileRequestArgs extends JsonObject {
 
-	public FileRequestArgs(String fileName) {
-		super.add("file", fileName);
+	/**
+	 * 
+	 * @param file
+	 *            The file for the request (absolute pathname required).
+	 */
+	public FileRequestArgs(String file) {
+		super.add("file", file);
 	}
 
 }
