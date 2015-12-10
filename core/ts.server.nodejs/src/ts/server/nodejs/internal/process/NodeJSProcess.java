@@ -134,7 +134,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	@Override
 	public boolean isStarted() {
-		return process != null && process.isAlive();
+		return process != null;
 	}
 
 	private class ShutdownHookThread extends Thread {

@@ -26,7 +26,45 @@
 	          </instanceof></enablement>
 	    </consolePageParticipant>
 	 </extension>
-			
+
+	<!--======================================================================================-->
+	<!-- TypeScript Outline View                                      						             -->
+	<!--======================================================================================-->
+	
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="%TypeScriptOutlineView.name"
+            icon="$nl$/icons/full/eview16/outline.png"
+            category="org.eclipse.wst.jsdt.ui.java"
+            class="ts.eclipse.ide.internal.ui.views.TypeScriptOutlineView"
+            id="ts.eclipse.ide.ui.views.TypeScriptOutlineView">
+      </view>
+  </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            contentProvider="ts.eclipse.ide.internal.ui.views.TypeScriptOutlineContentProvider"
+            icon="icons/full/obj16/logo.png"
+            id="ts.eclipse.ide.ui.navigatorContent"
+            labelProvider="ts.eclipse.ide.internal.ui.views.TypeScriptOutlineLabelProvider"
+            name="%testNavigatorContent_name">
+         <triggerPoints>
+         </triggerPoints>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="ts.eclipse.ide.ui.outline">
+         <includes>
+            <contentExtension
+                  pattern="ts.eclipse.ide.ui.navigatorContent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+   			
     <extension point="org.eclipse.ui.startup">
         <startup
             class="ts.eclipse.ide.internal.ui.TypeScriptIDEStartup">
