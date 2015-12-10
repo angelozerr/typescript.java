@@ -44,8 +44,8 @@ public class NodejsTSEditor {
 		ITypeScriptServiceClientFactory factory = new NodeJSTypeScriptServiceClientFactory(
 				new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
 		File projectDir = new File("./samples");
-		ITypeScriptProject project = new TypeScriptProject(projectDir, factory);
-		project.getClient().addInterceptor(new LoggingInterceptor());
+		ITypeScriptProject tsProject = new TypeScriptProject(projectDir, factory);
+		tsProject.getClient().addInterceptor(new LoggingInterceptor());
 
 		Display display = new Display();
 		Shell shell = new Shell(display);
@@ -62,8 +62,8 @@ public class NodejsTSEditor {
 		Text text = new Text(shell, SWT.MULTI | SWT.BORDER);
 		text.setText("var s = \"\";s.");
 
-		ITypeScriptFile file = new SWTTextTypeScriptFile("sample2.ts", text);
-		project.openFile(file);
+		ITypeScriptFile tsFile = new SWTTextTypeScriptFile("sample2.ts", text, tsProject);
+		tsFile.open();
 
 		char[] autoActivationCharacters = new char[] { '.' };
 		KeyStroke keyStroke = null;
@@ -73,7 +73,7 @@ public class NodejsTSEditor {
 			e.printStackTrace();
 		}
 		ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(),
-				new TypeScriptContentProposalProvider(file.getName(), project), keyStroke, autoActivationCharacters);
+				new TypeScriptContentProposalProvider(tsFile.getName(), tsProject), keyStroke, autoActivationCharacters);
 		adapter.setLabelProvider(TSLabelProvider.getInstance());
 		text.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -89,7 +89,7 @@ public class NodejsTSEditor {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-		project.dispose();
+		tsProject.dispose();
 		display.dispose();
 	}
 

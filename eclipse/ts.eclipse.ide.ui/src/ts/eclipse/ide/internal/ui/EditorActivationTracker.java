@@ -89,13 +89,10 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 							@Override
 							protected IStatus run(IProgressMonitor monitor) {
 								monitor.beginTask("", -1); //$NON-NLS-1$
-								if (project.getOpenedFile(file.getProjectRelativePath().toString()) == null) {
-									try {
-										project.getOpenedFile(file, document);
-									} catch (TSException e) {
-										return new Status(IStatus.ERROR, TypeScriptUIPlugin.PLUGIN_ID, e.getMessage(),
-												e);
-									}
+								try {
+									project.openFile(file, document);
+								} catch (TSException e) {
+									return new Status(IStatus.ERROR, TypeScriptUIPlugin.PLUGIN_ID, e.getMessage(), e);
 								}
 								return Status.OK_STATUS;
 							}
@@ -117,13 +114,12 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 			try {
 				final IIDETypeScriptProject project = TypeScriptCorePlugin.getTypeScriptProject(file.getProject());
 				if (project != null) {
-					final String fileName = file.getProjectRelativePath().toString();
 					new Job("Closing TypeScript file with tsserver...") {
 						@Override
 						protected IStatus run(IProgressMonitor monitor) {
 							monitor.beginTask("", -1); //$NON-NLS-1$
 							try {
-								project.closeFile(fileName);
+								project.closeFile(file);
 							} catch (TSException e) {
 								return new Status(IStatus.ERROR, TypeScriptUIPlugin.PLUGIN_ID, e.getMessage(), e);
 							}

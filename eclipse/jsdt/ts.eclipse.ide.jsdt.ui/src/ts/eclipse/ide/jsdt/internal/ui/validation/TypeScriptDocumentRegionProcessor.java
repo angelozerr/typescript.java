@@ -58,7 +58,7 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(resource.getProject());
 			if (tsProject != null) {
-				ITypeScriptFile tsFile = tsProject.getOpenedFile(resource, getDocument());
+				ITypeScriptFile tsFile = tsProject.openFile(resource, getDocument());
 				int start = dirtyRegion.getOffset();
 				int end = start + dirtyRegion.getLength() - 1;
 				String newText = dirtyRegion.getText();

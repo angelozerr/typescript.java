@@ -51,16 +51,16 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		return projectDir;
 	}
 
-	@Override
-	public void openFile(ITypeScriptFile file) throws TSException {
-		getClient().openFile(file.getName());
-		this.openedFiles.put(file.getName(), file);
+	void openFile(ITypeScriptFile tsFile) throws TSException {
+		String name = tsFile.getName();
+		getClient().openFile(name);
+		this.openedFiles.put(name, tsFile);
 	}
 
-	@Override
-	public void closeFile(String fileName) throws TSException {
-		getClient().closeFile(fileName);
-		this.openedFiles.remove(fileName);
+	void closeFile(ITypeScriptFile tsFile) throws TSException {
+		String name = tsFile.getName();
+		getClient().closeFile(name);
+		this.openedFiles.remove(name);
 	}
 
 	@Override
@@ -177,10 +177,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void dispose() throws TSException {
-		for (ITypeScriptFile openedFile : openedFiles.values()) {
-			closeFile(openedFile.getName());
-		}
+	public void dispose() throws TSException {		
 		disposeServer();
 	}
 
@@ -243,7 +240,19 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 				}
 			}
 		}
+		openedFiles.clear();
 	}
+	
+//	private void closeFiles() {
+//		for (ITypeScriptFile openedFile : openedFiles.values()) {
+//			try {
+//				openedFile.close();
+//			} catch (TSException e) {
+//				// ignore error
+//			}
+//		}
+//		openedFiles.clear();
+//	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T getData(String key) {

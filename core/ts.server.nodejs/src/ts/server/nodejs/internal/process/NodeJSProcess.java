@@ -54,6 +54,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 		public void run() {
 			try {
 				try {
+					notifyStartProcess(0);
 					BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					String line = null;
 					while ((line = r.readLine()) != null) {
@@ -66,8 +67,8 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 				}
 				if (process != null) {
 					process.waitFor();
-				}
-				kill();
+				}				
+				kill();				
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
@@ -133,7 +134,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	@Override
 	public boolean isStarted() {
-		return process != null;
+		return process != null && process.isAlive();
 	}
 
 	private class ShutdownHookThread extends Thread {
@@ -197,6 +198,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 		if (process != null) {
 			process.destroy();
 			process = null;
+			notifyStopProcess();
 		}
 		if (outThread != null) {
 			outThread.interrupt();
@@ -206,9 +208,9 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 			errThread.interrupt();
 			errThread = null;
 		}
-		if (pool != null) {
+		if (!pool.isShutdown()) {
 			pool.shutdown();
-		}
+		}		
 	}
 
 	/**

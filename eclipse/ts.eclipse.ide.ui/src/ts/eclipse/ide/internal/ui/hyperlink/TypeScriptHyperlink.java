@@ -33,7 +33,7 @@ public class TypeScriptHyperlink extends AbstractTypeScriptHyperlink {
 
 	@Override
 	protected void findDef() throws Exception {
-		ITypeScriptFile tsFile = tsProject.getOpenedFile(resource, document);
+		ITypeScriptFile tsFile = tsProject.openFile(resource, document);
 		int position = region.getOffset();
 		tsProject.definition(tsFile, position, this);
 	}

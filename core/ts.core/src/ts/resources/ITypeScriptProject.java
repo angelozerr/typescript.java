@@ -30,10 +30,6 @@ public interface ITypeScriptProject {
 	 */
 	ITypeScriptServiceClient getClient() throws TSException;
 
-	void openFile(ITypeScriptFile file) throws TSException;
-
-	void closeFile(String fileName) throws TSException;
-
 	void completions(ITypeScriptFile file, int position, ITypeScriptCompletionCollector collector) throws TSException;
 
 	void definition(ITypeScriptFile file, int position, ITypeScriptDefinitionCollector collector) throws TSException;

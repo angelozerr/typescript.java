@@ -6,17 +6,12 @@ import ts.internal.LocationReader;
 
 public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 
-	private final String name;
+	private final ITypeScriptProject tsProject;
 	private boolean dirty;
 
-	public AbstractTypeScriptFile(String name) {
-		this.name = name;
+	public AbstractTypeScriptFile(ITypeScriptProject tsProject) {
+		this.tsProject = tsProject;
 		this.setDirty(false);
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override
@@ -33,10 +28,20 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	public Location getLocation(int position) throws TSException {
 		return new LocationReader(getContents(), position).getLineOffset();
 	}
-	
+
 	@Override
 	public int getPosition(int line, int offset) throws TSException {
 		// TODO: implement that
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void open() throws TSException {
+		((TypeScriptProject) tsProject).openFile(this);
+	}
+	
+	@Override
+	public void close() throws TSException {
+		((TypeScriptProject) tsProject).closeFile(this);
 	}
 }

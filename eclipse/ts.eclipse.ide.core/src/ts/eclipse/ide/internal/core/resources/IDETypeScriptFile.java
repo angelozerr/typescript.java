@@ -9,6 +9,7 @@ import org.eclipse.jface.text.IDocumentListener;
 import ts.Location;
 import ts.TSException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.resources.AbstractTypeScriptFile;
 
 public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETypeScriptFile, IDocumentListener {
@@ -16,8 +17,8 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	private final IResource file;
 	private final IDocument document;
 
-	public IDETypeScriptFile(IResource file, IDocument document) {
-		super(getFileName(file));
+	public IDETypeScriptFile(IResource file, IDocument document, IIDETypeScriptProject tsProject) {
+		super(tsProject);
 		this.file = file;
 		this.document = document;
 		this.document.addDocumentListener(this);
@@ -25,6 +26,11 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 
 	public static String getFileName(IResource file) {
 		return file.getProjectRelativePath().toString();
+	}
+
+	@Override
+	public String getName() {
+		return getFileName(file);
 	}
 
 	@Override

@@ -62,7 +62,7 @@ public class TypeScriptCompletionProposalComputer
 					int position = javaContext.getInvocationOffset();
 					IResource resource = javaContext.getCompilationUnit().getResource();
 					IDocument document = javaContext.getDocument();
-					ITypeScriptFile tsFile = tsProject.getOpenedFile(resource, document);
+					ITypeScriptFile tsFile = tsProject.openFile(resource, document);
 
 					CharSequence prefix = javaContext.computeIdentifierPrefix(); //TSHelper.getPrefix(document.get(), position);
 					

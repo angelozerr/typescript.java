@@ -5,13 +5,16 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Text;
 
 import ts.resources.AbstractTypeScriptFile;
+import ts.resources.ITypeScriptProject;
 
 public class SWTTextTypeScriptFile extends AbstractTypeScriptFile {
 
+	private final String name;
 	private final Text text;
 
-	public SWTTextTypeScriptFile(String name, Text text) {
-		super(name);
+	public SWTTextTypeScriptFile(String name, Text text, ITypeScriptProject tsProject) {
+		super(tsProject);
+		this.name = name;
 		this.text = text;
 		text.addModifyListener(new ModifyListener() {
 
@@ -20,6 +23,11 @@ public class SWTTextTypeScriptFile extends AbstractTypeScriptFile {
 				setDirty(true);
 			}
 		});
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -32,7 +40,7 @@ public class SWTTextTypeScriptFile extends AbstractTypeScriptFile {
 	public String getPrefix(int position) {
 		return null;
 	}
-	
+
 	@Override
 	public String getContents() {
 		return text.getText();

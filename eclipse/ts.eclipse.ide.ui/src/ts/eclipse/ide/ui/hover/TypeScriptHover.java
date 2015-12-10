@@ -62,7 +62,7 @@ public class TypeScriptHover extends AbstractTextHover implements ITextHoverExte
 			try {
 				tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
 				int position = hoverRegion.getOffset();
-				ITypeScriptFile tsFile = tsProject.getOpenedFile(scriptFile, textViewer.getDocument());
+				ITypeScriptFile tsFile = tsProject.openFile(scriptFile, textViewer.getDocument());
 
 				HTMLTypeScriptQuickInfoCollector collector = new HTMLTypeScriptQuickInfoCollector();
 				tsProject.quickInfo(tsFile, position, collector);

@@ -52,9 +52,7 @@ public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClie
 	}
 
 	private void initProcess(INodejsProcess process) {
-		if (!process.isStarted()) {
-			process.start();
-		}
+		
 	}
 
 	private INodejsProcess getProcess() throws TSException {
@@ -63,6 +61,9 @@ public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClie
 			process.addProcessListener(listener);
 		}
 		initProcess(process);
+		if (!process.isStarted()) {
+			process.start();
+		}
 		return process;
 	}
 

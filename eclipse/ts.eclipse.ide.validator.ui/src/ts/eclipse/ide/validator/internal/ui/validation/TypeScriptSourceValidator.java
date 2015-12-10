@@ -49,7 +49,7 @@ public class TypeScriptSourceValidator implements IValidator, ISourceValidator {
 
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(file.getProject());
-			IIDETypeScriptFile tsFile = tsProject.getOpenedFile(file, document);
+			IIDETypeScriptFile tsFile = tsProject.openFile(file, document);
 			TypeScriptValidationHelper.validate(tsFile, tsProject, reporter, this);
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while TypeScript validation.", e);
