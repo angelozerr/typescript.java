@@ -30,10 +30,6 @@ public interface ITypeScriptProject {
 	 */
 	ITypeScriptServiceClient getClient() throws TSException;
 
-	void completions(ITypeScriptFile file, int position, ITypeScriptCompletionCollector collector) throws TSException;
-
-	void definition(ITypeScriptFile file, int position, ITypeScriptDefinitionCollector collector) throws TSException;
-
 	void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
 			throws TSException;
 

@@ -26,11 +26,11 @@ public class TypeScriptContentProposalProvider implements IContentProposalProvid
 
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
-		ITypeScriptFile file = project.getOpenedFile(fileName);
+		ITypeScriptFile tsFile = project.getOpenedFile(fileName);
 		String prefix = TSHelper.getPrefix(contents, position);
 		ContentProposalCollector collector = new ContentProposalCollector(prefix);
 		try {
-			project.completions(file, position, collector);
+			tsFile.completions(position, collector);
 		} catch (TSException e) {
 			e.printStackTrace();
 		}

@@ -16,6 +16,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.ui.Trace;
 import ts.eclipse.ide.internal.ui.hyperlink.TypeScriptHyperlink;
@@ -40,12 +41,13 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 			// the project of the resource has typescript nature, execute typescript
 			// hyperlink.
 			try {
-				IIDETypeScriptProject ternProject = TypeScriptCorePlugin
+				IIDETypeScriptProject tsProject = TypeScriptCorePlugin
 						.getTypeScriptProject(project);
 				IDocument document = textViewer.getDocument();
+				IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);				
 				IRegion wordRegion= JavaWordFinder.findWord(document, region.getOffset());
-				TypeScriptHyperlink hyperlink = new TypeScriptHyperlink(document, wordRegion,
-						resource, ternProject);
+				
+				TypeScriptHyperlink hyperlink = new TypeScriptHyperlink(tsFile, wordRegion);
 				if (hyperlink.isValid()) {
 					IHyperlink[] hyperlinks = new IHyperlink[1];
 					hyperlinks[0] = hyperlink;
@@ -53,7 +55,7 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 				}
 				return null;
 
-			} catch (CoreException e) {
+			} catch (Exception e) {
 				Trace.trace(Trace.WARNING, "Error while TypeScript hyperlink", e);
 			}
 		}

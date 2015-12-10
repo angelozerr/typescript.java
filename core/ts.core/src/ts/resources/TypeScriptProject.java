@@ -64,29 +64,6 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void completions(ITypeScriptFile file, int position, ITypeScriptCompletionCollector collector)
-			throws TSException {
-		ITypeScriptServiceClient client = getClient();
-		synchFileContent(file, client);
-		Location location = file.getLocation(position);
-		int line = location.getLine();
-		int offset = location.getOffset();
-		String prefix = null;
-		client.completions(file.getName(), line, offset, prefix, collector);
-	}
-
-	@Override
-	public void definition(ITypeScriptFile file, int position, ITypeScriptDefinitionCollector collector)
-			throws TSException {
-		ITypeScriptServiceClient client = getClient();
-		synchFileContent(file, client);
-		Location location = file.getLocation(position);
-		int line = location.getLine();
-		int offset = location.getOffset();
-		client.definition(file.getName(), line, offset, collector);
-	}
-
-	@Override
 	public void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
 			throws TSException {
 		ITypeScriptServiceClient client = getClient();
@@ -125,7 +102,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		getClient().geterr(new String[] { file.getName() }, delay, collector);
 	}
 
-	private void synchFileContent(ITypeScriptFile file, ITypeScriptServiceClient client) throws TSException {
+	void synchFileContent(ITypeScriptFile file, ITypeScriptServiceClient client) throws TSException {
 		if (file.isDirty()) {
 			client.updateFile(file.getName(), file.getContents());
 			file.setDirty(false);

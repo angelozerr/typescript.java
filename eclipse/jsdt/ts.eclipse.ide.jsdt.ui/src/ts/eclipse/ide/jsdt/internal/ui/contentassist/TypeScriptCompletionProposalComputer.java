@@ -12,35 +12,22 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui.contentassist;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.contentassist.CompletionProposal;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.wst.jsdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.wst.jsdt.ui.text.java.JavaContentAssistInvocationContext;
 
-import ts.ICompletionEntry;
-import ts.ICompletionInfo;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.jface.text.contentassist.CompletionProposalCollector;
 import ts.resources.ITypeScriptFile;
-import ts.resources.ITypeScriptProject;
-import ts.resources.TypeScriptResourcesManager;
-import ts.server.ITypeScriptServiceClient;
-import ts.server.nodejs.NodeJSTypeScriptServiceClient;
-import ts.utils.TSHelper;
 
 /**
  * JSDT completion proposal computer manage completion Proposal for Javascript
@@ -64,10 +51,12 @@ public class TypeScriptCompletionProposalComputer
 					IDocument document = javaContext.getDocument();
 					ITypeScriptFile tsFile = tsProject.openFile(resource, document);
 
-					CharSequence prefix = javaContext.computeIdentifierPrefix(); //TSHelper.getPrefix(document.get(), position);
-					
-					CompletionProposalCollector collector = new CompletionProposalCollector(position, prefix != null ? prefix.toString() : null);
-					tsProject.completions(tsFile, position, collector);
+					CharSequence prefix = javaContext.computeIdentifierPrefix(); // TSHelper.getPrefix(document.get(),
+																					// position);
+
+					CompletionProposalCollector collector = new CompletionProposalCollector(position,
+							prefix != null ? prefix.toString() : null);
+					tsFile.completions(position, collector);
 					return collector.getProposals();
 				}
 			} catch (Exception e) {

@@ -2,9 +2,13 @@ package ts.resources;
 
 import ts.Location;
 import ts.TSException;
+import ts.server.completions.ITypeScriptCompletionCollector;
+import ts.server.definition.ITypeScriptDefinitionCollector;
 
 public interface ITypeScriptFile {
 
+	ITypeScriptProject getProject();
+	
 	String getName();
 
 	boolean isDirty();
@@ -24,5 +28,10 @@ public interface ITypeScriptFile {
 	void open() throws TSException;
 
 	void close() throws TSException;
+	
+	void completions(int position, ITypeScriptCompletionCollector collector) throws TSException;
+
+	void definition(int position, ITypeScriptDefinitionCollector collector) throws TSException;
+
 
 }
