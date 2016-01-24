@@ -25,7 +25,7 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	}
 
 	public static String getFileName(IResource file) {
-		return file.getProjectRelativePath().toString();
+		return file.getLocation().toString();
 	}
 
 	@Override

@@ -11,7 +11,9 @@
 package ts.eclipse.ide.ui.hyperlink;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -54,11 +56,21 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 
 	}
 
-	private IFile findFile(String filename) {
-		if (StringUtils.isEmpty(filename)) {
+	private IFile findFile(String path) {	
+		if (StringUtils.isEmpty(path)) {
 			return null;
 		}
-		return tsProject.getProject().getFile(new Path(filename));
+		IPath filePath = new Path(path);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IFile file = root.getFile(filePath);
+		if (file.exists()) {
+			return file;
+		}
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(filePath);
+		if (files.length > 0) {
+			return files[0];
+		}
+		return null;
 	}
 
 	@Override
