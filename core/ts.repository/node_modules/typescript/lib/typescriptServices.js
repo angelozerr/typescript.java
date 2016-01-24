@@ -1947,10 +1947,6 @@ var ts;
                     // and is more efficient than `fs.watchFile` (ref: https://github.com/nodejs/node/pull/2649
                     // and https://github.com/Microsoft/TypeScript/issues/4643), therefore
                     // if the current node.js version is newer than 4, use `fs.watch` instead.
-                    if (isNode4OrLater()) {
-                        // Note: in node the callback of fs.watch is given only the relative file name as a parameter
-                        return _fs.watch(fileName, function (eventName, relativeFileName) { return callback(fileName); });
-                    }
                     var watchedFile = watchedFileSet.addFile(fileName, callback);
                     return {
                         close: function () { return watchedFileSet.removeFile(watchedFile); }
@@ -18777,9 +18773,11 @@ var ts;
                 }
                 else {
                     source = getApparentType(source);
-                    if (source.flags & 80896 /* ObjectType */ && (target.flags & (4096 /* Reference */ | 8192 /* Tuple */) ||
-                        (target.flags & 65536 /* Anonymous */) && target.symbol && target.symbol.flags & (8192 /* Method */ | 2048 /* TypeLiteral */ | 32 /* Class */))) {
-                        // If source is an object type, and target is a type reference, a tuple type, the type of a method, or a type literal, infer from members
+                    if (source.flags & 80896 /* ObjectType */ && (target.flags & 4096 /* Reference */ && target.typeArguments ||
+                        target.flags & 8192 /* Tuple */ ||
+                        target.flags & 65536 /* Anonymous */ && target.symbol && target.symbol.flags & (8192 /* Method */ | 2048 /* TypeLiteral */ | 32 /* Class */))) {
+                        // If source is an object type, and target is a type reference with type arguments, a tuple type,
+                        // the type of a method, or a type literal, infer from members
                         if (isInProcess(source, target)) {
                             return;
                         }
@@ -35986,7 +35984,7 @@ var ts;
     /* @internal */ ts.ioWriteTime = 0;
     /** The version of the TypeScript compiler release */
     var emptyArray = [];
-    ts.version = "1.7.3";
+    ts.version = "1.7.5";
     function findConfigFile(searchPath) {
         var fileName = "tsconfig.json";
         while (true) {
