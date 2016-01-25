@@ -41,11 +41,28 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	@Override
 	public void documentChanged(DocumentEvent event) {
 		setDirty(true);
+//		try {
+//			String newText = event.getText();
+//			int position = event.getOffset();
+//			Location loc = getLocation(position);
+//			int line = loc.getLine();
+//			int offset = loc.getOffset() - newText.length() - 1;		
+//			
+//			//int end = start + event.getLength();
+//			int endLine = line;//document.getLineOfOffset(end);
+//			int endOffset =  0;//loc.getOffset();//event.getLength(); //end - document.getLineOffset(line);
+//			
+//			getProject().getClient().changeFile(file.getName(), line, offset, endLine, endOffset, newText);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	@Override
-	public void dispose() {
+	public void close() throws TSException {
 		this.document.removeDocumentListener(this);
+		super.close();
 	}
 
 	@Override

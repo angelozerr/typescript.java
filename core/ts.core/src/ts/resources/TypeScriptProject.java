@@ -11,8 +11,6 @@ import ts.TSException;
 import ts.server.ITypeScriptServerListener;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
-import ts.server.completions.ITypeScriptCompletionCollector;
-import ts.server.definition.ITypeScriptDefinitionCollector;
 import ts.server.geterr.ITypeScriptGeterrCollector;
 import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
@@ -114,22 +112,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		synchronized (serverLock) {
 			if (isServerDisposed()) {
 				try {
-					// ITernServerType type =
-					// TernCorePreferencesSupport.getInstance().getServerType();
 					this.client = create(getProjectDir());
-					// this.client.addServerListener(new
-					// TypeScriptServerAdapter() {
-					// @Override
-					// public void onStop(ITernServer server) {
-					// getFileSynchronizer().cleanIndexedFiles();
-					// }
-					// });
-					// if
-					// (!TernCorePreferencesSupport.getInstance().isDisableAsynchronousReques(project))
-					// {
-					// this.ternServer.setRequestProcessor(new
-					// IDETernServerAsyncReqProcessor(ternServer));
-					// }
 					copyListeners();
 					onCreateClient(client);
 				} catch (Exception e) {
@@ -206,6 +189,14 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		synchronized (serverLock) {
 			if (!isServerDisposed()) {
 				if (hasClient()) {
+					// close opened files
+					for (ITypeScriptFile openedFile : openedFiles.values()) {
+						try {
+							openedFile.close();
+						} catch (TSException e) {							
+							e.printStackTrace();
+						}
+					}
 					// // notify uploader that we are going to dispose the
 					// server,
 					// // so that it can finish gracefully
@@ -217,7 +208,6 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 				}
 			}
 		}
-		openedFiles.clear();
 	}
 	
 //	private void closeFiles() {

@@ -15,8 +15,6 @@ public interface ITypeScriptFile {
 
 	void setDirty(boolean dirty);
 
-	void dispose();
-
 	String getPrefix(int position);
 
 	Location getLocation(int position) throws TSException;
