@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <bundle id="ts.eclipse" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.core" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.server.nodejs.core" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.server.nodejs.ui" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.ui" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.validator.core" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.validator.ui" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <category-def name="typescript.java" label="typescript.java"/>
+</site>

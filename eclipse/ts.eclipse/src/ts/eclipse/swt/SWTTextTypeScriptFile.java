@@ -30,7 +30,6 @@ public class SWTTextTypeScriptFile extends AbstractTypeScriptFile {
 		return name;
 	}
 
-	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 
