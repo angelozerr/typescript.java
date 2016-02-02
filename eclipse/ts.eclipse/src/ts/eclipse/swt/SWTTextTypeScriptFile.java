@@ -30,11 +30,6 @@ public class SWTTextTypeScriptFile extends AbstractTypeScriptFile {
 		return name;
 	}
 
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
-
 	@Override
 	public String getPrefix(int position) {
 		return null;
