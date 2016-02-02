@@ -1,5 +1,7 @@
 # typescript.java
 
+[![Build Status](https://secure.travis-ci.org/angelozerr/typescript.java.png)](http://travis-ci.org/angelozerr/typescript.java)
+
 Goal of typescript.java is to provide the capability to consume TypeScript language Service with tsserver in a Java context. Any Java IDE like Eclipse, Netbeans, WebStorm could consume typescript.java.
 
 typescript.java provides :
