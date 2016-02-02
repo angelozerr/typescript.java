@@ -3,7 +3,6 @@ package ts.eclipse.jface.text.contentassist;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import ts.server.completions.AbstractCompletionCollector;
@@ -22,11 +21,8 @@ public class CompletionProposalCollector extends AbstractCompletionCollector {
 	@Override
 	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
 		String prefix = getPrefix();
-		int cursorPosition = name.length();
-		int replacementOffset = position - prefix.length();
-		int replacementlength = prefix.length();
-		CompletionProposal proposal = new CompletionProposal(name, replacementOffset, replacementlength, cursorPosition,
-				null, null, null, null);
+		ICompletionProposal proposal = new TypeScriptCompletionProposal(name, kind, kindModifiers, sortText,
+				position, prefix);
 		proposals.add(proposal);
 	}
 

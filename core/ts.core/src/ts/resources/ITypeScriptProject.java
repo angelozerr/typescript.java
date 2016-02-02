@@ -58,4 +58,5 @@ public interface ITypeScriptProject {
 
 	boolean isServerDisposed();
 
+	SynchStrategy getSynchStrategy();
 }

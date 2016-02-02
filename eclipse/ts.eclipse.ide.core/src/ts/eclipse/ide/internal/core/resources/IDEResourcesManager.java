@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.resources.ITypeScriptProject;
 import ts.resources.ITypeScriptResourcesManagerDelegate;
-import ts.utils.FileExtensionUtils;
+import ts.utils.FileUtils;
 
 public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate {
 
@@ -68,9 +68,9 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		if (fileObject instanceof IFile) {
 			return ((IFile) fileObject).getFileExtension();
 		} else if (fileObject instanceof File) {
-			return FileExtensionUtils.getFileExtension(((File) fileObject).getName());
+			return FileUtils.getFileExtension(((File) fileObject).getName());
 		} else if (fileObject instanceof String) {
-			return FileExtensionUtils.getFileExtension((String) fileObject);
+			return FileUtils.getFileExtension((String) fileObject);
 		}
 		return null;
 	}
@@ -78,7 +78,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	@Override
 	public boolean isTSFile(Object fileObject) {
 		String ext = getExtension(fileObject);
-		return ext != null && FileExtensionUtils.TS_EXTENSION.equals(ext.toLowerCase());
+		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
 	}
 
 }

@@ -36,6 +36,13 @@ public class TypeScriptReporterCollector implements ITypeScriptGeterrCollector {
 			IResource resource = tsFile.getResource();
 			int start = tsFile.getPosition(startLine, startOffset);
 			int end = tsFile.getPosition(endLine, endOffset);
+			if (start == end) {
+				if (start == 0) {
+					end = 1;
+				} else {
+					start = start -1;
+				}
+			}
 			// TODO: severity
 			String severity = null;
 			LocalizedMessage message = new LocalizedMessage(getSeverity(severity), text, resource);

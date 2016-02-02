@@ -143,7 +143,11 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	@Override
 	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TSException {
 		Request request = new GeterrRequest(files, delay, collector);
-		internalProcessVoidRequest(request, true);
+		if (delay == 0) {
+			internalProcessRequest(request);
+		} else {
+			internalProcessVoidRequest(request, true);
+		}
 	}
 
 	/**

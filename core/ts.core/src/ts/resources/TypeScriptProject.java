@@ -19,6 +19,8 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 
 	private final File projectDir;
 	private final ITypeScriptServiceClientFactory factory;
+	private final SynchStrategy synchStrategy;
+
 	private final Map<String, ITypeScriptFile> openedFiles;
 	private ITypeScriptServiceClient client;
 
@@ -26,15 +28,20 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	private final List<ITypeScriptServerListener> listeners;
 	protected final Object serverLock = new Object();
 
+	public TypeScriptProject(File projectDir, ITypeScriptServiceClientFactory factory) {
+		this(projectDir, factory, SynchStrategy.RELOAD);
+	}
+
 	/**
 	 * Tern project constructor.
 	 * 
 	 * @param projectDir
 	 *            the project base directory.
 	 */
-	public TypeScriptProject(File projectDir, ITypeScriptServiceClientFactory factory) {
+	public TypeScriptProject(File projectDir, ITypeScriptServiceClientFactory factory, SynchStrategy synchStrategy) {
 		this.projectDir = projectDir;
 		this.factory = factory;
+		this.synchStrategy = synchStrategy;
 		this.openedFiles = new HashMap<String, ITypeScriptFile>();
 		this.data = new HashMap<String, Object>();
 		this.listeners = new ArrayList<ITypeScriptServerListener>();
@@ -57,16 +64,22 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	void closeFile(ITypeScriptFile tsFile) throws TSException {
+		closeFile(tsFile, true);
+	}
+
+	void closeFile(ITypeScriptFile tsFile, boolean updateCache) throws TSException {
 		String name = tsFile.getName();
 		getClient().closeFile(name);
-		this.openedFiles.remove(name);
+		if (updateCache) {
+			this.openedFiles.remove(name);
+		}
 	}
 
 	@Override
 	public void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
 			throws TSException {
 		ITypeScriptServiceClient client = getClient();
-		synchFileContent(file, client);
+		file.synch();
 		Location location = file.getLocation(position);
 		int line = location.getLine();
 		int offset = location.getOffset();
@@ -77,7 +90,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	public void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
 			throws TSException {
 		ITypeScriptServiceClient client = getClient();
-		synchFileContent(file, client);
+		file.synch();
 		Location location = file.getLocation(position);
 		int line = location.getLine();
 		int offset = location.getOffset();
@@ -97,15 +110,8 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 
 	@Override
 	public void geterr(ITypeScriptFile file, int delay, ITypeScriptGeterrCollector collector) throws TSException {
-		synchFileContent(file, client);
+		file.synch();
 		getClient().geterr(new String[] { file.getName() }, delay, collector);
-	}
-
-	void synchFileContent(ITypeScriptFile file, ITypeScriptServiceClient client) throws TSException {
-		if (file.isDirty()) {
-			// client.updateFile(file.getName(), file.getContents());
-			file.setDirty(false);
-		}
 	}
 
 	@Override
@@ -133,7 +139,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public ITypeScriptFile getOpenedFile(String fileName) {
+	public synchronized ITypeScriptFile getOpenedFile(String fileName) {
 		return openedFiles.get(fileName);
 	}
 
@@ -193,7 +199,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 					// close opened files
 					for (ITypeScriptFile openedFile : openedFiles.values()) {
 						try {
-							openedFile.close();
+							closeFile(openedFile, false);
 						} catch (TSException e) {
 							e.printStackTrace();
 						}
@@ -242,4 +248,8 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		}
 	}
 
+	@Override
+	public SynchStrategy getSynchStrategy() {
+		return synchStrategy;
+	}
 }

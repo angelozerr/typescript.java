@@ -27,6 +27,7 @@ import ts.resources.TypeScriptProject;
 import ts.server.ITypeScriptServiceClientFactory;
 import ts.server.LoggingInterceptor;
 import ts.server.nodejs.NodeJSTypeScriptServiceClientFactory;
+import ts.utils.FileUtils;
 
 public class NodejsTSEditor {
 
@@ -58,11 +59,13 @@ public class NodejsTSEditor {
 		saveButton.setEnabled(false);
 		saveButton.setLayoutData(new GridData());
 
-		// Tu cr�es ton text
+		File sampleFile = new File(projectDir, "sample.ts");
+		
 		Text text = new Text(shell, SWT.MULTI | SWT.BORDER);
-		text.setText("var s = \"\";s.");
+		text.setText(FileUtils.getContents(sampleFile));
 
-		ITypeScriptFile tsFile = new SWTTextTypeScriptFile("sample2.ts", text, tsProject);
+		
+		ITypeScriptFile tsFile = new SWTTextTypeScriptFile(FileUtils.getPath(sampleFile), text, tsProject);
 		tsFile.open();
 
 		char[] autoActivationCharacters = new char[] { '.' };

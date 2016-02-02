@@ -1,6 +1,7 @@
 package test;
 
 import java.io.File;
+import java.io.IOException;
 
 import ts.ICompletionEntry;
 import ts.ICompletionInfo;
@@ -9,20 +10,23 @@ import ts.server.ITypeScriptServiceClient;
 import ts.server.completions.CompletionInfo;
 import ts.server.definition.DefinitionsInfo;
 import ts.server.nodejs.NodeJSTypeScriptServiceClient;
+import ts.utils.FileUtils;
 
 public class Main {
 
-	public static void main(String[] args) throws InterruptedException, TSException {
+	public static void main(String[] args) throws InterruptedException, TSException, IOException {
 
+		File projectDir = new File("./samples");
 		// sample2.ts has the following content: 
 		// var s = "";s.
-		String fileName = "sample2.ts";
+		File sampleFile = new File(projectDir, "sample.ts");
+		String fileName = FileUtils.getPath(sampleFile);
 		
 		// Create TypeScript client
-		ITypeScriptServiceClient client = new NodeJSTypeScriptServiceClient(new File("./samples"), new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
+		ITypeScriptServiceClient client = new NodeJSTypeScriptServiceClient(projectDir, new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
 		
 		// Open "sample2.ts" in an editor
-		client.openFile(fileName);
+		client.openFile(fileName, null);
 		
 		// Do completion after the last dot of "s" variable which is a String (charAt, ....)
 		CompletionInfo completionInfo = new CompletionInfo(null);

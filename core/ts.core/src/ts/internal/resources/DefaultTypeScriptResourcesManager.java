@@ -8,7 +8,7 @@ import java.util.Map;
 import ts.resources.ITypeScriptProject;
 import ts.resources.ITypeScriptResourcesManagerDelegate;
 import ts.resources.TypeScriptProject;
-import ts.utils.FileExtensionUtils;
+import ts.utils.FileUtils;
 
 public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesManagerDelegate {
 
@@ -41,14 +41,14 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 	@Override
 	public boolean isTSFile(Object fileObject) {
 		String ext = getExtension(fileObject);
-		return ext != null && FileExtensionUtils.TS_EXTENSION.equals(ext.toLowerCase());
+		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
 	}
 
 	protected String getExtension(Object fileObject) {
 		if (fileObject instanceof File) {
-			return FileExtensionUtils.getFileExtension(((File) fileObject).getName());
+			return FileUtils.getFileExtension(((File) fileObject).getName());
 		} else if (fileObject instanceof String) {
-			return FileExtensionUtils.getFileExtension((String) fileObject);
+			return FileUtils.getFileExtension((String) fileObject);
 		}
 		return null;
 	}

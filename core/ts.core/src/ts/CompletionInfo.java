@@ -1,7 +1,4 @@
-package ts.internal;
-
-import ts.ICompletionEntry;
-import ts.ICompletionInfo;
+package ts;
 
 public class CompletionInfo implements ICompletionInfo {
 

@@ -12,6 +12,7 @@ Import-Package: com.eclipsesource.json;version="0.9.4",
  org.osgi.framework;version="1.3.0"
 Bundle-ActivationPolicy: lazy
 Export-Package: ts.eclipse.jface.fieldassist,
+ ts.eclipse.jface.images,
  ts.eclipse.jface.text,
  ts.eclipse.jface.text.contentassist,
  ts.eclipse.jface.text.html,

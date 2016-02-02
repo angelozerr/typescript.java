@@ -53,6 +53,6 @@ public class GeterrRequest extends Request {
 			collector.addDiagnostic(event, file, text, start.getInt("line", -1), start.getInt("offset", -1),
 					end.getInt("line", -1), end.getInt("offset", -1));
 		}
-
+		super.setResponse(response);
 	}
 }

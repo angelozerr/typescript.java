@@ -11,6 +11,7 @@ import ts.TSException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.resources.AbstractTypeScriptFile;
+import ts.resources.SynchStrategy;
 
 public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETypeScriptFile, IDocumentListener {
 
@@ -36,27 +37,34 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	@Override
 	public void documentAboutToBeChanged(DocumentEvent event) {
 		setDirty(true);
+		if (getProject().getSynchStrategy() == SynchStrategy.CHANGE) {
+			synchronized (synchLock) {
+				try {
+					String newText = event.getText();
+					int position = event.getOffset();
+
+					Location loc = getLocation(position);
+					int line = loc.getLine();
+					int offset = loc.getOffset();
+
+					Location endLoc = getLocation(position + event.getLength());
+					int endLine = endLoc.getLine();
+					int endOffset = endLoc.getOffset();
+
+					getProject().getClient().changeFile(getName(), line, offset, endLine, endOffset, newText);
+				} catch (Throwable e) {
+					e.printStackTrace();
+				} finally {
+					setDirty(false);
+					synchLock.notifyAll();
+				}
+			}
+		}
 	}
 
 	@Override
 	public void documentChanged(DocumentEvent event) {
-		setDirty(true);
-//		try {
-//			String newText = event.getText();
-//			int position = event.getOffset();
-//			Location loc = getLocation(position);
-//			int line = loc.getLine();
-//			int offset = loc.getOffset() - newText.length() - 1;		
-//			
-//			//int end = start + event.getLength();
-//			int endLine = line;//document.getLineOfOffset(end);
-//			int endOffset =  0;//loc.getOffset();//event.getLength(); //end - document.getLineOffset(line);
-//			
-//			getProject().getClient().changeFile(file.getName(), line, offset, endLine, endOffset, newText);
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
 	}
 
 	@Override

@@ -27,6 +27,8 @@ public interface ITypeScriptFile {
 
 	void close() throws TSException;
 	
+	void synch() throws TSException;
+	
 	void completions(int position, ITypeScriptCompletionCollector collector) throws TSException;
 
 	void definition(int position, ITypeScriptDefinitionCollector collector) throws TSException;

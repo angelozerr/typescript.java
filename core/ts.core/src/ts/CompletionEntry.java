@@ -1,6 +1,4 @@
-package ts.internal;
-
-import ts.ICompletionEntry;
+package ts;
 
 public class CompletionEntry implements ICompletionEntry {
 
