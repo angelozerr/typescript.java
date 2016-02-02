@@ -25,7 +25,7 @@ import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
  */
 public interface ITypeScriptServiceClient {
 
-	void openFile(String fileName) throws TSException;
+	void openFile(String fileName, String contents) throws TSException;
 
 	void closeFile(String fileName) throws TSException;
 

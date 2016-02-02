@@ -51,7 +51,8 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 
 	void openFile(ITypeScriptFile tsFile) throws TSException {
 		String name = tsFile.getName();
-		getClient().openFile(name);
+		String contents = tsFile.getContents();
+		getClient().openFile(name, contents);
 		this.openedFiles.put(name, tsFile);
 	}
 
@@ -102,7 +103,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 
 	void synchFileContent(ITypeScriptFile file, ITypeScriptServiceClient client) throws TSException {
 		if (file.isDirty()) {
-			client.updateFile(file.getName(), file.getContents());
+			// client.updateFile(file.getName(), file.getContents());
 			file.setDirty(false);
 		}
 	}
@@ -137,7 +138,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void dispose() throws TSException {		
+	public void dispose() throws TSException {
 		disposeServer();
 	}
 
@@ -193,7 +194,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 					for (ITypeScriptFile openedFile : openedFiles.values()) {
 						try {
 							openedFile.close();
-						} catch (TSException e) {							
+						} catch (TSException e) {
 							e.printStackTrace();
 						}
 					}
@@ -209,17 +210,17 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 			}
 		}
 	}
-	
-//	private void closeFiles() {
-//		for (ITypeScriptFile openedFile : openedFiles.values()) {
-//			try {
-//				openedFile.close();
-//			} catch (TSException e) {
-//				// ignore error
-//			}
-//		}
-//		openedFiles.clear();
-//	}
+
+	// private void closeFiles() {
+	// for (ITypeScriptFile openedFile : openedFiles.values()) {
+	// try {
+	// openedFile.close();
+	// } catch (TSException e) {
+	// // ignore error
+	// }
+	// }
+	// openedFiles.clear();
+	// }
 
 	@SuppressWarnings("unchecked")
 	public <T> T getData(String key) {

@@ -39,8 +39,8 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	}
 
 	@Override
-	public void openFile(String fileName) throws TSException {
-		Request request = new OpenRequest(fileName, null);
+	public void openFile(String fileName, String contents) throws TSException {
+		Request request = new OpenRequest(fileName, contents);
 		internalProcessVoidRequest(request, false);
 	}
 
