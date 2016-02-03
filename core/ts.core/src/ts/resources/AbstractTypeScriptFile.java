@@ -76,23 +76,26 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public void synch() throws TSException {
+	public synchronized void synch() throws TSException {
+		if (!isDirty()) {
+			// no need to synchronize it.
+			return;
+		}
 		switch (tsProject.getSynchStrategy()) {
 		case RELOAD:
-			if (isDirty()) {
-				tsProject.getClient().updateFile(this.getName(), this.getContents());
-				setDirty(false);
-			}
+			// reload strategy : store the content of the ts file in a temporary
+			// file and call reload command.
+			tsProject.getClient().updateFile(this.getName(), this.getContents());
+			setDirty(false);
 			break;
 		case CHANGE:
+			// change strategy: wait until "change" command is not finished.
 			while (isDirty()) {
-				//synchronized (synchLock) {
-					try {
-						synchLock.wait(5);
-					} catch (InterruptedException e) {
-						throw new TSException(e);
-					}
-				//}
+				try {
+					synchLock.wait(5);
+				} catch (InterruptedException e) {
+					throw new TSException(e);
+				}
 			}
 			break;
 		}
