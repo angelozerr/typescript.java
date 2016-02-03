@@ -15,13 +15,16 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import ts.ICompletionEntry;
+import ts.eclipse.jface.images.TypeScriptImagesRegistry;
+
 /**
  * Label provider to manage image with {@link TSContentProposal}.
  * 
  */
-public class TSLabelProvider extends LabelProvider {
+public class TypeScriptLabelProvider extends LabelProvider {
 
-	private static final ILabelProvider INSTANCE = new TSLabelProvider();
+	private static final ILabelProvider INSTANCE = new TypeScriptLabelProvider();
 
 	public static ILabelProvider getInstance() {
 		return INSTANCE;
@@ -37,10 +40,10 @@ public class TSLabelProvider extends LabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-		/*if (element instanceof TSCompletionItem) {
-			TernCompletionItem item = ((TernCompletionItem) element);
-			return TernImagesRegistry.getImage(item, false);
-		}*/
+		if (element instanceof ICompletionEntry) {
+			ICompletionEntry item = ((ICompletionEntry) element);
+			return TypeScriptImagesRegistry.getImage(item);
+		}
 		return super.getImage(element);
 	}
 

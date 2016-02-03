@@ -20,9 +20,7 @@ public class ContentProposalCollector extends AbstractCompletionCollector {
 
 	@Override
 	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
-		String content = name.substring(getPrefix().length(), name.length());
-		int cursorPosition = content.length();
-		ContentProposal proposal = new ContentProposal(content, name, "", cursorPosition);
+		IContentProposal proposal = new TypeScriptContentProposal(name, kind, kindModifiers, sortText, getPrefix());
 		proposals.add(proposal);
 	}
 

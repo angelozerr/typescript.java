@@ -1,6 +1,6 @@
 package ts.utils;
 
-public class TSHelper {
+public class TypeScriptHelper {
 
 	/**
 	 * Returns the TypeScript prefix completion for the given position of the

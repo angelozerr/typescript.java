@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Text;
 
 import ts.TSException;
 import ts.eclipse.jface.fieldassist.TypeScriptContentProposalProvider;
-import ts.eclipse.jface.viewers.TSLabelProvider;
+import ts.eclipse.jface.viewers.TypeScriptLabelProvider;
 import ts.eclipse.swt.SWTTextTypeScriptFile;
 import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
@@ -77,7 +77,7 @@ public class NodejsTSEditor {
 		}
 		ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(),
 				new TypeScriptContentProposalProvider(tsFile.getName(), tsProject), keyStroke, autoActivationCharacters);
-		adapter.setLabelProvider(TSLabelProvider.getInstance());
+		adapter.setLabelProvider(TypeScriptLabelProvider.getInstance());
 		text.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		saveButton.addSelectionListener(new SelectionAdapter() {

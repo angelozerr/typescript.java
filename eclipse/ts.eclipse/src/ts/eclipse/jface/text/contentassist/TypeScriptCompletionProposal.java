@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import ts.CompletionEntry;
+import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 
 public class TypeScriptCompletionProposal extends CompletionEntry implements ICompletionProposal {
 
@@ -63,7 +64,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 
 	@Override
 	public Image getImage() {
-		return null; //TernImagesRegistry.getImage(this);
+		return TypeScriptImagesRegistry.getImage(this);
 	}
 
 	@Override
