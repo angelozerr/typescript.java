@@ -66,7 +66,9 @@ public class IDETypeScriptProject extends TypeScriptProject
 		String fileName = IDETypeScriptFile.getFileName(file);
 		IIDETypeScriptFile tsFile = (IIDETypeScriptFile) super.getOpenedFile(fileName);
 		if (tsFile == null) {
-			tsFile = new IDETypeScriptFile(file, document, this);
+			tsFile = new IDETypeScriptFile(file, document, this);			
+		}
+		if (!tsFile.isOpened()) {
 			tsFile.open();
 		}
 		return tsFile;

@@ -279,7 +279,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 			}
 		}
 	}
-	
+
 	private JsonObject internalProcessRequest(Request request) throws TSException {
 		if (interceptors == null) {
 			return processRequest(request);
@@ -307,6 +307,9 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	}
 
 	private void handleResponse(Request request, JsonObject response, long startTime) {
+		if (response == null) {
+			return;
+		}
 		long ellapsedTime = getElapsedTimeInMs(startTime);
 		for (IInterceptor interceptor : interceptors) {
 			interceptor.handleResponse(response, this, request.getCommand(), ellapsedTime);

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,11 +16,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TSException;
 import ts.server.nodejs.process.AbstractNodejsProcess;
+import ts.server.protocol.GeterrRequest;
 import ts.server.protocol.Request;
+import ts.server.protocol.Request;
+import ts.server.protocol.SimpleRequest;
 
 public class NodeJSProcess extends AbstractNodejsProcess {
 
@@ -42,8 +47,9 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	private PrintStream out;
 
-	private final Map<Object, Request> requestsMap;
-	private final ExecutorService pool = Executors.newFixedThreadPool(1);
+	private final Map<Integer, SimpleRequest> requestsMap;
+	private final Map<String, GeterrRequest> diagRequestsMap;
+	private final ExecutorService pool = Executors.newFixedThreadPool(2);
 
 	/**
 	 * StdOut of the node.js process.
@@ -67,8 +73,8 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 				}
 				if (process != null) {
 					process.waitFor();
-				}				
-				kill();				
+				}
+				kill();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
@@ -98,7 +104,8 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 	public NodeJSProcess(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
 		super(nodejsFile, projectDir);
 		this.tsserverFile = tsserverFile;
-		this.requestsMap = new HashMap<Object, Request>();
+		this.requestsMap = new HashMap<Integer, SimpleRequest>();
+		this.diagRequestsMap = new HashMap<String, GeterrRequest>();
 	}
 
 	public void notifyErrorProcess(String line) {
@@ -210,7 +217,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 		}
 		if (!pool.isShutdown()) {
 			pool.shutdown();
-		}		
+		}
 	}
 
 	/**
@@ -225,19 +232,30 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 	}
 
 	@Override
-	public void sendRequestAsyncResponse(Request request) throws TSException {
-		synchronized (requestsMap) {
-			Object key = request.getResponseKey();
-			if (key instanceof Object[]) {
-				Object[] iter = (Object[]) key;
-				for (Object k : iter) {
-					requestsMap.put(k, request);
+	public void sendRequestAsyncResponse(Request r) throws TSException {
+		if (r instanceof GeterrRequest) {
+			synchronized (diagRequestsMap) {
+				GeterrRequest request = ((GeterrRequest) r);
+				Collection<String> files = request.getFiles();
+				GeterrRequest oldErrRequest = null;
+				// register the GeterrRequest for each file
+				for (String file : files) {
+					// check if an old GeterrRequest was registered for the
+					// given file
+					oldErrRequest = diagRequestsMap.get(file);
+					if (oldErrRequest != null) {
+						oldErrRequest.dispose(file);
+					}
+					diagRequestsMap.put(file, request);
 				}
-			} else {
-				requestsMap.put(key, request);
+			}
+		} else {
+			synchronized (requestsMap) {
+				SimpleRequest request = (SimpleRequest) r;
+				requestsMap.put(request.getSeq(), request);
 			}
 		}
-		sendRequest(request);
+		sendRequest(r);
 	}
 
 	@Override
@@ -273,24 +291,27 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 				if (body != null) {
 					String file = body.getString("file", null);
 					if (file != null) {
-						Request request = null;
-						synchronized (requestsMap) {
-							request = requestsMap.remove(file);
-						}
-						if (request != null) {
-							request.setResponse(response);
+						GeterrRequest request = null;
+						synchronized (diagRequestsMap) {
+							request = diagRequestsMap.get(file);
+							if (request != null) {
+								JsonArray diagnostics = body.get("diagnostics").asArray();
+								boolean remove = request.handleResponse(event, file, diagnostics);
+								if (remove) {
+									diagRequestsMap.remove(file);
+								}
+							}
 						}
 					}
 				}
 			}
-
 		} else if ("response".equals(type)) {
 			int seq = response.getInt("request_seq", -1);
 			if (seq != -1) {
 				synchronized (requestsMap) {
-					Request c = requestsMap.remove(seq);
-					if (c != null) {
-						c.setResponse(response);
+					SimpleRequest request = requestsMap.remove(seq);
+					if (request != null) {
+						request.handleResponse(response);
 					}
 				}
 			}

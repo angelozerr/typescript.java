@@ -11,6 +11,8 @@ public interface ITypeScriptFile {
 	
 	String getName();
 
+	boolean isOpened();
+	
 	boolean isDirty();
 
 	void setDirty(boolean dirty);

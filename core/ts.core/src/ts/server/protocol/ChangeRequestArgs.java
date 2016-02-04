@@ -23,7 +23,6 @@ public class ChangeRequestArgs extends FormatRequestArgs {
 		if (insertString != null) {
 			super.add("insertString", insertString);
 		}
-		// TODO Auto-generated constructor stub
 	}
 
 }

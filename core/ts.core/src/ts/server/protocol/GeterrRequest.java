@@ -1,5 +1,9 @@
 package ts.server.protocol;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -17,30 +21,39 @@ import ts.server.geterr.ITypeScriptGeterrCollector;
  */
 public class GeterrRequest extends Request {
 
+	private final static int EVENT_INIT = 0;
+	private final static int EVENT_SYNTAX_DIAG = 4;
+	private final static int EVENT_SEMANTIC_DIAG = 16;
+	private final static int EVENT_FINAL = 20;
+
 	private final ITypeScriptGeterrCollector collector;
-	private final String[] files;
+	private final Map<String, Integer> files;
+	private int delay;
 
 	public GeterrRequest(String[] files, int delay, ITypeScriptGeterrCollector collector) {
 		super(CommandNames.Geterr, new GeterrRequestArgs(files, delay), null);
-		this.files = files;
+		this.files = createFilesMap(files);
+		this.delay = delay;
 		this.collector = collector;
 	}
 
-	public JsonArray getFiles() {
-		return ((JsonArray) ((GeterrRequestArgs) getArguments()).getFiles());
+	private Map<String, Integer> createFilesMap(String[] files) {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		for (int i = 0; i < files.length; i++) {
+			map.put(files[i], EVENT_INIT);
+		}
+		return map;
 	}
 
-	@Override
-	public Object getResponseKey() {
-		return files;
+	public Collection<String> getFiles() {
+		return files.keySet();
 	}
 
-	@Override
-	public void setResponse(JsonObject response) {
-		String event = response.getString("event", null);
-		JsonObject body = response.get("body").asObject();
-		String file = body.getString("file", null);
-		JsonArray diagnostics = body.get("diagnostics").asArray();
+	public int getDelay() {
+		return delay;
+	}
+
+	public boolean handleResponse(String event, String file, JsonArray diagnostics) {
 		JsonObject diagnostic = null;
 		String text = null;
 		JsonObject start = null;
@@ -53,6 +66,40 @@ public class GeterrRequest extends Request {
 			collector.addDiagnostic(event, file, text, start.getInt("line", -1), start.getInt("offset", -1),
 					end.getInt("line", -1), end.getInt("offset", -1));
 		}
-		super.setResponse(response);
+		Integer mask = files.get(file);
+		mask = mask.intValue() | ("syntaxDiag".equals(event) ? EVENT_SYNTAX_DIAG : EVENT_SEMANTIC_DIAG);
+		if (mask == EVENT_FINAL) {
+			dispose(file);
+			return true;
+		} else {
+			synchronized (files) {
+				files.put(file, mask);
+			}
+			return false;
+		}
 	}
+
+	public void dispose(String file) {
+		synchronized (files) {
+			files.remove(file);
+		}
+		synchronized (this) {
+			this.notifyAll();
+		}
+	}
+
+	@Override
+	public JsonObject call() throws Exception {
+		while (!files.isEmpty()) {
+			synchronized (this) {
+				// wait for 200ms otherwise if we don't set ms, if completion is
+				// executed several times
+				// quickly (do Ctrl+Space every time), the Thread could be
+				// blocked? Why?
+				this.wait(5);
+			}
+		}
+		return null;
+	}
+
 }

@@ -29,6 +29,8 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptConsoleJob_name;
 	public static String ConsoleTerminateAction_tooltipText;
 
+	public static String TypeScriptHover_openDeclaration;
+
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

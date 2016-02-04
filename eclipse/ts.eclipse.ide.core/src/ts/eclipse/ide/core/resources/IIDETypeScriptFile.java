@@ -7,4 +7,5 @@ import ts.resources.ITypeScriptFile;
 public interface IIDETypeScriptFile extends ITypeScriptFile {
 
 	IResource getResource();
+
 }

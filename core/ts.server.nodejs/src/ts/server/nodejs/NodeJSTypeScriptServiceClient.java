@@ -52,7 +52,7 @@ public class NodeJSTypeScriptServiceClient extends AbstractTypeScriptServiceClie
 	}
 
 	private void initProcess(INodejsProcess process) {
-		
+
 	}
 
 	private INodejsProcess getProcess() throws TSException {

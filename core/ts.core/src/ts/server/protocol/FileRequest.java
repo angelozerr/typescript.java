@@ -6,7 +6,7 @@ package ts.server.protocol;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class FileRequest extends Request {
+public class FileRequest extends SimpleRequest {
 
 	public FileRequest(CommandNames command, FileRequestArgs args, Integer seq) {
 		super(command, args, seq);

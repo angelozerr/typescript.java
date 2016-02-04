@@ -10,7 +10,7 @@ package ts.server.protocol;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class OpenRequest extends Request {
+public class OpenRequest extends SimpleRequest {
 
 	public OpenRequest(String file, String fileContent) {
 		super(CommandNames.Open, new OpenRequestArgs(file, fileContent), null);

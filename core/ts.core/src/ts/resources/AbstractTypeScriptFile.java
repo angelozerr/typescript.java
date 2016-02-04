@@ -12,6 +12,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	private final ITypeScriptProject tsProject;
 	private boolean dirty;
 	protected final Object synchLock = new Object();
+	private boolean opened;
 
 	public AbstractTypeScriptFile(ITypeScriptProject tsProject) {
 		this.tsProject = tsProject;
@@ -47,11 +48,22 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	@Override
 	public void open() throws TSException {
 		((TypeScriptProject) tsProject).openFile(this);
+		this.opened = true;
 	}
 
 	@Override
 	public void close() throws TSException {
 		((TypeScriptProject) tsProject).closeFile(this);
+		this.opened = false;
+	}
+
+	@Override
+	public boolean isOpened() {
+		return opened;
+	}
+	
+	void setOpened(boolean opened) {
+		this.opened = opened;
 	}
 
 	@Override

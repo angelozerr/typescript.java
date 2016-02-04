@@ -70,6 +70,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	void closeFile(ITypeScriptFile tsFile, boolean updateCache) throws TSException {
 		String name = tsFile.getName();
 		getClient().closeFile(name);
+		((AbstractTypeScriptFile) tsFile).setOpened(false);
 		if (updateCache) {
 			this.openedFiles.remove(name);
 		}

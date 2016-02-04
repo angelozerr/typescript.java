@@ -32,21 +32,11 @@ import ts.utils.StringUtils;
  * TypeScript Hover.
  *
  */
-public class TypeScriptHover extends AbstractTextHover implements ITextHoverExtension, ITextHoverExtension2,
-		IInformationProviderExtension2, ITypeScriptHoverInfoProvider {
+public class TypeScriptHover extends AbstractTypeScriptHover  {
 
-	private IInformationControlCreator fHoverControlCreator;
-	private IInformationControlCreator fPresenterControlCreator;
 	private IIDETypeScriptProject tsProject;
 	private Integer offset;
 	private ITypeScriptFile file;
-
-	@Override
-	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
-		TypeScriptBrowserInformationControlInput info = (TypeScriptBrowserInformationControlInput) getHoverInfo2(
-				textViewer, hoverRegion);
-		return info != null ? info.getHtml() : null;
-	}
 
 	@Override
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
@@ -84,34 +74,5 @@ public class TypeScriptHover extends AbstractTextHover implements ITextHoverExte
 
 		return EditorUtils.getFile(textViewer.getDocument());
 	}
-
-	@Override
-	public IInformationControlCreator getHoverControlCreator() {
-		if (fHoverControlCreator == null)
-			fHoverControlCreator = new IDEHoverControlCreator(getInformationPresenterControlCreator(), this);
-		return fHoverControlCreator;
-	}
-
-	@Override
-	public IInformationControlCreator getInformationPresenterControlCreator() {
-		if (fPresenterControlCreator == null)
-			fPresenterControlCreator = new IDEPresenterControlCreator(this);
-		return fPresenterControlCreator;
-	}
-
-	// @Override
-	// public IIDETypeScriptProject getTypeScriptProject() {
-	// return TypeScriptProject;
-	// }
-	//
-	// @Override
-	// public ITypeScriptFile getFile() {
-	// return file;
-	// }
-	//
-	// @Override
-	// public Integer getOffset() {
-	// return offset;
-	// }
 
 }

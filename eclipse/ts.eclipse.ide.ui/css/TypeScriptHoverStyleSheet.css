@@ -40,3 +40,8 @@ ul.blockList li.blockList, ul.blockListLast li.blockList {
 ul.blockList ul.blockList ul.blockList ul.blockList li.blockListLast {
     list-style:none;
 }
+
+/**
+ * TypeScript use /n, etc for the quickInfo/@displayString
+*/
+pre.displayString { font-family: sans-serif; font-size: 1em; }
