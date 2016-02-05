@@ -1,9 +1,11 @@
-package ts.server.nodejs.process;
+package ts.server.nodejs;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.eclipsesource.json.JsonObject;
 
 import ts.TSException;
 
@@ -117,12 +119,12 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 	/**
 	 * Notify data process.
 	 * 
-	 * @param line
+	 * @param jsonObject
 	 */
-	protected void notifyDataProcess(String line) {
+	protected void notifyMessage(String message) {
 		synchronized (listeners) {
 			for (INodejsProcessListener listener : listeners) {
-				listener.onData(this, line);
+				listener.onMessage(this, message);
 			}
 		}
 	}

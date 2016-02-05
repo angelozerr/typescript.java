@@ -8,10 +8,12 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.server.nodejs.process;
+package ts.server.nodejs;
 
 import java.io.File;
 import java.util.List;
+
+import com.eclipsesource.json.JsonObject;
 
 /**
  * Listener for node.js process.
@@ -41,10 +43,10 @@ public interface INodejsProcessListener {
 	 * Callback called when the given node.js process send data.
 	 * 
 	 * @param process
-	 * @param line
+	 * @param jsonObject
 	 *            the data.
 	 */
-	void onData(INodejsProcess process, String line);
+	void onMessage(INodejsProcess process, String response);
 
 	/**
 	 * Callback called when the given node.js process stop.

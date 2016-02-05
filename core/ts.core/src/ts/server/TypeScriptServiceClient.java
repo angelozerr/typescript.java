@@ -1,9 +1,17 @@
 package ts.server;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -11,9 +19,15 @@ import com.eclipsesource.json.JsonValue;
 import ts.TSException;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
+import ts.internal.server.ICallbackItem;
+import ts.internal.server.RequestItem;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
 import ts.server.geterr.ITypeScriptGeterrCollector;
+import ts.server.nodejs.INodejsProcess;
+import ts.server.nodejs.INodejsProcessListener;
+import ts.server.nodejs.NodejsProcessAdapter;
+import ts.server.nodejs.NodejsProcessManager;
 import ts.server.protocol.ChangeRequest;
 import ts.server.protocol.CloseRequest;
 import ts.server.protocol.CompletionsRequest;
@@ -27,27 +41,88 @@ import ts.server.protocol.SignatureHelpRequest;
 import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
 
-public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServiceClient {
+public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	private boolean dispose;
 	private final List<ITypeScriptServerListener> listeners;
 	private ReentrantReadWriteLock stateLock = new ReentrantReadWriteLock();
 	private List<IInterceptor> interceptors;
 
-	public AbstractTypeScriptServiceClient() {
+	private final ExecutorService pool = Executors.newFixedThreadPool(2);
+	private final List<RequestItem> requestQueue;
+	private final AtomicInteger pendingResponses;
+	private final Map<Integer, ICallbackItem> callbacks;
+
+	private final File projectDir;
+	private INodejsProcess process;
+	private List<INodejsProcessListener> nodeListeners;
+
+	private final INodejsProcessListener listener = new NodejsProcessAdapter() {
+
+		@Override
+		public void onStart(INodejsProcess process) {
+			TypeScriptServiceClient.this.fireStartServer();
+		}
+
+		@Override
+		public void onStop(INodejsProcess process) {
+			dispose();
+			fireEndServer();
+		}
+
+		public void onMessage(INodejsProcess process, String message) {
+			JsonObject response = Json.parse(message).asObject();
+			TypeScriptServiceClient.this.dispatchMessage(response);
+		};
+
+	};
+
+	public TypeScriptServiceClient(File projectDir, File tsserverFile, File nodeFile) throws TSException {
+		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile));
+	}
+
+	public TypeScriptServiceClient(File projectDir, INodejsProcess process) {
 		this.listeners = new ArrayList<ITypeScriptServerListener>();
+		this.requestQueue = new ArrayList<RequestItem>();
+		this.pendingResponses = new AtomicInteger(0);
+		this.callbacks = new HashMap<Integer, ICallbackItem>();
+
+		this.projectDir = projectDir;
+		this.process = process;
+		process.addProcessListener(listener);
+		initProcess(process);
+	}
+
+	public File getProjectDir() {
+		return projectDir;
+	}
+
+	private void initProcess(INodejsProcess process) {
+
+	}
+
+	private INodejsProcess getProcess() throws TSException {
+		if (process == null) {
+			process = NodejsProcessManager.getInstance().create(getProjectDir());
+			process.addProcessListener(listener);
+		}
+		initProcess(process);
+		if (!process.isStarted()) {
+			process.start();
+		}
+		return process;
 	}
 
 	@Override
 	public void openFile(String fileName, String contents) throws TSException {
 		Request request = new OpenRequest(fileName, contents);
-		internalProcessVoidRequest(request, false);
+		execute(request, false, null);
 	}
 
 	@Override
 	public void closeFile(String fileName) throws TSException {
 		Request request = new CloseRequest(fileName);
-		internalProcessVoidRequest(request, false);
+		execute(request, false, null);
 	}
 
 	// ---------------- Completions
@@ -56,7 +131,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	public void completions(String fileName, int line, int offset, String prefix,
 			ITypeScriptCompletionCollector collector) throws TSException {
 		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
-		JsonObject response = internalProcessRequest(request);
+		JsonObject response = execute(request, true, null).asObject();
 		collectCompletions(response, collector);
 	}
 
@@ -76,7 +151,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	public void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
 			throws TSException {
 		DefinitionRequest request = new DefinitionRequest(fileName, line, offset);
-		JsonObject response = internalProcessRequest(request);
+		JsonObject response = execute(request, true, null).asObject();
 		collectDefinition(response, collector);
 	}
 
@@ -100,7 +175,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	public void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
 			throws TSException {
 		SignatureHelpRequest request = new SignatureHelpRequest(fileName, line, offset);
-		JsonObject response = internalProcessRequest(request);
+		JsonObject response = execute(request, true, null).asObject();
 		collectSignatureHelp(response, collector);
 	}
 
@@ -115,7 +190,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	public void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
 			throws TSException {
 		QuickInfoRequest request = new QuickInfoRequest(fileName, line, offset);
-		JsonObject response = internalProcessRequest(request);
+		JsonObject response = execute(request, true, null).asObject();
 		collectQuickInfo(response, collector);
 	}
 
@@ -137,16 +212,18 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TSException {
 		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText);
-		internalProcessVoidRequest(request, false);
+		execute(request, false, null);
 	}
 
 	@Override
 	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TSException {
 		Request request = new GeterrRequest(files, delay, collector);
 		if (delay == 0) {
-			internalProcessRequest(request);
+			execute(request, false, null);
+			// internalProcessRequest(request);
 		} else {
-			internalProcessVoidRequest(request, true);
+			execute(request, false, null);
+			// internalProcessVoidRequest(request, true);
 		}
 	}
 
@@ -165,7 +242,7 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 		try {
 			tempFileName = FileTempHelper.updateTempFile(newText, seq);
 			Request request = new ReloadRequest(fileName, tempFileName, seq);
-			JsonObject response = this.internalProcessRequest(request);
+			JsonObject response = execute(request, true, null).asObject();
 			requestSeq = response.getInt("request_seq", -1);
 		} finally {
 			if (requestSeq != -1) {
@@ -250,7 +327,14 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 		try {
 			if (!isDisposed()) {
 				this.dispose = true;
-				doDispose();
+				if (process != null) {
+					process.kill();
+				}
+				this.process = null;
+				if (!pool.isShutdown()) {
+					pool.shutdown();
+				}
+
 			}
 		} finally {
 			endWriteState();
@@ -262,49 +346,80 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 		return dispose;
 	}
 
-	private void internalProcessVoidRequest(Request request, boolean async) throws TSException {
-		if (interceptors == null) {
-			processVoidRequest(request, async);
-		} else {
-			long startTime = System.nanoTime();
-			try {
-				handleRequest(request);
-				processVoidRequest(request, async);
-			} catch (Throwable e) {
-				handleError(request, e, startTime);
-				if (e instanceof TSException) {
-					throw (TSException) e;
-				}
-				throw new TSException(e);
+	public void addProcessListener(INodejsProcessListener listener) {
+		beginWriteState();
+		try {
+			if (nodeListeners == null) {
+				nodeListeners = new ArrayList<INodejsProcessListener>();
 			}
+			nodeListeners.add(listener);
+			if (process != null) {
+				process.addProcessListener(listener);
+			}
+		} finally {
+			endWriteState();
 		}
 	}
 
-	private JsonObject internalProcessRequest(Request request) throws TSException {
-		if (interceptors == null) {
-			return processRequest(request);
-		} else {
-			long startTime = System.nanoTime();
-			try {
-				handleRequest(request);
-				JsonObject response = processRequest(request);
-				handleResponse(request, response, startTime);
-				return response;
-			} catch (Throwable e) {
-				handleError(request, e, startTime);
-				if (e instanceof TSException) {
-					throw (TSException) e;
-				}
-				throw new TSException(e);
+	public void removeProcessListener(INodejsProcessListener listener) {
+		beginWriteState();
+		try {
+			if (nodeListeners != null && listener != null) {
+				nodeListeners.remove(listener);
 			}
+			if (process != null) {
+				process.removeProcessListener(listener);
+			}
+		} finally {
+			endWriteState();
 		}
 	}
 
-	private void handleRequest(Request request) {
-		for (IInterceptor interceptor : interceptors) {
-			interceptor.handleRequest(request, this, request.getCommand());
+	public void join() throws InterruptedException {
+		if (process != null) {
+			this.process.join();
 		}
 	}
+
+	// private void internalProcessVoidRequest(Request request, boolean async)
+	// throws TSException {
+	// if (interceptors == null) {
+	// processVoidRequest(request, async);
+	// } else {
+	// long startTime = System.nanoTime();
+	// try {
+	// handleRequest(request);
+	// processVoidRequest(request, async);
+	// } catch (Throwable e) {
+	// handleError(request, e, startTime);
+	// if (e instanceof TSException) {
+	// throw (TSException) e;
+	// }
+	// throw new TSException(e);
+	// }
+	// }
+	// }
+
+	// private JsonObject internalProcessRequest(Request request) throws
+	// TSException {
+	// if (interceptors == null) {
+	// return processRequest(request);
+	// } else {
+	// long startTime = System.nanoTime();
+	// try {
+	// handleRequest(request);
+	// JsonObject response = processRequest(request);
+	// handleResponse(request, response, startTime);
+	// return response;
+	// } catch (Throwable e) {
+	// handleError(request, e, startTime);
+	// if (e instanceof TSException) {
+	// throw (TSException) e;
+	// }
+	// throw new TSException(e);
+	// }
+	// }
+	// }
 
 	private void handleResponse(Request request, JsonObject response, long startTime) {
 		if (response == null) {
@@ -326,10 +441,95 @@ public abstract class AbstractTypeScriptServiceClient implements ITypeScriptServ
 	private static long getElapsedTimeInMs(long startTime) {
 		return ((System.nanoTime() - startTime) / 1000000L);
 	}
+	//
+	// protected abstract void processVoidRequest(Request request, boolean
+	// async) throws TSException;
+	//
+	// protected abstract JsonObject processRequest(Request request) throws
+	// TSException;
 
-	protected abstract void processVoidRequest(Request request, boolean async) throws TSException;
+	private JsonValue execute(Request request, boolean expectsResult, CancellationToken token) throws TSException {
+		RequestItem requestInfo = null;
+		Future<JsonValue> result = null;
+		if (expectsResult) {
+			requestInfo = new RequestItem(request, request);
+			result = pool.submit(requestInfo.callbacks);
+		} else {
+			requestInfo = new RequestItem(request, null);
+		}
+		synchronized (requestQueue) {
+			this.requestQueue.add(requestInfo);
+		}
+		this.sendNextRequests();
+		try {
+			return result == null ? null : result.get();
+		} catch (Exception e) {
+			handleError(request, e, request.getStartTime());
+			if (e instanceof TSException) {
+				throw (TSException) e;
+			}
+			throw new TSException(e);
+		}
+	}
 
-	protected abstract JsonObject processRequest(Request request) throws TSException;
+	private void sendNextRequests() throws TSException {
+		RequestItem requestItem = null;
+		while (this.pendingResponses.get() == 0 && !this.requestQueue.isEmpty()) {
+			synchronized (requestQueue) {
+				requestItem = this.requestQueue.remove(0); // shift
+			}
+			this.sendRequest(requestItem);
+		}
+	}
 
-	protected abstract void doDispose();
+	private void sendRequest(RequestItem requestItem) throws TSException {
+		Request serverRequest = requestItem.request;
+		// log request
+		handleRequest(serverRequest);
+		ICallbackItem callbacks = requestItem.callbacks;
+		if (callbacks != null) {
+			synchronized (this.callbacks) {
+				this.callbacks.put(serverRequest.getSeq(), callbacks);
+			}
+			this.pendingResponses.incrementAndGet();
+		}
+		try {
+			getProcess().sendRequest(serverRequest);
+		} catch (TSException e) {
+			synchronized (callbacks) {
+				ICallbackItem callback = this.callbacks.get(serverRequest.getSeq());
+				if (callback != null) {
+					// callback.e(err);
+					this.callbacks.remove(serverRequest.getSeq());
+				}
+				this.pendingResponses.getAndDecrement();
+			}
+			throw e;
+		}
+	}
+
+	private void handleRequest(Request request) {
+		if (interceptors == null) {
+			return;
+		}
+		for (IInterceptor interceptor : interceptors) {
+			interceptor.handleRequest(request, this, request.getCommand());
+		}
+	}
+
+	private void dispatchMessage(JsonObject response) {
+		String type = response.getString("type", null);
+		if ("response".equals(type)) {
+			int seq = response.getInt("request_seq", -1);
+			ICallbackItem p = null;
+			synchronized (callbacks) {
+				p = this.callbacks.remove(seq);
+			}
+			if (p != null) {
+				this.pendingResponses.getAndDecrement();
+				p.complete(response);
+				handleResponse(((Request) p), response, ((Request) p).getStartTime());
+			}
+		}
+	}
 }

@@ -13,7 +13,6 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 
 import ts.eclipse.ide.internal.core.Trace;
 import ts.resources.ITypeScriptProject;

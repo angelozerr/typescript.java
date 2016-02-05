@@ -22,7 +22,7 @@ import ts.resources.SynchStrategy;
 import ts.resources.TypeScriptProject;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
-import ts.server.nodejs.NodeJSTypeScriptServiceClient;
+import ts.server.TypeScriptServiceClient;
 
 public class IDETypeScriptProject extends TypeScriptProject
 		implements IIDETypeScriptProject, ITypeScriptServiceClientFactory {
@@ -66,7 +66,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 		String fileName = IDETypeScriptFile.getFileName(file);
 		IIDETypeScriptFile tsFile = (IIDETypeScriptFile) super.getOpenedFile(fileName);
 		if (tsFile == null) {
-			tsFile = new IDETypeScriptFile(file, document, this);			
+			tsFile = new IDETypeScriptFile(file, document, this);
 		}
 		if (!tsFile.isOpened()) {
 			tsFile.open();
@@ -89,7 +89,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 			File nodeFile = null;
 			File tsRepositoryFile = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
 			File tsserverFile = new File(tsRepositoryFile, "node_modules/typescript/bin/tsserver");
-			return new NodeJSTypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
+			return new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
 		} catch (IOException e) {
 			throw new TSException(e);
 		}

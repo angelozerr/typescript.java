@@ -12,6 +12,7 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.resources.AbstractTypeScriptFile;
 import ts.resources.SynchStrategy;
+import ts.utils.FileUtils;
 
 public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETypeScriptFile, IDocumentListener {
 
@@ -26,7 +27,7 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	}
 
 	public static String getFileName(IResource file) {
-		return file.getLocation().toString();
+		return FileUtils.normalizeSlashes(file.getLocation().toString());
 	}
 
 	@Override

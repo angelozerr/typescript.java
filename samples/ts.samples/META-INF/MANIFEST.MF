@@ -11,5 +11,5 @@ Import-Package: com.eclipsesource.json;version="0.9.4",
  org.osgi.framework;version="1.3.0"
 Bundle-ActivationPolicy: lazy
 Require-Bundle: ts.core;bundle-version="1.0.0",
- ts.repository;bundle-version="1.0.0",
- ts.server.nodejs;bundle-version="1.0.0"
+ ts.repository;bundle-version="1.0.0"
+

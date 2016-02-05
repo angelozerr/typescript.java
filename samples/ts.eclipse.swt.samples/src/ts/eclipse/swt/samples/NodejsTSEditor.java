@@ -26,7 +26,7 @@ import ts.resources.ITypeScriptProject;
 import ts.resources.TypeScriptProject;
 import ts.server.ITypeScriptServiceClientFactory;
 import ts.server.LoggingInterceptor;
-import ts.server.nodejs.NodeJSTypeScriptServiceClientFactory;
+import ts.server.TypeScriptServiceClientFactory;
 import ts.utils.FileUtils;
 
 public class NodejsTSEditor {
@@ -42,7 +42,7 @@ public class NodejsTSEditor {
 
 	private void createUI() throws TSException, IOException, InterruptedException {
 
-		ITypeScriptServiceClientFactory factory = new NodeJSTypeScriptServiceClientFactory(
+		ITypeScriptServiceClientFactory factory = new TypeScriptServiceClientFactory(
 				new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
 		File projectDir = new File("./samples");
 		ITypeScriptProject tsProject = new TypeScriptProject(projectDir, factory);

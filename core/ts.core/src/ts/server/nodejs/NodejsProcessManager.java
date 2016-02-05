@@ -9,14 +9,13 @@
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *  Piotr Tomiak <piotr@genuitec.com> - support for tern.js debugging
  */
-package ts.server.nodejs.process;
+package ts.server.nodejs;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import ts.TSException;
-import ts.server.nodejs.internal.process.NodeJSProcess;
 
 /**
  * {@link NodejsProcess} manager.
@@ -119,7 +118,7 @@ public class NodejsProcessManager {
 	 * @throws TSException
 	 */
 	public INodejsProcess create(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
-		INodejsProcess process = new NodeJSProcess(projectDir, tsserverFile, nodejsFile);
+		INodejsProcess process = new NodejsProcess(projectDir, tsserverFile, nodejsFile);
 		process.addProcessListener(listener);
 		return process;
 	}

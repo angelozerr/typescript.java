@@ -32,12 +32,42 @@ public class FileUtils {
 		return fileName.substring(index + 1);
 	}
 
+	/**
+	 * Returns the normalized path of the given file.
+	 * 
+	 * @param file
+	 * @return the normalized path of the given file.
+	 */
 	public static String getPath(File file) {
+		return getPath(file, true);
+	}
+
+	/**
+	 * Returns the path of the given file.
+	 * 
+	 * @param file
+	 * @param normalize
+	 * @return
+	 */
+	public static String getPath(File file, boolean normalize) {
+		String path = null;
 		try {
-			return file.getCanonicalPath();
+			path = file.getCanonicalPath();
 		} catch (IOException e) {
-			return file.getPath();
+			path = file.getPath();
 		}
+		return normalize ? normalizeSlashes(path) : null;
+	}
+
+	/**
+	 * Replace '\' with '/' from the given path because tsserver normalize it
+	 * like this.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String normalizeSlashes(String path) {
+		return path.replaceAll("\\\\", "/");
 	}
 
 	public static String getContents(final File file) throws IOException {

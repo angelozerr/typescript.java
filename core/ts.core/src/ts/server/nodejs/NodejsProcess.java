@@ -1,4 +1,4 @@
-package ts.server.nodejs.internal.process;
+package ts.server.nodejs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,27 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TSException;
-import ts.server.nodejs.process.AbstractNodejsProcess;
-import ts.server.protocol.GeterrRequest;
 import ts.server.protocol.Request;
-import ts.server.protocol.Request;
-import ts.server.protocol.SimpleRequest;
 
-public class NodeJSProcess extends AbstractNodejsProcess {
+public class NodejsProcess extends AbstractNodejsProcess {
 
 	private final File tsserverFile;
 
@@ -47,9 +36,10 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 
 	private PrintStream out;
 
-	private final Map<Integer, SimpleRequest> requestsMap;
-	private final Map<String, GeterrRequest> diagRequestsMap;
-	private final ExecutorService pool = Executors.newFixedThreadPool(2);
+	public NodejsProcess(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
+		super(nodejsFile, projectDir);
+		this.tsserverFile = tsserverFile;
+	}
 
 	/**
 	 * StdOut of the node.js process.
@@ -65,7 +55,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 					String line = null;
 					while ((line = r.readLine()) != null) {
 						if (line.startsWith("{")) {
-							dispatch(line);
+							notifyMessage(line);
 						}
 					}
 				} catch (IOException e) {
@@ -99,13 +89,6 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public NodeJSProcess(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
-		super(nodejsFile, projectDir);
-		this.tsserverFile = tsserverFile;
-		this.requestsMap = new HashMap<Integer, SimpleRequest>();
-		this.diagRequestsMap = new HashMap<String, GeterrRequest>();
 	}
 
 	public void notifyErrorProcess(String line) {
@@ -147,7 +130,7 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 	private class ShutdownHookThread extends Thread {
 		@Override
 		public void run() {
-			Process process = NodeJSProcess.this.process;
+			Process process = NodejsProcess.this.process;
 			if (process != null) {
 				kill();
 			}
@@ -215,9 +198,6 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 			errThread.interrupt();
 			errThread = null;
 		}
-		if (!pool.isShutdown()) {
-			pool.shutdown();
-		}
 	}
 
 	/**
@@ -232,91 +212,8 @@ public class NodeJSProcess extends AbstractNodejsProcess {
 	}
 
 	@Override
-	public void sendRequestAsyncResponse(Request r) throws TSException {
-		if (r instanceof GeterrRequest) {
-			synchronized (diagRequestsMap) {
-				GeterrRequest request = ((GeterrRequest) r);
-				Collection<String> files = request.getFiles();
-				GeterrRequest oldErrRequest = null;
-				// register the GeterrRequest for each file
-				for (String file : files) {
-					// check if an old GeterrRequest was registered for the
-					// given file
-					oldErrRequest = diagRequestsMap.get(file);
-					if (oldErrRequest != null) {
-						oldErrRequest.dispose(file);
-					}
-					diagRequestsMap.put(file, request);
-				}
-			}
-		} else {
-			synchronized (requestsMap) {
-				SimpleRequest request = (SimpleRequest) r;
-				requestsMap.put(request.getSeq(), request);
-			}
-		}
-		sendRequest(r);
-	}
-
-	@Override
 	public void sendRequest(Request request) throws TSException {
 		out.println(request); // add \n for "readline" used by tsserver
 		out.flush();
 	}
-
-	@Override
-	public JsonObject sendRequestSyncResponse(Request request) throws TSException {
-		sendRequestAsyncResponse(request);
-		Future<JsonObject> f = pool.submit(request);
-		JsonObject response = null;
-		try {
-			response = f.get();
-		} catch (Exception e) {
-			if (e instanceof TSException) {
-				throw (TSException) e;
-			}
-			throw new TSException(e);
-		}
-		return response;
-	}
-
-	private void dispatch(String message) {
-		JsonObject response = Json.parse(message).asObject();
-		String type = response.getString("type", null);
-
-		if ("event".equals(type)) {
-			String event = response.getString("event", null);
-			if ("syntaxDiag".equals(event) || "semanticDiag".equals(event)) {
-				JsonObject body = response.get("body").asObject();
-				if (body != null) {
-					String file = body.getString("file", null);
-					if (file != null) {
-						GeterrRequest request = null;
-						synchronized (diagRequestsMap) {
-							request = diagRequestsMap.get(file);
-							if (request != null) {
-								JsonArray diagnostics = body.get("diagnostics").asArray();
-								boolean remove = request.handleResponse(event, file, diagnostics);
-								if (remove) {
-									diagRequestsMap.remove(file);
-								}
-							}
-						}
-					}
-				}
-			}
-		} else if ("response".equals(type)) {
-			int seq = response.getInt("request_seq", -1);
-			if (seq != -1) {
-				synchronized (requestsMap) {
-					SimpleRequest request = requestsMap.remove(seq);
-					if (request != null) {
-						request.handleResponse(response);
-					}
-				}
-			}
-		}
-
-	}
-
 }

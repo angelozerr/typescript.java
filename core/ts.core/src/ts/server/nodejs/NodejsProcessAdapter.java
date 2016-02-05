@@ -8,10 +8,12 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.server.nodejs.process;
+package ts.server.nodejs;
 
 import java.io.File;
 import java.util.List;
+
+import com.eclipsesource.json.JsonObject;
 
 /**
  * This adapter class provides default implementations for the methods described
@@ -32,7 +34,8 @@ public class NodejsProcessAdapter implements INodejsProcessListener {
 	}
 
 	@Override
-	public void onData(INodejsProcess process, String line) {
+	public void onMessage(INodejsProcess process, String response) {
+
 	}
 
 	@Override

@@ -89,17 +89,35 @@ public class GeterrRequest extends Request {
 	}
 
 	@Override
-	public JsonObject call() throws Exception {
-		while (!files.isEmpty()) {
-			synchronized (this) {
-				// wait for 200ms otherwise if we don't set ms, if completion is
-				// executed several times
-				// quickly (do Ctrl+Space every time), the Thread could be
-				// blocked? Why?
-				this.wait(5);
-			}
-		}
+	public void complete(JsonObject response) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected boolean isCompleted() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected Object getResult() throws Exception {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
+//	@Override
+//	public JsonObject call() throws Exception {
+//		while (!files.isEmpty()) {
+//			synchronized (this) {
+//				// wait for 200ms otherwise if we don't set ms, if completion is
+//				// executed several times
+//				// quickly (do Ctrl+Space every time), the Thread could be
+//				// blocked? Why?
+//				this.wait(5);
+//			}
+//		}
+//		return null;
+//	}
 
 }

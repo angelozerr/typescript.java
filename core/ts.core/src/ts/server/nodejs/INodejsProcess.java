@@ -1,17 +1,9 @@
-package ts.server.nodejs.process;
-
-import com.eclipsesource.json.JsonObject;
+package ts.server.nodejs;
 
 import ts.TSException;
 import ts.server.protocol.Request;
 
 public interface INodejsProcess {
-
-	void sendRequest(Request request) throws TSException;
-
-	void sendRequestAsyncResponse(Request request) throws TSException;
-
-	JsonObject sendRequestSyncResponse(Request request) throws TSException;
 
 	/**
 	 * Joint to the stdout thread;
@@ -43,4 +35,5 @@ public interface INodejsProcess {
 
 	void start();
 
+	void sendRequest(Request request) throws TSException;
 }

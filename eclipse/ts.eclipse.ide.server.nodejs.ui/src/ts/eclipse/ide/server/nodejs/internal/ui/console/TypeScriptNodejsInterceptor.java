@@ -18,13 +18,15 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
 
+import com.eclipsesource.json.JsonObject;
+
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.console.ITypeScriptConsole;
 import ts.eclipse.ide.ui.console.LineType;
 import ts.server.LoggingInterceptor;
-import ts.server.nodejs.process.INodejsProcess;
-import ts.server.nodejs.process.INodejsProcessListener;
+import ts.server.nodejs.INodejsProcess;
+import ts.server.nodejs.INodejsProcessListener;
 
 public class TypeScriptNodejsInterceptor extends LoggingInterceptor implements INodejsProcessListener {
 
@@ -102,16 +104,15 @@ public class TypeScriptNodejsInterceptor extends LoggingInterceptor implements I
 			} catch (IOException e) {
 			}
 			outProcessPrintln("Project dir: " + path);
-			/*String json = "";
-			try {
-				File ternProject = new File(projectDir, ITypeScriptProject.TERN_PROJECT_FILE);
-				json = IOUtils.toString(new FileInputStream(ternProject));
-			} catch (Throwable e) {
-				errPrintln(e.getMessage());
-			}
-
-			outProcessPrintln(ITypeScriptProject.TERN_PROJECT_FILE + ": " + json);
-			*/
+			/*
+			 * String json = ""; try { File ternProject = new File(projectDir,
+			 * ITypeScriptProject.TERN_PROJECT_FILE); json =
+			 * IOUtils.toString(new FileInputStream(ternProject)); } catch
+			 * (Throwable e) { errPrintln(e.getMessage()); }
+			 * 
+			 * outProcessPrintln(ITypeScriptProject.TERN_PROJECT_FILE + ": " +
+			 * json);
+			 */
 		}
 	}
 
@@ -121,8 +122,8 @@ public class TypeScriptNodejsInterceptor extends LoggingInterceptor implements I
 	}
 
 	@Override
-	public void onData(INodejsProcess process, String line) {
-		outProcessPrintln(line);
+	public void onMessage(INodejsProcess process, String message) {
+		// outProcessPrintln(message);
 	}
 
 	@Override

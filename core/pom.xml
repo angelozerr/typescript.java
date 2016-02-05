@@ -10,7 +10,6 @@
 	<modules>
 		<module>ts.core</module>
 		<module>ts.repository</module>		
-		<module>ts.server.nodejs</module>
 		<module>ts.core.tests</module>
 	</modules>
 </project>

@@ -13,18 +13,18 @@ package ts.eclipse.ide.server.nodejs.internal.ui.console;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.server.ITypeScriptServiceClient;
-import ts.server.nodejs.NodeJSTypeScriptServiceClient;
+import ts.server.TypeScriptServiceClient;
 
 public class TypeScriptConsoleNodejsConnector implements ITypeScriptConsoleConnector {
 
 	@Override
 	public boolean isAdaptFor(ITypeScriptServiceClient client) {
-		return client instanceof NodeJSTypeScriptServiceClient;
+		return client instanceof TypeScriptServiceClient;
 	}
 
 	@Override
 	public void connectToConsole(ITypeScriptServiceClient client, IIDETypeScriptProject project) {
-		NodeJSTypeScriptServiceClient nodeServer = (NodeJSTypeScriptServiceClient) client;
+		TypeScriptServiceClient nodeServer = (TypeScriptServiceClient) client;
 		TypeScriptNodejsInterceptor interceptor = getInterceptor(project);
 		nodeServer.addInterceptor(interceptor);
 		nodeServer.addProcessListener(interceptor);
@@ -32,7 +32,7 @@ public class TypeScriptConsoleNodejsConnector implements ITypeScriptConsoleConne
 
 	@Override
 	public void disconnectToConsole(ITypeScriptServiceClient client, IIDETypeScriptProject project) {
-		NodeJSTypeScriptServiceClient nodeServer = (NodeJSTypeScriptServiceClient) client;
+		TypeScriptServiceClient nodeServer = (TypeScriptServiceClient) client;
 		TypeScriptNodejsInterceptor interceptor = getInterceptor(project);
 		nodeServer.removeInterceptor(interceptor);
 		nodeServer.removeProcessListener(interceptor);

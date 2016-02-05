@@ -21,5 +21,17 @@
    <bundle id="ts.eclipse.ide.validator.ui" version="1.0.0.qualifier">
       <category name="typescript.java"/>
    </bundle>
+   <bundle id="ts.core" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.jsdt.core" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.eclipse.ide.jsdt.ui" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
+   <bundle id="ts.repository" version="1.0.0.qualifier">
+      <category name="typescript.java"/>
+   </bundle>
    <category-def name="typescript.java" label="typescript.java"/>
 </site>
