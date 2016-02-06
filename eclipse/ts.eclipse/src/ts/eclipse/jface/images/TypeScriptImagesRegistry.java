@@ -30,6 +30,7 @@ import ts.utils.StringUtils;
 public class TypeScriptImagesRegistry {
 
 	public static final String IMG_KEYWORD = "ts.eclipse.jface.IMG_KEYWORD";
+	public static final String IMG_PACKAGE = "ts.eclipse.jface.IMG_PACKAGE";
 	public static final String IMG_CLASS = "ts.eclipse.jface.IMG_CLASS";
 	public static final String IMG_ALIAS = "ts.eclipse.jface.IMG_ALIAS";
 	public static final String IMG_INTERFACE = "ts.eclipse.jface.IMG_INTERFACE";
@@ -46,6 +47,8 @@ public class TypeScriptImagesRegistry {
 	static {
 		registerImageDescriptor(IMG_KEYWORD,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "keyword_obj.png"));
+		registerImageDescriptor(IMG_PACKAGE,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "package_obj.gif"));		
 		registerImageDescriptor(IMG_CLASS,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "class_obj.gif"));
 		registerImageDescriptor(IMG_ALIAS,
@@ -285,7 +288,8 @@ public class TypeScriptImagesRegistry {
 			imageKey = IMG_ALIAS;
 			break;			
 		case MODULE:
-			break;
+			imageKey = IMG_PACKAGE;
+			break;	
 		case VAR:
 		case PROPERTY:
 			imageKey = getKey(parts, IMG_FIELD_DEFAULT, IMG_FIELD_PRIVATE, IMG_FIELD_PUBLIC);
