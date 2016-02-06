@@ -26,18 +26,18 @@ public class GeterrRequest extends Request {
 	private final static int EVENT_SEMANTIC_DIAG = 16;
 	private final static int EVENT_FINAL = 20;
 
-	private final ITypeScriptGeterrCollector collector;
-	private final Map<String, Integer> files;
+	private final Map<String, Integer> stateFiles;
+	private final JsonArray result;
 	private int delay;
 
-	public GeterrRequest(String[] files, int delay, ITypeScriptGeterrCollector collector) {
+	public GeterrRequest(String[] files, int delay) {
 		super(CommandNames.Geterr, new GeterrRequestArgs(files, delay), null);
-		this.files = createFilesMap(files);
+		this.stateFiles = createStateFiles(files);
 		this.delay = delay;
-		this.collector = collector;
+		this.result = new JsonArray();
 	}
 
-	private Map<String, Integer> createFilesMap(String[] files) {
+	private Map<String, Integer> createStateFiles(String[] files) {
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		for (int i = 0; i < files.length; i++) {
 			map.put(files[i], EVENT_INIT);
@@ -46,42 +46,42 @@ public class GeterrRequest extends Request {
 	}
 
 	public Collection<String> getFiles() {
-		return files.keySet();
+		return stateFiles.keySet();
 	}
 
 	public int getDelay() {
 		return delay;
 	}
 
-	public boolean handleResponse(String event, String file, JsonArray diagnostics) {
-		JsonObject diagnostic = null;
-		String text = null;
-		JsonObject start = null;
-		JsonObject end = null;
-		for (JsonValue value : diagnostics) {
-			diagnostic = value.asObject();
-			text = diagnostic.getString("text", null);
-			start = diagnostic.get("start").asObject();
-			end = diagnostic.get("end").asObject();
-			collector.addDiagnostic(event, file, text, start.getInt("line", -1), start.getInt("offset", -1),
-					end.getInt("line", -1), end.getInt("offset", -1));
-		}
-		Integer mask = files.get(file);
-		mask = mask.intValue() | ("syntaxDiag".equals(event) ? EVENT_SYNTAX_DIAG : EVENT_SEMANTIC_DIAG);
-		if (mask == EVENT_FINAL) {
-			dispose(file);
-			return true;
-		} else {
-			synchronized (files) {
-				files.put(file, mask);
-			}
-			return false;
-		}
-	}
+//	public boolean handleResponse(String event, String file, JsonArray diagnostics) {
+//		JsonObject diagnostic = null;
+//		String text = null;
+//		JsonObject start = null;
+//		JsonObject end = null;
+//		for (JsonValue value : diagnostics) {
+//			diagnostic = value.asObject();
+//			text = diagnostic.getString("text", null);
+//			start = diagnostic.get("start").asObject();
+//			end = diagnostic.get("end").asObject();
+//			collector.addDiagnostic(event, file, text, start.getInt("line", -1), start.getInt("offset", -1),
+//					end.getInt("line", -1), end.getInt("offset", -1));
+//		}
+//		Integer mask = stateFiles.get(file);
+//		mask = mask.intValue() | ("syntaxDiag".equals(event) ? EVENT_SYNTAX_DIAG : EVENT_SEMANTIC_DIAG);
+//		if (mask == EVENT_FINAL) {
+//			dispose(file);
+//			return true;
+//		} else {
+//			synchronized (stateFiles) {
+//				stateFiles.put(file, mask);
+//			}
+//			return false;
+//		}
+//	}
 
 	public void dispose(String file) {
-		synchronized (files) {
-			files.remove(file);
+		synchronized (stateFiles) {
+			stateFiles.remove(file);
 		}
 		synchronized (this) {
 			this.notifyAll();
@@ -89,21 +89,33 @@ public class GeterrRequest extends Request {
 	}
 
 	@Override
-	public void complete(JsonObject response) {
-		// TODO Auto-generated method stub
+	public boolean complete(JsonObject response) {
+		result.add(response);
 		
+		String event = response.getString("event", null);
+		JsonObject body = response.get("body").asObject();
+		String file = body.getString("file", null);		
+		Integer mask = stateFiles.get(file);
+		mask = mask.intValue() | ("syntaxDiag".equals(event) ? EVENT_SYNTAX_DIAG : EVENT_SEMANTIC_DIAG);
+		if (mask == EVENT_FINAL) {
+			dispose(file);
+			return true;
+		} else {
+			synchronized (stateFiles) {
+				stateFiles.put(file, mask);
+			}
+			return false;
+		}
 	}
 
 	@Override
 	protected boolean isCompleted() {
-		// TODO Auto-generated method stub
-		return false;
+		return stateFiles.isEmpty();
 	}
 
 	@Override
 	protected Object getResult() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return result;
 	}
 
 //	@Override

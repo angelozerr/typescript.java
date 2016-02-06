@@ -19,19 +19,13 @@ public class SimpleRequest extends Request<JsonObject> {
 		super(command, args, seq);
 	}
 
-	public void handleResponse(JsonObject response) {
-		this.response = response;
-		synchronized (this) {
-			this.notifyAll();
-		}
-	}
-
 	@Override
-	public void complete(JsonObject response) {
+	public boolean complete(JsonObject response) {
 		this.response = response;
 		synchronized (this) {
 			this.notifyAll();
 		}
+		return isCompleted();
 	}
 
 	@Override

@@ -6,6 +6,6 @@ import com.eclipsesource.json.JsonObject;
 
 public interface ICallbackItem<T> extends Callable<T> {
 
-	void complete(JsonObject response);
+	boolean complete(JsonObject response);
 
 }

@@ -3,6 +3,7 @@ package ts.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -52,6 +53,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	private final List<RequestItem> requestQueue;
 	private final AtomicInteger pendingResponses;
 	private final Map<Integer, ICallbackItem> callbacks;
+	private final Map<String, ICallbackItem> diagCallbacks;
 
 	private final File projectDir;
 	private INodejsProcess process;
@@ -86,6 +88,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		this.requestQueue = new ArrayList<RequestItem>();
 		this.pendingResponses = new AtomicInteger(0);
 		this.callbacks = new HashMap<Integer, ICallbackItem>();
+		this.diagCallbacks = new HashMap<String, ICallbackItem>();
 
 		this.projectDir = projectDir;
 		this.process = process;
@@ -217,13 +220,37 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TSException {
-		Request request = new GeterrRequest(files, delay, collector);
+		Request request = new GeterrRequest(files, delay);
 		if (delay == 0) {
-			execute(request, false, null);
-			// internalProcessRequest(request);
+			JsonObject response;
+			JsonArray result = execute(request, true, null).asArray();
+			for (JsonValue r : result) {
+				response = (JsonObject) r;
+				collect(response, collector);
+			}
 		} else {
+			// TODO
 			execute(request, false, null);
-			// internalProcessVoidRequest(request, true);
+		}
+	}
+
+	private void collect(JsonObject response, ITypeScriptGeterrCollector collector) {
+		String event = response.getString("event", null);
+		JsonObject body = response.get("body").asObject();
+		String file = body.getString("file", null);
+		JsonArray diagnostics = body.get("diagnostics").asArray();
+		
+		JsonObject diagnostic = null;
+		String text = null;
+		JsonObject start = null;
+		JsonObject end = null;
+		for (JsonValue value : diagnostics) {
+			diagnostic = value.asObject();
+			text = diagnostic.getString("text", null);
+			start = diagnostic.get("start").asObject();
+			end = diagnostic.get("end").asObject();
+			collector.addDiagnostic(event, file, text, start.getInt("line", -1), start.getInt("offset", -1),
+					end.getInt("line", -1), end.getInt("offset", -1));
 		}
 	}
 
@@ -486,26 +513,52 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		Request serverRequest = requestItem.request;
 		// log request
 		handleRequest(serverRequest);
+		boolean eventRequest = (serverRequest instanceof GeterrRequest);
 		ICallbackItem callbacks = requestItem.callbacks;
 		if (callbacks != null) {
-			synchronized (this.callbacks) {
-				this.callbacks.put(serverRequest.getSeq(), callbacks);
+			if (eventRequest) {
+				GeterrRequest err = (GeterrRequest) serverRequest;
+				synchronized (this.diagCallbacks) {
+					for (String file : err.getFiles()) {
+						this.diagCallbacks.put(file, callbacks);
+						// this.pendingResponses.incrementAndGet();
+						// this.pendingResponses.incrementAndGet();
+					}
+				}
+			} else {
+				synchronized (this.callbacks) {
+					this.callbacks.put(serverRequest.getSeq(), callbacks);
+				}
+				this.pendingResponses.incrementAndGet();
 			}
-			this.pendingResponses.incrementAndGet();
 		}
 		try {
 			getProcess().sendRequest(serverRequest);
 		} catch (TSException e) {
-			synchronized (callbacks) {
-				ICallbackItem callback = this.callbacks.get(serverRequest.getSeq());
-				if (callback != null) {
-					// callback.e(err);
-					this.callbacks.remove(serverRequest.getSeq());
+			if (eventRequest) {
+				synchronized (this.callbacks) {
+					GeterrRequest err = (GeterrRequest) serverRequest;
+					synchronized (this.diagCallbacks) {
+						for (String file : err.getFiles()) {
+							this.diagCallbacks.remove(file);
+							// this.pendingResponses.getAndDecrement();
+							// this.pendingResponses.getAndDecrement();
+						}
+					}
 				}
-				this.pendingResponses.getAndDecrement();
+			} else {
+				synchronized (this.callbacks) {
+					ICallbackItem callback = this.callbacks.get(serverRequest.getSeq());
+					if (callback != null) {
+						// callback.e(err);
+						this.callbacks.remove(serverRequest.getSeq());
+					}
+					this.pendingResponses.getAndDecrement();
+				}
 			}
 			throw e;
 		}
+
 	}
 
 	private void handleRequest(Request request) {
@@ -529,6 +582,26 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 				this.pendingResponses.getAndDecrement();
 				p.complete(response);
 				handleResponse(((Request) p), response, ((Request) p).getStartTime());
+			}
+		} else if ("event".equals(type)) {
+			String event = response.getString("event", null);
+			if ("syntaxDiag".equals(event) || "semanticDiag".equals(event)) {
+				JsonObject body = response.get("body").asObject();
+				if (body != null) {
+					String file = body.getString("file", null);
+					if (file != null) {
+						ICallbackItem p = null;
+						synchronized (diagCallbacks) {
+							p = diagCallbacks.get(file);
+							if (p != null) {
+								if (p.complete(response)) {
+									diagCallbacks.remove(file);
+								}
+								handleResponse(((Request) p), response, ((Request) p).getStartTime());
+							}
+						}
+					}
+				}
 			}
 		}
 	}
