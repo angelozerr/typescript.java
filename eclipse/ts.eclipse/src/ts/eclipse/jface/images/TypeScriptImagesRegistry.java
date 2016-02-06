@@ -273,10 +273,26 @@ public class TypeScriptImagesRegistry {
 	// }
 
 	public static Image getImage(ICompletionEntry entry) {
-		return getTypeScriptKindImage(entry.getKind(), entry.getKindModifiers(), null);
+		return getTypeScriptImage(entry.getKind(), entry.getKindModifiers(), null);
 	}
 
-	public static Image getTypeScriptKindImage(String kind, String kindModifiers, String containerKind) {
+	public static Image getTypeScriptImage(String kind, String kindModifiers, String containerKind) {
+		String imageKey = getImageKey(kind, kindModifiers, containerKind);
+		if (imageKey != null) {
+			return getImage(imageKey);
+		}
+		return null;
+	}
+
+	public static ImageDescriptor getTypeScriptImageDescriptor(String kind, String kindModifiers, String containerKind) {
+		String imageKey = getImageKey(kind, kindModifiers, containerKind);
+		if (imageKey != null) {
+			return getImageDescriptor(imageKey);
+		}
+		return null;
+	}
+	
+	private static String getImageKey(String kind, String kindModifiers, String containerKind) {
 		TypeScriptKind tsKind = TypeScriptKind.getKind(kind);
 		if (tsKind == null) {
 			return null;
@@ -323,10 +339,7 @@ public class TypeScriptImagesRegistry {
 			break;
 		default:
 		}
-		if (imageKey != null) {
-			return getImage(imageKey);
-		}
-		return null;
+		return imageKey;
 	}
 
 	private static List<TypeScriptKind> getParts(String kindModifiers) {

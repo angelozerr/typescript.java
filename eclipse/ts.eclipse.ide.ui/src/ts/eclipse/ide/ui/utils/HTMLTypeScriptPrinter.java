@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import org.eclipse.core.internal.expressions.TestExpression;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.internal.text.html.HTMLPrinter;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -15,7 +16,9 @@ import org.osgi.framework.Bundle;
 
 import ts.eclipse.ide.internal.ui.Trace;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
+import ts.eclipse.ide.ui.ImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 import ts.eclipse.jface.text.HoverLocationListener;
 import ts.utils.StringUtils;
 
@@ -39,7 +42,7 @@ public class HTMLTypeScriptPrinter {
 
 	public static String getQuickInfo(String kind, String kindModifiers, String displayString, String documentation) {
 		StringBuffer info = new StringBuffer();
-		ImageDescriptor descriptor = null;
+		ImageDescriptor descriptor = null; //TypeScriptImagesRegistry.getTypeScriptImageDescriptor(kind, kindModifiers, null);
 		startPage(info, null, descriptor);
 		if (!StringUtils.isEmpty(displayString)) {
 			info.append("<pre class=\"displayString\">");
@@ -167,6 +170,8 @@ public class HTMLTypeScriptPrinter {
 			buf.append("<!--[if lte IE 6]><![if gte IE 5.5]>\n"); //$NON-NLS-1$
 			String tooltip = "alt='" + TypeScriptUIMessages.TypeScriptHover_openDeclaration + "' "; //$NON-NLS-1$ //$NON-NLS-2$
 																									// $NON-NLS-1$
+																									// $NON-NLS-1$
+																									// $NON-NLS-1$
 																									//$NON-NLS-1$ //$NON-NLS-3$
 			buf.append("<span ").append(tooltip).append("style=\"").append(imageStyle). //$NON-NLS-1$ //$NON-NLS-2$
 					append("filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='").append(imageSrcPath) //$NON-NLS-1$
@@ -199,8 +204,7 @@ public class HTMLTypeScriptPrinter {
 			return null;
 		}
 		String imageName = null;
-		URL imageUrl = null; // TypeScriptUIPlugin.getTernDescriptorManager().getImageURL(
-		// descriptor);
+		URL imageUrl = ImageResource.getImageURL(descriptor);
 		if (imageUrl != null) {
 			imageName = imageUrl.toExternalForm();
 		}
