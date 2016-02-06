@@ -1,9 +1,9 @@
 package ts.resources;
 
-import ts.Location;
 import ts.TypeScriptException;
-import ts.server.completions.ITypeScriptCompletionCollector;
-import ts.server.definition.ITypeScriptDefinitionCollector;
+import ts.client.Location;
+import ts.client.completions.ITypeScriptCompletionCollector;
+import ts.client.definition.ITypeScriptDefinitionCollector;
 
 public interface ITypeScriptFile {
 

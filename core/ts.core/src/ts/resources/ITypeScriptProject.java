@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2013-2015 Angelo ZERR.
+ *  Copyright (c) 2015-2016 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -11,13 +11,11 @@
 package ts.resources;
 
 import ts.TypeScriptException;
-import ts.server.ITypeScriptServerListener;
-import ts.server.ITypeScriptServiceClient;
-import ts.server.completions.ITypeScriptCompletionCollector;
-import ts.server.definition.ITypeScriptDefinitionCollector;
-import ts.server.geterr.ITypeScriptGeterrCollector;
-import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
-import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.client.ITypeScriptClientListener;
+import ts.client.ITypeScriptServiceClient;
+import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
+import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public interface ITypeScriptProject {
 
@@ -50,9 +48,9 @@ public interface ITypeScriptProject {
 
 	// -------------- TypeScript server.
 
-	void addServerListener(ITypeScriptServerListener listener);
+	void addServerListener(ITypeScriptClientListener listener);
 
-	void removeServerListener(ITypeScriptServerListener listener);
+	void removeServerListener(ITypeScriptClientListener listener);
 
 	void disposeServer();
 

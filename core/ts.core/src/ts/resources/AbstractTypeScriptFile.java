@@ -1,11 +1,11 @@
 package ts.resources;
 
-import ts.Location;
 import ts.TypeScriptException;
+import ts.client.ITypeScriptServiceClient;
+import ts.client.Location;
+import ts.client.completions.ITypeScriptCompletionCollector;
+import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.internal.LocationReader;
-import ts.server.ITypeScriptServiceClient;
-import ts.server.completions.ITypeScriptCompletionCollector;
-import ts.server.definition.ITypeScriptDefinitionCollector;
 
 public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 

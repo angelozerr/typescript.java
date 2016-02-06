@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2013-2015 Angelo ZERR.
+ *  Copyright (c) 2015-2016 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -19,9 +19,9 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import ts.TypeScriptException;
+import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.utils.EditorUtils;
-import ts.server.definition.ITypeScriptDefinitionCollector;
 import ts.utils.StringUtils;
 
 public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeScriptDefinitionCollector {

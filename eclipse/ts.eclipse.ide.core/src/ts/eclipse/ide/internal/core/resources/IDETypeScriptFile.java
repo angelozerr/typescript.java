@@ -6,8 +6,8 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 
-import ts.Location;
 import ts.TypeScriptException;
+import ts.client.Location;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.resources.AbstractTypeScriptFile;

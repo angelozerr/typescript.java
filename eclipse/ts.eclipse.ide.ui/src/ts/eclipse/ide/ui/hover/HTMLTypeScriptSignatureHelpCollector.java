@@ -1,6 +1,6 @@
 package ts.eclipse.ide.ui.hover;
 
-import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public class HTMLTypeScriptSignatureHelpCollector implements ITypeScriptSignatureHelpCollector {
 

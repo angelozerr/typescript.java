@@ -7,10 +7,10 @@ import org.eclipse.wst.validation.internal.provisional.core.IReporter;
 import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
 import ts.TypeScriptException;
+import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.validator.internal.core.Trace;
 import ts.resources.ITypeScriptFile;
-import ts.server.geterr.ITypeScriptGeterrCollector;
 
 public class TypeScriptReporterCollector implements ITypeScriptGeterrCollector {
 

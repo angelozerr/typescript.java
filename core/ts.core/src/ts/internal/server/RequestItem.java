@@ -1,6 +1,6 @@
 package ts.internal.server;
 
-import ts.server.protocol.Request;
+import ts.client.protocol.Request;
 
 public class RequestItem {
 

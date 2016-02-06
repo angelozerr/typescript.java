@@ -3,10 +3,10 @@ package ts.core.tests;
 import java.io.File;
 
 import ts.TypeScriptException;
+import ts.client.ITypeScriptServiceClient;
+import ts.client.TypeScriptServiceClient;
 import ts.resources.SynchStrategy;
 import ts.resources.TypeScriptProject;
-import ts.server.ITypeScriptServiceClient;
-import ts.server.TypeScriptServiceClient;
 
 public class MockTypeScriptProject extends TypeScriptProject {
 

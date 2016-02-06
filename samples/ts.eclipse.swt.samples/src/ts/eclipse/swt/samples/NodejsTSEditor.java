@@ -18,15 +18,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import ts.TypeScriptException;
+import ts.client.ITypeScriptServiceClientFactory;
+import ts.client.LoggingInterceptor;
+import ts.client.TypeScriptServiceClientFactory;
 import ts.eclipse.jface.fieldassist.TypeScriptContentProposalProvider;
 import ts.eclipse.jface.viewers.TypeScriptLabelProvider;
 import ts.eclipse.swt.SWTTextTypeScriptFile;
 import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.resources.TypeScriptProject;
-import ts.server.ITypeScriptServiceClientFactory;
-import ts.server.LoggingInterceptor;
-import ts.server.TypeScriptServiceClientFactory;
 import ts.utils.FileUtils;
 
 public class NodejsTSEditor {

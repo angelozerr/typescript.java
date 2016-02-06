@@ -6,7 +6,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import ts.Location;
+import ts.client.Location;
 
 public class LocationReader {
 

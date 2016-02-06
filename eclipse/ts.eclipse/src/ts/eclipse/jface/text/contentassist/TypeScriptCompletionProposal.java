@@ -7,7 +7,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
-import ts.CompletionEntry;
+import ts.client.completions.CompletionEntry;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 
 public class TypeScriptCompletionProposal extends CompletionEntry implements ICompletionProposal {

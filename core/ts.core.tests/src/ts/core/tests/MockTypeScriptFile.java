@@ -3,7 +3,7 @@ package ts.core.tests;
 import java.io.File;
 import java.io.IOException;
 
-import ts.Location;
+import ts.client.Location;
 import ts.resources.AbstractTypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.resources.SynchStrategy;

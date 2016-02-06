@@ -12,6 +12,9 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
+import ts.client.ITypeScriptServiceClient;
+import ts.client.ITypeScriptServiceClientFactory;
+import ts.client.TypeScriptServiceClient;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
@@ -20,9 +23,6 @@ import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.resources.SynchStrategy;
 import ts.resources.TypeScriptProject;
-import ts.server.ITypeScriptServiceClient;
-import ts.server.ITypeScriptServiceClientFactory;
-import ts.server.TypeScriptServiceClient;
 
 public class IDETypeScriptProject extends TypeScriptProject
 		implements IIDETypeScriptProject, ITypeScriptServiceClientFactory {

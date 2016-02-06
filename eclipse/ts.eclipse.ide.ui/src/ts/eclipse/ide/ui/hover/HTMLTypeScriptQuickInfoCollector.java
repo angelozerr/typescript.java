@@ -1,7 +1,7 @@
 package ts.eclipse.ide.ui.hover;
 
+import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.eclipse.ide.ui.utils.HTMLTypeScriptPrinter;
-import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
 
 public class HTMLTypeScriptQuickInfoCollector implements ITypeScriptQuickInfoCollector {
 

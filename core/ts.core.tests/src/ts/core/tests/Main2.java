@@ -3,11 +3,11 @@ package ts.core.tests;
 import java.io.File;
 import java.io.IOException;
 
-import ts.ICompletionEntry;
-import ts.ICompletionInfo;
 import ts.TypeScriptException;
-import ts.server.definition.DefinitionsInfo;
-import ts.server.geterr.ITypeScriptGeterrCollector;
+import ts.client.completions.ICompletionEntry;
+import ts.client.completions.ICompletionInfo;
+import ts.client.definition.DefinitionsInfo;
+import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.utils.FileUtils;
 
 public class Main2 {

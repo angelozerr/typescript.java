@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ts.Location;
 import ts.TypeScriptException;
-import ts.server.ITypeScriptServerListener;
-import ts.server.ITypeScriptServiceClient;
-import ts.server.ITypeScriptServiceClientFactory;
-import ts.server.geterr.ITypeScriptGeterrCollector;
-import ts.server.quickinfo.ITypeScriptQuickInfoCollector;
-import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.client.ITypeScriptClientListener;
+import ts.client.ITypeScriptServiceClient;
+import ts.client.ITypeScriptServiceClientFactory;
+import ts.client.Location;
+import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
+import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 public class TypeScriptProject implements ITypeScriptProject, ITypeScriptServiceClientFactory {
 
@@ -25,7 +25,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	private ITypeScriptServiceClient client;
 
 	private final Map<String, Object> data;
-	private final List<ITypeScriptServerListener> listeners;
+	private final List<ITypeScriptClientListener> listeners;
 	protected final Object serverLock = new Object();
 
 	public TypeScriptProject(File projectDir, ITypeScriptServiceClientFactory factory) {
@@ -44,7 +44,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		this.synchStrategy = synchStrategy;
 		this.openedFiles = new HashMap<String, ITypeScriptFile>();
 		this.data = new HashMap<String, Object>();
-		this.listeners = new ArrayList<ITypeScriptServerListener>();
+		this.listeners = new ArrayList<ITypeScriptClientListener>();
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	// ----------------------- TypeScript server listeners.
 
 	@Override
-	public void addServerListener(ITypeScriptServerListener listener) {
+	public void addServerListener(ITypeScriptClientListener listener) {
 		synchronized (listeners) {
 			if (!listeners.contains(listener)) {
 				listeners.add(listener);
@@ -167,13 +167,13 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void removeServerListener(ITypeScriptServerListener listener) {
+	public void removeServerListener(ITypeScriptClientListener listener) {
 		synchronized (listeners) {
 			listeners.remove(listener);
 		}
 		synchronized (serverLock) {
 			if (hasClient()) {
-				this.client.removeServerListener(listener);
+				this.client.removeClientListener(listener);
 			}
 		}
 	}
@@ -185,8 +185,8 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	private void copyListeners() {
 		synchronized (serverLock) {
 			if (hasClient()) {
-				for (ITypeScriptServerListener listener : listeners) {
-					client.addServerListener(listener);
+				for (ITypeScriptClientListener listener : listeners) {
+					client.addClientListener(listener);
 				}
 			}
 		}

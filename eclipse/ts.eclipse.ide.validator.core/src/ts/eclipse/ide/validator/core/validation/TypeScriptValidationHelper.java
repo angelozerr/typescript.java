@@ -3,11 +3,11 @@ package ts.eclipse.ide.validator.core.validation;
 import org.eclipse.wst.validation.internal.provisional.core.IReporter;
 import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
+import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.validator.internal.core.Trace;
 import ts.eclipse.ide.validator.internal.core.validation.TypeScriptReporterCollector;
 import ts.resources.ITypeScriptProject;
-import ts.server.geterr.ITypeScriptGeterrCollector;
 
 public class TypeScriptValidationHelper {
 

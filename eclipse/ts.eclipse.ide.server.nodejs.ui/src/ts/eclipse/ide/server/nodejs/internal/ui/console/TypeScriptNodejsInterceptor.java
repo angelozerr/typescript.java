@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2013-2015 Angelo ZERR.
+ *  Copyright (c) 2015-2016 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -20,13 +20,13 @@ import org.eclipse.swt.widgets.Display;
 
 import com.eclipsesource.json.JsonObject;
 
+import ts.client.LoggingInterceptor;
+import ts.client.nodejs.INodejsProcess;
+import ts.client.nodejs.INodejsProcessListener;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.console.ITypeScriptConsole;
 import ts.eclipse.ide.ui.console.LineType;
-import ts.server.LoggingInterceptor;
-import ts.server.nodejs.INodejsProcess;
-import ts.server.nodejs.INodejsProcessListener;
 
 public class TypeScriptNodejsInterceptor extends LoggingInterceptor implements INodejsProcessListener {
 
