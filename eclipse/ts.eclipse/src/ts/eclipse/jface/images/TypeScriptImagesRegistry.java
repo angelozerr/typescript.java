@@ -31,6 +31,9 @@ public class TypeScriptImagesRegistry {
 
 	public static final String IMG_CLASS = "ts.eclipse.jface.IMG_CLASS";
 	public static final String IMG_INTERFACE = "ts.eclipse.jface.IMG_INTERFACE";
+	public static final String IMG_FIELD_DEFAULT = "ts.eclipse.jface.IMG_FIELD_DEFAULT";
+	public static final String IMG_FIELD_PRIVATE = "ts.eclipse.jface.IMG_FIELD_PRIVATE";
+	public static final String IMG_FIELD_PUBLIC = "ts.eclipse.jface.IMG_FIELD_PUBLIC";
 	public static final String IMG_METHOD_DEFAULT = "ts.eclipse.jface.IMG_METHOD_DEFAULT";
 	public static final String IMG_METHOD_PRIVATE = "ts.eclipse.jface.IMG_METHOD_PRIVATE";
 	public static final String IMG_METHOD_PUBLIC = "ts.eclipse.jface.IMG_METHOD_PUBLIC";
@@ -40,6 +43,12 @@ public class TypeScriptImagesRegistry {
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "class_obj.gif"));
 		registerImageDescriptor(IMG_INTERFACE,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "int_obj.gif"));
+		registerImageDescriptor(IMG_FIELD_DEFAULT,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "field_default_obj.gif"));
+		registerImageDescriptor(IMG_FIELD_PRIVATE,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "field_private_obj.gif"));
+		registerImageDescriptor(IMG_FIELD_PUBLIC,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "field_public_obj.gif"));
 		registerImageDescriptor(IMG_METHOD_DEFAULT,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "methdef_obj.gif"));
 		registerImageDescriptor(IMG_METHOD_PRIVATE,
@@ -258,6 +267,9 @@ public class TypeScriptImagesRegistry {
 			return null;
 		case MODULE:
 			break;
+		case VAR:
+			imageKey = getKey(parts, IMG_FIELD_DEFAULT, IMG_FIELD_PRIVATE, IMG_FIELD_PUBLIC);
+			break;
 		case METHOD:
 			imageKey = getKey(parts, IMG_METHOD_DEFAULT, IMG_METHOD_PRIVATE, IMG_METHOD_PUBLIC);
 			break;
@@ -265,7 +277,7 @@ public class TypeScriptImagesRegistry {
 			if (!isInner) {
 				imageKey = IMG_CLASS;
 			}
-			break;			
+			break;
 		case INTERFACE:
 			if (!isInner) {
 				imageKey = IMG_INTERFACE;
