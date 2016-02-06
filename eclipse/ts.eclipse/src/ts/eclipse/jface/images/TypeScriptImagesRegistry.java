@@ -29,6 +29,7 @@ import ts.utils.StringUtils;
  */
 public class TypeScriptImagesRegistry {
 
+	public static final String IMG_KEYWORD = "ts.eclipse.jface.IMG_KEYWORD";
 	public static final String IMG_CLASS = "ts.eclipse.jface.IMG_CLASS";
 	public static final String IMG_ALIAS = "ts.eclipse.jface.IMG_ALIAS";
 	public static final String IMG_INTERFACE = "ts.eclipse.jface.IMG_INTERFACE";
@@ -38,8 +39,13 @@ public class TypeScriptImagesRegistry {
 	public static final String IMG_METHOD_DEFAULT = "ts.eclipse.jface.IMG_METHOD_DEFAULT";
 	public static final String IMG_METHOD_PRIVATE = "ts.eclipse.jface.IMG_METHOD_PRIVATE";
 	public static final String IMG_METHOD_PUBLIC = "ts.eclipse.jface.IMG_METHOD_PUBLIC";
-
+	public static final String IMG_TYPE_DEFAULT = "ts.eclipse.jface.IMG_TYPE_DEFAULT";
+	public static final String IMG_TYPE_PRIVATE = "ts.eclipse.jface.IMG_TYPE_PRIVATE";
+	public static final String IMG_TYPE_PUBLIC = "ts.eclipse.jface.IMG_TYPE_PUBLIC";
+	
 	static {
+		registerImageDescriptor(IMG_KEYWORD,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "keyword_obj.png"));
 		registerImageDescriptor(IMG_CLASS,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "class_obj.gif"));
 		registerImageDescriptor(IMG_ALIAS,
@@ -58,6 +64,12 @@ public class TypeScriptImagesRegistry {
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "methpri_obj.gif"));
 		registerImageDescriptor(IMG_METHOD_PUBLIC,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "methpub_obj.gif"));
+		registerImageDescriptor(IMG_TYPE_DEFAULT,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_obj.gif"));
+		registerImageDescriptor(IMG_TYPE_PRIVATE,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_private_obj.gif"));
+		registerImageDescriptor(IMG_TYPE_PUBLIC,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_public_obj.gif"));		
 	}
 
 	/**
@@ -267,7 +279,8 @@ public class TypeScriptImagesRegistry {
 
 		switch (tsKind) {
 		case KEYWORD:
-			return null;
+			imageKey = IMG_KEYWORD;
+			break;	
 		case ALIAS:
 			imageKey = IMG_ALIAS;
 			break;			
@@ -277,6 +290,9 @@ public class TypeScriptImagesRegistry {
 		case PROPERTY:
 			imageKey = getKey(parts, IMG_FIELD_DEFAULT, IMG_FIELD_PRIVATE, IMG_FIELD_PUBLIC);
 			break;
+		case TYPE:			
+			imageKey = getKey(parts, IMG_TYPE_DEFAULT, IMG_TYPE_PRIVATE, IMG_TYPE_PUBLIC);
+			break;			
 		case METHOD:
 		case FUNCTION:			
 			imageKey = getKey(parts, IMG_METHOD_DEFAULT, IMG_METHOD_PRIVATE, IMG_METHOD_PUBLIC);
