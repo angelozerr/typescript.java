@@ -34,6 +34,8 @@ public class TypeScriptImagesRegistry {
 	public static final String IMG_CLASS = "ts.eclipse.jface.IMG_CLASS";
 	public static final String IMG_ALIAS = "ts.eclipse.jface.IMG_ALIAS";
 	public static final String IMG_INTERFACE = "ts.eclipse.jface.IMG_INTERFACE";
+	public static final String IMG_ENUM_DEFAULT = "ts.eclipse.jface.IMG_ENUM_DEFAULT";
+	public static final String IMG_ENUM_PRIVATE = "ts.eclipse.jface.IMG_ENUM_PRIVATE";
 	public static final String IMG_FIELD_DEFAULT = "ts.eclipse.jface.IMG_FIELD_DEFAULT";
 	public static final String IMG_FIELD_PRIVATE = "ts.eclipse.jface.IMG_FIELD_PRIVATE";
 	public static final String IMG_FIELD_PUBLIC = "ts.eclipse.jface.IMG_FIELD_PUBLIC";
@@ -55,6 +57,10 @@ public class TypeScriptImagesRegistry {
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "alias_obj.gif"));		
 		registerImageDescriptor(IMG_INTERFACE,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "int_obj.gif"));
+		registerImageDescriptor(IMG_ENUM_DEFAULT,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "enum_default_obj.gif"));
+		registerImageDescriptor(IMG_ENUM_PRIVATE,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "enum_private_obj.gif"));		
 		registerImageDescriptor(IMG_FIELD_DEFAULT,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "field_default_obj.gif"));
 		registerImageDescriptor(IMG_FIELD_PRIVATE,
@@ -289,9 +295,13 @@ public class TypeScriptImagesRegistry {
 			break;			
 		case MODULE:
 			imageKey = IMG_PACKAGE;
-			break;	
+			break;
+		case ENUM:			
+			imageKey = getKey(parts, IMG_ENUM_DEFAULT, IMG_ENUM_PRIVATE, null);
+			break;			
 		case VAR:
 		case PROPERTY:
+		case LET:			
 			imageKey = getKey(parts, IMG_FIELD_DEFAULT, IMG_FIELD_PRIVATE, IMG_FIELD_PUBLIC);
 			break;
 		case TYPE:			
