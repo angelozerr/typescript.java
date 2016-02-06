@@ -17,6 +17,7 @@ package ts;
 public enum TypeScriptKind {
 
 	/** Primitive type. */
+	ALIAS,
 	PRIMITIVE_TYPE, /** Keyword. */
 	KEYWORD, /** Class. */
 	CLASS, /** Interface. */
