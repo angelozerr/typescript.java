@@ -7,7 +7,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 
 import ts.Location;
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.resources.AbstractTypeScriptFile;
@@ -69,7 +69,7 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	}
 
 	@Override
-	public void close() throws TSException {
+	public void close() throws TypeScriptException {
 		this.document.removeDocumentListener(this);
 		super.close();
 	}
@@ -80,13 +80,13 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	}
 
 	@Override
-	public Location getLocation(int position) throws TSException {
+	public Location getLocation(int position) throws TypeScriptException {
 		try {
 			int line = document.getLineOfOffset(position);
 			int offset = position - document.getLineOffset(line);
 			return new Location(line + 1, offset + 1);
 		} catch (BadLocationException e) {
-			throw new TSException(e);
+			throw new TypeScriptException(e);
 		}
 	}
 
@@ -96,11 +96,11 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	}
 
 	@Override
-	public int getPosition(int line, int offset) throws TSException {
+	public int getPosition(int line, int offset) throws TypeScriptException {
 		try {
 			return document.getLineOffset(line - 1) + offset - 1;
 		} catch (BadLocationException e) {
-			throw new TSException(e);
+			throw new TypeScriptException(e);
 		}
 	}
 

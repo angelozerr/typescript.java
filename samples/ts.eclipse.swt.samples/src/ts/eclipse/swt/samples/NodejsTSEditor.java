@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.eclipse.jface.fieldassist.TypeScriptContentProposalProvider;
 import ts.eclipse.jface.viewers.TypeScriptLabelProvider;
 import ts.eclipse.swt.SWTTextTypeScriptFile;
@@ -40,7 +40,7 @@ public class NodejsTSEditor {
 		}
 	}
 
-	private void createUI() throws TSException, IOException, InterruptedException {
+	private void createUI() throws TypeScriptException, IOException, InterruptedException {
 
 		ITypeScriptServiceClientFactory factory = new TypeScriptServiceClientFactory(
 				new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);

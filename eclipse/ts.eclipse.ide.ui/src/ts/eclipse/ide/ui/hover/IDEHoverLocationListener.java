@@ -13,7 +13,7 @@ package ts.eclipse.ide.ui.hover;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.eclipse.jface.text.HoverLocationListener;
 import ts.server.definition.ITypeScriptDefinitionCollector;
@@ -83,7 +83,7 @@ public class IDEHoverLocationListener extends HoverLocationListener implements
 
 	@Override
 	public void addDefinition(String file, int startLine, int startOffset, int endLine, int endOffset)
-			throws TSException {
+			throws TypeScriptException {
 		
 	}
 

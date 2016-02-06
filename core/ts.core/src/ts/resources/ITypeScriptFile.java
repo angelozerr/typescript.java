@@ -1,7 +1,7 @@
 package ts.resources;
 
 import ts.Location;
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
 
@@ -19,21 +19,21 @@ public interface ITypeScriptFile {
 
 	String getPrefix(int position);
 
-	Location getLocation(int position) throws TSException;
+	Location getLocation(int position) throws TypeScriptException;
 
-	int getPosition(int line, int offset) throws TSException;
+	int getPosition(int line, int offset) throws TypeScriptException;
 
 	String getContents();
 
-	void open() throws TSException;
+	void open() throws TypeScriptException;
 
-	void close() throws TSException;
+	void close() throws TypeScriptException;
 	
-	void synch() throws TSException;
+	void synch() throws TypeScriptException;
 	
-	void completions(int position, ITypeScriptCompletionCollector collector) throws TSException;
+	void completions(int position, ITypeScriptCompletionCollector collector) throws TypeScriptException;
 
-	void definition(int position, ITypeScriptDefinitionCollector collector) throws TSException;
+	void definition(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
 
 
 }

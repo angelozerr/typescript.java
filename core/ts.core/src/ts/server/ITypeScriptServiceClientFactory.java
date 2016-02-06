@@ -2,9 +2,9 @@ package ts.server;
 
 import java.io.File;
 
-import ts.TSException;
+import ts.TypeScriptException;
 
 public interface ITypeScriptServiceClientFactory {
 
-	ITypeScriptServiceClient create(File projectDir) throws TSException;
+	ITypeScriptServiceClient create(File projectDir) throws TypeScriptException;
 }

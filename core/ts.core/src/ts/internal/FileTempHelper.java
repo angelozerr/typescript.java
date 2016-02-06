@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import ts.TSException;
+import ts.TypeScriptException;
 
 public class FileTempHelper {
 
 	private final static Stack<File> availableTempFileList = new Stack<File>();
 	private final static Map<Integer, File> seq_to_tempfile_name = new HashMap<Integer, File>();
 
-	public static String updateTempFile(String newText, int seq) throws TSException {
+	public static String updateTempFile(String newText, int seq) throws TypeScriptException {
 		Writer writer = null;
 		try {
 			File tempFile = getTempFile(seq);
@@ -24,14 +24,14 @@ public class FileTempHelper {
 			writer.flush();
 			return tempFile.getCanonicalPath();
 		} catch (Exception e) {
-			throw new TSException(e);
+			throw new TypeScriptException(e);
 		} finally {
 			try {
 				if (writer != null) {
 					writer.close();
 				}
 			} catch (IOException e) {
-				throw new TSException(e);
+				throw new TypeScriptException(e);
 			}
 		}
 	}

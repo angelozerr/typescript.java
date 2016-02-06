@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import ts.ICompletionEntry;
 import ts.ICompletionInfo;
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.TypeScriptServiceClient;
 import ts.server.completions.CompletionInfo;
@@ -14,7 +14,7 @@ import ts.utils.FileUtils;
 
 public class Main {
 
-	public static void main(String[] args) throws InterruptedException, TSException, IOException {
+	public static void main(String[] args) throws InterruptedException, TypeScriptException, IOException {
 
 		File projectDir = new File("./samples");
 		// sample2.ts has the following content: 

@@ -1,13 +1,13 @@
 package ts.server.definition;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.AbstractTypeScriptCollector;
 
 public abstract class AbstractDefinitionCollector extends AbstractTypeScriptCollector implements ITypeScriptDefinitionCollector {
 
 	@Override
 	public final void addDefinition(String file, int startLine, int startOffset, int endLine, int endOffset)
-			throws TSException {
+			throws TypeScriptException {
 		if (file != null && startLine != -1 && startOffset != -1 && endLine != -1 && endOffset != -1) {
 			doAddDefinition(file, startLine, startOffset, endLine, endOffset);
 		}
@@ -15,6 +15,6 @@ public abstract class AbstractDefinitionCollector extends AbstractTypeScriptColl
 	}
 
 	protected abstract void doAddDefinition(String file, int startLine, int startOffset, int endLine, int endOffset)
-			throws TSException;
+			throws TypeScriptException;
 
 }

@@ -2,7 +2,7 @@ package ts.server;
 
 import java.io.File;
 
-import ts.TSException;
+import ts.TypeScriptException;
 
 public class TypeScriptServiceClientFactory implements ITypeScriptServiceClientFactory {
 
@@ -15,7 +15,7 @@ public class TypeScriptServiceClientFactory implements ITypeScriptServiceClientF
 	}
 
 	@Override
-	public ITypeScriptServiceClient create(File projectDir) throws TSException {
+	public ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
 		return new TypeScriptServiceClient(projectDir, tsserverFile, nodeFile);
 	}
 

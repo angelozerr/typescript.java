@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import ts.Location;
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.ITypeScriptServerListener;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.ITypeScriptServiceClientFactory;
@@ -56,18 +56,18 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		return projectDir;
 	}
 
-	void openFile(ITypeScriptFile tsFile) throws TSException {
+	void openFile(ITypeScriptFile tsFile) throws TypeScriptException {
 		String name = tsFile.getName();
 		String contents = tsFile.getContents();
 		getClient().openFile(name, contents);
 		this.openedFiles.put(name, tsFile);
 	}
 
-	void closeFile(ITypeScriptFile tsFile) throws TSException {
+	void closeFile(ITypeScriptFile tsFile) throws TypeScriptException {
 		closeFile(tsFile, true);
 	}
 
-	void closeFile(ITypeScriptFile tsFile, boolean updateCache) throws TSException {
+	void closeFile(ITypeScriptFile tsFile, boolean updateCache) throws TypeScriptException {
 		String name = tsFile.getName();
 		getClient().closeFile(name);
 		((AbstractTypeScriptFile) tsFile).setOpened(false);
@@ -78,7 +78,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 
 	@Override
 	public void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
-			throws TSException {
+			throws TypeScriptException {
 		ITypeScriptServiceClient client = getClient();
 		file.synch();
 		Location location = file.getLocation(position);
@@ -89,7 +89,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 
 	@Override
 	public void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
-			throws TSException {
+			throws TypeScriptException {
 		ITypeScriptServiceClient client = getClient();
 		file.synch();
 		Location location = file.getLocation(position);
@@ -99,7 +99,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void changeFile(ITypeScriptFile file, int start, int end, String newText) throws TSException {
+	public void changeFile(ITypeScriptFile file, int start, int end, String newText) throws TypeScriptException {
 		Location loc = file.getLocation(start);
 		int line = loc.getLine();
 		int offset = loc.getOffset();
@@ -110,13 +110,13 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void geterr(ITypeScriptFile file, int delay, ITypeScriptGeterrCollector collector) throws TSException {
+	public void geterr(ITypeScriptFile file, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException {
 		file.synch();
 		getClient().geterr(new String[] { file.getName() }, delay, collector);
 	}
 
 	@Override
-	public final ITypeScriptServiceClient getClient() throws TSException {
+	public final ITypeScriptServiceClient getClient() throws TypeScriptException {
 		synchronized (serverLock) {
 			if (isServerDisposed()) {
 				try {
@@ -124,10 +124,10 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 					copyListeners();
 					onCreateClient(client);
 				} catch (Exception e) {
-					if (e instanceof TSException) {
-						throw (TSException) e;
+					if (e instanceof TypeScriptException) {
+						throw (TypeScriptException) e;
 					}
-					throw new TSException(e);
+					throw new TypeScriptException(e);
 				}
 
 			}
@@ -145,12 +145,12 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void dispose() throws TSException {
+	public void dispose() throws TypeScriptException {
 		disposeServer();
 	}
 
 	@Override
-	public ITypeScriptServiceClient create(File projectDir) throws TSException {
+	public ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
 		return factory.create(projectDir);
 	}
 
@@ -201,7 +201,7 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 					for (ITypeScriptFile openedFile : openedFiles.values()) {
 						try {
 							closeFile(openedFile, false);
-						} catch (TSException e) {
+						} catch (TypeScriptException e) {
 							e.printStackTrace();
 						}
 					}

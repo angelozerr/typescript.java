@@ -12,7 +12,7 @@ import java.util.List;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.protocol.Request;
 
 public class NodejsProcess extends AbstractNodejsProcess {
@@ -36,7 +36,7 @@ public class NodejsProcess extends AbstractNodejsProcess {
 
 	private PrintStream out;
 
-	public NodejsProcess(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
+	public NodejsProcess(File projectDir, File tsserverFile, File nodejsFile) throws TypeScriptException {
 		super(nodejsFile, projectDir);
 		this.tsserverFile = tsserverFile;
 	}
@@ -212,7 +212,7 @@ public class NodejsProcess extends AbstractNodejsProcess {
 	}
 
 	@Override
-	public void sendRequest(Request request) throws TSException {
+	public void sendRequest(Request request) throws TypeScriptException {
 		out.println(request); // add \n for "readline" used by tsserver
 		out.flush();
 	}

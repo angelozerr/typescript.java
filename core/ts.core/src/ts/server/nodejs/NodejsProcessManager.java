@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import ts.TSException;
+import ts.TypeScriptException;
 
 /**
  * {@link NodejsProcess} manager.
@@ -81,9 +81,9 @@ public class NodejsProcessManager {
 	 * @param projectDir
 	 *            project base dir where tsconfig.json is hosted.
 	 * @return an instance of the node tern process.
-	 * @throws TSException
+	 * @throws TypeScriptException
 	 */
-	public INodejsProcess create(File projectDir) throws TSException {
+	public INodejsProcess create(File projectDir) throws TypeScriptException {
 		return create(projectDir, tsserverFile, null);
 	}
 
@@ -98,9 +98,9 @@ public class NodejsProcessManager {
 	 * @param nodejsFile
 	 *            the nodejs exe file
 	 * @return an instance of the node tern process.
-	 * @throws TSException
+	 * @throws TypeScriptException
 	 */
-	public INodejsProcess create(File projectDir, File nodejsFile) throws TSException {
+	public INodejsProcess create(File projectDir, File nodejsFile) throws TypeScriptException {
 		return create(projectDir, null, nodejsFile);
 	}
 
@@ -115,9 +115,9 @@ public class NodejsProcessManager {
 	 * @param nodejsFile
 	 *            the nodejs exe file
 	 * @return an instance of the node tern process.
-	 * @throws TSException
+	 * @throws TypeScriptException
 	 */
-	public INodejsProcess create(File projectDir, File tsserverFile, File nodejsFile) throws TSException {
+	public INodejsProcess create(File projectDir, File tsserverFile, File nodejsFile) throws TypeScriptException {
 		INodejsProcess process = new NodejsProcess(projectDir, tsserverFile, nodejsFile);
 		process.addProcessListener(listener);
 		return process;

@@ -1,6 +1,6 @@
 package ts.server.nodejs;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.protocol.Request;
 
 public interface INodejsProcess {
@@ -35,5 +35,5 @@ public interface INodejsProcess {
 
 	void start();
 
-	void sendRequest(Request request) throws TSException;
+	void sendRequest(Request request) throws TypeScriptException;
 }

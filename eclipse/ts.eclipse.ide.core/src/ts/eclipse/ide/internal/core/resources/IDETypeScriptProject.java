@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.text.IDocument;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
@@ -62,7 +62,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 	}
 
 	@Override
-	public synchronized IIDETypeScriptFile openFile(IResource file, IDocument document) throws TSException {
+	public synchronized IIDETypeScriptFile openFile(IResource file, IDocument document) throws TypeScriptException {
 		String fileName = IDETypeScriptFile.getFileName(file);
 		IIDETypeScriptFile tsFile = (IIDETypeScriptFile) super.getOpenedFile(fileName);
 		if (tsFile == null) {
@@ -75,7 +75,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 	}
 
 	@Override
-	public void closeFile(IResource file) throws TSException {
+	public void closeFile(IResource file) throws TypeScriptException {
 		String fileName = IDETypeScriptFile.getFileName(file);
 		IIDETypeScriptFile tsFile = (IIDETypeScriptFile) super.getOpenedFile(fileName);
 		if (tsFile != null) {
@@ -84,14 +84,14 @@ public class IDETypeScriptProject extends TypeScriptProject
 	}
 
 	@Override
-	public ITypeScriptServiceClient create(File projectDir) throws TSException {
+	public ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
 		try {
 			File nodeFile = null;
 			File tsRepositoryFile = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
 			File tsserverFile = new File(tsRepositoryFile, "node_modules/typescript/bin/tsserver");
 			return new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
 		} catch (IOException e) {
-			throw new TSException(e);
+			throw new TypeScriptException(e);
 		}
 	}
 
@@ -122,7 +122,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 							connector.disconnectToConsole(client, this);
 						}
 					}
-				} catch (TSException e) {
+				} catch (TypeScriptException e) {
 					Trace.trace(Trace.SEVERE, "Error while getting TypeScript client", e);
 				}
 			}

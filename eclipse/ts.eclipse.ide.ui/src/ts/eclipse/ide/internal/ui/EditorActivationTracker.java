@@ -26,7 +26,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -91,7 +91,7 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 								monitor.beginTask("", -1); //$NON-NLS-1$
 								try {
 									project.openFile(file, document);
-								} catch (TSException e) {
+								} catch (TypeScriptException e) {
 									return new Status(IStatus.ERROR, TypeScriptUIPlugin.PLUGIN_ID, e.getMessage(), e);
 								}
 								return Status.OK_STATUS;
@@ -120,7 +120,7 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 							monitor.beginTask("", -1); //$NON-NLS-1$
 							try {
 								project.closeFile(file);
-							} catch (TSException e) {
+							} catch (TypeScriptException e) {
 								return new Status(IStatus.ERROR, TypeScriptUIPlugin.PLUGIN_ID, e.getMessage(), e);
 							}
 							return Status.OK_STATUS;

@@ -1,7 +1,7 @@
 package ts.resources;
 
 import ts.Location;
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.internal.LocationReader;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.completions.ITypeScriptCompletionCollector;
@@ -35,24 +35,24 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public Location getLocation(int position) throws TSException {
+	public Location getLocation(int position) throws TypeScriptException {
 		return new LocationReader(getContents(), position).getLineOffset();
 	}
 
 	@Override
-	public int getPosition(int line, int offset) throws TSException {
+	public int getPosition(int line, int offset) throws TypeScriptException {
 		// TODO: implement that
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void open() throws TSException {
+	public void open() throws TypeScriptException {
 		((TypeScriptProject) tsProject).openFile(this);
 		this.opened = true;
 	}
 
 	@Override
-	public void close() throws TSException {
+	public void close() throws TypeScriptException {
 		((TypeScriptProject) tsProject).closeFile(this);
 		this.opened = false;
 	}
@@ -67,7 +67,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public void completions(int position, ITypeScriptCompletionCollector collector) throws TSException {
+	public void completions(int position, ITypeScriptCompletionCollector collector) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
@@ -78,7 +78,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public void definition(int position, ITypeScriptDefinitionCollector collector) throws TSException {
+	public void definition(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
@@ -88,7 +88,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public synchronized void synch() throws TSException {
+	public synchronized void synch() throws TypeScriptException {
 		if (!isDirty()) {
 			// no need to synchronize it.
 			return;
@@ -106,7 +106,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 				try {
 					synchLock.wait(5);
 				} catch (InterruptedException e) {
-					throw new TSException(e);
+					throw new TypeScriptException(e);
 				}
 			}
 			break;

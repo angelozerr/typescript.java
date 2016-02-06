@@ -17,7 +17,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
 import ts.internal.server.ICallbackItem;
@@ -79,7 +79,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	};
 
-	public TypeScriptServiceClient(File projectDir, File tsserverFile, File nodeFile) throws TSException {
+	public TypeScriptServiceClient(File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
 		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile));
 	}
 
@@ -104,7 +104,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	}
 
-	private INodejsProcess getProcess() throws TSException {
+	private INodejsProcess getProcess() throws TypeScriptException {
 		if (process == null) {
 			process = NodejsProcessManager.getInstance().create(getProjectDir());
 			process.addProcessListener(listener);
@@ -117,13 +117,13 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	@Override
-	public void openFile(String fileName, String contents) throws TSException {
+	public void openFile(String fileName, String contents) throws TypeScriptException {
 		Request request = new OpenRequest(fileName, contents);
 		execute(request, false, null);
 	}
 
 	@Override
-	public void closeFile(String fileName) throws TSException {
+	public void closeFile(String fileName) throws TypeScriptException {
 		Request request = new CloseRequest(fileName);
 		execute(request, false, null);
 	}
@@ -132,7 +132,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void completions(String fileName, int line, int offset, String prefix,
-			ITypeScriptCompletionCollector collector) throws TSException {
+			ITypeScriptCompletionCollector collector) throws TypeScriptException {
 		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
 		JsonObject response = execute(request, true, null).asObject();
 		collectCompletions(response, collector);
@@ -152,13 +152,13 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
-			throws TSException {
+			throws TypeScriptException {
 		DefinitionRequest request = new DefinitionRequest(fileName, line, offset);
 		JsonObject response = execute(request, true, null).asObject();
 		collectDefinition(response, collector);
 	}
 
-	private void collectDefinition(JsonObject response, ITypeScriptDefinitionCollector collector) throws TSException {
+	private void collectDefinition(JsonObject response, ITypeScriptDefinitionCollector collector) throws TypeScriptException {
 		JsonArray items = response.get("body").asArray();
 		JsonObject def = null;
 		JsonObject start = null;
@@ -176,7 +176,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
-			throws TSException {
+			throws TypeScriptException {
 		SignatureHelpRequest request = new SignatureHelpRequest(fileName, line, offset);
 		JsonObject response = execute(request, true, null).asObject();
 		collectSignatureHelp(response, collector);
@@ -191,7 +191,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
-			throws TSException {
+			throws TypeScriptException {
 		QuickInfoRequest request = new QuickInfoRequest(fileName, line, offset);
 		JsonObject response = execute(request, true, null).asObject();
 		collectQuickInfo(response, collector);
@@ -213,13 +213,13 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
-			throws TSException {
+			throws TypeScriptException {
 		Request request = new ChangeRequest(fileName, line, offset, endLine, endOffset, newText);
 		execute(request, false, null);
 	}
 
 	@Override
-	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TSException {
+	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException {
 		Request request = new GeterrRequest(files, delay);
 		if (delay == 0) {
 			JsonObject response;
@@ -262,7 +262,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	 * @param newText
 	 */
 	@Override
-	public void updateFile(String fileName, String newText) throws TSException {
+	public void updateFile(String fileName, String newText) throws TypeScriptException {
 		int seq = SequenceHelper.getRequestSeq();
 		String tempFileName = null;
 		int requestSeq = -1;
@@ -475,7 +475,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// protected abstract JsonObject processRequest(Request request) throws
 	// TSException;
 
-	private JsonValue execute(Request request, boolean expectsResult, CancellationToken token) throws TSException {
+	private JsonValue execute(Request request, boolean expectsResult, CancellationToken token) throws TypeScriptException {
 		RequestItem requestInfo = null;
 		Future<JsonValue> result = null;
 		if (expectsResult) {
@@ -492,14 +492,14 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			return result == null ? null : result.get();
 		} catch (Exception e) {
 			handleError(request, e, request.getStartTime());
-			if (e instanceof TSException) {
-				throw (TSException) e;
+			if (e instanceof TypeScriptException) {
+				throw (TypeScriptException) e;
 			}
-			throw new TSException(e);
+			throw new TypeScriptException(e);
 		}
 	}
 
-	private void sendNextRequests() throws TSException {
+	private void sendNextRequests() throws TypeScriptException {
 		RequestItem requestItem = null;
 		while (this.pendingResponses.get() == 0 && !this.requestQueue.isEmpty()) {
 			synchronized (requestQueue) {
@@ -509,7 +509,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
-	private void sendRequest(RequestItem requestItem) throws TSException {
+	private void sendRequest(RequestItem requestItem) throws TypeScriptException {
 		Request serverRequest = requestItem.request;
 		// log request
 		handleRequest(serverRequest);
@@ -534,7 +534,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 		try {
 			getProcess().sendRequest(serverRequest);
-		} catch (TSException e) {
+		} catch (TypeScriptException e) {
 			if (eventRequest) {
 				synchronized (this.callbacks) {
 					GeterrRequest err = (GeterrRequest) serverRequest;

@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.server.definition.ITypeScriptDefinitionCollector;
@@ -47,7 +47,7 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 
 	@Override
 	public void addDefinition(String filename, int startLine, int startOffset, int endLine, int endOffset)
-			throws TSException {
+			throws TypeScriptException {
 		this.file = findFile(filename);
 		this.startLine = startLine;
 		this.startOffset = startOffset;

@@ -6,7 +6,7 @@ import org.eclipse.wst.validation.internal.provisional.core.IMessage;
 import org.eclipse.wst.validation.internal.provisional.core.IReporter;
 import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.validator.internal.core.Trace;
 import ts.resources.ITypeScriptFile;
@@ -52,7 +52,7 @@ public class TypeScriptReporterCollector implements ITypeScriptGeterrCollector {
 			message.setAttribute(CHAR_END, end);
 			message.setLineNo(startLine - 1);
 			reporter.addMessage(validator, message);
-		} catch (TSException e) {
+		} catch (TypeScriptException e) {
 			Trace.trace(Trace.SEVERE, "Error while reporting error", e);
 		}
 	}

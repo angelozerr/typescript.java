@@ -5,14 +5,14 @@ import java.io.IOException;
 
 import ts.ICompletionEntry;
 import ts.ICompletionInfo;
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.definition.DefinitionsInfo;
 import ts.server.geterr.ITypeScriptGeterrCollector;
 import ts.utils.FileUtils;
 
 public class Main2 {
 
-	public static void main(String[] args) throws InterruptedException, TSException, IOException {
+	public static void main(String[] args) throws InterruptedException, TypeScriptException, IOException {
 
 		File projectDir = new File("./samples");
 		// sample2.ts has the following content:
@@ -55,7 +55,7 @@ public class Main2 {
 
 	}
 
-	private static void validate(File sampleFile, MockTypeScriptProject tsProject, boolean normalize) throws TSException {
+	private static void validate(File sampleFile, MockTypeScriptProject tsProject, boolean normalize) throws TypeScriptException {
 		MockTypeScriptFile tsFile = tsProject.openFile(sampleFile, normalize);
 		tsFile.getProject().geterr(tsFile, 0, new ITypeScriptGeterrCollector() {
 			

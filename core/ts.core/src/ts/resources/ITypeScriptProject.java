@@ -10,7 +10,7 @@
  */
 package ts.resources;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.ITypeScriptServerListener;
 import ts.server.ITypeScriptServiceClient;
 import ts.server.completions.ITypeScriptCompletionCollector;
@@ -26,23 +26,23 @@ public interface ITypeScriptProject {
 	 * if it hasn't been created already.
 	 * 
 	 * @return
-	 * @throws TSException
+	 * @throws TypeScriptException
 	 */
-	ITypeScriptServiceClient getClient() throws TSException;
+	ITypeScriptServiceClient getClient() throws TypeScriptException;
 
 	void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
-			throws TSException;
+			throws TypeScriptException;
 
 	void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
-			throws TSException;
+			throws TypeScriptException;
 	
-	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TSException;
+	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TypeScriptException;
 
-	void geterr(ITypeScriptFile tsFile, int delay, ITypeScriptGeterrCollector collector) throws TSException;
+	void geterr(ITypeScriptFile tsFile, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException;
 	
 	ITypeScriptFile getOpenedFile(String fileName);
 
-	void dispose() throws TSException;
+	void dispose() throws TypeScriptException;
 
 	<T> T getData(String key);
 

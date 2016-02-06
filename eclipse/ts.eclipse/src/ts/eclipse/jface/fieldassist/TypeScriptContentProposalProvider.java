@@ -9,7 +9,7 @@ import java.util.List;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.utils.TypeScriptHelper;
@@ -31,7 +31,7 @@ public class TypeScriptContentProposalProvider implements IContentProposalProvid
 		ContentProposalCollector collector = new ContentProposalCollector(prefix);
 		try {
 			tsFile.completions(position, collector);
-		} catch (TSException e) {
+		} catch (TypeScriptException e) {
 			e.printStackTrace();
 		}
 		return collector.getProposals().toArray(ContentProposalCollector.EMPTY_PROPOSAL);

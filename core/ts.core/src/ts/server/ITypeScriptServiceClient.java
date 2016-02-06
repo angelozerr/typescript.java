@@ -10,7 +10,7 @@
  */
 package ts.server;
 
-import ts.TSException;
+import ts.TypeScriptException;
 import ts.server.completions.ITypeScriptCompletionCollector;
 import ts.server.definition.ITypeScriptDefinitionCollector;
 import ts.server.geterr.ITypeScriptGeterrCollector;
@@ -25,26 +25,26 @@ import ts.server.signaturehelp.ITypeScriptSignatureHelpCollector;
  */
 public interface ITypeScriptServiceClient {
 
-	void openFile(String fileName, String contents) throws TSException;
+	void openFile(String fileName, String contents) throws TypeScriptException;
 
-	void closeFile(String fileName) throws TSException;
+	void closeFile(String fileName) throws TypeScriptException;
 
-	void updateFile(String fileName, String newText) throws TSException;
+	void updateFile(String fileName, String newText) throws TypeScriptException;
 
 	void completions(String fileName, int line, int offset, String prefix, ITypeScriptCompletionCollector collector)
-			throws TSException;
+			throws TypeScriptException;
 
-	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TSException;
+	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
 
 	void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
-			throws TSException;
+			throws TypeScriptException;
 
-	void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector) throws TSException;
+	void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector) throws TypeScriptException;
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
-			throws TSException;
+			throws TypeScriptException;
 
-	void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TSException;
+	void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException;
 
 	void join() throws InterruptedException;
 

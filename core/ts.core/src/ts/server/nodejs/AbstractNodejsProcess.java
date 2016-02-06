@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.eclipsesource.json.JsonObject;
 
-import ts.TSException;
+import ts.TypeScriptException;
 
 public abstract class AbstractNodejsProcess implements INodejsProcess {
 
@@ -37,7 +37,7 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 	 *            the project base dir where tsconfig.json is hosted.
 	 * @throws TernException
 	 */
-	public AbstractNodejsProcess(File nodejsFile, File projectDir) throws TSException {
+	public AbstractNodejsProcess(File nodejsFile, File projectDir) throws TypeScriptException {
 		this.projectDir = projectDir;
 		this.nodejsFile = nodejsFile;
 		this.listeners = new ArrayList<INodejsProcessListener>();

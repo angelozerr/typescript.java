@@ -2,7 +2,7 @@ package ts.server.protocol;
 
 import com.eclipsesource.json.JsonObject;
 
-import ts.TSException;
+import ts.TypeScriptException;
 
 /**
  * Client-initiated request message
@@ -36,7 +36,7 @@ public class SimpleRequest extends Request<JsonObject> {
 	@Override
 	protected JsonObject getResult() throws Exception {
 		if (!response.getBoolean("success", true)) {
-			throw new TSException(response.getString("message", ""));
+			throw new TypeScriptException(response.getString("message", ""));
 		}
 		return response;
 	}

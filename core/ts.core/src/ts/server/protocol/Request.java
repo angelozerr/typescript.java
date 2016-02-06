@@ -4,7 +4,7 @@ import com.eclipsesource.json.JsonObject;
 
 import ts.internal.SequenceHelper;
 import ts.internal.server.ICallbackItem;
-import ts.server.TSTimeoutException;
+import ts.server.TypeScriptTimeoutException;
 
 public abstract class Request<T> extends Message implements ICallbackItem<T> {
 
@@ -44,7 +44,7 @@ public abstract class Request<T> extends Message implements ICallbackItem<T> {
 				this.wait(5);
 			}
 			if ((System.nanoTime() - startTime) > TIMEOUT) {
-				throw new TSTimeoutException("");
+				throw new TypeScriptTimeoutException("");
 			}
 		}
 		return getResult();
