@@ -63,6 +63,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	private List<IInterceptor> interceptors;
 
 	private final ExecutorService pool = Executors.newFixedThreadPool(2);
+	private final ExecutorService diagPool = Executors.newFixedThreadPool(2);
+
 	private final List<RequestItem> requestQueue;
 	private final AtomicInteger pendingResponses;
 	private final Map<Integer, ICallbackItem> callbacks;
@@ -128,7 +130,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 		return process;
 	}
-	
+
 	@Override
 	public void openFile(String fileName, String contents) throws TypeScriptException {
 		Request request = new OpenRequest(fileName, contents);
@@ -375,7 +377,9 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 				if (!pool.isShutdown()) {
 					pool.shutdown();
 				}
-
+				if (!diagPool.isShutdown()) {
+					diagPool.shutdown();
+				}
 			}
 		} finally {
 			endWriteState();
@@ -437,11 +441,16 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	 */
 	private JsonValue execute(Request request, boolean expectsResult, CancellationToken token)
 			throws TypeScriptException {
+		boolean eventRequest = (request instanceof GeterrRequest);
 		RequestItem requestInfo = null;
 		Future<JsonValue> result = null;
 		if (expectsResult) {
 			requestInfo = new RequestItem(request, request);
-			result = pool.submit(requestInfo.callbacks);
+			if (eventRequest) {
+				result = diagPool.submit(requestInfo.callbacks);
+			} else {
+				result = pool.submit(requestInfo.callbacks);
+			}
 		} else {
 			requestInfo = new RequestItem(request, null);
 		}
@@ -482,8 +491,6 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 				synchronized (this.diagCallbacks) {
 					for (String file : err.getFiles()) {
 						this.diagCallbacks.put(file, callbacks);
-						// this.pendingResponses.incrementAndGet();
-						// this.pendingResponses.incrementAndGet();
 					}
 				}
 			} else {
@@ -502,8 +509,6 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 					synchronized (this.diagCallbacks) {
 						for (String file : err.getFiles()) {
 							this.diagCallbacks.remove(file);
-							// this.pendingResponses.getAndDecrement();
-							// this.pendingResponses.getAndDecrement();
 						}
 					}
 				}
