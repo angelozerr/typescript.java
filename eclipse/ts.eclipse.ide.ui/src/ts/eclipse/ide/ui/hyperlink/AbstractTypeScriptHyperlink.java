@@ -10,6 +10,8 @@
  */
 package ts.eclipse.ide.ui.hyperlink;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -24,12 +26,17 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.utils.StringUtils;
 
+/**
+ * Abstract class for TypeScript Hyperlink.
+ *
+ */
 public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeScriptDefinitionCollector {
 
 	protected final IRegion region;
 	protected final IIDETypeScriptProject tsProject;
 
 	private IFile file;
+	private File fs;
 	private Integer startLine;
 	private Integer startOffset;
 	private Integer endLine;
@@ -48,7 +55,10 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 	@Override
 	public void addDefinition(String filename, int startLine, int startOffset, int endLine, int endOffset)
 			throws TypeScriptException {
-		this.file = findFile(filename);
+		this.file = findFileFromWorkspace(filename);
+		if (this.file == null) {
+			this.fs = findFileFormFileSystem(filename);
+		}
 		this.startLine = startLine;
 		this.startOffset = startOffset;
 		this.endLine = endLine;
@@ -56,7 +66,7 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 
 	}
 
-	private IFile findFile(String path) {	
+	private IFile findFileFromWorkspace(String path) {
 		if (StringUtils.isEmpty(path)) {
 			return null;
 		}
@@ -68,21 +78,35 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 		}
 		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(filePath);
 		if (files.length > 0) {
-			return files[0];
+			file = files[0];
+			if (file.exists()) {
+				return file;
+			}
 		}
 		return null;
 	}
 
+	private File findFileFormFileSystem(String path) {
+		if (StringUtils.isEmpty(path)) {
+			return null;
+		}
+		File file = new File(path);
+		return (file.exists() && file.isFile()) ? file : null;
+	}
+
 	@Override
 	public final void open() {
-		IFile file = getFile();
 		Integer startLine = getStartLine();
 		Integer startOffset = getStartOffset();
 		Integer endLine = getEndLine();
 		Integer endOffset = getEndOffset();
-		if (file != null && file.exists()) {
+
+		if (isFileExists(file)) {
 			EditorUtils.openInEditor(file, startLine, startOffset, endLine, endOffset, true);
+		} else if (isFileExists(fs)) {
+			EditorUtils.openInEditor(fs, startLine, startOffset, endLine, endOffset, true);
 		}
+
 	}
 
 	/**
@@ -97,11 +121,21 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 		} catch (Exception e) {
 			return false;
 		}
-		return file != null && file.exists();
+		return isFileExists(file) || isFileExists(fs);
 	}
 
-	public IFile getFile() {
-		return file;
+	private boolean isFileExists(IFile file) {
+		if (file == null) {
+			return false;
+		}
+		return file.exists();
+	}
+
+	private boolean isFileExists(File file) {
+		if (file == null) {
+			return false;
+		}
+		return file.exists() && file.isFile();
 	}
 
 	public Integer getStartLine() {
