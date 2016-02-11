@@ -16,6 +16,7 @@ import ts.client.ITypeScriptServiceClient;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.compiler.ITypeScriptCompiler;
 
 public interface ITypeScriptProject {
 
@@ -28,16 +29,23 @@ public interface ITypeScriptProject {
 	 */
 	ITypeScriptServiceClient getClient() throws TypeScriptException;
 
+	/**
+	 * Returns the tsc compiler.
+	 * 
+	 * @return
+	 */
+	ITypeScriptCompiler getCompiler() throws TypeScriptException;
+
 	void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
 			throws TypeScriptException;
 
 	void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
 			throws TypeScriptException;
-	
+
 	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TypeScriptException;
 
 	void geterr(ITypeScriptFile tsFile, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException;
-	
+
 	ITypeScriptFile getOpenedFile(String fileName);
 
 	void dispose() throws TypeScriptException;

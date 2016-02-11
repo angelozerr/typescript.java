@@ -9,7 +9,7 @@
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *  Piotr Tomiak <piotr@genuitec.com> - support for tern.js debugging
  */
-package ts.client.nodejs;
+package ts.nodejs;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,11 +38,6 @@ public class NodejsProcessManager {
 	 * List of node.js tern processes created.
 	 */
 	private final List<INodejsProcess> processes;
-
-	/**
-	 * The base dir where node.js Tern server is hosted.
-	 */
-	private File tsserverFile;
 
 	/**
 	 * Listener added for each process created.
@@ -74,38 +69,6 @@ public class NodejsProcessManager {
 
 	/**
 	 * Create the process with the given tern project base dir where
-	 * tsconfig.json is hosted. In this case the node exe used is the installed
-	 * node. The tern server node.js must be initialized before with
-	 * {@link NodejsProcessManager#init(File)}.
-	 * 
-	 * @param projectDir
-	 *            project base dir where tsconfig.json is hosted.
-	 * @return an instance of the node tern process.
-	 * @throws TypeScriptException
-	 */
-	public INodejsProcess create(File projectDir) throws TypeScriptException {
-		return create(projectDir, tsserverFile, null);
-	}
-
-	/**
-	 * Create the process with the given tern project base dir where
-	 * tsconfig.json is hosted and the given base dir of node.js exe. The tern
-	 * server node.js must be initialized before with
-	 * {@link NodejsProcessManager#init(File)}.
-	 * 
-	 * @param projectDir
-	 *            project base dir where tsconfig.json is hosted.
-	 * @param nodejsFile
-	 *            the nodejs exe file
-	 * @return an instance of the node tern process.
-	 * @throws TypeScriptException
-	 */
-	public INodejsProcess create(File projectDir, File nodejsFile) throws TypeScriptException {
-		return create(projectDir, null, nodejsFile);
-	}
-
-	/**
-	 * Create the process with the given tern project base dir where
 	 * tsconfig.json is hosted and the given base dir of node.js exe.
 	 * 
 	 * @param projectDir
@@ -117,28 +80,10 @@ public class NodejsProcessManager {
 	 * @return an instance of the node tern process.
 	 * @throws TypeScriptException
 	 */
-	public INodejsProcess create(File projectDir, File tsserverFile, File nodejsFile) throws TypeScriptException {
-		INodejsProcess process = new NodejsProcess(projectDir, tsserverFile, nodejsFile);
+	public INodejsProcess create(File projectDir, File tsserverFile, File nodejsFile, INodejsLaunchConfiguration configuration) throws TypeScriptException {
+		INodejsProcess process = new NodejsProcess(projectDir, tsserverFile, nodejsFile, configuration);
 		process.addProcessListener(listener);
 		return process;
-	}
-
-	/**
-	 * Initialize the manager with the tsserver file. hosted.
-	 * 
-	 * @param tsserverFile
-	 */
-	public void init(File tsserverFile) {
-		this.tsserverFile = tsserverFile;
-	}
-
-	/**
-	 * Return the base dir where the tern node.js server is hosted.
-	 * 
-	 * @return
-	 */
-	public File getTsserverFile() {
-		return tsserverFile;
 	}
 
 	/**

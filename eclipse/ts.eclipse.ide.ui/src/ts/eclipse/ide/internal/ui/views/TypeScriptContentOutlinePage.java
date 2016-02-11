@@ -1,8 +1,5 @@
 package ts.eclipse.ide.internal.ui.views;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -16,11 +13,7 @@ import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.internal.ui.Trace;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
-import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
 
 public class TypeScriptContentOutlinePage extends Page implements IContentOutlinePage {

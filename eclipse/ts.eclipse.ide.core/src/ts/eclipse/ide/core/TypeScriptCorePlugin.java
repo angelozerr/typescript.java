@@ -13,7 +13,9 @@ package ts.eclipse.ide.core;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
@@ -22,6 +24,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
+import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
@@ -88,6 +91,21 @@ public class TypeScriptCorePlugin extends Plugin {
 	 */
 	public static boolean hasTypeScriptNature(IProject project) {
 		return true; // return IDETSProject.hasTypeScriptNature(project);
+	}
+	
+	public static boolean hasTypeScriptBuilder(IProject project) {		
+		try {
+			IProjectDescription description = project.getDescription();
+			ICommand[] commands = description.getBuildSpec();
+			for (int i = 0; i < commands.length; i++) {
+				if (TypeScriptBuilder.ID.equals(commands[i].getBuilderName())) {
+					return true;
+				}
+			}
+		} catch (CoreException e) {
+			return false;
+		}
+		return false;
 	}
 
 	/**

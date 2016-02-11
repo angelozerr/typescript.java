@@ -21,12 +21,12 @@ import org.eclipse.swt.widgets.Display;
 import com.eclipsesource.json.JsonObject;
 
 import ts.client.LoggingInterceptor;
-import ts.client.nodejs.INodejsProcess;
-import ts.client.nodejs.INodejsProcessListener;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.console.ITypeScriptConsole;
 import ts.eclipse.ide.ui.console.LineType;
+import ts.nodejs.INodejsProcess;
+import ts.nodejs.INodejsProcessListener;
 
 public class TypeScriptNodejsInterceptor extends LoggingInterceptor implements INodejsProcessListener {
 

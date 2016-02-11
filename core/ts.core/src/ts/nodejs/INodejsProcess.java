@@ -1,4 +1,4 @@
-package ts.client.nodejs;
+package ts.nodejs;
 
 import ts.TypeScriptException;
 import ts.client.protocol.Request;

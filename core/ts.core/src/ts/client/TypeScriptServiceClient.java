@@ -30,10 +30,6 @@ import ts.TypeScriptException;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
-import ts.client.nodejs.INodejsProcess;
-import ts.client.nodejs.INodejsProcessListener;
-import ts.client.nodejs.NodejsProcessAdapter;
-import ts.client.nodejs.NodejsProcessManager;
 import ts.client.protocol.ChangeRequest;
 import ts.client.protocol.CloseRequest;
 import ts.client.protocol.CompletionsRequest;
@@ -50,6 +46,12 @@ import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
 import ts.internal.server.ICallbackItem;
 import ts.internal.server.RequestItem;
+import ts.nodejs.INodejsLaunchConfiguration;
+import ts.nodejs.INodejsProcess;
+import ts.nodejs.INodejsProcessListener;
+import ts.nodejs.NodejsProcessAdapter;
+import ts.nodejs.NodejsProcessManager;
+import ts.utils.FileUtils;
 
 /**
  * TypeScript service client implementation.
@@ -94,8 +96,17 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	};
 
-	public TypeScriptServiceClient(File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
-		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile));
+	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
+		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile, new INodejsLaunchConfiguration() {
+			
+			@Override
+			public List<String> createNodeArgs() {
+				List<String> args = new ArrayList<String>();
+				args.add("-p");
+				args.add(FileUtils.getPath(projectDir));
+				return args;
+			}
+		}));
 	}
 
 	public TypeScriptServiceClient(File projectDir, INodejsProcess process) {
@@ -120,11 +131,6 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	private INodejsProcess getProcess() throws TypeScriptException {
-		if (process == null) {
-			process = NodejsProcessManager.getInstance().create(getProjectDir());
-			process.addProcessListener(listener);
-		}
-		initProcess(process);
 		if (!process.isStarted()) {
 			process.start();
 		}

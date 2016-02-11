@@ -9,6 +9,7 @@ import ts.eclipse.ide.core.TypeScriptCorePlugin;
 public class TypeScriptNatureTester extends PropertyTester {
 
 	private static final String IS_TYPESCRIPT_PROJECT_PROPERTY = "isTypeScriptProject";
+	private static final String HAS_TYPESCRIPT_BUILDER_PROPERTY ="hasTypeScriptBuilder";
 
 	public TypeScriptNatureTester() {
 		// Default constructor is required for property tester
@@ -23,8 +24,11 @@ public class TypeScriptNatureTester extends PropertyTester {
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 
-		if (IS_TYPESCRIPT_PROJECT_PROPERTY.equals(property))
+		if (IS_TYPESCRIPT_PROJECT_PROPERTY.equals(property)) {
 			return testIsTypeScriptProject(receiver);
+		} else if (HAS_TYPESCRIPT_BUILDER_PROPERTY.equals(property)) {
+			return testHasTypeScriptBuilder(receiver);
+		}
 
 		return false;
 	}
@@ -40,4 +44,14 @@ public class TypeScriptNatureTester extends PropertyTester {
 		return false;
 	}
 
+	private boolean testHasTypeScriptBuilder(Object receiver) {
+		if (receiver instanceof IAdaptable) {
+			IProject project = (IProject) ((IAdaptable) receiver).getAdapter(IProject.class);
+			if (project != null) {
+				return TypeScriptCorePlugin.hasTypeScriptBuilder(project);
+			}
+		}
+
+		return false;
+	}
 }

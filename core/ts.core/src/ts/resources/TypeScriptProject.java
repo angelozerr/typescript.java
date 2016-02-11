@@ -14,6 +14,8 @@ import ts.client.Location;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.compiler.ITypeScriptCompiler;
+import ts.compiler.TypeScriptCompiler;
 
 public class TypeScriptProject implements ITypeScriptProject, ITypeScriptServiceClientFactory {
 
@@ -21,9 +23,13 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	private final ITypeScriptServiceClientFactory factory;
 	private final SynchStrategy synchStrategy;
 
-	private final Map<String, ITypeScriptFile> openedFiles;
+	// TypeScript service client
 	private ITypeScriptServiceClient client;
+	private final Map<String, ITypeScriptFile> openedFiles;
 
+	// TypeScript compiler
+	private ITypeScriptCompiler compiler;
+	
 	private final Map<String, Object> data;
 	private final List<ITypeScriptClientListener> listeners;
 	protected final Object serverLock = new Object();
@@ -252,5 +258,13 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	@Override
 	public SynchStrategy getSynchStrategy() {
 		return synchStrategy;
+	}
+	
+	@Override
+	public ITypeScriptCompiler getCompiler() throws TypeScriptException {
+		if (compiler == null) {
+			compiler = new TypeScriptCompiler();
+		}
+		return compiler;
 	}
 }

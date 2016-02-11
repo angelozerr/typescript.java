@@ -1,4 +1,4 @@
-package ts.client.nodejs;
+package ts.nodejs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,8 +33,8 @@ public class NodejsProcess extends AbstractNodejsProcess {
 
 	private PrintStream out;
 
-	public NodejsProcess(File projectDir, File tsserverFile, File nodejsFile) throws TypeScriptException {
-		super(nodejsFile, projectDir);
+	public NodejsProcess(File projectDir, File tsserverFile, File nodejsFile, INodejsLaunchConfiguration configuration) throws TypeScriptException {
+		super(nodejsFile, projectDir, configuration);
 		this.tsserverFile = tsserverFile;
 	}
 
@@ -160,13 +160,10 @@ public class NodejsProcess extends AbstractNodejsProcess {
 		} catch (IOException e) {
 			commands.add(tsserverFile.getPath());
 		}
-		commands.add("-p");
-		try {
-			commands.add(getProjectDir().getCanonicalPath());
-		} catch (IOException e) {
-			commands.add(getProjectDir().getPath());
+		List<String> args = createNodeArgs();
+		if (args != null) {
+			commands.addAll(args);
 		}
-		// commands.addAll(createTernServerArgs());
 		return commands;
 	}
 

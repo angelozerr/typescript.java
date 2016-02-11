@@ -22,6 +22,4 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	
 	void configureConsole();
 
-
-
 }

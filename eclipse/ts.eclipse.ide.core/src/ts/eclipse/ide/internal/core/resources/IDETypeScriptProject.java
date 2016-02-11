@@ -25,7 +25,7 @@ import ts.resources.SynchStrategy;
 import ts.resources.TypeScriptProject;
 
 public class IDETypeScriptProject extends TypeScriptProject
-		implements IIDETypeScriptProject, ITypeScriptServiceClientFactory {
+		implements IIDETypeScriptProject {
 
 	private static final QualifiedName TYPESCRIPT_PROJECT = new QualifiedName(
 			TypeScriptCorePlugin.PLUGIN_ID + ".sessionprops", //$NON-NLS-1$

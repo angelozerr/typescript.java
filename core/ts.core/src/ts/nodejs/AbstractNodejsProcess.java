@@ -1,4 +1,4 @@
-package ts.client.nodejs;
+package ts.nodejs;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,12 +19,18 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 	 */
 	protected final File projectDir;
 
+	private final INodejsLaunchConfiguration launchConfiguration;
+
 	/**
 	 * Process listeners.
 	 */
 	protected final List<INodejsProcessListener> listeners;
 
 	private boolean hasError;
+
+	public AbstractNodejsProcess(File nodejsFile, File projectDir) throws TypeScriptException {
+		this(nodejsFile, projectDir, null);
+	}
 
 	/**
 	 * Nodejs process constructor.
@@ -35,16 +41,20 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 	 *            the project base dir where tsconfig.json is hosted.
 	 * @throws TernException
 	 */
-	public AbstractNodejsProcess(File nodejsFile, File projectDir) throws TypeScriptException {
+	public AbstractNodejsProcess(File nodejsFile, File projectDir, INodejsLaunchConfiguration launchConfiguration)
+			throws TypeScriptException {
 		this.projectDir = projectDir;
 		this.nodejsFile = nodejsFile;
 		this.listeners = new ArrayList<INodejsProcessListener>();
 		this.hasError = false;
+		this.launchConfiguration = launchConfiguration;
 	}
 
-	protected List<String> createTernServerArgs() {
-		List<String> args = new LinkedList<String>();
-		return args;
+	protected List<String> createNodeArgs() {
+		if (launchConfiguration == null) {
+			return null;
+		}
+		return launchConfiguration.createNodeArgs();
 	}
 
 	/**

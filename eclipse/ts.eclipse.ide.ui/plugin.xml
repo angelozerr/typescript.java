@@ -64,11 +64,76 @@
          </includes>
       </viewerContentBinding>
    </extension>
-   			
+   	
+  <!-- TypeScript UI Commands -->
+  <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="ts.eclipse.ide.ui.commands.AddTypeScriptBuilder"
+            categoryId="org.eclipse.ui.category.file"
+            defaultHandler="ts.eclipse.ide.internal.ui.commands.AddTypeScriptBuilderHandler"
+            name="%AddTypeScriptBuilder.name">
+      </command>
+      <command
+            id="ts.eclipse.ide.ui.commands.RemoveTypeScriptBuilder"
+            categoryId="org.eclipse.ui.category.file"
+            defaultHandler="ts.eclipse.ide.internal.ui.commands.RemoveTypeScriptBuilderHandler"
+            name="%RemoveTypeScriptBuilder.name">
+      </command>      
+  	</extension>
+    
+	<extension point="org.eclipse.ui.menus">
+        <menuContribution locationURI="popup:org.eclipse.ui.projectConfigure">
+            <command label="%AddTypeScriptBuilder.name" 
+            		 commandId="ts.eclipse.ide.ui.commands.AddTypeScriptBuilder">
+                <visibleWhen>
+                    <with variable="activeMenuSelection">
+                        <iterate ifEmpty="false">
+                            <adapt type="org.eclipse.core.resources.IProject">
+                                <and>
+                                    <test property="org.eclipse.core.resources.open" value="true"/> 
+                                    <not><test property="ts.eclipse.ide.core.hasTypeScriptBuilder"/></not>
+                                </and>
+                            </adapt>
+                        </iterate>
+                    </with> 
+                </visibleWhen>
+            </command>
+            <command label="%RemoveTypeScriptBuilder.name" 
+            		 commandId="ts.eclipse.ide.ui.commands.RemoveTypeScriptBuilder">
+                <visibleWhen>
+                    <with variable="activeMenuSelection">
+                        <iterate ifEmpty="false">
+                            <adapt type="org.eclipse.core.resources.IProject">
+                                <and>
+                                    <test property="org.eclipse.core.resources.open" value="true"/> 
+                                    <test property="ts.eclipse.ide.core.hasTypeScriptBuilder"/>
+                                </and>
+                            </adapt>
+                        </iterate>
+                    </with> 
+                </visibleWhen>
+            </command>
+        </menuContribution>
+    </extension>
+         		
+  <extension
+         point="org.eclipse.ui.propertyPages">		      
+      <page
+            name="%TypeScriptMainPropertyPage.name"        
+            class="ts.eclipse.ide.internal.ui.properties.TypeScriptMainPropertyPage"
+            id="ts.eclipse.ide.ui.properties.TypeScriptMainPropertyPage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
+		     </adapt>         
+         </enabledWhen>
+      </page>
+   </extension>
     <extension point="org.eclipse.ui.startup">
         <startup
             class="ts.eclipse.ide.internal.ui.TypeScriptIDEStartup">
         </startup>
     </extension> 
-       
+           
 </plugin>        

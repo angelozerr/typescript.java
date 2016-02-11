@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.client.nodejs;
+package ts.nodejs;
 
 import java.io.File;
 import java.util.List;

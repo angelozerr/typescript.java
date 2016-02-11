@@ -15,6 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.commands,
  org.eclipse.core.expressions
 Export-Package: ts.eclipse.ide.core,
+ ts.eclipse.ide.core.builder,
  ts.eclipse.ide.core.console,
  ts.eclipse.ide.core.resources
 Bundle-ActivationPolicy: lazy

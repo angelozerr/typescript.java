@@ -14,17 +14,28 @@
  -->
 <plugin>
 
-   <extension-point id="typeScriptConsoleConnectors" name="%typeScriptConsoleConnectors.name"
-		schema="schema/typeScriptConsoleConnectors.exsd" />
+   <extension-point id="typeScriptConsoleConnectors" 
+   					name="%typeScriptConsoleConnectors.name"
+					schema="schema/typeScriptConsoleConnectors.exsd" />
 
    <extension point="org.eclipse.core.expressions.propertyTesters">
 		<propertyTester
 			id="ts.eclipse.ide.core.TypeScriptNatureTester"
 			type="org.eclipse.core.resources.IResource"
 			namespace="ts.eclipse.ide.core"
-			properties="isTypeScriptProject"
+			properties="isTypeScriptProject,hasTypeScriptBuilder"
 			class="ts.eclipse.ide.internal.core.TypeScriptNatureTester">
 		</propertyTester>
 	</extension>
-				
+			
+   <extension
+         id="typeScriptBuilder"
+         name="%TypeScriptBuilder.name"
+         point="org.eclipse.core.resources.builders">
+      <builder>
+         <run class="ts.eclipse.ide.core.builder.TypeScriptBuilder">
+         </run>
+      </builder>
+   </extension>
+
 </plugin>        
