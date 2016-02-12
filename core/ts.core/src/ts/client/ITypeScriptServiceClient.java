@@ -12,6 +12,7 @@ package ts.client;
 
 import ts.TypeScriptException;
 import ts.client.completions.ITypeScriptCompletionCollector;
+import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
@@ -34,12 +35,17 @@ public interface ITypeScriptServiceClient {
 	void completions(String fileName, int line, int offset, String prefix, ITypeScriptCompletionCollector collector)
 			throws TypeScriptException;
 
-	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
+	void completionEntryDetails(String fileName, int line, int offset, String[] entryNames,
+			ITypeScriptCompletionEntryDetailsCollector collector) throws TypeScriptException;
+
+	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+			throws TypeScriptException;
 
 	void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
 			throws TypeScriptException;
 
-	void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector) throws TypeScriptException;
+	void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
+			throws TypeScriptException;
 
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TypeScriptException;

@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import ts.TypeScriptException;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 
@@ -26,7 +27,12 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		IProject project = this.getProject();
 		if (TypeScriptCorePlugin.hasTypeScriptNature(project)) {
 			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
-			//tsProject.getCompiler().compile();
+			try {
+				tsProject.getCompiler().compile(null);
+			} catch (TypeScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}		
 		return null;
 	}

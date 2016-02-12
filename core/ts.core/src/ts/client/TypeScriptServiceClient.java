@@ -28,10 +28,12 @@ import com.eclipsesource.json.JsonValue;
 
 import ts.TypeScriptException;
 import ts.client.completions.ITypeScriptCompletionCollector;
+import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.protocol.ChangeRequest;
 import ts.client.protocol.CloseRequest;
+import ts.client.protocol.CompletionDetailsRequest;
 import ts.client.protocol.CompletionsRequest;
 import ts.client.protocol.DefinitionRequest;
 import ts.client.protocol.GeterrRequest;
@@ -97,16 +99,17 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	};
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
-		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile, new INodejsLaunchConfiguration() {
-			
-			@Override
-			public List<String> createNodeArgs() {
-				List<String> args = new ArrayList<String>();
-				args.add("-p");
-				args.add(FileUtils.getPath(projectDir));
-				return args;
-			}
-		}));
+		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile,
+				new INodejsLaunchConfiguration() {
+
+					@Override
+					public List<String> createNodeArgs() {
+						List<String> args = new ArrayList<String>();
+						args.add("-p");
+						args.add(FileUtils.getPath(projectDir));
+						return args;
+					}
+				}));
 	}
 
 	public TypeScriptServiceClient(File projectDir, INodejsProcess process) {
@@ -156,16 +159,47 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			ITypeScriptCompletionCollector collector) throws TypeScriptException {
 		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
 		JsonObject response = execute(request, true, null).asObject();
-		collectCompletions(response, collector);
+		collectCompletions(response, fileName, line, offset, collector);
 	}
 
-	private void collectCompletions(JsonObject response, ITypeScriptCompletionCollector collector) {
+	private void collectCompletions(JsonObject response, String fileName, int line, int offset,
+			ITypeScriptCompletionCollector collector) {
 		JsonArray items = response.get("body").asArray();
 		JsonObject obj = null;
 		for (JsonValue item : items) {
 			obj = (JsonObject) item;
 			collector.addCompletionEntry(obj.getString("name", ""), obj.getString("kind", ""),
-					obj.getString("kindModifiers", ""), obj.getString("sortText", ""));
+					obj.getString("kindModifiers", ""), obj.getString("sortText", ""), fileName, line, offset, this);
+		}
+	}
+
+	@Override
+	public void completionEntryDetails(String fileName, int line, int offset, String[] entryNames,
+			ITypeScriptCompletionEntryDetailsCollector collector) throws TypeScriptException {
+		CompletionDetailsRequest request = new CompletionDetailsRequest(fileName, line, offset, entryNames);
+		JsonObject response = execute(request, true, null).asObject();
+		collectCompletionDetails(response, collector);
+	}
+
+	private void collectCompletionDetails(JsonObject response, ITypeScriptCompletionEntryDetailsCollector collector) {
+		JsonArray body = response.get("body").asArray();
+		if (body != null && body.size() > 0) {
+			JsonObject obj = body.get(0).asObject();
+			collector.setEntryDetails(obj.getString("name", ""), obj.getString("kind", ""),
+					obj.getString("kindModifiers", ""));
+			// displayParts
+			JsonArray displayParts = obj.get("displayParts").asArray();
+			JsonObject o = null;
+			for (JsonValue part : displayParts) {
+				o = part.asObject();
+				collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
+			}
+			// documentation
+			JsonArray documentation = obj.get("documentation").asArray();
+			for (JsonValue part : documentation) {
+				o = part.asObject();
+				collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
+			}
 		}
 	}
 

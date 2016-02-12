@@ -263,8 +263,13 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	@Override
 	public ITypeScriptCompiler getCompiler() throws TypeScriptException {
 		if (compiler == null) {
-			compiler = new TypeScriptCompiler();
+			compiler = createCompiler();
 		}
 		return compiler;
+	}
+
+	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

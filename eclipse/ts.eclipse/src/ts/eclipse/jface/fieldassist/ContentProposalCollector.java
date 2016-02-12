@@ -3,9 +3,9 @@ package ts.eclipse.jface.fieldassist;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.fieldassist.ContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposal;
 
+import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.AbstractCompletionCollector;
 
 public class ContentProposalCollector extends AbstractCompletionCollector {
@@ -19,8 +19,10 @@ public class ContentProposalCollector extends AbstractCompletionCollector {
 	}
 
 	@Override
-	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
-		IContentProposal proposal = new TypeScriptContentProposal(name, kind, kindModifiers, sortText, getPrefix());
+	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText,
+			String fileName, int line, int offset, ITypeScriptServiceClient client) {
+		IContentProposal proposal = new TypeScriptContentProposal(name, kind, kindModifiers, sortText, getPrefix(),
+				fileName, line, offset, client);
 		proposals.add(proposal);
 	}
 

@@ -1,8 +1,10 @@
 package ts.client.completions;
 
 import ts.client.AbstractTypeScriptCollector;
+import ts.client.ITypeScriptServiceClient;
 
-public abstract class AbstractCompletionCollector extends AbstractTypeScriptCollector implements ITypeScriptCompletionCollector {
+public abstract class AbstractCompletionCollector extends AbstractTypeScriptCollector
+		implements ITypeScriptCompletionCollector {
 
 	private final String prefix;
 
@@ -11,9 +13,10 @@ public abstract class AbstractCompletionCollector extends AbstractTypeScriptColl
 	}
 
 	@Override
-	public final void addCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
+	public void addCompletionEntry(String name, String kind, String kindModifiers, String sortText, String fileName,
+			int line, int offset, ITypeScriptServiceClient client) {
 		if (name.toUpperCase().startsWith(prefix.toUpperCase())) {
-			doAddCompletionEntry(name, kind, kindModifiers, sortText);
+			doAddCompletionEntry(name, kind, kindModifiers, sortText, fileName, line, offset, client);
 		}
 	}
 
@@ -21,5 +24,6 @@ public abstract class AbstractCompletionCollector extends AbstractTypeScriptColl
 		return prefix;
 	}
 
-	protected abstract void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText);
+	protected abstract void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText,
+			String fileName, int line, int offset, ITypeScriptServiceClient client);
 }

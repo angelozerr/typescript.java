@@ -15,6 +15,8 @@ import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.ITypeScriptServiceClientFactory;
 import ts.client.TypeScriptServiceClient;
+import ts.compiler.ITypeScriptCompiler;
+import ts.compiler.TypeScriptCompiler;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
@@ -133,4 +135,15 @@ public class IDETypeScriptProject extends TypeScriptProject
 		return true;
 	}
 
+	@Override
+	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
+		try {
+			File nodeFile = null;
+			File tsRepositoryFile = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
+			File tscFile = new File(tsRepositoryFile, "node_modules/typescript/bin/tsc");
+			return new TypeScriptCompiler(getProjectDir(), tscFile, nodeFile);
+		} catch (IOException e) {
+			throw new TypeScriptException(e);
+		}
+	}
 }

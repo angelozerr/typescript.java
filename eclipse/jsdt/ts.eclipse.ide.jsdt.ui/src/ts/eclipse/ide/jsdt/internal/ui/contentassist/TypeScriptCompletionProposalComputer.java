@@ -50,9 +50,7 @@ public class TypeScriptCompletionProposalComputer
 					IResource resource = javaContext.getCompilationUnit().getResource();
 					IDocument document = javaContext.getDocument();
 					ITypeScriptFile tsFile = tsProject.openFile(resource, document);
-
-					CharSequence prefix = javaContext.computeIdentifierPrefix(); // TSHelper.getPrefix(document.get(),
-																					// position);
+					CharSequence prefix = javaContext.computeIdentifierPrefix();
 
 					CompletionProposalCollector collector = new CompletionProposalCollector(position,
 							prefix != null ? prefix.toString() : null);

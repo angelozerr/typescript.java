@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
+import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.AbstractCompletionCollector;
 
 public class CompletionProposalCollector extends AbstractCompletionCollector {
@@ -19,10 +20,11 @@ public class CompletionProposalCollector extends AbstractCompletionCollector {
 	}
 
 	@Override
-	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText) {
+	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText,
+			String fileName, int line, int offset, ITypeScriptServiceClient client) {
 		String prefix = getPrefix();
-		ICompletionProposal proposal = new TypeScriptCompletionProposal(name, kind, kindModifiers, sortText,
-				position, prefix);
+		ICompletionProposal proposal = new TypeScriptCompletionProposal(name, kind, kindModifiers, sortText, position,
+				prefix, fileName, line, offset, client);
 		proposals.add(proposal);
 	}
 

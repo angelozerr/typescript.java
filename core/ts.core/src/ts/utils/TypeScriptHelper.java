@@ -1,5 +1,9 @@
 package ts.utils;
 
+import java.util.List;
+
+import ts.client.completions.SymbolDisplayPart;
+
 public class TypeScriptHelper {
 
 	/**
@@ -27,5 +31,17 @@ public class TypeScriptHelper {
 			i--;
 		}
 		return prefix != null ? prefix.toString() : null;
+	}
+
+	public static String html(List<SymbolDisplayPart> parts) {
+		if (parts == null || parts.size() < 1) {
+			return null;
+		}
+		StringBuilder html = new StringBuilder("<pre>");
+		for (SymbolDisplayPart part : parts) {
+			html.append(part.getText());
+		}
+		html.append("</pre>");
+		return html.toString();
 	}
 }

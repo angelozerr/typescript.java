@@ -12,17 +12,17 @@ package ts.eclipse.jface.fieldassist;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 
+import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.CompletionEntry;
 
-public class TypeScriptContentProposal extends CompletionEntry implements
-		IContentProposal {
+public class TypeScriptContentProposal extends CompletionEntry implements IContentProposal {
 
 	private final String content;
 	private final String description;
 
-	
-	public TypeScriptContentProposal(String name, String kind, String kindModifiers, String sortText, String prefix) {
-		super(name, kind, kindModifiers, sortText);
+	public TypeScriptContentProposal(String name, String kind, String kindModifiers, String sortText, String prefix,
+			String fileName, int line, int offset, ITypeScriptServiceClient client) {
+		super(name, kind, kindModifiers, sortText, fileName, line, offset, client);
 		this.content = name.substring(prefix.length(), name.length());
 		this.description = null;
 	}
