@@ -10,7 +10,7 @@
  */
 package ts.client.protocol;
 
-import ts.utils.JSONUtils;
+import ts.utils.JsonHelper;
 
 /**
  * Arguments for completion details request.
@@ -29,7 +29,7 @@ public class CompletionDetailsRequestArgs extends FileLocationRequestArgs {
 	public CompletionDetailsRequestArgs(String fileName, int line, int offset, String[] entryNames) {
 		super(fileName, line, offset);
 		if (entryNames != null) {
-			super.add("entryNames", JSONUtils.toJson(entryNames));
+			super.add("entryNames", JsonHelper.toJson(entryNames));
 		}
 	}
 

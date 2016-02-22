@@ -3,7 +3,7 @@ package ts.client.protocol;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
-import ts.utils.JSONUtils;
+import ts.utils.JsonHelper;
 
 /**
  * Arguments for geterr messages.
@@ -20,7 +20,7 @@ public class GeterrRequestArgs extends JsonObject {
 	 *            errors for the files in the file list
 	 */
 	public GeterrRequestArgs(String[] files, int delay) {
-		super.add("files", JSONUtils.toJson(files));
+		super.add("files", JsonHelper.toJson(files));
 		super.add("delay", delay);
 	}
 

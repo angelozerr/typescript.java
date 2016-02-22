@@ -54,6 +54,7 @@ import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 import ts.nodejs.NodejsProcessManager;
 import ts.utils.FileUtils;
+import ts.utils.JsonHelper;
 
 /**
  * TypeScript service client implementation.
@@ -188,17 +189,21 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			collector.setEntryDetails(obj.getString("name", ""), obj.getString("kind", ""),
 					obj.getString("kindModifiers", ""));
 			// displayParts
-			JsonArray displayParts = obj.get("displayParts").asArray();
+			JsonArray displayParts = JsonHelper.getArray(obj, "displayParts");
 			JsonObject o = null;
-			for (JsonValue part : displayParts) {
-				o = part.asObject();
-				collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
+			if (displayParts != null) {
+				for (JsonValue part : displayParts) {
+					o = part.asObject();
+					collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
+				}
 			}
 			// documentation
-			JsonArray documentation = obj.get("documentation").asArray();
-			for (JsonValue part : documentation) {
-				o = part.asObject();
-				collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
+			JsonArray documentation = JsonHelper.getArray(obj, "documentation");
+			if (documentation != null) {
+				for (JsonValue part : documentation) {
+					o = part.asObject();
+					collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
+				}
 			}
 		}
 	}
