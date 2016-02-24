@@ -3,21 +3,14 @@ package ts.core.tests;
 import java.io.File;
 
 import ts.TypeScriptException;
-import ts.client.ITypeScriptServiceClient;
-import ts.client.TypeScriptServiceClient;
-import ts.resources.SynchStrategy;
+import ts.resources.BasicTypeScriptProjectSettings;
 import ts.resources.TypeScriptProject;
 
 public class MockTypeScriptProject extends TypeScriptProject {
 
 	public MockTypeScriptProject(File projectDir) {
-		super(projectDir, null, SynchStrategy.CHANGE);
-	}
-
-	@Override
-	public ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
-		return new TypeScriptServiceClient(projectDir,
-				new File("../ts.repository/node_modules/typescript/bin/tsserver"), null);
+		super(projectDir, new BasicTypeScriptProjectSettings(null,
+				new File("../ts.repository/node_modules/typescript/bin/tsserver")));
 	}
 
 	public synchronized MockTypeScriptFile openFile(File file, boolean normalize) throws TypeScriptException {

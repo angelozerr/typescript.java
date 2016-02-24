@@ -47,7 +47,7 @@ public class MockTypeScriptFile extends AbstractTypeScriptFile {
 
 	public void change(int position, int length, String newText) {
 		setDirty(true);
-		if (getProject().getSynchStrategy() == SynchStrategy.CHANGE) {
+		if (getProject().getProjectSettings().getSynchStrategy() == SynchStrategy.CHANGE) {
 			synchronized (synchLock) {
 				try {
 

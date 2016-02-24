@@ -17,7 +17,17 @@
    <extension-point id="typeScriptConsoleConnectors" 
    					name="%typeScriptConsoleConnectors.name"
 					schema="schema/typeScriptConsoleConnectors.exsd" />
-
+	<extension-point id="nodeJSInstalls" 
+					 name="%nodeJSInstallsContribution.name"
+					 schema="schema/nodeJSInstalls.exsd" />
+		
+	<!-- Native node.js-->
+	<extension point="ts.eclipse.ide.core.nodeJSInstalls" >
+		<install id="node-native"
+				 name="%nodeJSInstall.name" 
+				 path="" />
+	</extension>
+	
    <extension point="org.eclipse.core.expressions.propertyTesters">
 		<propertyTester
 			id="ts.eclipse.ide.core.TypeScriptNatureTester"
@@ -28,6 +38,14 @@
 		</propertyTester>
 	</extension>
 			
+	<!-- Preferences initialization -->
+	<extension
+		point="org.eclipse.core.runtime.preferences">
+		<initializer
+			class="ts.eclipse.ide.internal.core.preferences.TypeScriptCorePreferenceInitializer" />
+	</extension>
+			
+	<!-- Builder to compile TypeScript -> JaavScript with tsc -->			
    <extension
          id="typeScriptBuilder"
          name="%TypeScriptBuilder.name"

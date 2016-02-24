@@ -8,7 +8,7 @@ public class StringUtils {
 	public static final int INDEX_NOT_FOUND = -1;
 
 	private static final int NOT_FOUND = -1;
-	
+
 	public static int countMatches(final CharSequence str, final CharSequence sub) {
 		if (isEmpty(str) || isEmpty(sub)) {
 			return 0;
@@ -45,4 +45,5 @@ public class StringUtils {
 	public static boolean isEmpty(final CharSequence cs) {
 		return cs == null || cs.length() == 0;
 	}
+
 }

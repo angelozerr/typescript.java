@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.resources;
 
 import java.io.File;
@@ -9,19 +19,21 @@ import java.util.Map;
 import ts.TypeScriptException;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
-import ts.client.ITypeScriptServiceClientFactory;
 import ts.client.Location;
+import ts.client.TypeScriptServiceClient;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.compiler.ITypeScriptCompiler;
-import ts.compiler.TypeScriptCompiler;
 
-public class TypeScriptProject implements ITypeScriptProject, ITypeScriptServiceClientFactory {
+/**
+ * TypeScript project.
+ *
+ */
+public class TypeScriptProject implements ITypeScriptProject {
 
 	private final File projectDir;
-	private final ITypeScriptServiceClientFactory factory;
-	private final SynchStrategy synchStrategy;
+	private final ITypeScriptProjectSettings projectSettings;
 
 	// TypeScript service client
 	private ITypeScriptServiceClient client;
@@ -29,25 +41,14 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 
 	// TypeScript compiler
 	private ITypeScriptCompiler compiler;
-	
+
 	private final Map<String, Object> data;
 	private final List<ITypeScriptClientListener> listeners;
 	protected final Object serverLock = new Object();
 
-	public TypeScriptProject(File projectDir, ITypeScriptServiceClientFactory factory) {
-		this(projectDir, factory, SynchStrategy.RELOAD);
-	}
-
-	/**
-	 * Tern project constructor.
-	 * 
-	 * @param projectDir
-	 *            the project base directory.
-	 */
-	public TypeScriptProject(File projectDir, ITypeScriptServiceClientFactory factory, SynchStrategy synchStrategy) {
+	public TypeScriptProject(File projectDir, ITypeScriptProjectSettings projectSettings) {
 		this.projectDir = projectDir;
-		this.factory = factory;
-		this.synchStrategy = synchStrategy;
+		this.projectSettings = projectSettings;
 		this.openedFiles = new HashMap<String, ITypeScriptFile>();
 		this.data = new HashMap<String, Object>();
 		this.listeners = new ArrayList<ITypeScriptClientListener>();
@@ -116,7 +117,8 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public void geterr(ITypeScriptFile file, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException {
+	public void geterr(ITypeScriptFile file, int delay, ITypeScriptGeterrCollector collector)
+			throws TypeScriptException {
 		file.synch();
 		getClient().geterr(new String[] { file.getName() }, delay, collector);
 	}
@@ -155,9 +157,10 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 		disposeServer();
 	}
 
-	@Override
-	public ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
-		return factory.create(projectDir);
+	protected ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
+		File nodeFile = getProjectSettings().getNodejsInstallPath();
+		File tsserverFile = getProjectSettings().getTsserverFile();
+		return new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
 	}
 
 	// ----------------------- TypeScript server listeners.
@@ -256,11 +259,6 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	}
 
 	@Override
-	public SynchStrategy getSynchStrategy() {
-		return synchStrategy;
-	}
-	
-	@Override
 	public ITypeScriptCompiler getCompiler() throws TypeScriptException {
 		if (compiler == null) {
 			compiler = createCompiler();
@@ -271,5 +269,10 @@ public class TypeScriptProject implements ITypeScriptProject, ITypeScriptService
 	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public ITypeScriptProjectSettings getProjectSettings() {
+		return projectSettings;
 	}
 }

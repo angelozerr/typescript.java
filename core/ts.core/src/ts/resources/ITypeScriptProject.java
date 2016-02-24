@@ -18,6 +18,10 @@ import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.compiler.ITypeScriptCompiler;
 
+/**
+ * TypeScript project API.
+ *
+ */
 public interface ITypeScriptProject {
 
 	/**
@@ -64,5 +68,5 @@ public interface ITypeScriptProject {
 
 	boolean isServerDisposed();
 
-	SynchStrategy getSynchStrategy();
+	ITypeScriptProjectSettings getProjectSettings();
 }

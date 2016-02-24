@@ -61,7 +61,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	public boolean isOpened() {
 		return opened;
 	}
-	
+
 	void setOpened(boolean opened) {
 		this.opened = opened;
 	}
@@ -93,7 +93,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 			// no need to synchronize it.
 			return;
 		}
-		switch (tsProject.getSynchStrategy()) {
+		switch (tsProject.getProjectSettings().getSynchStrategy()) {
 		case RELOAD:
 			// reload strategy : store the content of the ts file in a temporary
 			// file and call reload command.

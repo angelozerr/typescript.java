@@ -18,12 +18,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import ts.TypeScriptException;
-import ts.client.ITypeScriptServiceClientFactory;
 import ts.client.LoggingInterceptor;
-import ts.client.TypeScriptServiceClientFactory;
 import ts.eclipse.jface.fieldassist.TypeScriptContentProposalProvider;
 import ts.eclipse.jface.viewers.TypeScriptLabelProvider;
 import ts.eclipse.swt.SWTTextTypeScriptFile;
+import ts.resources.BasicTypeScriptProjectSettings;
 import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.resources.TypeScriptProject;
@@ -41,11 +40,11 @@ public class NodejsTSEditor {
 	}
 
 	private void createUI() throws TypeScriptException, IOException, InterruptedException {
-
-		ITypeScriptServiceClientFactory factory = new TypeScriptServiceClientFactory(
-				new File("../../core/ts.repository/node_modules/typescript/bin/tsserver"), null);
+		File nodejsInstallPath = null;
+		File tsserverFile = new File("../../core/ts.repository/node_modules/typescript/bin/tsserver");
 		File projectDir = new File("./samples");
-		ITypeScriptProject tsProject = new TypeScriptProject(projectDir, factory);
+		ITypeScriptProject tsProject = new TypeScriptProject(projectDir,
+				new BasicTypeScriptProjectSettings(nodejsInstallPath, tsserverFile));
 		tsProject.getClient().addInterceptor(new LoggingInterceptor());
 
 		Display display = new Display();
@@ -60,11 +59,10 @@ public class NodejsTSEditor {
 		saveButton.setLayoutData(new GridData());
 
 		File sampleFile = new File(projectDir, "sample.ts");
-		
+
 		Text text = new Text(shell, SWT.MULTI | SWT.BORDER);
 		text.setText(FileUtils.getContents(sampleFile));
 
-		
 		ITypeScriptFile tsFile = new SWTTextTypeScriptFile(FileUtils.getPath(sampleFile), text, tsProject);
 		tsFile.open();
 
@@ -76,7 +74,8 @@ public class NodejsTSEditor {
 			e.printStackTrace();
 		}
 		ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(),
-				new TypeScriptContentProposalProvider(tsFile.getName(), tsProject), keyStroke, autoActivationCharacters);
+				new TypeScriptContentProposalProvider(tsFile.getName(), tsProject), keyStroke,
+				autoActivationCharacters);
 		adapter.setLabelProvider(TypeScriptLabelProvider.getInstance());
 		text.setLayoutData(new GridData(GridData.FILL_BOTH));
 

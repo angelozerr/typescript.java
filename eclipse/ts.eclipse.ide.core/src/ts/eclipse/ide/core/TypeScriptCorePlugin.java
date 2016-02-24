@@ -25,7 +25,9 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
+import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.internal.core.nodejs.NodejsInstallManager;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
 import ts.resources.TypeScriptResourcesManager;
@@ -181,4 +183,12 @@ public class TypeScriptCorePlugin extends Plugin {
 	// return TSRepositoryManager.getManager();
 	// }
 
+	/**
+	 * Returns the Nodejs install manager.
+	 * 
+	 * @return the Nodejs install manager.
+	 */
+	public static INodejsInstallManager getNodejsInstallManager() {
+		return NodejsInstallManager.getManager();
+	}
 }

@@ -13,21 +13,18 @@ import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
-import ts.client.ITypeScriptServiceClientFactory;
-import ts.client.TypeScriptServiceClient;
 import ts.compiler.ITypeScriptCompiler;
 import ts.compiler.TypeScriptCompiler;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
-import ts.resources.SynchStrategy;
 import ts.resources.TypeScriptProject;
 
-public class IDETypeScriptProject extends TypeScriptProject
-		implements IIDETypeScriptProject {
+public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeScriptProject {
 
 	private static final QualifiedName TYPESCRIPT_PROJECT = new QualifiedName(
 			TypeScriptCorePlugin.PLUGIN_ID + ".sessionprops", //$NON-NLS-1$
@@ -36,7 +33,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 	private final IProject project;
 
 	public IDETypeScriptProject(IProject project) throws CoreException {
-		super(project.getLocation().toFile(), null, SynchStrategy.CHANGE);
+		super(project.getLocation().toFile(), new IDETypeScriptProjectSettings(project));
 		this.project = project;
 		project.setSessionProperty(TYPESCRIPT_PROJECT, this);
 	}
@@ -86,18 +83,6 @@ public class IDETypeScriptProject extends TypeScriptProject
 	}
 
 	@Override
-	public ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
-		try {
-			File nodeFile = null;
-			File tsRepositoryFile = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
-			File tsserverFile = new File(tsRepositoryFile, "node_modules/typescript/bin/tsserver");
-			return new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
-		} catch (IOException e) {
-			throw new TypeScriptException(e);
-		}
-	}
-
-	@Override
 	protected void onCreateClient(ITypeScriptServiceClient client) {
 		configureConsole();
 	}
@@ -132,7 +117,7 @@ public class IDETypeScriptProject extends TypeScriptProject
 	}
 
 	private boolean isTraceOnConsole() {
-		return true;
+		return getProjectSettings().isTraceOnConsole();
 	}
 
 	@Override
@@ -145,5 +130,10 @@ public class IDETypeScriptProject extends TypeScriptProject
 		} catch (IOException e) {
 			throw new TypeScriptException(e);
 		}
+	}
+
+	@Override
+	public IIDETypeScriptProjectSettings getProjectSettings() {
+		return (IIDETypeScriptProjectSettings) super.getProjectSettings();
 	}
 }
