@@ -2,18 +2,27 @@
 
 [![Build Status](https://secure.travis-ci.org/angelozerr/typescript.java.png)](http://travis-ci.org/angelozerr/typescript.java)
 
-Goal of typescript.java is to provide the capability to consume TypeScript language Service with tsserver in a Java context. Any Java IDE like Eclipse, Netbeans, WebStorm could consume typescript.java.
+Goal of typescript.java is to provide the capability to consume TypeScript language Service with [tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver in a Java context. Any Java IDE like Eclipse, Netbeans, WebStorm could consume typescript.java.
 
-typescript.java provides :
+## Core Features
 
- * a simple SWT/JFace integration.
- * an Eclipse IDE with JSDT integration and WTP Validator.
- 
-This integration looks like [tern.java](https://github.com/angelozerr/tern.java); JSDT was extended (completion, hyperlink, hover, etc) to consumme the official TypeScript server [tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver).
+Once that TypeScript Service client which consumes tsserver is created with Java using `core` module, you can use it in any Java context (Eclipse, Netbeans, etc). 
+typescript.java provides the capability to use TypeScript language Service with tsserver with SWT : 
 
-Here a screenshot with TypeScript completion inside JSDT Editor:
+ * contentassist which uses typescript.java. If you start the SWT [TypeScriptEditor](https://github.com/angelozerr/typescript.java/blob/master/samples/ts.eclipse.swt.samples/src/ts/eclipse/swt/samples/TypeScriptEditor.java) demo, 
+you will see contentassist available for JavaScript : 
+
+![SWT TypeScript Editor](https://github.com/angelozerr/typescript.java/wiki/images/SWTTypeScriptEditor.png)
+
+## Eclipse IDE
+
+On top of `core` module typescript.java provides an **Eclipse IDE** integration with TypeScript. 
 
 ![JSDT TypeScript Completion](https://github.com/angelozerr/typescript.java/wiki/images/JSDTTypeScriptCompletion.png)  
+
+To install TypeScript IDE, please start to read [Getting Started](https://github.com/angelozerr/typescript.java/wiki/Getting-Started) section.
+
+This integration looks like [tern.java](https://github.com/angelozerr/tern.java); JSDT was extended (completion, hyperlink, hover, etc) to consumme the official TypeScript server [tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver).
 
 # Similar Project
 
