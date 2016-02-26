@@ -28,10 +28,10 @@ import ts.resources.ITypeScriptProject;
 import ts.resources.TypeScriptProject;
 import ts.utils.FileUtils;
 
-public class NodejsTSEditor {
+public class TypeScriptEditor {
 
 	public static void main(String[] args) {
-		NodejsTSEditor editor = new NodejsTSEditor();
+		TypeScriptEditor editor = new TypeScriptEditor();
 		try {
 			editor.createUI();
 		} catch (Exception e) {
