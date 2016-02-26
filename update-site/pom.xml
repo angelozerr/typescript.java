@@ -12,6 +12,6 @@
 	<module>ts-jsdt-feature</module>
 	<module>ts-nodejs.embed-feature</module>
 	<module>ts-validation-feature</module>
-	<module>ts.site</module>
+	<module>typescript.ide</module> <!-- Update site -->
  </modules>
 </project>

@@ -5,7 +5,7 @@
 		<artifactId>update-site</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>ts.site</artifactId>
+	<artifactId>typescript.ide</artifactId>
 	<packaging>eclipse-repository</packaging>
 	<!-- https://github.com/jutzig/github-release-plugin/issues/14 -->
 	<scm>
