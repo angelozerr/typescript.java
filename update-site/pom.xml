@@ -7,6 +7,12 @@
   </parent>
   <artifactId>update-site</artifactId>
   <packaging>eclipse-repository</packaging>
+  <modules>
+  	<module>ts-feature</module>
+	<module>ts-jsdt-feature</module>
+	<module>ts-nodejs.embed-feature</module>
+	<module>ts-validation-feature</module>
+ </modules>
   <build>
 		<extensions>
 			<!-- Enabling the use of FTP -->

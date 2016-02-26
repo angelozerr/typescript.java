@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <bundle id="ts.eclipse" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
+   <bundle id="minimal-json">
+      <category name="TypeScript IDE"/>
    </bundle>
-   <bundle id="ts.eclipse.ide.core" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.eclipse.ide.server.nodejs.core" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.eclipse.ide.server.nodejs.ui" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.eclipse.ide.ui" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.eclipse.ide.validator.core" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.eclipse.ide.validator.ui" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.core" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.eclipse.ide.jsdt.core" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.eclipse.ide.jsdt.ui" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <bundle id="ts.repository" version="1.0.0.qualifier">
-      <category name="typescript.java"/>
-   </bundle>
-   <category-def name="typescript.java" label="typescript.java"/>
+   <feature id="ts-feature">
+      <category name="TypeScript IDE"/>
+   </feature>   
+   <feature id="ts-jsdt-feature">
+      <category name="TypeScript IDE"/>
+   </feature>
+   <feature id="ts-validation-feature">
+      <category name="TypeScript IDE"/>
+   </feature>
+   
+   <feature id="ts-validation-feature">
+      <category name="TypeScript IDE"/>
+   </feature>
+
+   <feature id="ts-nodejs.embed-feature">
+      <category name="Embed Node.js"/>
+   </feature>
+      
+   <category-def name="TypeScript IDE" label="TypeScript IDE" >
+      <description>
+         TypeScript IDE to use TypeScript with Eclipse IDE.
+      </description>   
+   </category-def>
+   
+   <category-def name="Embed Node.js" label="Embed Node.js">
+      <description>
+         Embed Node.js switch OS
+      </description>
+   </category-def>   
+   
 </site>
