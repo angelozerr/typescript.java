@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="typescript-feature"
+      id="ts-validation-feature"
       label="%featureName"
       version="1.0.0.qualifier"
       provider-name="%featureProvider"
