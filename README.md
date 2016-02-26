@@ -22,13 +22,14 @@ On top of `core` module typescript.java provides an **Eclipse IDE** integration 
 
 To install TypeScript IDE, please start to read [Getting Started](https://github.com/angelozerr/typescript.java/wiki/Getting-Started) section.
 
-This integration looks like [tern.java](https://github.com/angelozerr/tern.java); JSDT was extended (completion, hyperlink, hover, etc) to consumme the official TypeScript server [tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver).
+This integration looks like [tern.java](https://github.com/angelozerr/tern.java); JSDT was extended (completion, hyperlink, hover, etc) to consumme the official TypeScript server 
+[tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver).
 
 # Similar Project
 
 ## Java 
 
-See https://github.com/BestSolution-at/java-tsserver which provides the capability to consume tsserevr with Java. So why developping an another tsclient?
+See https://github.com/BestSolution-at/java-tsserver which provides the capability to consume tsserver with Java. So why developping an another tsclient?
 
  * java-tsserver requires Java8. Eclipse IDE uses Java7.
  * It uses GSON, I prefer using minimal-json and serialize JSON to Pojo/Collector at hand.
