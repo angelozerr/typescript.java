@@ -10,21 +10,16 @@
  */
 package ts.eclipse.ide.internal.core.resources;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
-import ts.compiler.ITypeScriptCompiler;
-import ts.compiler.TypeScriptCompiler;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
@@ -132,18 +127,6 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 
 	private boolean isTraceOnConsole() {
 		return getProjectSettings().isTraceOnConsole();
-	}
-
-	@Override
-	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
-		try {
-			File nodeFile = null;
-			File tsRepositoryFile = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
-			File tscFile = new File(tsRepositoryFile, "node_modules/typescript/bin/tsc");
-			return new TypeScriptCompiler(getProjectDir(), tscFile, nodeFile);
-		} catch (IOException e) {
-			throw new TypeScriptException(e);
-		}
 	}
 
 	@Override

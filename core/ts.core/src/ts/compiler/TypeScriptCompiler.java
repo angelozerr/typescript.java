@@ -4,10 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import ts.TypeScriptException;
-import ts.client.protocol.Message;
 import ts.nodejs.INodejsLaunchConfiguration;
 import ts.nodejs.INodejsProcess;
-import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 import ts.nodejs.NodejsProcessManager;
 

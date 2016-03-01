@@ -25,6 +25,7 @@ import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.compiler.ITypeScriptCompiler;
+import ts.compiler.TypeScriptCompiler;
 
 /**
  * TypeScript project implementation.
@@ -128,7 +129,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 		synchronized (serverLock) {
 			if (isServerDisposed()) {
 				try {
-					this.client = create(getProjectDir());
+					this.client = createServiceClient(getProjectDir());
 					copyListeners();
 					onCreateClient(client);
 				} catch (Exception e) {
@@ -157,10 +158,29 @@ public class TypeScriptProject implements ITypeScriptProject {
 		disposeServer();
 	}
 
-	protected ITypeScriptServiceClient create(File projectDir) throws TypeScriptException {
+	/**
+	 * Create service client which consumes tsserver.
+	 * 
+	 * @param projectDir
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	protected ITypeScriptServiceClient createServiceClient(File projectDir) throws TypeScriptException {
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File tsserverFile = getProjectSettings().getTsserverFile();
 		return new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
+	}
+
+	/**
+	 * Create compiler which consumes tsc.
+	 * 
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
+		File nodeFile = getProjectSettings().getNodejsInstallPath();
+		File tscFile = getProjectSettings().getTsserverFile();
+		return new TypeScriptCompiler(getProjectDir(), tscFile, nodeFile);
 	}
 
 	// ----------------------- TypeScript server listeners.
@@ -264,11 +284,6 @@ public class TypeScriptProject implements ITypeScriptProject {
 			compiler = createCompiler();
 		}
 		return compiler;
-	}
-
-	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
