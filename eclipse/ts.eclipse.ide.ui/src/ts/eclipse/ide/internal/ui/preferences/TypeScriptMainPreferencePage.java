@@ -10,14 +10,14 @@
  */
 package ts.eclipse.ide.internal.ui.preferences;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbenchPropertyPage;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ts.eclipse.ide.ui.ImageResource;
 
@@ -26,7 +26,7 @@ import ts.eclipse.ide.ui.ImageResource;
  * 
  */
 public class TypeScriptMainPreferencePage extends PreferencePage implements
-		IWorkbenchPropertyPage {
+		IWorkbenchPreferencePage {
 
 	public static final String PROP_ID = "ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage";
 
@@ -43,12 +43,7 @@ public class TypeScriptMainPreferencePage extends PreferencePage implements
 	}
 
 	@Override
-	public IAdaptable getElement() {
-		return null;
-	}
-
-	@Override
-	public void setElement(IAdaptable element) {
+	public void init(IWorkbench workbench) {
 		
 	}
 
