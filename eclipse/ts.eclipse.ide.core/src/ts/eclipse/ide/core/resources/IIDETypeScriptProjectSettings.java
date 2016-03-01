@@ -10,7 +10,7 @@
  */
 package ts.eclipse.ide.core.resources;
 
-import ts.eclipse.ide.core.nodejs.INodejsInstall;
+import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.resources.ITypeScriptProjectSettings;
 
 /**
@@ -24,7 +24,7 @@ public interface IIDETypeScriptProjectSettings extends ITypeScriptProjectSetting
 	 * 
 	 * @return the node install from the project/workspace preferences.
 	 */
-	INodejsInstall getNodejsInstall();
+	IEmbeddedNodejs getEmbeddedNodejs();
 
 	/**
 	 * Returns true if JSON request/response can be traced inside Eclipse

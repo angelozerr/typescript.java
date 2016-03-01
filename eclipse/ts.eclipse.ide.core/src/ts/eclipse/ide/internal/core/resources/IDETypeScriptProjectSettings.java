@@ -18,10 +18,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.nodejs.INodejsInstall;
+import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.AbstractTypeScriptSettings;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
-import ts.eclipse.ide.internal.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.resources.SynchStrategy;
 import ts.utils.StringUtils;
 
@@ -49,23 +49,23 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
-	public INodejsInstall getNodejsInstall() {
-		String id = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_INSTALL, null);
+	public IEmbeddedNodejs getEmbeddedNodejs() {
+		String id = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED, null);
 		return TypeScriptCorePlugin.getNodejsInstallManager().findNodejsInstall(id);
 	}
 
 	@Override
 	public File getNodejsInstallPath() {
-		INodejsInstall install = getNodejsInstall();
-		if (install != null) {
-			if (install.isNative()) {
-				String path = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_PATH, null);
-				if (!StringUtils.isEmpty(path)) {
-					return new File(path);
-				}
-			} else {
-				return install.getPath();
-			}
+		if (super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, false)) {
+			// Use Embedded nodejs.
+			IEmbeddedNodejs embed = getEmbeddedNodejs();
+			return embed != null ? embed.getPath() : null;
+		}
+
+		// Use Installed node.js
+		String path = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_PATH, null);
+		if (!StringUtils.isEmpty(path)) {
+			return new File(path);
 		}
 		return null;
 	}

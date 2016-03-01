@@ -23,18 +23,16 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
-import ts.eclipse.ide.internal.ui.Trace;
-
 /**
  * Utility class to handle image resources.
  */
 public class ImageResource {
-	
+
 	// the image registry
 	private static ImageRegistry imageRegistry;
 
 	private static final String IMAGE_DIR = "typescript-images"; //$NON-NLS-1$
-	
+
 	// map of image descriptors since these
 	// will be lost by the image registry
 	private static Map<String, ImageDescriptor> imageDescriptors;
@@ -60,12 +58,11 @@ public class ImageResource {
 	static {
 		try {
 			String pathSuffix = "icons/";
-			ICON_BASE_URL = TypeScriptUIPlugin.getDefault().getBundle()
-					.getEntry(pathSuffix);
+			ICON_BASE_URL = TypeScriptUIPlugin.getDefault().getBundle().getEntry(pathSuffix);
 		} catch (Exception e) {
-			Trace.trace(Trace.SEVERE, "Images error", e);
+			TypeScriptUIPlugin.log("Images error", e);
 		}
-		
+
 		fURLMap = new HashMap<ImageDescriptor, URL>();
 		fTempDir = getTempDir();
 		fImageCount = 0;
@@ -158,12 +155,10 @@ public class ImageResource {
 	 */
 	public static void registerImage(String key, String partialURL) {
 		try {
-			ImageDescriptor id = ImageDescriptor.createFromURL(new URL(
-					ICON_BASE_URL, partialURL));
+			ImageDescriptor id = ImageDescriptor.createFromURL(new URL(ICON_BASE_URL, partialURL));
 			registerImageDescriptor(key, id);
 		} catch (Exception e) {
-			Trace.trace(Trace.SEVERE, "Error registering image " + key
-					+ " from " + partialURL, e);
+			TypeScriptUIPlugin.log("Error while registering image " + key + " from " + partialURL, e);
 		}
 	}
 
@@ -176,8 +171,7 @@ public class ImageResource {
 
 	private static File getTempDir() {
 		try {
-			File imageDir = TypeScriptUIPlugin.getDefault().getStateLocation()
-					.append(IMAGE_DIR).toFile();
+			File imageDir = TypeScriptUIPlugin.getDefault().getStateLocation().append(IMAGE_DIR).toFile();
 			if (imageDir.exists()) {
 				// has not been deleted on previous shutdown
 				delete(imageDir);
@@ -186,9 +180,7 @@ public class ImageResource {
 				imageDir.mkdir();
 			}
 			if (!imageDir.isDirectory()) {
-				Trace.trace(
-						Trace.SEVERE,
-						"Failed to create image directory " + imageDir.toString()); //$NON-NLS-1$
+				TypeScriptUIPlugin.logErrorMessage("Failed to create image directory " + imageDir.toString()); //$NON-NLS-1$
 				return null;
 			}
 			return imageDir;
@@ -231,7 +223,7 @@ public class ImageResource {
 			fURLMap.put(descriptor, url);
 			return url;
 		} catch (MalformedURLException e) {
-			Trace.trace(Trace.SEVERE, "Failed to create image directory ", e); //$NON-NLS-1$
+			TypeScriptUIPlugin.log("Failed to create image directory ", e); //$NON-NLS-1$
 		}
 		return null;
 	}

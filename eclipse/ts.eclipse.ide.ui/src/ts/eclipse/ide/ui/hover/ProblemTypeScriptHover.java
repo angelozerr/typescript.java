@@ -29,7 +29,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
-import ts.eclipse.ide.internal.ui.Trace;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.HTMLTypeScriptPrinter;
 import ts.eclipse.jface.text.html.TypeScriptBrowserInformationControlInput;
 import ts.utils.StringUtils;
@@ -115,7 +115,7 @@ public class ProblemTypeScriptHover extends AbstractTypeScriptHover {
 					manager.disconnect(path, LocationKind.NORMALIZE, null);
 				}
 			} catch (CoreException ex) {
-				Trace.trace(Trace.SEVERE, "Error while get problem info", ex);
+				TypeScriptUIPlugin.log("Error while getting problem info", ex);
 			}
 		}
 		return null;
@@ -137,7 +137,8 @@ public class ProblemTypeScriptHover extends AbstractTypeScriptHover {
 	}
 
 	private Object formatMessage(String message) {
-		return StringUtils.isEmpty(message) ? null : new TypeScriptBrowserInformationControlInput(null, HTMLTypeScriptPrinter.getError(message), 20);
+		return StringUtils.isEmpty(message) ? null
+				: new TypeScriptBrowserInformationControlInput(null, HTMLTypeScriptPrinter.getError(message), 20);
 	}
 
 	private IPath getEditorInputPath() {
@@ -149,7 +150,7 @@ public class ProblemTypeScriptHover extends AbstractTypeScriptHover {
 			try {
 				return ((IStorageEditorInput) input).getStorage().getFullPath();
 			} catch (CoreException ex) {
-				Trace.trace(Trace.SEVERE, "Error while get editor input path", ex);
+				TypeScriptUIPlugin.log("Error while getting editor input path", ex);
 			}
 		}
 		return null;
@@ -163,7 +164,7 @@ public class ProblemTypeScriptHover extends AbstractTypeScriptHover {
 		try {
 			manager.connect(path, LocationKind.NORMALIZE, null);
 		} catch (CoreException ex) {
-			Trace.trace(Trace.SEVERE, "Error while get annotation model", ex);
+			TypeScriptUIPlugin.log("Error while getting annotation model", ex);
 			return null;
 		}
 
@@ -176,7 +177,7 @@ public class ProblemTypeScriptHover extends AbstractTypeScriptHover {
 				try {
 					manager.disconnect(path, LocationKind.NORMALIZE, null);
 				} catch (CoreException ex) {
-					Trace.trace(Trace.SEVERE, "Error while get annotation model", ex);
+					TypeScriptUIPlugin.log("Error while getting annotation model", ex);
 				}
 			}
 		}

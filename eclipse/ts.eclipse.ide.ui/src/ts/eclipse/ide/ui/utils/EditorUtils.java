@@ -24,12 +24,9 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import ts.eclipse.ide.internal.ui.Trace;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 public class EditorUtils {
@@ -182,14 +179,14 @@ public class EditorUtils {
 
 			return buffer.getDocument();
 		} catch (CoreException ce) {
-			Trace.trace(Trace.SEVERE, "Error while get document from file", ce);
+			TypeScriptUIPlugin.log("Error while getting document from file", ce);
 			return null;
 		} finally {
 			if (connected) {
 				try {
 					manager.disconnect(location, LocationKind.NORMALIZE, new NullProgressMonitor());
 				} catch (CoreException e) {
-					Trace.trace(Trace.SEVERE, "Error while get document from file", e);
+					TypeScriptUIPlugin.log("Error while getting document from file", e);
 				}
 			}
 		}

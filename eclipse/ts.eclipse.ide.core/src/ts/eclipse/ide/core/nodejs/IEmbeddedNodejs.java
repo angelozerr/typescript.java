@@ -16,9 +16,7 @@ import java.io.File;
  * Nodejs installation API.
  * 
  */
-public interface INodejsInstall {
-
-	public static final String NODE_NATIVE = "node-native";
+public interface IEmbeddedNodejs {
 	
 	/**
 	 * Returns the id of this Nodejs install. Each known Nodejs install has a
@@ -45,12 +43,5 @@ public interface INodejsInstall {
 	 * @return a the file path for this Nodejs install
 	 */
 	File getPath();
-
-	/**
-	 * Returns true if the node install is native and false otherwise (embed).
-	 * 
-	 * @return
-	 */
-	boolean isNative();
 
 }

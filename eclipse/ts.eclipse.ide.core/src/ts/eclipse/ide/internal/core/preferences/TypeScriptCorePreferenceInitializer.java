@@ -11,14 +11,13 @@
 package ts.eclipse.ide.internal.core.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
-import ts.eclipse.ide.core.nodejs.INodejsInstall;
+import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
-import ts.eclipse.ide.internal.core.nodejs.NodejsInstall;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.internal.core.resources.IDETypeScriptProjectSettings;
 
 /**
@@ -46,27 +45,20 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 	 */
 	private void initializeNodejsPreferences(IEclipsePreferences node) {
 		// By default use the embedded Node.js install (if exists)
-		if (!useBundledNodeJsInstall(node)) {
+		if (!useBundledNodeJsEmbedded(node)) {
 			// Use native node.js install in case there is no embedded install.
-			node.put(TypeScriptCorePreferenceConstants.NODEJS_INSTALL, NodejsInstall.NODE_NATIVE);
+			node.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, false);
 			node.put(TypeScriptCorePreferenceConstants.NODEJS_PATH, IDENodejsProcessHelper.getNodejsPath());
 		}
-		// timeout to start node.js
-		// node.putLong(TypeScriptCoreConstants.NODEJS_TIMEOUT,
-		// NodejsTypeScriptHelper.DEFAULT_TIMEOUT);
-		// test number to start node.js
-		// node.putInt(TypeScriptCoreConstants.NODEJS_TEST_NUMBER,
-		// NodejsTypeScriptHelper.DEFAULT_TEST_NUMBER);
 	}
 
-	private static boolean useBundledNodeJsInstall(IEclipsePreferences node) {
+	private static boolean useBundledNodeJsEmbedded(IEclipsePreferences node) {
 		INodejsInstallManager installManager = TypeScriptCorePlugin.getNodejsInstallManager();
-		INodejsInstall[] installs = installManager.getNodejsInstalls();
-		for (INodejsInstall install : installs) {
-			if (!install.isNative()) {
-				node.put(TypeScriptCorePreferenceConstants.NODEJS_INSTALL, install.getId());
-				return true;
-			}
+		IEmbeddedNodejs[] installs = installManager.getNodejsInstalls();
+		for (IEmbeddedNodejs install : installs) {
+			node.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, true);
+			node.put(TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED, install.getId());
+			return true;
 		}
 		return false;
 	}

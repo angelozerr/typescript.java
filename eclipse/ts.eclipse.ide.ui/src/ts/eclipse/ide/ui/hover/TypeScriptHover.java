@@ -12,17 +12,13 @@ package ts.eclipse.ide.ui.hover;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextHoverExtension;
-import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.ui.IEditorPart;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.internal.ui.Trace;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.eclipse.jface.text.html.TypeScriptBrowserInformationControlInput;
 import ts.resources.ITypeScriptFile;
@@ -32,7 +28,7 @@ import ts.utils.StringUtils;
  * TypeScript Hover.
  *
  */
-public class TypeScriptHover extends AbstractTypeScriptHover  {
+public class TypeScriptHover extends AbstractTypeScriptHover {
 
 	private IIDETypeScriptProject tsProject;
 	private Integer offset;
@@ -60,7 +56,7 @@ public class TypeScriptHover extends AbstractTypeScriptHover  {
 				String text = collector.getInfo();
 				return StringUtils.isEmpty(text) ? null : new TypeScriptBrowserInformationControlInput(null, text, 20);
 			} catch (Exception e) {
-				Trace.trace(Trace.WARNING, "Error while TypeScript hover", e);
+				TypeScriptUIPlugin.log("Error while TypeScript hover", e);
 			}
 		}
 		return null;

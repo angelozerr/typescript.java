@@ -27,7 +27,7 @@ import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.compiler.ITypeScriptCompiler;
 
 /**
- * TypeScript project.
+ * TypeScript project implementation.
  *
  */
 public class TypeScriptProject implements ITypeScriptProject {

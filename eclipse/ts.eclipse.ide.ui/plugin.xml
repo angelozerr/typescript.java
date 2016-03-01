@@ -116,20 +116,54 @@
             </command>
         </menuContribution>
     </extension>
+
+  <!-- Preference Pages -->          		
+  <extension
+         point="org.eclipse.ui.preferencePages">		      
+      <page
+            name="%TypeScriptMainPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.TypeScriptMainPreferencePage"
+            id="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
+      </page>
+	  <page
+            name="%NodejsPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.NodejsPreferencePage"
+            id="ts.eclipse.ide.ui.preference.NodejsPreferencePage"
+            category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
+		     </adapt>         
+         </enabledWhen>
+      </page>      
+   </extension>
          		
+  <!-- Property Pages -->          		
   <extension
          point="org.eclipse.ui.propertyPages">		      
       <page
             name="%TypeScriptMainPropertyPage.name"        
-            class="ts.eclipse.ide.internal.ui.properties.TypeScriptMainPropertyPage"
-            id="ts.eclipse.ide.ui.properties.TypeScriptMainPropertyPage">
+            class="ts.eclipse.ide.internal.ui.preferences.TypeScriptMainPropertyPage"
+            id="ts.eclipse.ide.ui.property.TypeScriptMainPropertyPage">
          <enabledWhen>
 		     <adapt type="org.eclipse.core.resources.IProject">
 		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
 		     </adapt>         
          </enabledWhen>
       </page>
+	  <page
+            name="%NodejsPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.NodejsPreferencePage"
+            id="ts.eclipse.ide.ui.property.NodejsPreferencePage"
+            category="ts.eclipse.ide.ui.property.TypeScriptMainPropertyPage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
+		     </adapt>         
+         </enabledWhen>
+      </page>      
    </extension>
+
     <extension point="org.eclipse.ui.startup">
         <startup
             class="ts.eclipse.ide.internal.ui.TypeScriptIDEStartup">

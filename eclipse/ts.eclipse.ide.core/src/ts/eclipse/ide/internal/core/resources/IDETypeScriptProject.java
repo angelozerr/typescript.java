@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
@@ -24,6 +34,10 @@ import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.resources.TypeScriptProject;
 
+/**
+ * IDE TypeScript project implementation.
+ *
+ */
 public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeScriptProject {
 
 	private static final QualifiedName TYPESCRIPT_PROJECT = new QualifiedName(

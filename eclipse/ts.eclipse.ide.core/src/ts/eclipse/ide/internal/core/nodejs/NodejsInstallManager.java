@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.Platform;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.nodejs.INodejsInstall;
+import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.internal.core.Trace;
 
@@ -33,7 +33,7 @@ public class NodejsInstallManager implements INodejsInstallManager, IRegistryCha
 	private static final NodejsInstallManager INSTANCE = new NodejsInstallManager();
 
 	// cached copy of all Nodejs install
-	private List<INodejsInstall> nodeJSInstalls;
+	private List<IEmbeddedNodejs> nodeJSInstalls;
 
 	private boolean registryListenerIntialized;
 
@@ -61,13 +61,13 @@ public class NodejsInstallManager implements INodejsInstallManager, IRegistryCha
 	 * result.
 	 * </p>
 	 * 
-	 * @return the array of Nodejs installs {@link INodejsInstall}
+	 * @return the array of Nodejs installs {@link IEmbeddedNodejs}
 	 */
-	public INodejsInstall[] getNodejsInstalls() {
+	public IEmbeddedNodejs[] getNodejsInstalls() {
 		if (nodeJSInstalls == null)
 			loadNodejsInstalls();
 
-		INodejsInstall[] st = new INodejsInstall[nodeJSInstalls.size()];
+		IEmbeddedNodejs[] st = new IEmbeddedNodejs[nodeJSInstalls.size()];
 		nodeJSInstalls.toArray(st);
 		return st;
 	}
@@ -76,23 +76,23 @@ public class NodejsInstallManager implements INodejsInstallManager, IRegistryCha
 	 * Returns the Nodejs install with the given id, or <code>null</code> if
 	 * none. This convenience method searches the list of known Nodejs installs
 	 * ({@link #getNodejsInstalls()}) for the one with a matching Nodejs install
-	 * id ({@link INodejsInstall#getId()}). The id may not be null.
+	 * id ({@link IEmbeddedNodejs#getId()}). The id may not be null.
 	 * 
 	 * @param id
 	 *            the Nodejs install id
 	 * @return the Nodejs install, or <code>null</code> if there is no generator
 	 *         type with the given id
 	 */
-	public INodejsInstall findNodejsInstall(String id) {
+	public IEmbeddedNodejs findNodejsInstall(String id) {
 		if (id == null) {
 			throw new IllegalArgumentException();
 		}
 		if (nodeJSInstalls == null) {
 			loadNodejsInstalls();
 		}
-		Iterator<INodejsInstall> iterator = nodeJSInstalls.iterator();
+		Iterator<IEmbeddedNodejs> iterator = nodeJSInstalls.iterator();
 		while (iterator.hasNext()) {
-			INodejsInstall nodeJSInstall = (INodejsInstall) iterator.next();
+			IEmbeddedNodejs nodeJSInstall = (IEmbeddedNodejs) iterator.next();
 			if (id.equals(nodeJSInstall.getId()))
 				return nodeJSInstall;
 		}
@@ -111,7 +111,7 @@ public class NodejsInstallManager implements INodejsInstallManager, IRegistryCha
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] cf = registry.getConfigurationElementsFor(TypeScriptCorePlugin.PLUGIN_ID,
 				EXTENSION_NODEJS_INSTALLS);
-		List<INodejsInstall> list = new ArrayList<INodejsInstall>(cf.length);
+		List<IEmbeddedNodejs> list = new ArrayList<IEmbeddedNodejs>(cf.length);
 		addNodejsInstalls(cf, list);
 		addRegistryListenerIfNeeded();
 		nodeJSInstalls = list;
@@ -122,7 +122,7 @@ public class NodejsInstallManager implements INodejsInstallManager, IRegistryCha
 	/**
 	 * Load the Nodejs installs.
 	 */
-	private synchronized void addNodejsInstalls(IConfigurationElement[] cf, List<INodejsInstall> list) {
+	private synchronized void addNodejsInstalls(IConfigurationElement[] cf, List<IEmbeddedNodejs> list) {
 		for (IConfigurationElement ce : cf) {
 			try {
 				list.add(new NodejsInstall(ce));
@@ -139,7 +139,7 @@ public class NodejsInstallManager implements INodejsInstallManager, IRegistryCha
 
 		IConfigurationElement[] cf = delta.getExtension().getConfigurationElements();
 
-		List<INodejsInstall> list = new ArrayList<INodejsInstall>(nodeJSInstalls);
+		List<IEmbeddedNodejs> list = new ArrayList<IEmbeddedNodejs>(nodeJSInstalls);
 		if (delta.getKind() == IExtensionDelta.ADDED) {
 			addNodejsInstalls(cf, list);
 		} else {

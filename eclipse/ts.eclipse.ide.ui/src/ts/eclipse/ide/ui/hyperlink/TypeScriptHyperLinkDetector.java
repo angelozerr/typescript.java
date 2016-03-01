@@ -17,16 +17,15 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.internal.ui.Trace;
 import ts.eclipse.ide.internal.ui.hyperlink.TypeScriptHyperlink;
 import ts.eclipse.ide.ui.JavaWordFinder;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
 public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 
 	@Override
-	public IHyperlink[] detectHyperlinks(ITextViewer textViewer,
-			IRegion region, boolean canShowMultipleHyperlinks) {
+	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
 		if (region == null || textViewer == null) {
 			return null;
 		}
@@ -37,15 +36,15 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 		}
 		IProject project = resource.getProject();
 		if (TypeScriptCorePlugin.hasTypeScriptNature(project)) {
-			// the project of the resource has typescript nature, execute typescript
+			// the project of the resource has typescript nature, execute
+			// typescript
 			// hyperlink.
 			try {
-				IIDETypeScriptProject tsProject = TypeScriptCorePlugin
-						.getTypeScriptProject(project);
+				IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
 				IDocument document = textViewer.getDocument();
-				IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);				
-				IRegion wordRegion= JavaWordFinder.findWord(document, region.getOffset());
-				
+				IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);
+				IRegion wordRegion = JavaWordFinder.findWord(document, region.getOffset());
+
 				TypeScriptHyperlink hyperlink = new TypeScriptHyperlink(tsFile, wordRegion);
 				if (hyperlink.isValid()) {
 					IHyperlink[] hyperlinks = new IHyperlink[1];
@@ -55,7 +54,7 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 				return null;
 
 			} catch (Exception e) {
-				Trace.trace(Trace.WARNING, "Error while TypeScript hyperlink", e);
+				TypeScriptUIPlugin.log("Error while TypeScript hyperlink", e);
 			}
 		}
 		return null;
@@ -74,14 +73,11 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 		if (textEditor != null) {
 			return EditorUtils.getResource(textEditor);
 		}
-		ITextFileBufferManager bufferManager = FileBuffers
-				.getTextFileBufferManager();
-		ITextFileBuffer textFileBuffer = bufferManager
-				.getTextFileBuffer(textViewer.getDocument());
+		ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+		ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(textViewer.getDocument());
 		if (textFileBuffer != null) {
 			IPath location = textFileBuffer.getLocation();
-			return ResourcesPlugin.getWorkspace().getRoot()
-					.findMember(location);
+			return ResourcesPlugin.getWorkspace().getRoot().findMember(location);
 		}
 		return null;
 	}

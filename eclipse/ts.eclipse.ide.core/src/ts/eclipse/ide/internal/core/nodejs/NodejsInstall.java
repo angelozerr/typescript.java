@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
-import ts.eclipse.ide.core.nodejs.INodejsInstall;
+import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.utils.ZipUtils;
 
-public class NodejsInstall implements INodejsInstall {
+public class NodejsInstall implements IEmbeddedNodejs {
 
 	private final String id;
 	private final String name;
@@ -39,8 +39,7 @@ public class NodejsInstall implements INodejsInstall {
 		String pluginId = element.getNamespaceIdentifier();
 		String path = element.getAttribute("path");
 		if (path != null && path.length() > 0) {
-			File baseDir = FileLocator.getBundleFile(Platform
-					.getBundle(pluginId));
+			File baseDir = FileLocator.getBundleFile(Platform.getBundle(pluginId));
 			this.path = new File(baseDir, path);
 
 			// check if path exists, if it doesn't look for zip
@@ -54,7 +53,7 @@ public class NodejsInstall implements INodejsInstall {
 						ZipUtils.extract(zipFile, baseDir);
 					}
 
-					if(this.path.exists()) {
+					if (this.path.exists()) {
 						this.path.setExecutable(true);
 					}
 				}
@@ -81,8 +80,4 @@ public class NodejsInstall implements INodejsInstall {
 
 	}
 
-	@Override
-	public boolean isNative() {
-		return NODE_NATIVE.equals(getId());
-	}
 }

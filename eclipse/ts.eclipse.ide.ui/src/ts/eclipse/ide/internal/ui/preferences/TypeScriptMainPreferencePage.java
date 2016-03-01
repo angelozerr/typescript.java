@@ -8,28 +8,29 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.internal.ui.properties;
+package ts.eclipse.ide.internal.ui.preferences;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPropertyPage;
-import org.eclipse.ui.dialogs.PropertyPage;
 
 import ts.eclipse.ide.ui.ImageResource;
 
 /**
- * TypeScript Main page for project properties.
+ * TypeScript Main page for global preferences.
  * 
  */
-public class TypeScriptMainPropertyPage extends PropertyPage implements
+public class TypeScriptMainPreferencePage extends PreferencePage implements
 		IWorkbenchPropertyPage {
 
-	public static final String PROP_ID = "ts.eclipse.ide.ui.properties.TypeScriptMainPropertyPage";
+	public static final String PROP_ID = "ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage";
 
-	public TypeScriptMainPropertyPage() {
+	public TypeScriptMainPreferencePage() {
 		setImageDescriptor(ImageResource
 				.getImageDescriptor(ImageResource.IMG_LOGO));
 	}
@@ -39,6 +40,16 @@ public class TypeScriptMainPropertyPage extends PropertyPage implements
 		composite.setLayoutData(new GridData(4, 4, true, true));
 		composite.setLayout(new GridLayout());
 		return composite;
+	}
+
+	@Override
+	public IAdaptable getElement() {
+		return null;
+	}
+
+	@Override
+	public void setElement(IAdaptable element) {
+		
 	}
 
 }

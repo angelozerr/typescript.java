@@ -21,6 +21,9 @@ public class TypeScriptUIMessages extends NLS {
 
 	private static ResourceBundle fResourceBundle;
 
+	// Errors
+	public static String TypeScriptUIPlugin_internal_error;
+
 	// Hyperlink
 	public static String TypeScriptHyperlink_typeLabel;
 	public static String TypeScriptHyperlink_text;
@@ -29,7 +32,17 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptConsoleJob_name;
 	public static String ConsoleTerminateAction_tooltipText;
 
+	// Hover
 	public static String TypeScriptHover_openDeclaration;
+
+	// Preferences
+	public static String PropertyAndPreferencePage_useprojectsettings_label;
+	public static String PropertyAndPreferencePage_useworkspacesettings_change;
+	public static String PropertyAndPreferencePage_showprojectspecificsettings_label;
+
+	public static String NodejsConfigurationBlock_nodejs_group_label;
+	public static String NodejsConfigurationBlock_embedded_checkbox_label;
+	public static String NodejsConfigurationBlock_installed_checkbox_label;
 
 	public static ResourceBundle getResourceBundle() {
 		try {

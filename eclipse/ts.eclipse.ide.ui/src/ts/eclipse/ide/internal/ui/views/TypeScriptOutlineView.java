@@ -22,7 +22,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.internal.ui.Trace;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.TypeScriptResourcesManager;
 
@@ -60,7 +60,7 @@ public class TypeScriptOutlineView extends ContentOutline {
 							IIDETypeScriptFile tsFile = tsProject.openFile(file, document);
 							return new TypeScriptContentOutlinePage(tsFile);
 						} catch (Throwable e) {
-							Trace.trace(Trace.SEVERE, "Error while opening TypeScript outline", e);
+							TypeScriptUIPlugin.log("Error while opening TypeScript outline", e);
 						}
 					}
 				}
