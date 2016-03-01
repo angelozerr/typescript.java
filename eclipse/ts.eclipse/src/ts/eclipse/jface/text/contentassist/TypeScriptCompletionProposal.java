@@ -106,6 +106,9 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 	public String getAdditionalProposalInfo() {
 		try {
 			ICompletionEntryDetails details = getEntryDetails();
+			if (details == null) {
+				return null;
+			}
 			String html = TypeScriptHelper.html(details.getDocumentation());
 			if (StringUtils.isEmpty(html)) {
 				html = TypeScriptHelper.html(details.getDisplayParts());

@@ -27,7 +27,7 @@ import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
 public class CompilerConfigurationBlock extends OptionsConfigurationBlock {
 
 	private static final Key PREF_TYPESCRIPT_REPOSITORY = getTypeScriptCoreKey(
-			TypeScriptCorePreferenceConstants.TYPESCRIPT_REPOSITORY);
+			TypeScriptCorePreferenceConstants.TSC_REPOSITORY);
 
 	public CompilerConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {

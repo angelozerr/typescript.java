@@ -3,14 +3,14 @@ package ts.core.tests;
 import java.io.File;
 
 import ts.TypeScriptException;
+import ts.repository.TypeScriptRepositoryException;
 import ts.resources.BasicTypeScriptProjectSettings;
 import ts.resources.TypeScriptProject;
 
 public class MockTypeScriptProject extends TypeScriptProject {
 
-	public MockTypeScriptProject(File projectDir) {
-		super(projectDir, new BasicTypeScriptProjectSettings(null,
-				new File("../ts.repository/node_modules/typescript/bin/tsserver")));
+	public MockTypeScriptProject(File projectDir) throws TypeScriptRepositoryException {
+		super(projectDir, new BasicTypeScriptProjectSettings(null, new File("../ts.repository/node_modules")));
 	}
 
 	public synchronized MockTypeScriptFile openFile(File file, boolean normalize) throws TypeScriptException {

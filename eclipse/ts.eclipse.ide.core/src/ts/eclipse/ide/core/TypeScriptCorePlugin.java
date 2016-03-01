@@ -28,7 +28,9 @@ import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.core.nodejs.NodejsInstallManager;
+import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
+import ts.repository.ITypeScriptRepositoryManager;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
 import ts.resources.TypeScriptResourcesManager;
 
@@ -94,8 +96,8 @@ public class TypeScriptCorePlugin extends Plugin {
 	public static boolean hasTypeScriptNature(IProject project) {
 		return true; // return IDETSProject.hasTypeScriptNature(project);
 	}
-	
-	public static boolean hasTypeScriptBuilder(IProject project) {		
+
+	public static boolean hasTypeScriptBuilder(IProject project) {
 		try {
 			IProjectDescription description = project.getDescription();
 			ICommand[] commands = description.getBuildSpec();
@@ -190,5 +192,9 @@ public class TypeScriptCorePlugin extends Plugin {
 	 */
 	public static INodejsInstallManager getNodejsInstallManager() {
 		return NodejsInstallManager.getManager();
+	}
+
+	public static ITypeScriptRepositoryManager getTypeScriptRepositoryManager() {
+		return IDETypeScriptRepositoryManager.INSTANCE;
 	}
 }

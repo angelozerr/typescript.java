@@ -11,17 +11,15 @@
 package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.AbstractTypeScriptSettings;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
+import ts.repository.ITypeScriptRepository;
 import ts.resources.SynchStrategy;
 import ts.utils.StringUtils;
 
@@ -76,15 +74,23 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
+	public File getTscFile() {
+		ITypeScriptRepository repository = getRepository(TypeScriptCorePreferenceConstants.TSC_REPOSITORY);
+		return (repository != null) ? repository.getTscFile() : null;
+	}
+	
+	@Override
 	public File getTsserverFile() {
-		try {
-			File tsRepositoryFile = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
-			File tsserverFile = new File(tsRepositoryFile, "node_modules/typescript/bin/tsserver");
-			return tsserverFile;
-		} catch (IOException e) {
-			e.printStackTrace();
+		ITypeScriptRepository repository = getRepository(TypeScriptCorePreferenceConstants.TSSERVER_REPOSITORY);
+		return (repository != null) ? repository.getTsserverFile() : null;
+	}
+
+	private ITypeScriptRepository getRepository(String preferenceName) {
+		String name = super.getStringPreferencesValue(preferenceName, null);
+		if (StringUtils.isEmpty(name)) {
+			return null;
 		}
-		return null;
+		return TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepository(name);
 	}
 
 }

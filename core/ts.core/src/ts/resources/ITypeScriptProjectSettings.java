@@ -18,6 +18,11 @@ import java.io.File;
  */
 public interface ITypeScriptProjectSettings {
 
+	/**
+	 * Returns the strategy to synchronize editor content with tsserver.
+	 * 
+	 * @return the strategy to synchronize editor content with tsserver.
+	 */
 	SynchStrategy getSynchStrategy();
 
 	/**
@@ -27,6 +32,18 @@ public interface ITypeScriptProjectSettings {
 	 */
 	File getNodejsInstallPath();
 
+	/**
+	 * Returns the typescript/bin/tsc file to execute.
+	 * 
+	 * @return the typescript/bin/tsc file to execute.
+	 */
+	File getTscFile();
+
+	/**
+	 * Returns the typescript/bin/tsserver file to execute.
+	 * 
+	 * @return the typescript/bin/tsserver file to execute.
+	 */
 	File getTsserverFile();
 
 }

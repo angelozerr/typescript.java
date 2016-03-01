@@ -20,5 +20,6 @@ Export-Package: ts,
  ts.client.signaturehelp,
  ts.compiler,
  ts.nodejs,
+ ts.repository,
  ts.resources,
  ts.utils

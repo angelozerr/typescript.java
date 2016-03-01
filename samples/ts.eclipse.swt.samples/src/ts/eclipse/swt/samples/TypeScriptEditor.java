@@ -41,10 +41,10 @@ public class TypeScriptEditor {
 
 	private void createUI() throws TypeScriptException, IOException, InterruptedException {
 		File nodejsInstallPath = null;
-		File tsserverFile = new File("../../core/ts.repository/node_modules/typescript/bin/tsserver");
+		File typeScriptDir = new File("../../core/ts.repository");
 		File projectDir = new File("./samples");
 		ITypeScriptProject tsProject = new TypeScriptProject(projectDir,
-				new BasicTypeScriptProjectSettings(nodejsInstallPath, tsserverFile));
+				new BasicTypeScriptProjectSettings(nodejsInstallPath, typeScriptDir));
 		tsProject.getClient().addInterceptor(new LoggingInterceptor());
 
 		Display display = new Display();

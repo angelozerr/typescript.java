@@ -10,6 +10,10 @@
  */
 package ts.eclipse.ide.internal.core.preferences;
 
+import java.io.File;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
@@ -18,7 +22,9 @@ import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
+import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.resources.IDETypeScriptProjectSettings;
+import ts.repository.ITypeScriptRepository;
 
 /**
  * Eclipse preference initializer for TypeScript Core.
@@ -33,8 +39,19 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		// initialize properties for direct access of node.js server (start an
 		// internal process)
 		initializeNodejsPreferences(node);
-		// Initialize tsserver
-		initializeTsserverPreferences(node);
+
+		try {
+			File tsRepositoryBaseDir = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
+			ITypeScriptRepository defaultRepository = TypeScriptCorePlugin.getTypeScriptRepositoryManager()
+					.createDefaultRepository(tsRepositoryBaseDir);
+
+			// Initialize tsc preferences
+			initializeTscPreferences(node, defaultRepository);
+			// Initialize tsserver preferences
+			initializeTsserverPreferences(node, defaultRepository);
+		} catch (Exception e) {
+			Trace.trace(Trace.SEVERE, "Error while getting the default TypeScript repository", e);
+		}
 	}
 
 	/**
@@ -63,7 +80,12 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		return false;
 	}
 
-	private void initializeTsserverPreferences(IEclipsePreferences node) {
+	private void initializeTscPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
+		node.put(TypeScriptCorePreferenceConstants.TSC_REPOSITORY, defaultRepository.getName());
+	}
+
+	private void initializeTsserverPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
+		node.put(TypeScriptCorePreferenceConstants.TSSERVER_REPOSITORY, defaultRepository.getName());
 		node.putBoolean(TypeScriptCorePreferenceConstants.TRACE_ON_CONSOLE, true);
 	}
 

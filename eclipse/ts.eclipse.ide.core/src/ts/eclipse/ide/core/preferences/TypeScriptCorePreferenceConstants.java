@@ -22,7 +22,9 @@ public class TypeScriptCorePreferenceConstants {
 
 	public static final String NODEJS_PATH = "nodeJSPath"; //$NON-NLS-1$
 
-	public static final String TYPESCRIPT_REPOSITORY = "typescriptRepository"; //$NON-NLS-1$
+	public static final String TSSERVER_REPOSITORY = "tscRepository"; //$NON-NLS-1$
+	
+	public static final String TSC_REPOSITORY = "tsserverRepository"; //$NON-NLS-1$
 
 	public static final String TRACE_ON_CONSOLE = "traceOnConsole"; //$NON-NLS-1$
 	
