@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.internal.ui.preferences;
 
 import org.eclipse.core.resources.IProject;
@@ -8,23 +18,23 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import ts.eclipse.ide.ui.preferences.PropertyAndPreferencePage;
 
 /**
- * Node.js preferences page
+ * tsserver preferences page
  *
  */
-public class NodejsPreferencePage extends PropertyAndPreferencePage {
+public class ServerPreferencePage extends PropertyAndPreferencePage {
 
-	public static final String PREF_ID = "ts.eclipse.ide.ui.preference.NodejsPreferencePage"; //$NON-NLS-1$
-	public static final String PROP_ID = "ts.eclipse.ide.ui.property.NodejsPreferencePage"; //$NON-NLS-1$
+	public static final String PREF_ID = "ts.eclipse.ide.ui.preference.ServerPreferencePage"; //$NON-NLS-1$
+	public static final String PROP_ID = "ts.eclipse.ide.ui.property.ServerPreferencePage"; //$NON-NLS-1$
 
-	private NodejsConfigurationBlock configurationBlock;
+	private ServerConfigurationBlock configurationBlock;
 
-	public NodejsPreferencePage() {
+	public ServerPreferencePage() {
 	}
 	
 	@Override
 	public void createControl(Composite parent) {
 		IWorkbenchPreferenceContainer container = (IWorkbenchPreferenceContainer) getContainer();
-		configurationBlock = new NodejsConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
+		configurationBlock = new ServerConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
 		super.createControl(parent);
 	}
 
