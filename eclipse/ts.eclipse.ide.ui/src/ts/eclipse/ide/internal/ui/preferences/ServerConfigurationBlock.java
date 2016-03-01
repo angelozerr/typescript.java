@@ -11,6 +11,7 @@
 package ts.eclipse.ide.internal.ui.preferences;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
@@ -39,7 +40,8 @@ public class ServerConfigurationBlock extends OptionsConfigurationBlock {
 
 	@Override
 	protected Control createContents(Composite parent) {
-		return null;
+		Composite contents = new Composite(parent, SWT.NONE);
+		return contents;
 	}
 
 	@Override
