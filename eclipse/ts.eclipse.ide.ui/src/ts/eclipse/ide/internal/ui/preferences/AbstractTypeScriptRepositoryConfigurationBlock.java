@@ -85,11 +85,16 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 		layout.numColumns = 1;
 		controlsComposite.setLayout(layout);
 
+		createBody(controlsComposite);
+		return pageContent;
+	}
+
+	protected void createBody(Composite parent) {
 		int nColumns = 2;
-		layout = new GridLayout();
+		GridLayout layout = new GridLayout();
 		layout.numColumns = nColumns;
 
-		Group group = new Group(controlsComposite, SWT.NONE);
+		Group group = new Group(parent, SWT.NONE);
 		group.setFont(controlsComposite.getFont());
 		group.setText(getTypeScriptGroupLabel());
 		group.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
@@ -100,7 +105,6 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 		// Installed TypeScript
 		createInstalledTypeScriptField(group);
 		updateComboBoxes();
-		return pageContent;
 	}
 
 	private void createEmbeddedTypeScriptField(Composite parent) {

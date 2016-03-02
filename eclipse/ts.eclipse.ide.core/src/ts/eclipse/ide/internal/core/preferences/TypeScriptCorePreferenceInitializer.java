@@ -92,7 +92,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		node.put(TypeScriptCorePreferenceConstants.TSSERVER_EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
 		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_USE_EMBEDDED_TYPESCRIPT, true);
 		node.put(TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH, "");
-		node.putBoolean(TypeScriptCorePreferenceConstants.TRACE_ON_CONSOLE, true);
+		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE, false);
 	}
 
 }

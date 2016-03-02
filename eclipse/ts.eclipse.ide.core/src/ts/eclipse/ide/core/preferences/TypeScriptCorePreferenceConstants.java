@@ -32,7 +32,7 @@ public class TypeScriptCorePreferenceConstants {
 
 	public static final String TSSERVER_INSTALLED_TYPESCRIPT_PATH = "tsserverInstalledTypeScriptPath"; //$NON-NLS-1$
 
-	public static final String TRACE_ON_CONSOLE = "traceOnConsole"; //$NON-NLS-1$
+	public static final String TSSERVER_TRACE_ON_CONSOLE = "tsserverTraceOnConsole"; //$NON-NLS-1$
 
 	// tsc
 

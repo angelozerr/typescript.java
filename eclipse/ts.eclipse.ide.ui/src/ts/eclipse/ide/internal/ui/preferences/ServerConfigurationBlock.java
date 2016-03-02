@@ -11,6 +11,7 @@
 package ts.eclipse.ide.internal.ui.preferences;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
@@ -29,15 +30,25 @@ public class ServerConfigurationBlock extends AbstractTypeScriptRepositoryConfig
 			TypeScriptCorePreferenceConstants.TSSERVER_EMBEDDED_TYPESCRIPT_ID);
 	private static final Key PREF_TSSERVER_TYPESCRIPT_PATH = getTypeScriptCoreKey(
 			TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH);
+	private static final Key PREF_TSSERVER_TRACE_ON_CONSOLE = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE);
 
 	public ServerConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {
 		super(context, project, getKeys(), container);
 	}
 
+	@Override
+	protected void createBody(Composite parent) {
+		super.createBody(parent);
+
+		super.addCheckBox(parent, TypeScriptUIMessages.ServerConfigurationBlock_traceOnConsole_label,
+				PREF_TSSERVER_TRACE_ON_CONSOLE, new String[] { "true", "false" }, 0);
+	}
+
 	private static Key[] getKeys() {
 		return new Key[] { PREF_TSSERVER_USE_EMBEDDED_TYPESCRIPT, PREF_TSSERVER_TYPESCRIPT_EMBEDDED,
-				PREF_TSSERVER_TYPESCRIPT_PATH };
+				PREF_TSSERVER_TYPESCRIPT_PATH, PREF_TSSERVER_TRACE_ON_CONSOLE };
 	}
 
 	@Override

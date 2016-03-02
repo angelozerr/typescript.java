@@ -55,10 +55,12 @@ public class TypeScriptUIMessages extends NLS {
 	public static String ServerConfigurationBlock_typescript_group_label;
 	public static String ServerConfigurationBlock_embedded_checkbox_label;
 	public static String ServerConfigurationBlock_installed_checkbox_label;
-
+	public static String ServerConfigurationBlock_traceOnConsole_label;
+	
 	public static String CompilerConfigurationBlock_typescript_group_label;
 	public static String CompilerConfigurationBlock_embedded_checkbox_label;
 	public static String CompilerConfigurationBlock_installed_checkbox_label;
+
 
 	public static ResourceBundle getResourceBundle() {
 		try {

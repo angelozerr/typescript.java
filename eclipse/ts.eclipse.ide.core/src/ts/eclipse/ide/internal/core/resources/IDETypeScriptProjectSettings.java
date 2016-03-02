@@ -46,7 +46,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	 */
 	@Override
 	public boolean isTraceOnConsole() {
-		return super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.TRACE_ON_CONSOLE, false);
+		return super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE, false);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return TypeScriptCorePreferenceConstants.TSSERVER_USE_EMBEDDED_TYPESCRIPT.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSSERVER_EMBEDDED_TYPESCRIPT_ID.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH.equals(event.getKey())
-				|| TypeScriptCorePreferenceConstants.TRACE_ON_CONSOLE.equals(event.getKey());
+				|| TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE.equals(event.getKey());
 	}
 
 	private boolean isTscPreferencesChanged(PreferenceChangeEvent event) {
