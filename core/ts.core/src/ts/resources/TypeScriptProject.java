@@ -34,7 +34,7 @@ import ts.compiler.TypeScriptCompiler;
 public class TypeScriptProject implements ITypeScriptProject {
 
 	private final File projectDir;
-	private final ITypeScriptProjectSettings projectSettings;
+	private ITypeScriptProjectSettings projectSettings;
 
 	// TypeScript service client
 	private ITypeScriptServiceClient client;
@@ -53,6 +53,10 @@ public class TypeScriptProject implements ITypeScriptProject {
 		this.openedFiles = new HashMap<String, ITypeScriptFile>();
 		this.data = new HashMap<String, Object>();
 		this.listeners = new ArrayList<ITypeScriptClientListener>();
+	}
+
+	protected void setProjectSettings(ITypeScriptProjectSettings projectSettings) {
+		this.projectSettings = projectSettings;
 	}
 
 	/**
@@ -156,6 +160,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 	@Override
 	public void dispose() throws TypeScriptException {
 		disposeServer();
+		getProjectSettings().dispose();
 	}
 
 	/**
@@ -179,7 +184,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 	 */
 	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
-		File tscFile = getProjectSettings().getTsserverFile();
+		File tscFile = getProjectSettings().getTscFile();
 		return new TypeScriptCompiler(getProjectDir(), tscFile, nodeFile);
 	}
 
@@ -247,6 +252,13 @@ public class TypeScriptProject implements ITypeScriptProject {
 		}
 	}
 
+	@Override
+	public void disposeCompiler() {
+		if (compiler != null) {
+			compiler.dispose();
+			compiler = null;
+		}
+	}
 	// private void closeFiles() {
 	// for (ITypeScriptFile openedFile : openedFiles.values()) {
 	// try {

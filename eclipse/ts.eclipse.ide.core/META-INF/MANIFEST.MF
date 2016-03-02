@@ -19,6 +19,7 @@ Export-Package: ts.eclipse.ide.core,
  ts.eclipse.ide.core.console,
  ts.eclipse.ide.core.nodejs,
  ts.eclipse.ide.core.preferences,
+ ts.eclipse.ide.core.repository,
  ts.eclipse.ide.core.resources
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.core.TypeScriptCorePlugin

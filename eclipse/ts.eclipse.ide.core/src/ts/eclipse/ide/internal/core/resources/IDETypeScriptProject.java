@@ -42,8 +42,9 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	private final IProject project;
 
 	public IDETypeScriptProject(IProject project) throws CoreException {
-		super(project.getLocation().toFile(), new IDETypeScriptProjectSettings(project));
+		super(project.getLocation().toFile(), null);
 		this.project = project;
+		super.setProjectSettings(new IDETypeScriptProjectSettings(this));
 		project.setSessionProperty(TYPESCRIPT_PROJECT, this);
 	}
 

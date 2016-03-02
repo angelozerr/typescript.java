@@ -73,15 +73,16 @@ public class NodejsProcessManager {
 	 * 
 	 * @param projectDir
 	 *            project base dir where tsconfig.json is hosted.
-	 * @param tsserverFile
-	 *            the tsserver file.
+	 * @param tsFile
+	 *            the tsserver, tsc file.
 	 * @param nodejsFile
 	 *            the nodejs exe file
 	 * @return an instance of the node tern process.
 	 * @throws TypeScriptException
 	 */
-	public INodejsProcess create(File projectDir, File tsserverFile, File nodejsFile, INodejsLaunchConfiguration configuration) throws TypeScriptException {
-		INodejsProcess process = new NodejsProcess(projectDir, tsserverFile, nodejsFile, configuration);
+	public INodejsProcess create(File projectDir, File tsFile, File nodejsFile,
+			INodejsLaunchConfiguration configuration, String fileType) throws TypeScriptException {
+		INodejsProcess process = new NodejsProcess(projectDir, tsFile, nodejsFile, configuration, fileType);
 		process.addProcessListener(listener);
 		return process;
 	}

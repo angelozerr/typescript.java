@@ -58,4 +58,8 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 		return repository.getTsserverFile();
 	}
 
+	@Override
+	public void dispose() {
+		// Do nothing
+	}
 }

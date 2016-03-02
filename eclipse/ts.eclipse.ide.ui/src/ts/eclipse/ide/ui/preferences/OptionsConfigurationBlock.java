@@ -940,4 +940,8 @@ public abstract class OptionsConfigurationBlock {
 		combo.setEnabled(enabled);
 		label.setEnabled(enabled);
 	}
+	
+	public IProject getProject() {
+		return fProject;
+	}
 }

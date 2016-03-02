@@ -11,23 +11,24 @@
 package ts.eclipse.ide.internal.ui.preferences;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
+import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.IStatusChangeListener;
-import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
 
 /**
- * tsc configuration block.
+ * Compiler configuration block.
  *
  */
-public class CompilerConfigurationBlock extends OptionsConfigurationBlock {
+public class CompilerConfigurationBlock extends AbstractTypeScriptRepositoryConfigurationBlock {
 
-	private static final Key PREF_TYPESCRIPT_REPOSITORY = getTypeScriptCoreKey(
-			TypeScriptCorePreferenceConstants.TSC_REPOSITORY);
+	private static final Key PREF_TSC_USE_EMBEDDED_TYPESCRIPT = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.TSC_USE_EMBEDDED_TYPESCRIPT);
+	private static final Key PREF_TSC_TYPESCRIPT_EMBEDDED = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.TSC_EMBEDDED_TYPESCRIPT_ID);
+	private static final Key PREF_TSC_TYPESCRIPT_PATH = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.TSC_INSTALLED_TYPESCRIPT_PATH);
 
 	public CompilerConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {
@@ -35,27 +36,37 @@ public class CompilerConfigurationBlock extends OptionsConfigurationBlock {
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] { PREF_TYPESCRIPT_REPOSITORY };
+		return new Key[] { PREF_TSC_USE_EMBEDDED_TYPESCRIPT, PREF_TSC_TYPESCRIPT_EMBEDDED, PREF_TSC_TYPESCRIPT_PATH };
 	}
 
 	@Override
-	protected Control createContents(Composite parent) {
-		Composite contents = new Composite(parent, SWT.NONE);
-		return contents;
+	protected String getTypeScriptGroupLabel() {
+		return TypeScriptUIMessages.CompilerConfigurationBlock_typescript_group_label;
 	}
 
 	@Override
-	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
-
+	protected String getEmbeddedCheckboxLabel() {
+		return TypeScriptUIMessages.CompilerConfigurationBlock_embedded_checkbox_label;
 	}
 
 	@Override
-	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
-		return null;
+	protected String getInstalledCheckboxLabel() {
+		return TypeScriptUIMessages.CompilerConfigurationBlock_installed_checkbox_label;
 	}
 
-	public void enablePreferenceContent(boolean enable) {
+	@Override
+	protected Key getUseEmbeddedTypescriptKey() {
+		return PREF_TSC_USE_EMBEDDED_TYPESCRIPT;
+	}
 
+	@Override
+	protected Key getEmbeddedTypescriptKey() {
+		return PREF_TSC_TYPESCRIPT_EMBEDDED;
+	}
+
+	@Override
+	protected Key getInstalledTypescriptPathKey() {
+		return PREF_TSC_TYPESCRIPT_PATH;
 	}
 
 }

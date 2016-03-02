@@ -16,18 +16,32 @@ package ts.eclipse.ide.core.preferences;
  */
 public class TypeScriptCorePreferenceConstants {
 
+	// Node.js
+
 	public static final String USE_NODEJS_EMBEDDED = "useNodeJSEmbedded"; //$NON-NLS-1$
-	
-	public static final String NODEJS_EMBEDDED = "nodeJSEmbedded"; //$NON-NLS-1$
+
+	public static final String NODEJS_EMBEDDED_ID = "nodeJSEmbedded"; //$NON-NLS-1$
 
 	public static final String NODEJS_PATH = "nodeJSPath"; //$NON-NLS-1$
 
-	public static final String TSSERVER_REPOSITORY = "tscRepository"; //$NON-NLS-1$
-	
-	public static final String TSC_REPOSITORY = "tsserverRepository"; //$NON-NLS-1$
+	// tsserver
+
+	public static final String TSSERVER_USE_EMBEDDED_TYPESCRIPT = "tsserverUseEmbeddedTypeScript"; //$NON-NLS-1$
+
+	public static final String TSSERVER_EMBEDDED_TYPESCRIPT_ID = "tsserverEmbeddedTypeScriptid"; //$NON-NLS-1$
+
+	public static final String TSSERVER_INSTALLED_TYPESCRIPT_PATH = "tsserverInstalledTypeScriptPath"; //$NON-NLS-1$
 
 	public static final String TRACE_ON_CONSOLE = "traceOnConsole"; //$NON-NLS-1$
-	
+
+	// tsc
+
+	public static final String TSC_USE_EMBEDDED_TYPESCRIPT = "tscUseEmbeddedTypeScript"; //$NON-NLS-1$
+
+	public static final String TSC_EMBEDDED_TYPESCRIPT_ID = "tscEmbeddedTypeScriptId"; //$NON-NLS-1$
+
+	public static final String TSC_INSTALLED_TYPESCRIPT_PATH = "tscInstalledTypeScriptPath"; //$NON-NLS-1$
+
 	private TypeScriptCorePreferenceConstants() {
 	}
 }

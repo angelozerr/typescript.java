@@ -66,6 +66,8 @@ public interface ITypeScriptProject {
 
 	void disposeServer();
 
+	void disposeCompiler();
+	
 	boolean isServerDisposed();
 
 	ITypeScriptProjectSettings getProjectSettings();

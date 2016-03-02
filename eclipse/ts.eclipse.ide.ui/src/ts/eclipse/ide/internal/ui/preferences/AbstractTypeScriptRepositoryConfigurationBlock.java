@@ -23,73 +23,48 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
-import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
-import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.IStatusChangeListener;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog.Mode;
 import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
 import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
+import ts.repository.ITypeScriptRepository;
 import ts.utils.StringUtils;
 
 /**
- * Node.js configuration block.
+ * Server configuration block.
  *
  */
-public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
+public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends OptionsConfigurationBlock {
 
-	private static final Key PREF_USE_NODEJS_EMBEDDED = getTypeScriptCoreKey(
-			TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED);
-	private static final Key PREF_NODEJS_EMBEDDED = getTypeScriptCoreKey(
-			TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED_ID);
-	private static final Key PREF_NODEJS_PATH = getTypeScriptCoreKey(TypeScriptCorePreferenceConstants.NODEJS_PATH);
+	private static final String[] DEFAULT_PATHS = new String[] { "${project_loc:node_modules/typescript}" };
 
 	private Composite controlsComposite;
 	private ControlEnableState blockEnableState;
 	private Combo embeddedComboBox;
 	private Combo installedComboBox;
-	private Button useEmbedNodeJs;
+	private Button useEmbedded;
 
 	private Button browseFileSystemButton;
 	private Button browseWorkspaceButton;
 
-	public NodejsConfigurationBlock(IStatusChangeListener context, IProject project,
-			IWorkbenchPreferenceContainer container) {
-		super(context, project, getKeys(), container);
+	public AbstractTypeScriptRepositoryConfigurationBlock(IStatusChangeListener context, IProject project,
+			Key[] allKeys, IWorkbenchPreferenceContainer container) {
+		super(context, project, allKeys, container);
 		blockEnableState = null;
-	}
-
-	private static Key[] getKeys() {
-		return new Key[] { PREF_USE_NODEJS_EMBEDDED, PREF_NODEJS_EMBEDDED, PREF_NODEJS_PATH };
-	}
-
-	public void enablePreferenceContent(boolean enable) {
-		if (controlsComposite != null && !controlsComposite.isDisposed()) {
-			if (enable) {
-				if (blockEnableState != null) {
-					blockEnableState.restore();
-					blockEnableState = null;
-				}
-			} else {
-				if (blockEnableState == null) {
-					blockEnableState = ControlEnableState.disable(controlsComposite);
-				}
-			}
-		}
 	}
 
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite nodejsComposite = createUI(parent);
+		Composite contents = createUI(parent);
 		validateSettings(null, null, null);
-		return nodejsComposite;
+		return contents;
 	}
 
 	private Composite createUI(Composite parent) {
@@ -116,23 +91,23 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 
 		Group group = new Group(controlsComposite, SWT.NONE);
 		group.setFont(controlsComposite.getFont());
-		group.setText(TypeScriptUIMessages.NodejsConfigurationBlock_nodejs_group_label);
+		group.setText(getTypeScriptGroupLabel());
 		group.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 		group.setLayout(layout);
 
-		// Embedded node.js
-		createEmbeddedNodejsField(group);
-		// Installed node.js
-		createInstalledNodejsField(group);
+		// Embedded TypeScript
+		createEmbeddedTypeScriptField(group);
+		// Installed TypeScript
+		createInstalledTypeScriptField(group);
 		updateComboBoxes();
 		return pageContent;
 	}
 
-	private void createEmbeddedNodejsField(Composite parent) {
+	private void createEmbeddedTypeScriptField(Composite parent) {
 		// Create "Embedded node.js" checkbox
-		useEmbedNodeJs = addRadioBox(parent, TypeScriptUIMessages.NodejsConfigurationBlock_embedded_checkbox_label,
-				PREF_USE_NODEJS_EMBEDDED, new String[] { "true", "true" }, 0);
-		useEmbedNodeJs.addSelectionListener(new SelectionAdapter() {
+		useEmbedded = addRadioBox(parent, getEmbeddedCheckboxLabel(), getUseEmbeddedTypescriptKey(),
+				new String[] { "true", "true" }, 0);
+		useEmbedded.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateComboBoxes();
@@ -140,38 +115,34 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 		});
 
 		// Create combo of embedded node.js
-		IEmbeddedNodejs[] installs = TypeScriptCorePlugin.getNodejsInstallManager().getNodejsInstalls();
-		String[] values = new String[installs.length];
-		String[] valueLabels = new String[installs.length];
+		ITypeScriptRepository[] respositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
+		String[] values = new String[respositories.length];
 		int i = 0;
-		for (IEmbeddedNodejs install : installs) {
-			values[i] = install.getId();
-			valueLabels[i] = install.getName();
+		for (ITypeScriptRepository repository : respositories) {
+			values[i] = repository.getName();
 			i++;
 		}
-		embeddedComboBox = newComboControl(parent, PREF_NODEJS_EMBEDDED, values, valueLabels);
+		embeddedComboBox = newComboControl(parent, getEmbeddedTypescriptKey(), values, values);
 		embeddedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
-	private void createInstalledNodejsField(Composite parent) {
-		// Create "Installed node.js" checkbox
-		Button useInstalledNodeJs = addRadioBox(parent,
-				TypeScriptUIMessages.NodejsConfigurationBlock_installed_checkbox_label, PREF_USE_NODEJS_EMBEDDED,
+	private void createInstalledTypeScriptField(Composite parent) {
+		// Create "Installed TypeScript" checkbox
+		Button useInstalled = addRadioBox(parent, getInstalledCheckboxLabel(), getUseEmbeddedTypescriptKey(),
 				new String[] { "false", "false" }, 0);
-		useInstalledNodeJs.addSelectionListener(new SelectionAdapter() {
+		useInstalled.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateComboBoxes();
 			}
 		});
 
-		String[] defaultPaths = IDENodejsProcessHelper.getDefaultNodejsPaths();
-		installedComboBox = newComboControl(parent, PREF_NODEJS_PATH, defaultPaths, defaultPaths, false);
+		installedComboBox = newComboControl(parent, getInstalledTypescriptPathKey(), DEFAULT_PATHS, DEFAULT_PATHS,
+				false);
 		installedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Create Browse buttons.
 		createBrowseButtons(parent, installedComboBox);
-
 	}
 
 	protected void createBrowseButtons(final Composite parent, final Combo filePathCombo) {
@@ -187,7 +158,7 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 		browseFileSystemButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog dialog = new FileDialog(parent.getShell());
+				DirectoryDialog dialog = new DirectoryDialog(parent.getShell());
 				dialog.setFilterPath(filePathCombo.getText());
 				String result = dialog.open();
 				if (!StringUtils.isEmpty(result)) {
@@ -203,7 +174,7 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				WorkspaceResourceSelectionDialog dialog = new WorkspaceResourceSelectionDialog(parent.getShell(),
-						Mode.FILE);
+						Mode.FILE_FOLDER);
 				IResource initialResource = TypeScriptCorePlugin.getTypeScriptRepositoryManager()
 						.getResource(filePathCombo.getText(), getProject());
 				if (initialResource != null) {
@@ -214,13 +185,12 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 					filePathCombo.setText(TypeScriptCorePlugin.getTypeScriptRepositoryManager()
 							.generateFileName(resource, getProject()));
 				}
-
 			}
 		});
 	}
 
 	private void updateComboBoxes() {
-		boolean embedded = useEmbedNodeJs.getSelection();
+		boolean embedded = useEmbedded.getSelection();
 		embeddedComboBox.setEnabled(embedded);
 		installedComboBox.setEnabled(!embedded);
 		browseFileSystemButton.setEnabled(!embedded);
@@ -241,5 +211,32 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		return null;
 	}
+
+	public void enablePreferenceContent(boolean enable) {
+		if (controlsComposite != null && !controlsComposite.isDisposed()) {
+			if (enable) {
+				if (blockEnableState != null) {
+					blockEnableState.restore();
+					blockEnableState = null;
+				}
+			} else {
+				if (blockEnableState == null) {
+					blockEnableState = ControlEnableState.disable(controlsComposite);
+				}
+			}
+		}
+	}
+
+	protected abstract String getTypeScriptGroupLabel();
+
+	protected abstract String getEmbeddedCheckboxLabel();
+
+	protected abstract String getInstalledCheckboxLabel();
+
+	protected abstract Key getUseEmbeddedTypescriptKey();
+
+	protected abstract Key getEmbeddedTypescriptKey();
+
+	protected abstract Key getInstalledTypescriptPathKey();
 
 }

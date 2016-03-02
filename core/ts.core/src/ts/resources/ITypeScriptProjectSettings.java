@@ -12,6 +12,8 @@ package ts.resources;
 
 import java.io.File;
 
+import ts.TypeScriptException;
+
 /**
  * TypeScript project settings API.
  *
@@ -30,20 +32,26 @@ public interface ITypeScriptProjectSettings {
 	 * 
 	 * @return the node.js install path.
 	 */
-	File getNodejsInstallPath();
+	File getNodejsInstallPath() throws TypeScriptException;
 
 	/**
 	 * Returns the typescript/bin/tsc file to execute.
 	 * 
 	 * @return the typescript/bin/tsc file to execute.
 	 */
-	File getTscFile();
+	File getTscFile() throws TypeScriptException;
 
 	/**
 	 * Returns the typescript/bin/tsserver file to execute.
 	 * 
 	 * @return the typescript/bin/tsserver file to execute.
+	 * @throws TypeScriptException
 	 */
-	File getTsserverFile();
+	File getTsserverFile() throws TypeScriptException;
+
+	/**
+	 * Dispose the settings.
+	 */
+	void dispose();
 
 }

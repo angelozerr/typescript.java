@@ -2,8 +2,6 @@ package ts.internal.repository;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
@@ -13,7 +11,6 @@ import ts.repository.TypeScriptRepositoryException;
 import ts.repository.TypeScriptRepositoryManager;
 import ts.utils.FileUtils;
 import ts.utils.IOUtils;
-import ts.utils.JsonHelper;
 
 /**
  *
@@ -41,16 +38,16 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 
 	private void updateBaseDir(File baseDir) throws TypeScriptRepositoryException {
 		this.typesScriptDir = baseDir;
-		this.tsserverFile = getTsserverFile(typesScriptDir);
+		this.tsserverFile = TypeScriptRepositoryManager.getTsserverFile(typesScriptDir);
 		if (!tsserverFile.exists()) {
 			this.typesScriptDir = new File(baseDir, "node_modules/typescript");
-			this.tsserverFile = getTsserverFile(typesScriptDir);
+			this.tsserverFile = TypeScriptRepositoryManager.getTsserverFile(typesScriptDir);
 		}
 		if (!tsserverFile.exists()) {
 			throw new TypeScriptRepositoryException(FileUtils.getPath(typesScriptDir)
 					+ " is not a valid TypeScript repository. Check the directory contains node_modules/typescript/bin/tsserver or bin/tsserver.");
 		}
-		this.tscFile = getTscFile(typesScriptDir);
+		this.tscFile = TypeScriptRepositoryManager.getTscFile(typesScriptDir);
 		this.setName(generateName());
 	}
 
@@ -67,14 +64,6 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 		}
 		name.append(")");
 		return name.toString();
-	}
-
-	private File getTsserverFile(File typesScriptDir) {
-		return new File(typesScriptDir, "bin/tsserver");
-	}
-
-	private File getTscFile(File typesScriptDir) {
-		return new File(typesScriptDir, "bin/tsc");
 	}
 
 	@Override

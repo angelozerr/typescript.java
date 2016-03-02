@@ -15,11 +15,19 @@ import java.util.ResourceBundle;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * TypeScript UI messages.
+ *
+ */
 public class TypeScriptUIMessages extends NLS {
 
 	private static final String BUNDLE_NAME = "ts.eclipse.ide.internal.ui.TypeScriptUIMessages"; //$NON-NLS-1$
 
 	private static ResourceBundle fResourceBundle;
+
+	// Buttons
+	public static String Browse_FileSystem_button;
+	public static String Browse_Workspace_button;
 
 	// Errors
 	public static String TypeScriptUIPlugin_internal_error;
@@ -43,6 +51,14 @@ public class TypeScriptUIMessages extends NLS {
 	public static String NodejsConfigurationBlock_nodejs_group_label;
 	public static String NodejsConfigurationBlock_embedded_checkbox_label;
 	public static String NodejsConfigurationBlock_installed_checkbox_label;
+
+	public static String ServerConfigurationBlock_typescript_group_label;
+	public static String ServerConfigurationBlock_embedded_checkbox_label;
+	public static String ServerConfigurationBlock_installed_checkbox_label;
+
+	public static String CompilerConfigurationBlock_typescript_group_label;
+	public static String CompilerConfigurationBlock_embedded_checkbox_label;
+	public static String CompilerConfigurationBlock_installed_checkbox_label;
 
 	public static ResourceBundle getResourceBundle() {
 		try {

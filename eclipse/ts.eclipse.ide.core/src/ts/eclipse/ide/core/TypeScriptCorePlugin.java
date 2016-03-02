@@ -26,11 +26,11 @@ import org.osgi.framework.BundleContext;
 
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
+import ts.eclipse.ide.core.repository.IIDETypeScriptRepositoryManager;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.core.nodejs.NodejsInstallManager;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
-import ts.repository.ITypeScriptRepositoryManager;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
 import ts.resources.TypeScriptResourcesManager;
 
@@ -194,7 +194,7 @@ public class TypeScriptCorePlugin extends Plugin {
 		return NodejsInstallManager.getManager();
 	}
 
-	public static ITypeScriptRepositoryManager getTypeScriptRepositoryManager() {
+	public static IIDETypeScriptRepositoryManager getTypeScriptRepositoryManager() {
 		return IDETypeScriptRepositoryManager.INSTANCE;
 	}
 }

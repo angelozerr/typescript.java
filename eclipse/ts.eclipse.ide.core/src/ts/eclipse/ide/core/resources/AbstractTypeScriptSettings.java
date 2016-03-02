@@ -10,10 +10,11 @@
  */
 package ts.eclipse.ide.core.resources;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
  * Abstract class for TypeScript settings which search preferences from the
@@ -21,14 +22,19 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
  * Preferences.
  *
  */
-public class AbstractTypeScriptSettings {
+public abstract class AbstractTypeScriptSettings implements IPreferenceChangeListener {
 
+	private final IIDETypeScriptProject tsProject;
 	private final ProjectScope projectScope;
 	private final String pluginId;
 
-	public AbstractTypeScriptSettings(IProject project, String pluginId) {
-		this.projectScope = new ProjectScope(project);
+	public AbstractTypeScriptSettings(IIDETypeScriptProject tsProject, String pluginId) {
+		this.tsProject = tsProject;
+		this.projectScope = new ProjectScope(tsProject.getProject());
 		this.pluginId = pluginId;
+		getProjectPreferences().addPreferenceChangeListener(this);
+		getWorkspacePreferences().addPreferenceChangeListener(this);
+		InstanceScope.INSTANCE.getNode(pluginId).addPreferenceChangeListener(this);
 	}
 
 	public String getStringPreferencesValue(String key, String def) {
@@ -85,12 +91,23 @@ public class AbstractTypeScriptSettings {
 	protected IEclipsePreferences getProjectPreferences() {
 		return projectScope.getNode(pluginId);
 	}
-	
+
 	protected IEclipsePreferences getWorkspacePreferences() {
 		return getWorkspacePreferences(pluginId);
+	}
+
+	public void dispose() {
+		getProjectPreferences().removePreferenceChangeListener(this);
+		getWorkspacePreferences().removePreferenceChangeListener(this);
+		InstanceScope.INSTANCE.getNode(pluginId).removePreferenceChangeListener(this);
+	}
+
+	public IIDETypeScriptProject getTypeScriptProject() {
+		return tsProject;
 	}
 
 	public static IEclipsePreferences getWorkspacePreferences(String pluginId) {
 		return DefaultScope.INSTANCE.getNode(pluginId);
 	}
+
 }

@@ -11,10 +11,11 @@ import java.util.List;
 
 import ts.TypeScriptException;
 import ts.client.protocol.Request;
+import ts.utils.FileUtils;
 
 public class NodejsProcess extends AbstractNodejsProcess {
 
-	private final File tsserverFile;
+	private final File tsFile;
 
 	/**
 	 * node.js process.
@@ -33,9 +34,31 @@ public class NodejsProcess extends AbstractNodejsProcess {
 
 	private PrintStream out;
 
-	public NodejsProcess(File projectDir, File tsserverFile, File nodejsFile, INodejsLaunchConfiguration configuration) throws TypeScriptException {
+	public NodejsProcess(File projectDir, File tsFile, File nodejsFile, INodejsLaunchConfiguration configuration,
+			String fileType) throws TypeScriptException {
 		super(nodejsFile, projectDir, configuration);
-		this.tsserverFile = tsserverFile;
+		this.tsFile = checkFile(tsFile, fileType);
+	}
+
+	/**
+	 * Check if the given tsserver, tsc, etc file is a valid file.
+	 * 
+	 * @param tsFile
+	 *            the tsserver, tsc, etc file to check.
+	 * @return the tsFile
+	 * @throws TypeScriptException
+	 */
+	private static File checkFile(File tsFile, String fileType) throws TypeScriptException {
+		if (tsFile == null) {
+			throw new TypeScriptException("[" + fileType + "] file cannot be null");
+		}
+		if (!tsFile.exists()) {
+			throw new TypeScriptException("Cannot find [" + fileType + "] file " + FileUtils.getPath(tsFile));
+		}
+		if (!tsFile.isFile()) {
+			throw new TypeScriptException("[" + fileType + "] " + FileUtils.getPath(tsFile) + " is not a file.");
+		}
+		return tsFile;
 	}
 
 	/**
@@ -156,9 +179,9 @@ public class NodejsProcess extends AbstractNodejsProcess {
 			commands.add(nodejsFile.getPath());
 		}
 		try {
-			commands.add(tsserverFile.getCanonicalPath());
+			commands.add(tsFile.getCanonicalPath());
 		} catch (IOException e) {
-			commands.add(tsserverFile.getPath());
+			commands.add(tsFile.getPath());
 		}
 		List<String> args = createNodeArgs();
 		if (args != null) {

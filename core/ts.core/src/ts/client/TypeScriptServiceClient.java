@@ -62,6 +62,7 @@ import ts.utils.JsonHelper;
  */
 public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
+	private static final String TSSERVER_FILE_TYPE = "tsserver";
 	private boolean dispose;
 	private final List<ITypeScriptClientListener> listeners;
 	private ReentrantReadWriteLock stateLock = new ReentrantReadWriteLock();
@@ -100,8 +101,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	};
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
-		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile,
-				new INodejsLaunchConfiguration() {
+		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile,
+				nodeFile, new INodejsLaunchConfiguration() {
 
 					@Override
 					public List<String> createNodeArgs() {
@@ -110,7 +111,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 						args.add(FileUtils.getPath(projectDir));
 						return args;
 					}
-				}));
+				}, TSSERVER_FILE_TYPE));
 	}
 
 	public TypeScriptServiceClient(File projectDir, INodejsProcess process) {

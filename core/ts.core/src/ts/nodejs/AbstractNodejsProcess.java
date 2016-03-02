@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ts.TypeScriptException;
+import ts.utils.FileUtils;
 
 public abstract class AbstractNodejsProcess implements INodejsProcess {
 
@@ -43,11 +44,31 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 	 */
 	public AbstractNodejsProcess(File nodejsFile, File projectDir, INodejsLaunchConfiguration launchConfiguration)
 			throws TypeScriptException {
-		this.projectDir = projectDir;
-		this.nodejsFile = nodejsFile;
+		this.projectDir = checkProjectDir(projectDir);
+		this.nodejsFile = checkNodejsFile(nodejsFile);
 		this.listeners = new ArrayList<INodejsProcessListener>();
 		this.hasError = false;
 		this.launchConfiguration = launchConfiguration;
+	}
+
+	private File checkProjectDir(File projectDir) throws TypeScriptException {
+		if (projectDir == null) {
+			throw new TypeScriptException("project directory cannot be null");
+		}
+		if (!projectDir.exists()) {
+			throw new TypeScriptException("Cannot find project directory " + FileUtils.getPath(projectDir));
+		}
+		return projectDir;
+	}
+
+	private File checkNodejsFile(File nodejsFile) throws TypeScriptException {
+		if (nodejsFile == null) {
+			throw new TypeScriptException("node file cannot be null");
+		}
+		if (!nodejsFile.exists()) {
+			throw new TypeScriptException("Cannot find node file " + FileUtils.getPath(nodejsFile));
+		}
+		return nodejsFile;
 	}
 
 	protected List<String> createNodeArgs() {

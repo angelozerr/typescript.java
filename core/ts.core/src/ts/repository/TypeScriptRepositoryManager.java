@@ -52,4 +52,18 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 		return repositories.values().toArray(new ITypeScriptRepository[repositories.size()]);
 	}
 
+	public static File getTsserverFile(File typesScriptDir) {
+		if (typesScriptDir.getName().equals("tsserver")) {
+			return typesScriptDir;
+		}
+		return new File(typesScriptDir, "bin/tsserver");
+	}
+
+	public static File getTscFile(File typesScriptDir) {
+		if (typesScriptDir.getName().equals("tsc")) {
+			return typesScriptDir;
+		}
+		return new File(typesScriptDir, "bin/tsc");
+	}
+
 }
