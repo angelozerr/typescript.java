@@ -20,7 +20,34 @@
 			scope="total"
 			class="ts.eclipse.ide.validator.internal.ui.validation.TypeScriptSourceValidator"
 			id="ts.eclipse.ide.validator.ui.validation.TypeScriptSourceValidator">
+			<contentTypeIdentifier id="org.eclipse.wst.jsdt.core.jsSource">
+				<partitionType id="___java_partitioning"/>
+				<partitionType id="__java_singleline_comment"/>
+				<partitionType id="__java_multiline_comment"/>
+				<partitionType id="__java_javadoc"/>
+				<partitionType id="__java_string"/>
+				<partitionType id="__java_character"/>				
+			    <partitionType id="__dftl_partition_content_type"/>
+			</contentTypeIdentifier>
 			<contentTypeIdentifier id="ts.eclipse.ide.jsdt.core.tsSource">
+				<partitionType id="___java_partitioning"/>
+				<partitionType id="__java_singleline_comment"/>
+				<partitionType id="__java_multiline_comment"/>
+				<partitionType id="__java_javadoc"/>
+				<partitionType id="__java_string"/>
+				<partitionType id="__java_character"/>				
+			    <partitionType id="__dftl_partition_content_type"/>
+			</contentTypeIdentifier>
+			<contentTypeIdentifier id="ts.eclipse.ide.jsdt.core.jsxSource">
+				<partitionType id="___java_partitioning"/>
+				<partitionType id="__java_singleline_comment"/>
+				<partitionType id="__java_multiline_comment"/>
+				<partitionType id="__java_javadoc"/>
+				<partitionType id="__java_string"/>
+				<partitionType id="__java_character"/>				
+			    <partitionType id="__dftl_partition_content_type"/>
+			</contentTypeIdentifier>			
+			<contentTypeIdentifier id="ts.eclipse.ide.jsdt.core.tsxSource">
 				<partitionType id="___java_partitioning"/>
 				<partitionType id="__java_singleline_comment"/>
 				<partitionType id="__java_multiline_comment"/>

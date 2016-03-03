@@ -21,7 +21,10 @@ public class FileUtils {
 	/**
 	 * Extension file
 	 */
+	public static final String JS_EXTENSION = "js";
 	public static final String TS_EXTENSION = "ts";
+	public static final String JSX_EXTENSION = "jsx";
+	public static final String TSX_EXTENSION = "tsx";
 
 	public static String getFileExtension(String fileName) {
 		int index = fileName.lastIndexOf('.');

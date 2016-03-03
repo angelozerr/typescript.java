@@ -38,15 +38,30 @@
             version="3"
             markerId="ts.eclipse.ide.validator.core.validationMarker">
 		<include>
-            <rules>            
+            <rules>
+              <contentType id="org.eclipse.wst.jsdt.core.jsSource"></contentType>                        
               <contentType id="ts.eclipse.ide.jsdt.core.tsSource"></contentType>
+              <contentType id="ts.eclipse.ide.jsdt.core.jsxSource"></contentType>
+              <contentType id="ts.eclipse.ide.jsdt.core.tsxSource"></contentType>
               <!--<contentType id="org.eclipse.wst.html.core.htmlsource"></contentType>
                <contentType id="org.eclipse.jst.jsp.core.jspsource"></contentType>
                -->
                <fileext
                      caseSensitive="false"
+                     ext="js">
+               </fileext>
+               <fileext
+                     caseSensitive="false"
                      ext="ts">
                </fileext>
+               <fileext
+                     caseSensitive="false"
+                     ext="jsx">
+               </fileext>
+               <fileext
+                     caseSensitive="false"
+                     ext="tsx">
+               </fileext>                                             
                <!--<fileext
                      caseSensitive="false"
                      ext="html">

@@ -20,6 +20,7 @@ import org.eclipse.wst.sse.ui.internal.reconcile.DocumentRegionProcessor;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.resources.ITypeScriptFile;
+import ts.utils.FileUtils;
 
 /**
  * Extends SSE {@link DocumentRegionProcessor} to be able to validate JSDT
@@ -30,10 +31,20 @@ import ts.resources.ITypeScriptFile;
  */
 public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 
+	private final String contentType;
 	private final IResource resource;
 
 	public TypeScriptDocumentRegionProcessor(IResource resource) {
+		this.contentType = getContentType(resource);
 		this.resource = resource;
+	}
+
+	private String getContentType(IResource resource) {
+		String extension = resource.getFileExtension();
+		if (FileUtils.JS_EXTENSION.equals(extension)) {
+			return "org.eclipse.wst.jsdt.core.jsSource";
+		}
+		return new StringBuilder("ts.eclipse.ide.jsdt.core.").append(extension).append("Source").toString();
 	}
 
 	@Override
@@ -49,7 +60,7 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 
 	@Override
 	protected String getContentType(IDocument doc) {
-		return "ts.eclipse.ide.jsdt.core.tsSource";
+		return contentType;
 	}
 
 	@Override

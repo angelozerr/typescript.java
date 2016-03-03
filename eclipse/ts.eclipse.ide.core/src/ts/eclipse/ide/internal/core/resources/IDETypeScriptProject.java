@@ -111,10 +111,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 							.getConnector(client);
 					if (connector != null) {
 						if (isTraceOnConsole()) {
-							// connect the tern server to the eclipse console.
+							// connect the tsserver to the eclipse console.
 							connector.connectToConsole(client, this);
 						} else {
-							// disconnect the tern server to the eclipse
+							// disconnect the tsserver to the eclipse
 							// console.
 							connector.disconnectToConsole(client, this);
 						}
