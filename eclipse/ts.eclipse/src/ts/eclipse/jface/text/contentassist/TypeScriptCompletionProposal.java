@@ -33,6 +33,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 	private int cursorPosition;
 	private int replacementOffset;
 	private int replacementlength;
+	private boolean contextInformationComputed;
 	private IContextInformation contextInformation;
 	private boolean fToggleEating;
 
@@ -42,6 +43,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 		this.cursorPosition = name.length();
 		this.replacementOffset = position - prefix.length();
 		setReplacementLength(prefix.length());
+		this.contextInformationComputed = false;
 	}
 
 	public void setReplacementLength(int replacementlength) {
@@ -122,16 +124,23 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 
 	@Override
 	public IContextInformation getContextInformation() {
-		if (contextInformation != null) {
+		if (contextInformationComputed) {
 			return contextInformation;
 		}
+		this.contextInformation = createContextInformation();
+		contextInformationComputed = true;
+		return contextInformation;
+	}
+
+	private IContextInformation createContextInformation() {
 		try {
 			ICompletionEntryDetails details = getEntryDetails();
-			List<SymbolDisplayPart> parts = details.getDisplayParts();
-			if (parts.size() > 0) {
-				contextInformation = new ContextInformation("", TypeScriptHelper.html(parts));
+			if (details != null) {
+				List<SymbolDisplayPart> parts = details.getDisplayParts();
+				if (parts != null && parts.size() > 0) {
+					return new ContextInformation("", TypeScriptHelper.html(parts));
+				}
 			}
-			return contextInformation;
 		} catch (TypeScriptException e) {
 			e.printStackTrace();
 		}
