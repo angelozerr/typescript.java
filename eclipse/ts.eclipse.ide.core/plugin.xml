@@ -38,7 +38,7 @@
 			class="ts.eclipse.ide.internal.core.preferences.TypeScriptCorePreferenceInitializer" />
 	</extension>
 			
-	<!-- Builder to compile TypeScript -> JaavScript with tsc -->			
+	<!-- Builder to compile TypeScript -> JavaScript with tsc -->			
    <extension
          id="typeScriptBuilder"
          name="%TypeScriptBuilder.name"
