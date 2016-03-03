@@ -23,6 +23,24 @@
 	</content-type>
   </extension>
   		
+  <extension point="org.eclipse.core.runtime.contentTypes">
+	<content-type 
+		id="jsxSource"
+		name="%jsxSourceName"
+		base-type="org.eclipse.wst.jsdt.core.jsSource"
+		file-extensions="jsx">
+	</content-type>
+  </extension>
+
+  <extension point="org.eclipse.core.runtime.contentTypes">
+	<content-type 
+		id="tsxSource"
+		name="%tsxSourceName"
+		base-type="org.eclipse.wst.jsdt.core.jsSource"
+		file-extensions="tsx">
+	</content-type>
+  </extension>
+      		
   <!--<extension
        point="org.eclipse.core.runtime.adapters">
     <factory
