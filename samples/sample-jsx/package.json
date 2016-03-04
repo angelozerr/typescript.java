@@ -1,0 +1,10 @@
+{
+  "name": "angular2-basics",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "react": "^0.14.7",
+    "react-global": "^0.1.8",
+    "react-native": "^0.21.0"
+  }
+}
