@@ -43,7 +43,7 @@ public class TypeScriptSourceValidator implements IValidator, ISourceValidator {
 		// ReconcileStepForValidator#getFile())
 		// and JSDT JavaScript Editor doesn't manage IStructuredModel
 		IFile file = EditorUtils.getFile(document);
-		if (file == null || !TypeScriptCorePlugin.hasTypeScriptNature(file.getProject())) {
+		if (file == null || !TypeScriptCorePlugin.canConsumeTsserver(file)) {
 			return;
 		}
 

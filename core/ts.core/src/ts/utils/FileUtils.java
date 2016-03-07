@@ -26,6 +26,12 @@ public class FileUtils {
 	public static final String JSX_EXTENSION = "jsx";
 	public static final String TSX_EXTENSION = "tsx";
 
+	/**
+	 * Configuration file
+	 */
+	public static final String TSCONFIG_JSON = "tsconfig.json";
+	public static final String JSCONFIG_JSON = "jsconfig.json";
+
 	public static String getFileExtension(String fileName) {
 		int index = fileName.lastIndexOf('.');
 		if (index == -1)

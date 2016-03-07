@@ -43,9 +43,9 @@ public class TypeScriptHover extends AbstractTypeScriptHover {
 		if (scriptFile == null) {
 			return null;
 		}
-		IProject project = scriptFile.getProject();
-		if (TypeScriptCorePlugin.hasTypeScriptNature(project)) {
+		if (TypeScriptCorePlugin.canConsumeTsserver(scriptFile)) {
 			try {
+				IProject project = scriptFile.getProject();
 				tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
 				int position = hoverRegion.getOffset();
 				ITypeScriptFile tsFile = tsProject.openFile(scriptFile, textViewer.getDocument());

@@ -10,41 +10,60 @@
  */
 package ts.eclipse.ide.internal.ui.preferences;
 
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.ComboFieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
+import ts.eclipse.ide.core.resources.UseSalsa;
+import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.ImageResource;
 
 /**
  * TypeScript Main page for global preferences.
  * 
  */
-public class TypeScriptMainPreferencePage extends PreferencePage implements
-		IWorkbenchPreferencePage {
+public class TypeScriptMainPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	public static final String PROP_ID = "ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage";
 
 	public TypeScriptMainPreferencePage() {
-		setImageDescriptor(ImageResource
-				.getImageDescriptor(ImageResource.IMG_LOGO));
+		setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_LOGO));
 	}
 
-	protected Control createContents(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayoutData(new GridData(4, 4, true, true));
-		composite.setLayout(new GridLayout());
-		return composite;
+	@Override
+	protected void createFieldEditors() {
+
+		String[][] uses = new String[3][2];
+		uses[0][0] = TypeScriptUIMessages.TypeScriptMainPreferencePage_useSalsa_Never;
+		uses[0][1] = UseSalsa.Never.name();
+		uses[1][0] = TypeScriptUIMessages.TypeScriptMainPreferencePage_useSalsa_EveryTime;
+		uses[1][1] = UseSalsa.EveryTime.name();
+		uses[2][0] = TypeScriptUIMessages.TypeScriptMainPreferencePage_useSalsa_WhenNoJSDTNature;
+		uses[2][1] = UseSalsa.WhenNoJSDTNature.name();
+
+		ComboFieldEditor ternServerEditor = new ComboFieldEditor(
+				TypeScriptCorePreferenceConstants.USE_SALSA_AS_JS_INFERENCE,
+				TypeScriptUIMessages.TypeScriptMainPreferencePage_useSalsa, uses, getFieldEditorParent());
+		addField(ternServerEditor);
 	}
 
 	@Override
 	public void init(IWorkbench workbench) {
-		
+
+	}
+
+	@Override
+	protected IPreferenceStore doGetPreferenceStore() {
+		IScopeContext scope = DefaultScope.INSTANCE;
+		return new ScopedPreferenceStore(scope, TypeScriptCorePlugin.PLUGIN_ID);
 	}
 
 }

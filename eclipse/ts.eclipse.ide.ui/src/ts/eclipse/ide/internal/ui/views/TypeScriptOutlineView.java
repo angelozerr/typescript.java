@@ -51,11 +51,11 @@ public class TypeScriptOutlineView extends ContentOutline {
 		if (part != null && part instanceof IEditorPart) {
 			IFile file = EditorUtils.getFile((IEditorPart) part);
 			if (file != null && TypeScriptResourcesManager.isTSFile(file)) {
-				IProject project = file.getProject();
-				if (TypeScriptCorePlugin.hasTypeScriptNature(project)) {
+				if (TypeScriptCorePlugin.canConsumeTsserver(file)) {
 					IDocument document = EditorUtils.getDocument(file);
 					if (document != null) {
 						try {
+							IProject project = file.getProject();
 							IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
 							IIDETypeScriptFile tsFile = tsProject.openFile(file, document);
 							return new TypeScriptContentOutlinePage(tsFile);

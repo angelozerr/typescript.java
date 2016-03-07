@@ -23,6 +23,7 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.repository.ITypeScriptRepository;
+import ts.resources.ITypeScriptProject;
 import ts.resources.SynchStrategy;
 import ts.utils.StringUtils;
 
@@ -32,8 +33,11 @@ import ts.utils.StringUtils;
  */
 public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings implements IIDETypeScriptProjectSettings {
 
+	private final IIDETypeScriptProject tsProject;
+
 	public IDETypeScriptProjectSettings(IIDETypeScriptProject tsProject) {
-		super(tsProject, TypeScriptCorePlugin.PLUGIN_ID);
+		super(tsProject.getProject(), TypeScriptCorePlugin.PLUGIN_ID);
+		this.tsProject = tsProject;
 	}
 
 	/**
@@ -109,7 +113,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	private File resolvePath(String path) {
 		if (!StringUtils.isEmpty(path)) {
 			IPath p = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getPath(path,
-					getTypeScriptProject().getProject());
+					super.getProject());
 			return p != null ? p.toFile() : new File(path);
 		}
 		return null;
@@ -154,4 +158,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 				|| TypeScriptCorePreferenceConstants.TSC_INSTALLED_TYPESCRIPT_PATH.equals(event.getKey());
 	}
 
+	private ITypeScriptProject getTypeScriptProject() {
+		return tsProject;
+	}
 }

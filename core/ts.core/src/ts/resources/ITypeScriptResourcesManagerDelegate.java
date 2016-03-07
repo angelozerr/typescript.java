@@ -26,6 +26,15 @@ public interface ITypeScriptResourcesManagerDelegate {
 	 * @return true if the given file object is a TypeScript file and false
 	 *         otherwise.
 	 */
-	boolean isTSFile(Object fileObject);
+	boolean isTsFile(Object fileObject);
 
+	/**
+	 * Returns true if the given file object is a JavaScript file and false
+	 * otherwise.
+	 * 
+	 * @param fileObject
+	 * @return true if the given file object is a JavaScript file and false
+	 *         otherwise.
+	 */
+	boolean isJsFile(Object fileObject);
 }

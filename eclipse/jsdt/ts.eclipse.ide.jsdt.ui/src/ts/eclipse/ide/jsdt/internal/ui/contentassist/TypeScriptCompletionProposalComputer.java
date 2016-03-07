@@ -28,6 +28,8 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.jface.text.contentassist.CompletionProposalCollector;
 import ts.resources.ITypeScriptFile;
+import ts.resources.TypeScriptResourcesManager;
+import ts.utils.FileUtils;
 
 /**
  * JSDT completion proposal computer manage completion Proposal for Javascript
@@ -42,20 +44,23 @@ public class TypeScriptCompletionProposalComputer
 		if (context instanceof JavaContentAssistInvocationContext) {
 			try {
 				JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-				IProject project = javaContext.getProject().getProject();
-				IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
-				if (tsProject != null) {
+				IResource resource = javaContext.getCompilationUnit().getResource();
+				if (TypeScriptCorePlugin.canConsumeTsserver(resource)) {
+					IProject project = resource.getProject();
+					IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
+					if (tsProject != null) {
 
-					int position = javaContext.getInvocationOffset();
-					IResource resource = javaContext.getCompilationUnit().getResource();
-					IDocument document = javaContext.getDocument();
-					ITypeScriptFile tsFile = tsProject.openFile(resource, document);
-					CharSequence prefix = javaContext.computeIdentifierPrefix();
+						int position = javaContext.getInvocationOffset();
 
-					CompletionProposalCollector collector = new CompletionProposalCollector(position,
-							prefix != null ? prefix.toString() : null);
-					tsFile.completions(position, collector);
-					return collector.getProposals();
+						IDocument document = javaContext.getDocument();
+						ITypeScriptFile tsFile = tsProject.openFile(resource, document);
+						CharSequence prefix = javaContext.computeIdentifierPrefix();
+
+						CompletionProposalCollector collector = new CompletionProposalCollector(position,
+								prefix != null ? prefix.toString() : null);
+						tsFile.completions(position, collector);
+						return collector.getProposals();
+					}
 				}
 			} catch (Exception e) {
 				Trace.trace(Trace.SEVERE, "Error while TypeScript completion", e);

@@ -10,8 +10,8 @@
  */
 package ts.eclipse.ide.core.resources;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -24,13 +24,13 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
  */
 public abstract class AbstractTypeScriptSettings implements IPreferenceChangeListener {
 
-	private final IIDETypeScriptProject tsProject;
+	private final IProject project;
 	private final ProjectScope projectScope;
 	private final String pluginId;
 
-	public AbstractTypeScriptSettings(IIDETypeScriptProject tsProject, String pluginId) {
-		this.tsProject = tsProject;
-		this.projectScope = new ProjectScope(tsProject.getProject());
+	public AbstractTypeScriptSettings(IProject project, String pluginId) {
+		this.project = project;
+		this.projectScope = new ProjectScope(project);
 		this.pluginId = pluginId;
 		getProjectPreferences().addPreferenceChangeListener(this);
 		getWorkspacePreferences().addPreferenceChangeListener(this);
@@ -93,7 +93,7 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 	}
 
 	protected IEclipsePreferences getWorkspacePreferences() {
-		return getWorkspacePreferences(pluginId);
+		return TypeScriptSettingsHelper.getWorkspacePreferences(pluginId);
 	}
 
 	public void dispose() {
@@ -102,12 +102,7 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 		InstanceScope.INSTANCE.getNode(pluginId).removePreferenceChangeListener(this);
 	}
 
-	public IIDETypeScriptProject getTypeScriptProject() {
-		return tsProject;
+	public IProject getProject() {
+		return project;
 	}
-
-	public static IEclipsePreferences getWorkspacePreferences(String pluginId) {
-		return DefaultScope.INSTANCE.getNode(pluginId);
-	}
-
 }

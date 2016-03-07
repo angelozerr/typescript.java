@@ -22,8 +22,9 @@ import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
+import ts.eclipse.ide.core.resources.TypeScriptSettingsHelper;
+import ts.eclipse.ide.core.resources.UseSalsa;
 import ts.eclipse.ide.internal.core.Trace;
-import ts.eclipse.ide.internal.core.resources.IDETypeScriptProjectSettings;
 import ts.repository.ITypeScriptRepository;
 
 /**
@@ -34,7 +35,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = IDETypeScriptProjectSettings.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
+		IEclipsePreferences node = TypeScriptSettingsHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
 
 		// initialize properties for direct access of node.js server (start an
 		// internal process)
@@ -52,6 +53,16 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while getting the default TypeScript repository", e);
 		}
+
+		// initialize Salsa (use TypeScript Language Service for JavaSCript
+		// files)
+		initializeSalsa(node);
+
+		// Initialize default path for TypeScript/Salsa nature
+		// node.put(TypeScriptCorePreferenceConstants.NATURE_TYPESCRIPT_PATHS,
+		// TypeScriptCorePreferenceConstants.DEFAULT_NATURE_TYPESCRIPT_PATHS);
+		// node.put(TypeScriptCorePreferenceConstants.NATURE_SALSA_PATHS,
+		// TypeScriptCorePreferenceConstants.DEFAULT_NATURE_SALSA_PATHS);
 	}
 
 	/**
@@ -93,6 +104,10 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_USE_EMBEDDED_TYPESCRIPT, true);
 		node.put(TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH, "");
 		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE, false);
+	}
+
+	private void initializeSalsa(IEclipsePreferences node) {
+		node.put(TypeScriptCorePreferenceConstants.USE_SALSA_AS_JS_INFERENCE, UseSalsa.WhenNoJSDTNature.name());
 	}
 
 }

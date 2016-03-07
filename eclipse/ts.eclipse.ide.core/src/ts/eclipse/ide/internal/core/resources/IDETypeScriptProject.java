@@ -58,10 +58,6 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		return project;
 	}
 
-	public static boolean hasTypeScriptNature(IProject project) {
-		return true;
-	}
-
 	public static IDETypeScriptProject getTypeScriptProject(IProject project) throws CoreException {
 		return (IDETypeScriptProject) project.getSessionProperty(TYPESCRIPT_PROJECT);
 	}

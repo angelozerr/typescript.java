@@ -24,7 +24,10 @@ public class ConfigurableTypeScriptResourcesManager {
 	}
 
 	public boolean isTSFile(Object fileObject) {
-		return typeScriptResourcesManagerDelegate.isTSFile(fileObject);
+		return typeScriptResourcesManagerDelegate.isTsFile(fileObject);
 	}
-	
+
+	public boolean isJavaScriptFile(Object fileObject) {
+		return typeScriptResourcesManagerDelegate.isJsFile(fileObject);
+	}
 }

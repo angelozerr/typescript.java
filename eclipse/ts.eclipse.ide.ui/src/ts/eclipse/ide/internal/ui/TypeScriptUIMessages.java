@@ -44,6 +44,11 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptHover_openDeclaration;
 
 	// Preferences
+	public static String TypeScriptMainPreferencePage_useSalsa;
+	public static String TypeScriptMainPreferencePage_useSalsa_Never;
+	public static String TypeScriptMainPreferencePage_useSalsa_EveryTime;
+	public static String TypeScriptMainPreferencePage_useSalsa_WhenNoJSDTNature;
+			
 	public static String PropertyAndPreferencePage_useprojectsettings_label;
 	public static String PropertyAndPreferencePage_useworkspacesettings_change;
 	public static String PropertyAndPreferencePage_showprojectspecificsettings_label;

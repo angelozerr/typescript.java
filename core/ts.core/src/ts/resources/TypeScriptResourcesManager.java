@@ -66,4 +66,8 @@ public class TypeScriptResourcesManager {
 	public static boolean isTSFile(Object fileObject) {
 		return INSTANCE.isTSFile(fileObject);
 	}
+	
+	public static boolean isJavaScriptFile(Object fileObject) {
+		return INSTANCE.isTSFile(fileObject);
+	}
 }

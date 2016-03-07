@@ -40,7 +40,6 @@ public class TypeScriptNatureTester extends PropertyTester {
 				return TypeScriptCorePlugin.hasTypeScriptNature(project);
 			}
 		}
-
 		return false;
 	}
 

@@ -11,15 +11,10 @@
 package ts.eclipse.ide.jsdt.internal.ui.validation;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.wst.sse.ui.internal.reconcile.DocumentRegionProcessor;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.resources.ITypeScriptFile;
 import ts.utils.FileUtils;
 
 /**
@@ -32,11 +27,9 @@ import ts.utils.FileUtils;
 public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 
 	private final String contentType;
-	private final IResource resource;
 
 	public TypeScriptDocumentRegionProcessor(IResource resource) {
 		this.contentType = getContentType(resource);
-		this.resource = resource;
 	}
 
 	private String getContentType(IResource resource) {
@@ -61,24 +54,6 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 	@Override
 	protected String getContentType(IDocument doc) {
 		return contentType;
-	}
-
-	@Override
-	protected void process(DirtyRegion dirtyRegion) {
-		super.process(dirtyRegion);
-		try {
-			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(resource.getProject());
-			if (tsProject != null) {
-				ITypeScriptFile tsFile = tsProject.openFile(resource, getDocument());
-				int start = dirtyRegion.getOffset();
-				int end = start + dirtyRegion.getLength() - 1;
-				String newText = dirtyRegion.getText();
-				// It doesn't works, why?
-				// tsProject.changeFile(tsFile, start, end, newText);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 }

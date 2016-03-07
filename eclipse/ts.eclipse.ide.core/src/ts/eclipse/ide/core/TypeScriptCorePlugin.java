@@ -16,6 +16,7 @@ import java.io.IOException;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
@@ -73,12 +74,7 @@ public class TypeScriptCorePlugin extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		// TSServerTypeManager.getManager().destroy();
-		// TSNatureAdaptersManager.getManager().destroy();
-		// TSFileConfigurationManager.getManager().destroy();
-		// IDETSProjectSynchronizer.getInstance().dispose();
-		// TSModuleInstallManager.getManager().destroy();
-		// TSRepositoryManager.getManager().dispose();
+		IDEResourcesManager.getInstance().dispose();
 
 		plugin = null;
 		super.stop(context);
@@ -94,7 +90,15 @@ public class TypeScriptCorePlugin extends Plugin {
 	 *         false otherwise.
 	 */
 	public static boolean hasTypeScriptNature(IProject project) {
-		return true; // return IDETSProject.hasTypeScriptNature(project);
+		return IDEResourcesManager.getInstance().hasTypeScriptNature(project);
+	}
+
+	public static boolean canConsumeTsserver(IProject project, Object fileObject) {
+		return IDEResourcesManager.getInstance().canConsumeTsserver(project, fileObject);
+	}
+
+	public static boolean canConsumeTsserver(IResource resource) {
+		return canConsumeTsserver(resource.getProject(), resource);
 	}
 
 	public static boolean hasTypeScriptBuilder(IProject project) {
@@ -197,4 +201,5 @@ public class TypeScriptCorePlugin extends Plugin {
 	public static IIDETypeScriptRepositoryManager getTypeScriptRepositoryManager() {
 		return IDETypeScriptRepositoryManager.INSTANCE;
 	}
+
 }

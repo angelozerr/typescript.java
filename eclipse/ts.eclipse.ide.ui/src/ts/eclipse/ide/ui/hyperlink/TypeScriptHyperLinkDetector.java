@@ -34,12 +34,12 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 		if (resource == null) {
 			return null;
 		}
-		IProject project = resource.getProject();
-		if (TypeScriptCorePlugin.hasTypeScriptNature(project)) {
+		if (TypeScriptCorePlugin.canConsumeTsserver(resource)) {
 			// the project of the resource has typescript nature, execute
 			// typescript
 			// hyperlink.
 			try {
+				IProject project = resource.getProject();
 				IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
 				IDocument document = textViewer.getDocument();
 				IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);
