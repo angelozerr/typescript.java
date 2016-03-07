@@ -59,6 +59,9 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	}
 
 	public static IDETypeScriptProject getTypeScriptProject(IProject project) throws CoreException {
+		if (!project.isAccessible()) {
+			return null;
+		}
 		return (IDETypeScriptProject) project.getSessionProperty(TYPESCRIPT_PROJECT);
 	}
 

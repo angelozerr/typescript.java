@@ -10,8 +10,6 @@ package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,8 +21,6 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
-import ts.TypeScriptException;
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.TypeScriptSettingsHelper;
 import ts.eclipse.ide.core.resources.UseSalsa;
@@ -38,10 +34,7 @@ public class IDEResourcesManager
 
 	private static IDEResourcesManager instance = new IDEResourcesManager();
 
-	private final Map<IProject, IDETypeScriptProject> tsProjects;
-
 	private IDEResourcesManager() {
-		this.tsProjects = new HashMap<IProject, IDETypeScriptProject>();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 	}
 
@@ -168,16 +161,15 @@ public class IDEResourcesManager
 	}
 
 	private void closeProject(IProject project) {
-		synchronized (tsProjects) {
-			IIDETypeScriptProject tsProject = tsProjects.remove(project);
+		try {
+			IIDETypeScriptProject tsProject = IDETypeScriptProject.getTypeScriptProject(project);
 			if (tsProject != null) {
-				try {
-					tsProject.dispose();
-				} catch (TypeScriptException e) {
-					Trace.trace(Trace.SEVERE, "Error while disposing TypeScript project", e);
-				}
+				tsProject.dispose();
 			}
+		} catch (Throwable e) {
+			Trace.trace(Trace.SEVERE, "Error while disposing TypeScript project", e);
 		}
+
 	}
 
 	@Override
