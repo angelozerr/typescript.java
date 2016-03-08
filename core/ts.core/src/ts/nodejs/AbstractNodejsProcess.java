@@ -1,17 +1,30 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.nodejs;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import ts.TypeScriptException;
 import ts.utils.FileUtils;
 
+/**
+ * Abstract class for node.js process.
+ *
+ */
 public abstract class AbstractNodejsProcess implements INodejsProcess {
 
 	/**
-	 * The node.js base dir.
+	 * The node.js base dir. If null, it uses installed node.js
 	 */
 	protected final File nodejsFile;
 
@@ -26,8 +39,6 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 	 * Process listeners.
 	 */
 	protected final List<INodejsProcessListener> listeners;
-
-	private boolean hasError;
 
 	public AbstractNodejsProcess(File nodejsFile, File projectDir) throws TypeScriptException {
 		this(nodejsFile, projectDir, null);
@@ -47,7 +58,6 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 		this.projectDir = checkProjectDir(projectDir);
 		this.nodejsFile = checkNodejsFile(nodejsFile);
 		this.listeners = new ArrayList<INodejsProcessListener>();
-		this.hasError = false;
 		this.launchConfiguration = launchConfiguration;
 	}
 
@@ -63,7 +73,9 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 
 	private File checkNodejsFile(File nodejsFile) throws TypeScriptException {
 		if (nodejsFile == null) {
-			throw new TypeScriptException("node file cannot be null");
+			// node.js file cannot be null. In this case it uses installed
+			// node.js
+			return null;
 		}
 		if (!nodejsFile.exists()) {
 			throw new TypeScriptException("Cannot find node file " + FileUtils.getPath(nodejsFile));
@@ -162,7 +174,6 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 	 * Notify error process.
 	 */
 	protected void notifyErrorProcess(String line) {
-		this.hasError = true;
 		synchronized (listeners) {
 			for (INodejsProcessListener listener : listeners) {
 				listener.onError(AbstractNodejsProcess.this, line);
