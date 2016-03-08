@@ -21,15 +21,38 @@ import ts.client.definition.ITypeScriptDefinitionCollector;
  */
 public interface ITypeScriptFile {
 
+	/**
+	 * Returns the owner project of the file.
+	 * 
+	 * @return the owner project of the file.
+	 */
 	ITypeScriptProject getProject();
 
+	/**
+	 * Returns the full path of the file.
+	 * 
+	 * @return the full path of the file.
+	 */
 	String getName();
 
+	/**
+	 * Returns true if the file is flagged as "open" in tsserver side and false
+	 * otherwise. In the case where tsserver is not started and the file is
+	 * opened in the IDE editor, this method returns false.
+	 * 
+	 * @return true if the file is flagged as "open" in tsserver side and false
+	 *         otherwise.
+	 */
 	boolean isOpened();
 
+	/**
+	 * Returns true if file content has changed and must be synchronized with
+	 * tsserver and false otherwise.
+	 * 
+	 * @return true if file content has changed and must be synchronized with
+	 *         tsserver and false otherwise.
+	 */
 	boolean isDirty();
-
-	void setDirty(boolean dirty);
 
 	String getPrefix(int position);
 
@@ -39,14 +62,44 @@ public interface ITypeScriptFile {
 
 	String getContents();
 
+	/**
+	 * Flag the file as "opened" into tsserver side.
+	 * 
+	 * @throws TypeScriptException
+	 */
 	void open() throws TypeScriptException;
 
+	/**
+	 * Flag the file as "closed" into tsserver side.
+	 * 
+	 * @throws TypeScriptException
+	 */
 	void close() throws TypeScriptException;
 
+	/**
+	 * Synchronize file content with tsserver according the
+	 * {@link SynchStrategy}.
+	 * 
+	 * @throws TypeScriptException
+	 */
 	void synch() throws TypeScriptException;
 
+	/**
+	 * Call completions from the tsserver.
+	 * 
+	 * @param position
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
 	void completions(int position, ITypeScriptCompletionCollector collector) throws TypeScriptException;
 
+	/**
+	 * Call definitions from the tsserver.
+	 * 
+	 * @param position
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
 	void definition(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
 
 }

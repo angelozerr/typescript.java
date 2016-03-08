@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.resources;
 
 import ts.TypeScriptException;
@@ -7,6 +17,10 @@ import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.internal.LocationReader;
 
+/**
+ * Abstract TypeScript file.
+ *
+ */
 public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 
 	private final ITypeScriptProject tsProject;
@@ -24,7 +38,6 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		return tsProject;
 	}
 
-	@Override
 	public void setDirty(boolean dirty) {
 		this.dirty = dirty;
 	}
@@ -90,7 +103,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	@Override
 	public synchronized void synch() throws TypeScriptException {
 		if (!isDirty()) {
-			// no need to synchronize it.
+			// no need to synchronize the file content with tsserver.
 			return;
 		}
 		switch (tsProject.getProjectSettings().getSynchStrategy()) {
