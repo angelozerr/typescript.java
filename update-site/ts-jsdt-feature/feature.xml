@@ -21,7 +21,6 @@
 
    <requires>
       <import plugin="minimal-json"/>
-      <import plugin="minimatch.java"/>
    </requires>
 
    <plugin
