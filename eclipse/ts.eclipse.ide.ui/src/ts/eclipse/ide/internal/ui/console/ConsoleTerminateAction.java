@@ -17,7 +17,7 @@ import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.ImageResource;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 
 /**
  * Stop ts Server action.
@@ -31,9 +31,9 @@ public class ConsoleTerminateAction extends Action implements ITypeScriptClientL
 		this.project = project;
 		setToolTipText(
 				NLS.bind(TypeScriptUIMessages.ConsoleTerminateAction_tooltipText, project.getProject().getName()));
-		setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_STOP_ENABLED));
-		setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_STOP_DISABLED));
-		setHoverImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_STOP_ENABLED));
+		setImageDescriptor(TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_STOP_ENABLED));
+		setDisabledImageDescriptor(TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_STOP_DISABLED));
+		setHoverImageDescriptor(TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_STOP_ENABLED));
 		project.addServerListener(this);
 	}
 

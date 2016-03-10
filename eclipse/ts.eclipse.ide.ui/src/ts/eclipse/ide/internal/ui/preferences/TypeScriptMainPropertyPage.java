@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-import ts.eclipse.ide.ui.ImageResource;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 
 /**
  * TypeScript Main page for project properties.
@@ -30,8 +30,8 @@ public class TypeScriptMainPropertyPage extends PropertyPage implements
 	public static final String PROP_ID = "ts.eclipse.ide.ui.property.TypeScriptMainPropertyPage";
 
 	public TypeScriptMainPropertyPage() {
-		setImageDescriptor(ImageResource
-				.getImageDescriptor(ImageResource.IMG_LOGO));
+		setImageDescriptor(TypeScriptUIImageResource
+				.getImageDescriptor(TypeScriptUIImageResource.IMG_LOGO));
 	}
 
 	protected Control createContents(Composite parent) {

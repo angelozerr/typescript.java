@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 /**
  * Utility class to handle image resources.
  */
-public class ImageResource {
+public class TypeScriptUIImageResource {
 
 	// the image registry
 	private static ImageRegistry imageRegistry;
@@ -71,7 +71,7 @@ public class ImageResource {
 	/**
 	 * Cannot construct an ImageResource. Use static methods only.
 	 */
-	private ImageResource() {
+	private TypeScriptUIImageResource() {
 		// do nothing
 	}
 

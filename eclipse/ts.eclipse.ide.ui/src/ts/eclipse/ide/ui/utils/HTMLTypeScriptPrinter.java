@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.osgi.framework.Bundle;
 
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.ImageResource;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.jface.text.HoverLocationListener;
 import ts.utils.StringUtils;
@@ -203,7 +203,7 @@ public class HTMLTypeScriptPrinter {
 			return null;
 		}
 		String imageName = null;
-		URL imageUrl = ImageResource.getImageURL(descriptor);
+		URL imageUrl = TypeScriptUIImageResource.getImageURL(descriptor);
 		if (imageUrl != null) {
 			imageName = imageUrl.toExternalForm();
 		}

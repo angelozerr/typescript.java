@@ -24,7 +24,7 @@ import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.UseSalsa;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.ImageResource;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 
 /**
  * TypeScript Main page for global preferences.
@@ -35,7 +35,7 @@ public class TypeScriptMainPreferencePage extends FieldEditorPreferencePage impl
 	public static final String PROP_ID = "ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage";
 
 	public TypeScriptMainPreferencePage() {
-		setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_LOGO));
+		setImageDescriptor(TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_LOGO));
 	}
 
 	@Override

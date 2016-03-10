@@ -25,7 +25,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
 
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.ImageResource;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.console.ITypeScriptConsole;
 import ts.eclipse.ide.ui.console.LineType;
 
@@ -48,7 +48,7 @@ public class TypeScriptConsole extends MessageConsole implements ITypeScriptCons
 	private final IIDETypeScriptProject project;
 
 	public TypeScriptConsole(IIDETypeScriptProject project) {
-		super(getName(project), ImageResource.getImageDescriptor(ImageResource.IMG_LOGO));
+		super(getName(project), TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_LOGO));
 		project.setData(CONSOLE_KEY, this);
 		this.project = project;
 		consoleManager = ConsolePlugin.getDefault().getConsoleManager();
