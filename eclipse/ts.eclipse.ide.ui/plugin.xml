@@ -123,7 +123,8 @@
       <page
             name="%TypeScriptMainPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.TypeScriptMainPreferencePage"
-            id="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
+            id="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage"
+            category="org.eclipse.wst.jsdt.ui.preferences.JavaBasePreferencePage">
       </page>
 	  <page
             name="%NodejsPreferencePage.name"        
