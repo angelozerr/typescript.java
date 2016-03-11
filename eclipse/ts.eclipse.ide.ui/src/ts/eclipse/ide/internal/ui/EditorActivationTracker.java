@@ -76,8 +76,8 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 	}
 
 	private void openTypeScriptFile(IWorkbenchPart part) {
-		final IFile file = getFile(part);
-		if (file != null && TypeScriptResourcesManager.isTSFile(file)) {
+		final IFile file = getFile(part);		
+		if (TypeScriptCorePlugin.canConsumeTsserver(file)) {
 			// Ensure that everything is synchronized when TypeScript file is
 			// opened
 			try {
@@ -108,7 +108,7 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 	@Override
 	public void partClosed(IWorkbenchPart part) {
 		final IFile file = getFile(part);
-		if (file != null && TypeScriptResourcesManager.isTSFile(file)) {
+		if (TypeScriptCorePlugin.canConsumeTsserver(file)) {
 			// Ensure that everything is synchronized when TypeScript file is
 			// opened
 			try {

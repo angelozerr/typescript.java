@@ -29,9 +29,11 @@ import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.repository.IIDETypeScriptRepositoryManager;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.watcher.IResourcesWatcher;
 import ts.eclipse.ide.internal.core.nodejs.NodejsInstallManager;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
+import ts.eclipse.ide.internal.core.resources.watcher.ResourcesWatcher;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
 import ts.resources.TypeScriptResourcesManager;
 
@@ -74,8 +76,7 @@ public class TypeScriptCorePlugin extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		IDEResourcesManager.getInstance().dispose();
-
+		ResourcesWatcher.getInstance().dispose();
 		plugin = null;
 		super.stop(context);
 	}
@@ -94,10 +95,16 @@ public class TypeScriptCorePlugin extends Plugin {
 	}
 
 	public static boolean canConsumeTsserver(IProject project, Object fileObject) {
+		if (!project.isAccessible()) {
+			return false;
+		}
 		return IDEResourcesManager.getInstance().canConsumeTsserver(project, fileObject);
 	}
 
 	public static boolean canConsumeTsserver(IResource resource) {
+		if (resource == null) {
+			return false;
+		}
 		return canConsumeTsserver(resource.getProject(), resource);
 	}
 
@@ -200,6 +207,10 @@ public class TypeScriptCorePlugin extends Plugin {
 
 	public static IIDETypeScriptRepositoryManager getTypeScriptRepositoryManager() {
 		return IDETypeScriptRepositoryManager.INSTANCE;
+	}
+
+	public static IResourcesWatcher getResourcesWatcher() {
+		return ResourcesWatcher.getInstance();
 	}
 
 }

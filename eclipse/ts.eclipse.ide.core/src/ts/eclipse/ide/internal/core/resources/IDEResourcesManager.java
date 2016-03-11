@@ -5,6 +5,8 @@
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
  *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
 package ts.eclipse.ide.internal.core.resources;
 
@@ -13,15 +15,8 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
-import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.TypeScriptSettingsHelper;
 import ts.eclipse.ide.core.resources.UseSalsa;
 import ts.eclipse.ide.internal.core.Trace;
@@ -29,18 +24,9 @@ import ts.resources.ITypeScriptProject;
 import ts.resources.ITypeScriptResourcesManagerDelegate;
 import ts.utils.FileUtils;
 
-public class IDEResourcesManager
-		implements ITypeScriptResourcesManagerDelegate, IResourceChangeListener, IResourceDeltaVisitor {
+public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate {
 
 	private static IDEResourcesManager instance = new IDEResourcesManager();
-
-	private IDEResourcesManager() {
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-	}
-
-	public void dispose() {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-	}
 
 	public static IDEResourcesManager getInstance() {
 		return instance;
@@ -60,13 +46,7 @@ public class IDEResourcesManager
 				}
 				IDETypeScriptProject tsProject = getTypeScriptProject(project);
 				if (tsProject == null) {
-					tsProject = new IDETypeScriptProject(project);
-					try {
-						tsProject.load();
-					} catch (IOException e) {
-						Trace.trace(Trace.SEVERE, "Error while loading TypeScript project", e);
-						throw e;
-					}
+					tsProject = create(project);
 				}
 				return tsProject;
 			} catch (Exception ex) {
@@ -75,6 +55,21 @@ public class IDEResourcesManager
 			}
 		}
 		return null;
+	}
+
+	private synchronized IDETypeScriptProject create(IProject project) throws CoreException, IOException {
+		IDETypeScriptProject tsProject = getTypeScriptProject(project);
+		if (tsProject != null) {
+			return tsProject;
+		}
+		tsProject = new IDETypeScriptProject(project);
+		try {
+			tsProject.load();
+		} catch (IOException e) {
+			Trace.trace(Trace.SEVERE, "Error while loading TypeScript project", e);
+			throw e;
+		}
+		return tsProject;
 	}
 
 	public boolean hasTypeScriptNature(IProject project) {
@@ -132,57 +127,6 @@ public class IDEResourcesManager
 	public boolean isJsFile(Object fileObject) {
 		String ext = getExtension(fileObject);
 		return ext != null && FileUtils.JS_EXTENSION.equals(ext.toLowerCase());
-	}
-
-	@Override
-	public void resourceChanged(IResourceChangeEvent event) {
-		try {
-			IResource resource = event.getResource();
-			switch (event.getType()) {
-			case IResourceChangeEvent.PRE_DELETE:
-				// called when project is deleted.
-			case IResourceChangeEvent.PRE_CLOSE:
-				// called when project is closed.
-				if (resource != null && resource.getType() == IResource.PROJECT) {
-					IProject project = (IProject) resource;
-					closeProject(project);
-				}
-				break;
-			case IResourceChangeEvent.POST_CHANGE:
-				IResourceDelta delta = event.getDelta();
-				if (delta != null) {
-					delta.accept(this);
-				}
-				break;
-			}
-		} catch (Throwable e) {
-			Trace.trace(Trace.SEVERE, "Error while TypeScript resource changed", e);
-		}
-	}
-
-	private void closeProject(IProject project) {
-		try {
-			IIDETypeScriptProject tsProject = IDETypeScriptProject.getTypeScriptProject(project);
-			if (tsProject != null) {
-				tsProject.dispose();
-			}
-		} catch (Throwable e) {
-			Trace.trace(Trace.SEVERE, "Error while disposing TypeScript project", e);
-		}
-
-	}
-
-	@Override
-	public boolean visit(IResourceDelta delta) throws CoreException {
-		IResource resource = delta.getResource();
-		if (resource == null) {
-			return false;
-		}
-		switch (resource.getType()) {
-		case IResource.ROOT:
-			return true;
-		}
-		return false;
 	}
 
 	public boolean canConsumeTsserver(IProject project, Object fileObject) {

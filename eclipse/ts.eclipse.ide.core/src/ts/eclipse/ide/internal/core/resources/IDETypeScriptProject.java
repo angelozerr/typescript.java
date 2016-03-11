@@ -25,6 +25,7 @@ import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
+import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.resources.TypeScriptProject;
@@ -46,6 +47,26 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		this.project = project;
 		super.setProjectSettings(new IDETypeScriptProjectSettings(this));
 		project.setSessionProperty(TYPESCRIPT_PROJECT, this);
+		TypeScriptCorePlugin.getResourcesWatcher().addProjectWatcherListener(getProject(),
+				new ProjectWatcherListenerAdapter() {
+					@Override
+					public void onClosed(IProject project) {
+						try {
+							IDETypeScriptProject.this.dispose();
+						} catch (TypeScriptException e) {
+							Trace.trace(Trace.SEVERE, "Error while closing project", e);
+						}
+					}
+
+					@Override
+					public void onDeleted(IProject project) {
+						try {
+							IDETypeScriptProject.this.dispose();
+						} catch (TypeScriptException e) {
+							Trace.trace(Trace.SEVERE, "Error while deleting project", e);
+						}
+					}
+				});
 	}
 
 	/**
@@ -133,4 +154,5 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	public IIDETypeScriptProjectSettings getProjectSettings() {
 		return (IIDETypeScriptProjectSettings) super.getProjectSettings();
 	}
+
 }
