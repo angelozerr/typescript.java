@@ -39,17 +39,29 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 	}
 
 	@Override
+	public boolean isJsFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.JS_EXTENSION.equals(ext.toLowerCase());
+	}
+
+	@Override
 	public boolean isTsFile(Object fileObject) {
 		String ext = getExtension(fileObject);
 		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
 	}
 
 	@Override
-	public boolean isJsFile(Object fileObject) {
+	public boolean isJsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.JS_EXTENSION.equals(ext.toLowerCase());
+		return ext != null && FileUtils.JSX_EXTENSION.equals(ext.toLowerCase());
 	}
-	
+
+	@Override
+	public boolean isTsxFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.TSX_EXTENSION.equals(ext.toLowerCase());
+	}
+
 	protected String getExtension(Object fileObject) {
 		if (fileObject instanceof File) {
 			return FileUtils.getFileExtension(((File) fileObject).getName());

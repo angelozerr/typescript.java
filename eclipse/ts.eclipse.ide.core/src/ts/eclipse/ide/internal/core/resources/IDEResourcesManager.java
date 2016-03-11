@@ -129,11 +129,25 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		return ext != null && FileUtils.JS_EXTENSION.equals(ext.toLowerCase());
 	}
 
+	@Override
+	public boolean isJsxFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.JSX_EXTENSION.equals(ext.toLowerCase());
+	}
+	
+	@Override
+	public boolean isTsxFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.TSX_EXTENSION.equals(ext.toLowerCase());
+	}
 	public boolean canConsumeTsserver(IProject project, Object fileObject) {
+		if (!project.isAccessible()) {
+			return false;
+		}
 		if (isJsFile(fileObject)) {
 			return hasSalsaNature(project);
 		}
-		return true;
+		return (isTsFile(fileObject) || isJsxFile(fileObject) || isTsxFile(fileObject));
 	}
 
 }

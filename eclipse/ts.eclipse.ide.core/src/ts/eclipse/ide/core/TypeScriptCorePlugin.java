@@ -95,9 +95,6 @@ public class TypeScriptCorePlugin extends Plugin {
 	}
 
 	public static boolean canConsumeTsserver(IProject project, Object fileObject) {
-		if (!project.isAccessible()) {
-			return false;
-		}
 		return IDEResourcesManager.getInstance().canConsumeTsserver(project, fileObject);
 	}
 

@@ -47,6 +47,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		this.project = project;
 		super.setProjectSettings(new IDETypeScriptProjectSettings(this));
 		project.setSessionProperty(TYPESCRIPT_PROJECT, this);
+		// Stop tsserver + dispose settings when project is closed, deleted.
 		TypeScriptCorePlugin.getResourcesWatcher().addProjectWatcherListener(getProject(),
 				new ProjectWatcherListenerAdapter() {
 					@Override
@@ -67,6 +68,8 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 						}
 					}
 				});
+		// Stop tsserver when tsconfig.json/jsconfig.json of the project is
+		// created, deleted or modified
 	}
 
 	/**
