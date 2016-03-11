@@ -1,0 +1,36 @@
+<?json version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+	<extension point="org.eclipse.core.contenttype.contentTypes">
+
+		<content-type
+		    file-names="tsconfig.json"
+			priority="high"
+			name="%tsconfig_Content_Type_Extension_Element"
+			id="ts.eclipse.ide.json.core.tsconfigsource"
+			base-type="org.eclipse.wst.json.core.jsonsource">
+		</content-type>
+
+		<content-type
+		    file-names="jsconfig.json"
+			priority="high"
+			name="%jsconfig_Content_Type_Extension_Element"
+			id="ts.eclipse.ide.json.core.jsconfigsource"
+			base-type="org.eclipse.wst.json.core.jsonsource">
+		</content-type>
+	</extension>
+			
+ 	<!-- See http://schemastore.org/api.html and https://github.com/SchemaStore/schemastore/blob/master/src/api/json/catalog.json -->
+   <extension
+         point="org.eclipse.wst.json.core.schemaCatalogContributions">
+         <schemaCatalogContribution id="http://schemastore.org/ts">
+         	<schema name="tsconfig.json"
+         			description="JSON schema for the TypeScript compiler's configuration file"
+         			fileMatch="tsconfig.json"
+         			url="http://json.schemastore.org/tsconfig"
+         			uri="schemastore/tsconfig" />      			
+         </schemaCatalogContribution>
+	</extension>
+
+</plugin>

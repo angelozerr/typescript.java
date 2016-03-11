@@ -10,6 +10,9 @@
 	<modules>
 		<module>embed</module>
 		<module>jsdt</module>
+		<!-- Uncomment when Neon will be available.
+		     <module>json</module>
+		 -->
 		<module>ts.eclipse</module>
 		<module>ts.eclipse.ide.core</module>
 		<module>ts.eclipse.ide.ui</module>

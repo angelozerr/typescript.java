@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: ts.eclipse.ide.json.core;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ts.eclipse.ide.json.core.internal.TypeScriptJSONCorePlugin
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.wst.sse.core,
+ com.ibm.icu,
+ org.eclipse.core.resources,
+ org.eclipse.wst.json.core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
