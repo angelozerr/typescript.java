@@ -20,7 +20,7 @@ public interface IResourcesWatcher {
 
 	void removeProjectWatcherListener(IProject project, IProjectWatcherListener listener);
 
-	void addFileWatcherListener(IProject project, IFileWatcherListener listener);
+	void addFileWatcherListener(IProject project, String fileName, IFileWatcherListener listener);
 
-	void removeFileWatcherListener(IProject project, IFileWatcherListener listener);
+	void removeFileWatcherListener(IProject project, String fileName, IFileWatcherListener listener);
 }

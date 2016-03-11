@@ -23,6 +23,5 @@ public interface IFileWatcherListener {
 	void onCreate(IFile file);
 
 	void onChanged(IFile file);
-	
-	boolean isMatch(IFile file);
+
 }

@@ -42,11 +42,11 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 	}
 
 	private final Map<IProject, List<IProjectWatcherListener>> projectListeners;
-	private final Map<IProject, List<IFileWatcherListener>> fileListeners;
+	private final Map<IProject, Map<String, List<IFileWatcherListener>>> fileListeners;
 
 	private ResourcesWatcher() {
 		this.projectListeners = new HashMap<IProject, List<IProjectWatcherListener>>();
-		this.fileListeners = new HashMap<IProject, List<IFileWatcherListener>>();
+		this.fileListeners = new HashMap<IProject, Map<String, List<IFileWatcherListener>>>();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 	}
 
@@ -63,13 +63,13 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 	@Override
 	public void addProjectWatcherListener(IProject project, IProjectWatcherListener listener) {
 		synchronized (projectListeners) {
-			List<IProjectWatcherListener> listeners = projectListeners.get(project);
-			if (listeners == null) {
-				listeners = new ArrayList<IProjectWatcherListener>();
-				projectListeners.put(project, listeners);
+			List<IProjectWatcherListener> listenersForProject = projectListeners.get(project);
+			if (listenersForProject == null) {
+				listenersForProject = new ArrayList<IProjectWatcherListener>();
+				projectListeners.put(project, listenersForProject);
 			}
-			if (!listeners.contains(listener)) {
-				listeners.add(listener);
+			if (!listenersForProject.contains(listener)) {
+				listenersForProject.add(listener);
 			}
 		}
 	}
@@ -77,33 +77,41 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 	@Override
 	public void removeProjectWatcherListener(IProject project, IProjectWatcherListener listener) {
 		synchronized (projectListeners) {
-			List<IProjectWatcherListener> listeners = projectListeners.get(project);
-			if (listeners != null) {
-				listeners.remove(listener);
+			List<IProjectWatcherListener> listenersForProject = projectListeners.get(project);
+			if (listenersForProject != null) {
+				listenersForProject.remove(listener);
 			}
 		}
 	}
 
 	@Override
-	public void addFileWatcherListener(IProject project, IFileWatcherListener listener) {
+	public void addFileWatcherListener(IProject project, String fileName, IFileWatcherListener listener) {
 		synchronized (fileListeners) {
-			List<IFileWatcherListener> listeners = fileListeners.get(project);
-			if (listeners == null) {
-				listeners = new ArrayList<IFileWatcherListener>();
-				fileListeners.put(project, listeners);
+			Map<String, List<IFileWatcherListener>> listenersForProject = fileListeners.get(project);
+			if (listenersForProject == null) {
+				listenersForProject = new HashMap<String, List<IFileWatcherListener>>();
+				fileListeners.put(project, listenersForProject);
 			}
-			if (!listeners.contains(listener)) {
-				listeners.add(listener);
+			List<IFileWatcherListener> listenersForProjectAndFile = listenersForProject.get(fileName);
+			if (listenersForProjectAndFile == null) {
+				listenersForProjectAndFile = new ArrayList<IFileWatcherListener>();
+				listenersForProject.put(fileName, listenersForProjectAndFile);
+			}
+			if (!listenersForProjectAndFile.contains(listener)) {
+				listenersForProjectAndFile.add(listener);
 			}
 		}
 	}
 
 	@Override
-	public void removeFileWatcherListener(IProject project, IFileWatcherListener listener) {
+	public void removeFileWatcherListener(IProject project, String fileName, IFileWatcherListener listener) {
 		synchronized (fileListeners) {
-			List<IFileWatcherListener> listeners = fileListeners.get(project);
-			if (listeners != null) {
-				listeners.remove(listener);
+			Map<String, List<IFileWatcherListener>> listenersForProject = fileListeners.get(project);
+			if (listenersForProject != null) {
+				List<IFileWatcherListener> listenersForProjectAndFile = listenersForProject.get(fileName);
+				if (listenersForProjectAndFile != null) {
+					listenersForProjectAndFile.remove(listener);
+				}
 			}
 		}
 	}
@@ -164,8 +172,13 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 						listener.onDeleted(current);
 					}
 				}
-				projectListeners.remove(current);
 			}
+			// Remove all project listeners of the project
+			projectListeners.remove(current);
+		}
+		synchronized (fileListeners) {
+			// Remove all file listeners of the project
+			fileListeners.remove(current);
 		}
 	}
 

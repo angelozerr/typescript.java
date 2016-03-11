@@ -10,26 +10,26 @@
  */
 package ts.eclipse.ide.core.resources.watcher;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IFile;
 
 /**
- * Adapter class for {@link IProjectWatcherListener}.
+ * Adapter class for {@link IFileWatcherListener}.
  *
  */
-public class ProjectWatcherListenerAdapter implements IProjectWatcherListener {
+public class FileWatcherListenerAdapter implements IFileWatcherListener {
 
 	@Override
-	public void onOpened(IProject project) {
+	public void onDeleted(IFile file) {
 
 	}
 
 	@Override
-	public void onClosed(IProject project) {
+	public void onCreate(IFile file) {
 
 	}
 
 	@Override
-	public void onDeleted(IProject project) {
+	public void onChanged(IFile file) {
 
 	}
 
