@@ -1,11 +1,18 @@
 package ts.client;
 
 import ts.TypeScriptException;
+import ts.client.protocol.Request;
 
-public class TypeScriptTimeoutException extends TypeScriptException  {
+public class TypeScriptTimeoutException extends TypeScriptException {
 
-	public TypeScriptTimeoutException(String message) {
-		super(message);
+	private final Request request;
+
+	public TypeScriptTimeoutException(Request<?> request, long timeout) {
+		super("Timeout error " + timeout + "ms");
+		this.request = request;
 	}
 
+	public Request getRequest() {
+		return request;
+	}
 }

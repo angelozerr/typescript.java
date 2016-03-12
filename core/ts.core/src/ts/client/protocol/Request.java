@@ -8,7 +8,8 @@ import ts.internal.server.ICallbackItem;
 
 public abstract class Request<T> extends Message implements ICallbackItem<T> {
 
-	private static final long TIMEOUT = 10000L * 1000000L; // wait 10 second before timeout.
+	private static final long TIMEOUT = 10000L * 1000000L; // wait 10 second
+															// before timeout.
 
 	private long startTime;
 
@@ -44,7 +45,7 @@ public abstract class Request<T> extends Message implements ICallbackItem<T> {
 				this.wait(5);
 			}
 			if ((System.nanoTime() - startTime) > TIMEOUT) {
-				throw new TypeScriptTimeoutException("");
+				throw new TypeScriptTimeoutException(this, TIMEOUT);
 			}
 		}
 		return getResult();
@@ -53,7 +54,7 @@ public abstract class Request<T> extends Message implements ICallbackItem<T> {
 	public long getStartTime() {
 		return startTime;
 	}
-	
+
 	protected abstract boolean isCompleted();
 
 	protected abstract T getResult() throws Exception;

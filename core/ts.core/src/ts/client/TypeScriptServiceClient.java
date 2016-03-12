@@ -101,8 +101,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	};
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
-		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile,
-				nodeFile, new INodejsLaunchConfiguration() {
+		this(projectDir, NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile,
+				new INodejsLaunchConfiguration() {
 
 					@Override
 					public List<String> createNodeArgs() {
@@ -508,11 +508,38 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			return result == null ? null : result.get();
 		} catch (Exception e) {
 			handleError(request, e, request.getStartTime());
-			if (e instanceof TypeScriptException) {
-				throw (TypeScriptException) e;
+			TypeScriptException tse = getTypeScriptException(e);
+			if (tse != null) {
+				if (tse instanceof TypeScriptTimeoutException) {
+					// when time out exception, we must be sure that the request is removed
+					tryCancelRequest(((TypeScriptTimeoutException) tse).getRequest().getSeq());
+				}
+				throw (TypeScriptException) tse;
 			}
 			throw new TypeScriptException(e);
 		}
+	}
+
+	private TypeScriptException getTypeScriptException(Exception e) {
+		if (e instanceof TypeScriptException) {
+			return (TypeScriptException) e;
+		}
+		if (e.getCause() instanceof TypeScriptException) {
+			return (TypeScriptException) e.getCause();
+		}
+		return null;
+	}
+
+	private boolean tryCancelRequest(int seq) {
+		for (RequestItem requestItem : requestQueue) {
+			if (requestItem.request.getSeq() == seq) {
+				synchronized (requestQueue) {
+					requestQueue.remove(requestItem);
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void sendNextRequests() throws TypeScriptException {
