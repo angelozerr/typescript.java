@@ -18,11 +18,11 @@ import org.eclipse.jface.text.IDocumentListener;
 
 import ts.TypeScriptException;
 import ts.client.Location;
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.resources.AbstractTypeScriptFile;
 import ts.resources.SynchStrategy;
-import ts.utils.FileUtils;
 
 /**
  * {@link IIDETypeScriptFile} implementation.
@@ -36,17 +36,17 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	public IDETypeScriptFile(IResource file, IDocument document, IIDETypeScriptProject tsProject) {
 		super(tsProject);
 		this.file = file;
-		this.document = document;
-		this.document.addDocumentListener(this);
-	}
-
-	public static String getFileName(IResource file) {
-		return FileUtils.normalizeSlashes(file.getLocation().toString());
+		if (document != null) {
+			this.document = document;
+			this.document.addDocumentListener(this);
+		} else {
+			this.document = null;
+		}
 	}
 
 	@Override
 	public String getName() {
-		return getFileName(file);
+		return TypeScriptCorePlugin.getFileName(file);
 	}
 
 	@Override
@@ -84,7 +84,9 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 
 	@Override
 	public void close() throws TypeScriptException {
-		this.document.removeDocumentListener(this);
+		if (this.document != null) {
+			this.document.removeDocumentListener(this);
+		}
 		super.close();
 	}
 
@@ -106,11 +108,17 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 
 	@Override
 	public String getContents() {
-		return document.get();
+		if (document != null) {
+			return document.get();
+		}
+		return null;
 	}
 
 	@Override
 	public int getPosition(int line, int offset) throws TypeScriptException {
+		if (document == null) {
+			return -1;
+		}
 		try {
 			return document.getLineOffset(line - 1) + offset - 1;
 		} catch (BadLocationException e) {

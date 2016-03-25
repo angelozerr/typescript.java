@@ -11,10 +11,10 @@ import ts.resources.ITypeScriptProject;
 
 public class TypeScriptValidationHelper {
 
-	public static void validate(IIDETypeScriptFile tsFile, ITypeScriptProject tsProject, IReporter reporter,
-			IValidator validator) {
+	public static void validate(IIDETypeScriptFile tsFile, IReporter reporter, IValidator validator) {
 		int delay = 0;
 		try {
+			ITypeScriptProject tsProject = tsFile.getProject();
 			ITypeScriptGeterrCollector collector = new TypeScriptReporterCollector(tsFile, reporter, validator);
 			tsProject.geterr(tsFile, delay, collector);
 		} catch (Exception e) {

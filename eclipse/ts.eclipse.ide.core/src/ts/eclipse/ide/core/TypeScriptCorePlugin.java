@@ -36,6 +36,7 @@ import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
 import ts.eclipse.ide.internal.core.resources.watcher.ResourcesWatcher;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
 import ts.resources.TypeScriptResourcesManager;
+import ts.utils.FileUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -208,6 +209,10 @@ public class TypeScriptCorePlugin extends Plugin {
 
 	public static IResourcesWatcher getResourcesWatcher() {
 		return ResourcesWatcher.getInstance();
+	}
+
+	public static String getFileName(IResource file) {
+		return FileUtils.normalizeSlashes(file.getLocation().toString());
 	}
 
 }
