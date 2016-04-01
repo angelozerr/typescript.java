@@ -12,6 +12,7 @@ package ts.eclipse.ide.internal.core.resources;
 
 import java.io.IOException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -25,10 +26,12 @@ import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
+import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.resources.TypeScriptProject;
+import ts.utils.FileUtils;
 
 /**
  * IDE TypeScript project implementation.
@@ -39,6 +42,24 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	private static final QualifiedName TYPESCRIPT_PROJECT = new QualifiedName(
 			TypeScriptCorePlugin.PLUGIN_ID + ".sessionprops", //$NON-NLS-1$
 			"TypeScriptProject"); //$NON-NLS-1$
+
+	private IFileWatcherListener tsconfigFileListener = new IFileWatcherListener() {
+
+		@Override
+		public void onDeleted(IFile file) {
+			IDETypeScriptProject.this.disposeServer();
+		}
+
+		@Override
+		public void onCreate(IFile file) {
+			IDETypeScriptProject.this.disposeServer();
+		}
+
+		@Override
+		public void onChanged(IFile file) {
+			IDETypeScriptProject.this.disposeServer();
+		}
+	};
 
 	private final IProject project;
 
@@ -70,6 +91,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 				});
 		// Stop tsserver when tsconfig.json/jsconfig.json of the project is
 		// created, deleted or modified
+		TypeScriptCorePlugin.getResourcesWatcher().addFileWatcherListener(getProject(), FileUtils.TSCONFIG_JSON,
+				tsconfigFileListener);
+		TypeScriptCorePlugin.getResourcesWatcher().addFileWatcherListener(getProject(), FileUtils.JSCONFIG_JSON,
+				tsconfigFileListener);
 	}
 
 	/**

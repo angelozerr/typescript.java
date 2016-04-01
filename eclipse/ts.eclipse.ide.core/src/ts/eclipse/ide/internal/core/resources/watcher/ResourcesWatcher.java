@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -191,6 +192,34 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 		switch (resource.getType()) {
 		case IResource.ROOT:
 			return true;
+		case IResource.PROJECT:
+			// Continue if project has defined file listeners.
+			return fileListeners.containsKey(resource);
+		case IResource.FOLDER:
+			return true;
+		case IResource.FILE:
+			IFile file = (IFile) resource;
+			synchronized (fileListeners) {
+				Map<String, List<IFileWatcherListener>> listenersForFilename = fileListeners.get(file.getProject());
+				List<IFileWatcherListener> listeners = listenersForFilename.get(file.getName());
+				if (listeners != null) {
+					for (IFileWatcherListener listener : listeners) {
+						switch (delta.getKind()) {
+						case IResourceDelta.ADDED:
+							// handle added resource
+							listener.onCreate(file);
+							break;
+						case IResourceDelta.REMOVED:
+							// handle removed resource
+							listener.onDeleted(file);
+							break;
+						default:
+							listener.onChanged(file);
+						}
+					}
+				}
+			}
+			return false;
 		}
 		return false;
 	}
