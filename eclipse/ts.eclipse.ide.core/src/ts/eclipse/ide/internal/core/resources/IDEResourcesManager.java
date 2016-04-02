@@ -140,6 +140,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		String ext = getExtension(fileObject);
 		return ext != null && FileUtils.TSX_EXTENSION.equals(ext.toLowerCase());
 	}
+	
 	public boolean canConsumeTsserver(IProject project, Object fileObject) {
 		if (!project.isAccessible()) {
 			return false;

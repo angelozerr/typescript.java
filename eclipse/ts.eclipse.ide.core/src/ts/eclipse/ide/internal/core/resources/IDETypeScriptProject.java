@@ -30,7 +30,9 @@ import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
+import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
 import ts.resources.TypeScriptProject;
+import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.FileUtils;
 
 /**
@@ -48,16 +50,19 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		@Override
 		public void onDeleted(IFile file) {
 			IDETypeScriptProject.this.disposeServer();
+			JsonConfigResourcesManager.getInstance().remove(file);
 		}
 
 		@Override
 		public void onCreate(IFile file) {
 			IDETypeScriptProject.this.disposeServer();
+			JsonConfigResourcesManager.getInstance().remove(file);
 		}
 
 		@Override
 		public void onChanged(IFile file) {
 			IDETypeScriptProject.this.disposeServer();
+			JsonConfigResourcesManager.getInstance().remove(file);
 		}
 	};
 
@@ -181,6 +186,30 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public IIDETypeScriptProjectSettings getProjectSettings() {
 		return (IIDETypeScriptProjectSettings) super.getProjectSettings();
+	}
+
+	@Override
+	public boolean canValidate(IResource resource) {
+		try {
+			TsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+			if (tsconfig != null) {
+				// TODO: check exclude + files
+			}
+		} catch (CoreException e) {
+			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canValidate", e);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean canCompileOnSave(IResource resource) {
+		try {
+			TsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+			return tsconfig != null ? tsconfig.isCompileOnSave() : null;
+		} catch (CoreException e) {
+			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canCompileOnSave", e);
+			return false;
+		}
 	}
 
 }

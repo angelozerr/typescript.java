@@ -63,4 +63,40 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 */
 	IIDETypeScriptProjectSettings getProjectSettings();
 
+	/**
+	 * Returns true if the given file can be validated and false otherwise.
+	 * 
+	 * A file can be validated if :
+	 * 
+	 * <ul>
+	 * <li>it doesn't exists tsconfig.json in the folder (and parent) of the
+	 * file.</li>
+	 * <li>it exists a tsconfig.json in the folder (or parent) of the file and:
+	 * <ul>
+	 * <li>the given file is defined in the "files" config section.</li>
+	 * <li>or the given file is not excluded by the "exclude" config section.
+	 * </li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * 
+	 * @param resource
+	 *            the TypeScript resource to validate.
+	 * @return true if the given file can be validated and false otherwise.
+	 */
+	boolean canValidate(IResource resource);
+
+	/**
+	 * Returns true if the given file can be be compiled to JavaScript file when
+	 * it is saved and false otherwise.
+	 * 
+	 * A file can be compiled if it exists a tsconfig.json in the folder (or
+	 * parent) of the file and "compileOnSave" is defined to true
+	 * 
+	 * @param resource
+	 *            the resource to validate.
+	 * @return true if the given file can be be compiled to JavaScript file when
+	 *         it is saved and false otherwise.
+	 */
+	boolean canCompileOnSave(IResource resource);
 }

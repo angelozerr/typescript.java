@@ -59,7 +59,7 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 	public ValidationResult validate(IResource resource, int kind, ValidationState state, IProgressMonitor monitor) {
 		ValidationResult result = new ValidationResult();
 		IIDETypeScriptProject tsProject = (IIDETypeScriptProject) state.get(TYPESCRIPT_VALIDATOR_CONTEXT);
-		if (tsProject != null && TypeScriptCorePlugin.canConsumeTsserver(resource)) {
+		if (tsProject != null && TypeScriptCorePlugin.canConsumeTsserver(resource) && tsProject.canValidate(resource)) {
 			IReporter reporter = result.getReporter(monitor);
 
 			// Here we call geterr from tsserver for the given file IResource.
