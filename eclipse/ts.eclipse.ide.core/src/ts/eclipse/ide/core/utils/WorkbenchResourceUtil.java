@@ -1,19 +1,20 @@
-/*******************************************************************************
- * Copyright (c) 2015, 2016 Red Hat, Inc. 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
  *
- * 	Contributors:
- * 		 Red Hat Inc. - initial API and implementation and/or initial documentation
- *******************************************************************************/
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.core.utils;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 
 /**
  * Utilities for Eclipse resources.
@@ -21,7 +22,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class WorkbenchResourceUtil {
 
-	public static IFile findFileRecursively(IResource resource, String name) throws CoreException {
+	public static IFile findFileRecursively(IResource resource, IPath name) throws CoreException {
 		IContainer parent = getContainer(resource);
 		return findFileRecursively(parent, name);
 	}
@@ -33,17 +34,14 @@ public class WorkbenchResourceUtil {
 		return resource.getParent();
 	}
 
-	public static IFile findFileRecursively(IContainer container, String name) throws CoreException {
-		for (IResource r : container.members()) {
-			if (r instanceof IContainer) {
-				IFile file = findFileRecursively((IContainer) r, name);
-				if (file != null && file.exists()) {
-					return file;
-				}
-			} else if (r instanceof IFile && r.getName().equals(name) && r.exists()) {
-				return (IFile) r;
-			}
+	public static IFile findFileRecursively(IContainer container, IPath name) throws CoreException {
+		if (container == null) {
+			return null;
 		}
-		return null;
+		IFile file = container.getFile(name);
+		if (file != null && file.exists()) {
+			return file;
+		}
+		return findFileRecursively(container.getParent(), name);
 	}
 }

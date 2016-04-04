@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,12 +29,40 @@ public class TsconfigJson {
 
 	private boolean compileOnSave;
 
+	private List<String> files;
+
+	private List<String> exclude;
+
 	public boolean isCompileOnSave() {
 		return compileOnSave;
 	}
 
 	public void setCompileOnSave(boolean compileOnSave) {
 		this.compileOnSave = compileOnSave;
+	}
+
+	public List<String> getFiles() {
+		return files;
+	}
+
+	public void setFiles(List<String> files) {
+		this.files = files;
+	}
+
+	public boolean hasFiles() {
+		return files != null;
+	}
+
+	public List<String> getExclude() {
+		return exclude;
+	}
+
+	public void setExclude(List<String> exclude) {
+		this.exclude = exclude;
+	}
+
+	public boolean hasExclude() {
+		return exclude != null;
 	}
 
 	/**
@@ -43,8 +72,27 @@ public class TsconfigJson {
 	 * @return tsconfig.json instance from the given reader.
 	 */
 	public static TsconfigJson load(Reader reader) {
+		return load(reader, TsconfigJson.class);
+	}
+
+	public static <T extends TsconfigJson> T load(Reader json, Class<T> classOfT) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-		return gson.fromJson(reader, TsconfigJson.class);
+		return gson.fromJson(json, classOfT);
+	}
+
+	public static <T extends TsconfigJson> T load(InputStream in, Class<T> classOfT) {
+		Reader isr = null;
+		try {
+			isr = new InputStreamReader(in);
+			return load(isr, classOfT);
+		} finally {
+			if (isr != null) {
+				try {
+					isr.close();
+				} catch (IOException e) {
+				}
+			}
+		}
 	}
 
 	/**
@@ -54,18 +102,7 @@ public class TsconfigJson {
 	 * @return tsconfig.json instance from the given input stream
 	 */
 	public static TsconfigJson load(InputStream in) {
-		Reader isr = null;
-		try {
-			isr = new InputStreamReader(in);
-			return load(isr);
-		} finally {
-			if (isr != null) {
-				try {
-					isr.close();
-				} catch (IOException e) {
-				}
-			}
-		}
+		return load(in, TsconfigJson.class);
 	}
 
 }

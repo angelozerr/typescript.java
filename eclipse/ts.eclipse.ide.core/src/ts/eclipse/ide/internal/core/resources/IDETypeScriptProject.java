@@ -26,6 +26,7 @@ import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
+import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
 import ts.eclipse.ide.internal.core.Trace;
@@ -191,9 +192,14 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public boolean canValidate(IResource resource) {
 		try {
-			TsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+			IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
 			if (tsconfig != null) {
-				// TODO: check exclude + files
+				// check if the given file is declared in the "files"
+				if (tsconfig.hasFiles()) {
+					return tsconfig.isInFiles(resource);
+				} else if (tsconfig.hasExclude()) {
+					return !tsconfig.isExcluded(resource);
+				}
 			}
 		} catch (CoreException e) {
 			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canValidate", e);

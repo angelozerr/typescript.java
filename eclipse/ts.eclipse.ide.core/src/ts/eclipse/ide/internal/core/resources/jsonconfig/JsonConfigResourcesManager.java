@@ -16,9 +16,11 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
+import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
-import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.FileUtils;
 
 /**
@@ -29,16 +31,23 @@ public class JsonConfigResourcesManager {
 
 	private static final JsonConfigResourcesManager INSTANCE = new JsonConfigResourcesManager();
 
+	private static final IPath TSCONFIG_JSON_PATH = new Path(FileUtils.TSCONFIG_JSON);
+
 	public static JsonConfigResourcesManager getInstance() {
 		return INSTANCE;
 	}
 
-	private final Map<IFile, TsconfigJson> jsconConfig;
+	private final Map<IFile, IDETsconfigJson> jsconConfig;
 
 	public JsonConfigResourcesManager() {
-		this.jsconConfig = new HashMap<IFile, TsconfigJson>();
+		this.jsconConfig = new HashMap<IFile, IDETsconfigJson>();
 	}
 
+	/**
+	 * Remove the given tsconfig.json from the cache.
+	 * 
+	 * @param file
+	 */
 	public void remove(IFile file) {
 		synchronized (jsconConfig) {
 			jsconConfig.remove(file);
@@ -53,29 +62,43 @@ public class JsonConfigResourcesManager {
 	 * @return
 	 * @throws CoreException
 	 */
-	public TsconfigJson findTsconfig(IResource resource) throws CoreException {
-		IFile tsconfigFile = WorkbenchResourceUtil.findFileRecursively(resource, FileUtils.TSCONFIG_JSON);
+	public IDETsconfigJson findTsconfig(IResource resource) throws CoreException {
+		IFile tsconfigFile = WorkbenchResourceUtil.findFileRecursively(resource, TSCONFIG_JSON_PATH);
 		if (tsconfigFile != null) {
 			return getTsconfig(tsconfigFile);
 		}
 		return null;
 	}
 
-	private TsconfigJson getTsconfig(IFile tsconfigFile) throws CoreException {
-		TsconfigJson tsconfig = jsconConfig.get(tsconfigFile);
+	/**
+	 * Returns the Pojo of the given tsconfig.json file.
+	 * 
+	 * @param tsconfigFile
+	 * @return the Pojo of the given tsconfig.json file.
+	 * @throws CoreException
+	 */
+	private IDETsconfigJson getTsconfig(IFile tsconfigFile) throws CoreException {
+		IDETsconfigJson tsconfig = jsconConfig.get(tsconfigFile);
 		if (tsconfig == null) {
 			return createTsConfig(tsconfigFile);
 		}
 		return tsconfig;
 	}
 
-	private synchronized TsconfigJson createTsConfig(IFile tsconfigFile) throws CoreException {
-		TsconfigJson tsconfig = jsconConfig.get(tsconfigFile);
+	/**
+	 * Create Pojo instance of the given tsconfig.json file.
+	 * 
+	 * @param tsconfigFile
+	 * @return Pojo instance of the given tsconfig.json file.
+	 * @throws CoreException
+	 */
+	private synchronized IDETsconfigJson createTsConfig(IFile tsconfigFile) throws CoreException {
+		IDETsconfigJson tsconfig = jsconConfig.get(tsconfigFile);
 		if (tsconfig != null) {
 			return tsconfig;
 		}
 
-		tsconfig = TsconfigJson.load(tsconfigFile.getContents());
+		tsconfig = IDETsconfigJson.load(tsconfigFile);
 		synchronized (jsconConfig) {
 			jsconConfig.put(tsconfigFile, tsconfig);
 		}
