@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!--
+###############################################################################
+# Copyright (c) 2015-2016 Angelo Zerr and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#     Angelo Zerr <angelo.zerr@gmail.com> - Initial API and implementation 
+###############################################################################
+ -->
+<plugin>
+
+   <extension
+         id="TypeScriptDocumentSetupParticipant"
+         name="%javaDocumentSetupParticipant"
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            contentTypeId="ts.eclipse.ide.jsdt.core.tsSource"
+            extensions="ts,tsx,jsx"
+            class="org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaDocumentSetupParticipant">
+      </participant>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="%TypeScriptEditor.name"
+            default="true"
+            icon="$nl$/icons/full/obj16/ts.png"
+            contributorClass="ts.eclipse.ide.ui.editor.internal.TypeScriptEditorActionContributor"
+            class="ts.eclipse.ide.ui.editor.internal.TypeScriptEditor"
+            symbolicFontName="org.eclipse.wst.jsdt.ui.editors.textfont"
+            id="ts.eclipse.ide.ui.editor.TypeScriptEditor"
+            extensions="ts,tsx,jsx">
+            <contentTypeBinding contentTypeId="org.eclipse.wst.jsdt.core.tsSource" /> 
+            <contentTypeBinding contentTypeId="org.eclipse.wst.jsdt.core.tsxSource" />
+            <contentTypeBinding contentTypeId="org.eclipse.wst.jsdt.core.jsxSource" />
+      </editor>
+   </extension>
+     	
+</plugin>        
