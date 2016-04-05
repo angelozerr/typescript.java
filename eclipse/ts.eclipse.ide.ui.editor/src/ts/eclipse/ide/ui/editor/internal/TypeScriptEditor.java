@@ -17,6 +17,7 @@ import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptTextTools;
 
 import ts.eclipse.ide.ui.editor.TypeScriptUIEditorPlugin;
+import ts.eclipse.ide.ui.editor.internal.text.TypeScriptSourceViewerConfiguration;
 
 public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 
@@ -41,7 +42,7 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 	 */
 	protected JavaScriptSourceViewerConfiguration createJavaSourceViewerConfiguration() {
 		JavaScriptTextTools textTools = JavaScriptPlugin.getDefault().getJavaTextTools();
-		return new JavaScriptSourceViewerConfiguration(textTools.getColorManager(), getPreferenceStore(), this,
+		return new TypeScriptSourceViewerConfiguration(textTools.getColorManager(), getPreferenceStore(), this,
 				IJavaScriptPartitions.JAVA_PARTITIONING);
 	}
 	
