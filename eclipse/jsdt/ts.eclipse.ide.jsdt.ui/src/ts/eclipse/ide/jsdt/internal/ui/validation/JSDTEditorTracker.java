@@ -27,16 +27,15 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaEditor;
 
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
 /**
  * JavaScript editor tracker.
  */
-public class JSDTEditorTracker implements IWindowListener, IPageListener,
-		IPartListener {
+public class JSDTEditorTracker implements IWindowListener, IPageListener, IPartListener {
 	static JSDTEditorTracker INSTANCE;
 
 	Map<IEditorPart, TypeScriptDocumentRegionProcessor> fAsYouTypeValidators = new HashMap<IEditorPart, TypeScriptDocumentRegionProcessor>();
@@ -60,8 +59,7 @@ public class JSDTEditorTracker implements IWindowListener, IPageListener,
 				for (IWorkbenchWindow window : windows) {
 					windowOpened(window);
 				}
-				JSDTTypeScriptUIPlugin.getDefault().getWorkbench()
-						.addWindowListener(this);
+				JSDTTypeScriptUIPlugin.getDefault().getWorkbench().addWindowListener(this);
 			}
 		}
 	}
@@ -149,18 +147,12 @@ public class JSDTEditorTracker implements IWindowListener, IPageListener,
 	}
 
 	private void editorOpened(IEditorPart part) {
-		if (part instanceof JavaEditor) {
+		if (part instanceof ITextEditor) {
 			IResource resource = EditorUtils.getResource(part);
-			if (resource != null
-					/*
-					&& resource.getType() == IResource.FILE
-					&& (TypeScriptResourcesManager.isJSFile(resource) || TypeScriptResourcesManager
-							.isHTMLFile(resource))
-					&& TypeScriptCorePlugin.hasTypeScriptNature(resource.getProject())*/) {
+			if (resource != null && TypeScriptCorePlugin.canConsumeTsserver(resource)) {
 				ISourceViewer viewer = EditorUtils.getSourceViewer(part);
 				if (viewer != null) {
-					TypeScriptDocumentRegionProcessor processor = fAsYouTypeValidators
-							.get(part);
+					TypeScriptDocumentRegionProcessor processor = fAsYouTypeValidators.get(part);
 					if (processor != null) {
 						// Emulate editor closed due to uninstall the old
 						// processor
@@ -186,8 +178,7 @@ public class JSDTEditorTracker implements IWindowListener, IPageListener,
 
 	private void editorClosed(IEditorPart part) {
 		if (part instanceof ITextEditor) {
-			TypeScriptDocumentRegionProcessor processor = fAsYouTypeValidators
-					.remove(part);
+			TypeScriptDocumentRegionProcessor processor = fAsYouTypeValidators.remove(part);
 			if (processor != null) {
 				processor.uninstall();
 				Assert.isTrue(null == fAsYouTypeValidators.get(part),
