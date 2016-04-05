@@ -9,6 +9,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
@@ -16,6 +17,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
@@ -23,7 +25,6 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.wst.jsdt.core.JavaScriptCore;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
-import org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaSourceViewer;
 import org.eclipse.wst.jsdt.internal.ui.text.JavaPairMatcher;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
@@ -45,8 +46,35 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 	/** The editor's bracket matcher */
 	protected JavaPairMatcher fBracketMatcher = new JavaPairMatcher(BRACKETS);
 
+	/** Preference key for automatically closing strings */
+	private final static String CLOSE_STRINGS= PreferenceConstants.EDITOR_CLOSE_STRINGS;
+	/** Preference key for automatically closing brackets and parenthesis */
+	private final static String CLOSE_BRACKETS= PreferenceConstants.EDITOR_CLOSE_BRACKETS;
+	/** The bracket inserter. */
+	private BracketInserter fBracketInserter = new BracketInserter(this);
+
 	public TypeScriptEditor() {
 		super.setDocumentProvider(TypeScriptUIEditorPlugin.getDefault().getTypeScriptDocumentProvider());
+	}
+
+	@Override
+	public void createPartControl(Composite parent) {
+
+		super.createPartControl(parent);
+
+		IPreferenceStore preferenceStore = getPreferenceStore();
+		boolean closeBrackets = preferenceStore.getBoolean(CLOSE_BRACKETS);
+		boolean closeStrings = preferenceStore.getBoolean(CLOSE_STRINGS);
+		boolean closeAngularBrackets = JavaScriptCore.VERSION_1_5
+				.compareTo(preferenceStore.getString(JavaScriptCore.COMPILER_SOURCE)) <= 0;
+
+		fBracketInserter.setCloseBracketsEnabled(closeBrackets);
+		fBracketInserter.setCloseStringsEnabled(closeStrings);
+		fBracketInserter.setCloseAngularBracketsEnabled(closeAngularBrackets);
+
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer instanceof ITextViewerExtension)
+			((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(fBracketInserter);
 	}
 
 	@Override
@@ -82,11 +110,11 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 
 	private void internalDoSetInput(IEditorInput input) throws CoreException {
 		ISourceViewer sourceViewer = getSourceViewer();
-//		TSourceViewer javaSourceViewer = null;
-//		if (sourceViewer instanceof JavaSourceViewer) {
-//			javaSourceViewer = (JavaSourceViewer) sourceViewer;
-//		}
-		
+		// TSourceViewer javaSourceViewer = null;
+		// if (sourceViewer instanceof JavaSourceViewer) {
+		// javaSourceViewer = (JavaSourceViewer) sourceViewer;
+		// }
+
 		super.doSetInput(input);
 	}
 
@@ -261,6 +289,17 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 			fBracketMatcher.dispose();
 			fBracketMatcher = null;
 		}
+
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer instanceof ITextViewerExtension) {
+			((ITextViewerExtension) sourceViewer).removeVerifyKeyListener(fBracketInserter);
+		}
+
 		super.dispose();
 	}
+
+	ISourceViewer getViewser() {
+		return getSourceViewer();
+	}
+
 }
