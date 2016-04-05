@@ -26,10 +26,9 @@ import org.eclipse.wst.jsdt.ui.text.java.JavaContentAssistInvocationContext;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
+import ts.eclipse.ide.jsdt.ui.TypeScriptContentAssistInvocationContext;
 import ts.eclipse.jface.text.contentassist.CompletionProposalCollector;
 import ts.resources.ITypeScriptFile;
-import ts.resources.TypeScriptResourcesManager;
-import ts.utils.FileUtils;
 
 /**
  * JSDT completion proposal computer manage completion Proposal for Javascript
@@ -41,20 +40,26 @@ public class TypeScriptCompletionProposalComputer
 		implements IJavaCompletionProposalComputer/* , ICompletionProposalComputer */ {
 
 	public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-		if (context instanceof JavaContentAssistInvocationContext) {
+		IResource resource = null;
+		if (context instanceof TypeScriptContentAssistInvocationContext) {
+			TypeScriptContentAssistInvocationContext tsContext = (TypeScriptContentAssistInvocationContext) context;
+			resource = tsContext.getResource();
+		} else if (context instanceof JavaContentAssistInvocationContext) {
+			JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
+			resource = javaContext.getCompilationUnit().getResource();
+		}
+		if (resource != null) {
 			try {
-				JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-				IResource resource = javaContext.getCompilationUnit().getResource();
 				if (TypeScriptCorePlugin.canConsumeTsserver(resource)) {
 					IProject project = resource.getProject();
 					IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
 					if (tsProject != null) {
 
-						int position = javaContext.getInvocationOffset();
+						int position = context.getInvocationOffset();
 
-						IDocument document = javaContext.getDocument();
+						IDocument document = context.getDocument();
 						ITypeScriptFile tsFile = tsProject.openFile(resource, document);
-						CharSequence prefix = javaContext.computeIdentifierPrefix();
+						CharSequence prefix = context.computeIdentifierPrefix();
 
 						CompletionProposalCollector collector = new CompletionProposalCollector(position,
 								prefix != null ? prefix.toString() : null);

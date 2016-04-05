@@ -28,3 +28,4 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
+Export-Package: ts.eclipse.ide.jsdt.ui

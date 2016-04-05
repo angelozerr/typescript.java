@@ -128,9 +128,9 @@ public class TypeScriptUIEditorPlugin extends AbstractUIPlugin {
 		log(new Status(IStatus.ERROR, PLUGIN_ID, INTERNAL_ERROR, message, e));
 	}
 
-	public static void log(Throwable e) {
-		log(TypeScriptUIMessages.TypeScriptUIPlugin_internal_error, e);
-	}
+//	public static void log(Throwable e) {
+//		log(TypeScriptUIMessages.TypeScriptUIPlugin_internal_error, e);
+//	}
 
 	public synchronized IDocumentProvider getTypeScriptDocumentProvider() {
 		if (documentProvider == null) {

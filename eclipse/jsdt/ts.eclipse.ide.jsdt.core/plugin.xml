@@ -18,7 +18,9 @@
 	<content-type 
 		id="tsSource"
 		name="%tsSourceName"
-		base-type="org.eclipse.wst.jsdt.core.jsSource"
+		base-type="org.eclipse.core.runtime.text"
+		priority="high"	
+		default-charset="UTF-8"	
 		file-extensions="ts">
 	</content-type>
   </extension>
@@ -27,7 +29,9 @@
 	<content-type 
 		id="jsxSource"
 		name="%jsxSourceName"
-		base-type="org.eclipse.wst.jsdt.core.jsSource"
+		base-type="org.eclipse.core.runtime.text"
+		priority="high"	
+		default-charset="UTF-8"
 		file-extensions="jsx">
 	</content-type>
   </extension>
@@ -36,7 +40,9 @@
 	<content-type 
 		id="tsxSource"
 		name="%tsxSourceName"
-		base-type="org.eclipse.wst.jsdt.core.jsSource"
+		base-type="org.eclipse.core.runtime.text"
+		priority="high"	
+		default-charset="UTF-8"
 		file-extensions="tsx">
 	</content-type>
   </extension>
