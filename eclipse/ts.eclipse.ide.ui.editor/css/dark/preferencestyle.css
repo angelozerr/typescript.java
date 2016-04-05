@@ -1,0 +1,48 @@
+/***************************************************************************
+ * Copyright (c) 2014, 2016 Kaloyan Raev and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Kaloyan Raev - initial API and implementation
+ *     Andrea Guarinoni - intial color schema definition
+ *     Angelo ZERR - content assist coloration, hover, occurrence 
+ ***************************************************************************/
+
+/* ####################### JSDT syntax highlighting ###################### */
+
+IEclipsePreferences#ts-eclipse-ide-ui-editor {
+	preferences:
+		'content_assist_completion_replacement_background=200,200,0'
+		'content_assist_completion_replacement_foreground=200,0,0'
+		'content_assist_parameters_background=52,57,61'
+		'content_assist_parameters_foreground=238,238,238'
+		'content_assist_proposals_background=52,57,61'
+		'content_assist_proposals_foreground=238,238,238'
+		'java_bracket=249,250,244'
+		'java_comment_task_tag=154,140,124'
+		'java_default=217,232,247'
+		'java_doc_default=96,139,78'
+		'java_doc_keyword=65,94,53'
+		'java_doc_link=65,94,53'
+		'java_doc_tag=30,120,155'
+		'java_keyword=86,156,214'
+		'java_keyword_return=86,156,214'
+		'java_multi_line_comment=96,139,78'
+		'java_operator=230,230,250'
+		'java_single_line_comment=96,139,78'
+		'java_string=206,145,120'
+		'semanticHighlighting.deprecatedMember.color=171,31,54'
+		'semanticHighlighting.localVariable.color=255,191,38'
+		'semanticHighlighting.localVariable.enabled=true'
+		'semanticHighlighting.localVariableDeclaration.color=237,127,72'
+		'semanticHighlighting.localVariableDeclaration.enabled=true'
+		'semanticHighlighting.parameterVariable.color=121,171,255'
+		'semanticHighlighting.parameterVariable.enabled=true'
+		'tagName=217,232,247'
+		'sourceHoverBackgroundColor=68,68,68'
+		'sourceHoverBackgroundColor.SystemDefault=false'
+		'javaScriptOccurrenceIndicationColor=18,79,120'
+}
