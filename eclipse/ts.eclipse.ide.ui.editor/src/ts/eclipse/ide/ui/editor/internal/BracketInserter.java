@@ -368,7 +368,7 @@ public class BracketInserter implements VerifyKeyListener, ILinkedModeListener {
 	}
 
 	private ISourceViewer getSourceViewer() {
-		return editor.getViewser();
+		return editor.getViewer();
 	}
 
 	/*

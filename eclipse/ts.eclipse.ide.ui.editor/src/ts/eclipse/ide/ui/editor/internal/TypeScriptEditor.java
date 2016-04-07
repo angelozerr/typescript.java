@@ -7,20 +7,31 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
+import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
+import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.projection.ProjectionSupport;
+import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.wst.jsdt.core.JavaScriptCore;
@@ -47,11 +58,17 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 	protected JavaPairMatcher fBracketMatcher = new JavaPairMatcher(BRACKETS);
 
 	/** Preference key for automatically closing strings */
-	private final static String CLOSE_STRINGS= PreferenceConstants.EDITOR_CLOSE_STRINGS;
+	private final static String CLOSE_STRINGS = PreferenceConstants.EDITOR_CLOSE_STRINGS;
 	/** Preference key for automatically closing brackets and parenthesis */
-	private final static String CLOSE_BRACKETS= PreferenceConstants.EDITOR_CLOSE_BRACKETS;
+	private final static String CLOSE_BRACKETS = PreferenceConstants.EDITOR_CLOSE_BRACKETS;
 	/** The bracket inserter. */
 	private BracketInserter fBracketInserter = new BracketInserter(this);
+
+	/**
+	 * This editor's projection support
+	 * 
+	 */
+	private ProjectionSupport fProjectionSupport;
 
 	public TypeScriptEditor() {
 		super.setDocumentProvider(TypeScriptUIEditorPlugin.getDefault().getTypeScriptDocumentProvider());
@@ -61,6 +78,12 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 	public void createPartControl(Composite parent) {
 
 		super.createPartControl(parent);
+
+		// do not even install projection support until folding is actually
+		// enabled
+		if (isFoldingEnabled()) {
+			installProjectionSupport();
+		}
 
 		IPreferenceStore preferenceStore = getPreferenceStore();
 		boolean closeBrackets = preferenceStore.getBoolean(CLOSE_BRACKETS);
@@ -81,8 +104,7 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 	protected void initializeEditor() {
 		IPreferenceStore store = createCombinedPreferenceStore(null);
 		setPreferenceStore(store);
-		setSourceViewerConfiguration(createJavaSourceViewerConfiguration());
-
+		setSourceViewerConfiguration(createTypeScriptSourceViewerConfiguration());
 		super.initializeEditor();
 	}
 
@@ -110,12 +132,32 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 
 	private void internalDoSetInput(IEditorInput input) throws CoreException {
 		ISourceViewer sourceViewer = getSourceViewer();
-		// TSourceViewer javaSourceViewer = null;
-		// if (sourceViewer instanceof JavaSourceViewer) {
-		// javaSourceViewer = (JavaSourceViewer) sourceViewer;
-		// }
+		TypeScriptSourceViewer TypeScriptSourceViewer = null;
+		if (sourceViewer instanceof TypeScriptSourceViewer)
+			TypeScriptSourceViewer = (TypeScriptSourceViewer) sourceViewer;
+
+		IPreferenceStore store = getPreferenceStore();
+		// if (TypeScriptSourceViewer != null && isFoldingEnabled() &&(store ==
+		// null || !store.getBoolean(PreferenceConstants.EDITOR_SHOW_SEGMENTS)))
+		// TypeScriptSourceViewer.prepareDelayedProjection();
 
 		super.doSetInput(input);
+
+		if (TypeScriptSourceViewer != null && TypeScriptSourceViewer.getReconciler() == null) {
+			IReconciler reconciler = getSourceViewerConfiguration().getReconciler(TypeScriptSourceViewer);
+			if (reconciler != null) {
+				reconciler.install(TypeScriptSourceViewer);
+				TypeScriptSourceViewer.setReconciler(reconciler);
+			}
+		}
+
+		// if (fEncodingSupport != null)
+		// fEncodingSupport.reset();
+
+		// setOutlinePageInput(fOutlinePage, input);
+		//
+		// if (isShowingOverrideIndicators())
+		// installOverrideIndicator(false);
 	}
 
 	/**
@@ -124,7 +166,7 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 	 * @return a new <code>JavaScriptSourceViewerConfiguration</code>
 	 * 
 	 */
-	protected JavaScriptSourceViewerConfiguration createJavaSourceViewerConfiguration() {
+	protected JavaScriptSourceViewerConfiguration createTypeScriptSourceViewerConfiguration() {
 		JavaScriptTextTools textTools = JavaScriptPlugin.getDefault().getJavaTextTools();
 		return new TypeScriptSourceViewerConfiguration(textTools.getColorManager(), getPreferenceStore(), this,
 				IJavaScriptPartitions.JAVA_PARTITIONING);
@@ -285,6 +327,11 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 
 	@Override
 	public void dispose() {
+		if (fProjectionSupport != null) {
+			fProjectionSupport.dispose();
+			fProjectionSupport = null;
+		}
+
 		if (fBracketMatcher != null) {
 			fBracketMatcher.dispose();
 			fBracketMatcher = null;
@@ -298,8 +345,139 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 		super.dispose();
 	}
 
-	ISourceViewer getViewser() {
+	protected final ISourceViewer createSourceViewer(Composite parent, IVerticalRuler verticalRuler, int styles) {
+
+		IPreferenceStore store = getPreferenceStore();
+		ISourceViewer viewer = createTypeScriptSourceViewer(parent, verticalRuler, getOverviewRuler(),
+				isOverviewRulerVisible(), styles, store);
+
+		// JavaUIHelp.setHelp(this, viewer.getTextWidget(),
+		// IJavaHelpContextIds.JAVA_EDITOR);
+
+		TypeScriptSourceViewer TypeScriptSourceViewer = null;
+		if (viewer instanceof TypeScriptSourceViewer)
+			TypeScriptSourceViewer = (TypeScriptSourceViewer) viewer;
+
+		/*
+		 * This is a performance optimization to reduce the computation of the
+		 * text presentation triggered by {@link #setVisibleDocument(IDocument)}
+		 */
+		if (TypeScriptSourceViewer != null && isFoldingEnabled()
+				&& (store == null || !store.getBoolean(PreferenceConstants.EDITOR_SHOW_SEGMENTS))) {
+			// TypeScriptSourceViewer.prepareDelayedProjection();
+		}
+
+		// // do not even install projection support until folding is actually
+		// // enabled
+		// if (isFoldingEnabled()) {
+		// installProjectionSupport(TypeScriptSourceViewer);
+		// }
+
+		// fProjectionModelUpdater =
+		// JavaScriptPlugin.getDefault().getFoldingStructureProviderRegistry()
+		// .getCurrentFoldingProvider();
+		// if (fProjectionModelUpdater != null) {
+		// fProjectionModelUpdater.install(this, projectionViewer);
+		// }
+		// ensure source viewer decoration support has been created and
+		// configured
+		getSourceViewerDecorationSupport(viewer);
+
+		return viewer;
+	}
+
+	public final ISourceViewer getViewer() {
 		return getSourceViewer();
 	}
 
+	protected ISourceViewer createTypeScriptSourceViewer(Composite parent, IVerticalRuler verticalRuler,
+			IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
+		return new TypeScriptSourceViewer(parent, verticalRuler, getOverviewRuler(), isOverviewRulerVisible(), styles,
+				store);
+	}
+
+	@Override
+	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
+
+		String property = event.getProperty();
+
+		if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH.equals(property)) {
+			/*
+			 * Ignore tab setting since we rely on the formatter preferences. We
+			 * do this outside the try-finally block to avoid that
+			 * EDITOR_TAB_WIDTH is handled by the sub-class
+			 * (AbstractDecoratedTextEditor).
+			 */
+			return;
+		}
+
+		try {
+			ISourceViewer sourceViewer = getSourceViewer();
+			if (sourceViewer == null)
+				return;
+
+			if (JavaScriptCore.COMPILER_SOURCE.equals(property)) {
+				if (event.getNewValue() instanceof String)
+					fBracketMatcher.setSourceVersion((String) event.getNewValue());
+				// fall through as others are interested in source change as
+				// well.
+			}
+
+			((JavaScriptSourceViewerConfiguration) getSourceViewerConfiguration()).handlePropertyChangeEvent(event);
+
+			if (PreferenceConstants.EDITOR_FOLDING_PROVIDER.equals(property)) {
+				if (sourceViewer instanceof ProjectionViewer) {
+					ProjectionViewer pv = (ProjectionViewer) sourceViewer;
+					// install projection support if it has not even been
+					// installed yet
+					if (isFoldingEnabled() && (fProjectionSupport == null)) {
+						installProjectionSupport();
+					}
+					if (pv.isProjectionMode() != isFoldingEnabled()) {
+						if (pv.canDoOperation(ProjectionViewer.TOGGLE)) {
+							pv.doOperation(ProjectionViewer.TOGGLE);
+						}
+					}
+				}
+				return;
+			}
+		} finally {
+			super.handlePreferenceStoreChanged(event);
+		}
+	}
+
+	/**
+	 * Install everything necessary to get document folding working and enable
+	 * document folding
+	 * 
+	 * @param sourceViewer
+	 */
+	private void installProjectionSupport() {
+
+		ProjectionViewer projectionViewer = (ProjectionViewer) getSourceViewer();
+		fProjectionSupport = new ProjectionSupport(projectionViewer, getAnnotationAccess(), getSharedColors());
+		fProjectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.error"); //$NON-NLS-1$
+		fProjectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.warning"); //$NON-NLS-1$
+		fProjectionSupport.setHoverControlCreator(new IInformationControlCreator() {
+			public IInformationControl createInformationControl(Shell parent) {
+				return new DefaultInformationControl(parent);
+			}
+		});
+		fProjectionSupport.install();
+
+		if (isFoldingEnabled()) {
+			projectionViewer.doOperation(ProjectionViewer.TOGGLE);
+		}
+	}
+
+	/**
+	 * Return whether document folding should be enabled according to the
+	 * preference store settings.
+	 * 
+	 * @return <code>true</code> if document folding should be enabled
+	 */
+	private boolean isFoldingEnabled() {
+		return JavaScriptPlugin.getDefault().getPreferenceStore()
+				.getBoolean(PreferenceConstants.EDITOR_FOLDING_ENABLED);
+	}
 }
