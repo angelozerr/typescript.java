@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package ts.eclipse.ide.ui.editor.internal;
+package ts.eclipse.ide.jsdt.internal.ui.editor;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;

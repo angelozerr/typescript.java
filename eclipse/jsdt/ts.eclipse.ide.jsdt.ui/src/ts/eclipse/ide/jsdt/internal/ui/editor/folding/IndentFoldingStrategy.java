@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.jsdt.internal.ui.folding;
+package ts.eclipse.ide.jsdt.internal.ui.editor.folding;
 
 import java.util.ArrayList;
 import java.util.HashMap;

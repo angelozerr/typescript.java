@@ -12,7 +12,10 @@
 package ts.eclipse.ide.jsdt.internal.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
+
+import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptDocumentProvider;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -25,8 +28,8 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static JSDTTypeScriptUIPlugin plugin;
 
-	//private static ITernContextProvider contextProvider = new JSDTTernContextProvider();
-
+	private TypeScriptDocumentProvider documentProvider;
+	
 	/**
 	 * The constructor
 	 */
@@ -66,12 +69,10 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 	
-//	public static ITernContextProvider getContextProvider() {
-//		return contextProvider;
-//	}
-//	
-//	public static void setContextProvider(ITernContextProvider projectProvider) {
-//		contextProvider = projectProvider;
-//	}
-//	
+	public synchronized IDocumentProvider getTypeScriptDocumentProvider() {
+		if (documentProvider == null) {
+			documentProvider = new TypeScriptDocumentProvider();
+		}
+		return documentProvider;
+	}
 }

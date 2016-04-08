@@ -8,17 +8,14 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.jsdt.internal.ui.hover;
+package ts.eclipse.ide.jsdt.internal.ui.editor;
 
-import org.eclipse.wst.jsdt.ui.text.java.hover.IJavaEditorTextHover;
-
-import ts.eclipse.ide.ui.hover.ProblemTypeScriptHover;
+import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
 
 /**
- * JSDT Problem Hover used to display errors when mouse over a JS content which
- * have a typescript error.
- *
+ * 
+ * Action contributor for TypeScript.
  */
-public class JSDTProblemTypeScriptHover extends ProblemTypeScriptHover implements IJavaEditorTextHover {
+public class TypeScriptEditorActionContributor extends BasicTextEditorActionContributor {
 
 }

@@ -1,4 +1,14 @@
-package ts.eclipse.ide.ui.editor.internal;
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
+package ts.eclipse.ide.jsdt.internal.ui.editor;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
@@ -9,6 +19,10 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaSourceViewer;
 
+/**
+ * Extension of JSDT {@link JavaSourceViewer}.
+ *
+ */
 public class TypeScriptSourceViewer extends JavaSourceViewer {
 
 	public TypeScriptSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler,
@@ -38,7 +52,8 @@ public class TypeScriptSourceViewer extends JavaSourceViewer {
 	}
 
 	@Override
-	public void setDocument(IDocument document, IAnnotationModel annotationModel, int modelRangeOffset, int modelRangeLength) {
+	public void setDocument(IDocument document, IAnnotationModel annotationModel, int modelRangeOffset,
+			int modelRangeLength) {
 		// partial fix for:
 		// https://w3.opensource.ibm.com/bugzilla/show_bug.cgi?id=1970
 		// when our document is set, especially to null during close,
@@ -52,6 +67,6 @@ public class TypeScriptSourceViewer extends JavaSourceViewer {
 		}
 
 		super.setDocument(document, annotationModel, modelRangeOffset, modelRangeLength);
-		
+
 	}
 }

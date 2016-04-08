@@ -1,4 +1,14 @@
-package ts.eclipse.ide.ui.editor.internal;
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
+package ts.eclipse.ide.jsdt.internal.ui.editor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +54,12 @@ import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptTextTools;
 
-import ts.eclipse.ide.ui.editor.TypeScriptUIEditorPlugin;
-import ts.eclipse.ide.ui.editor.internal.text.TypeScriptSourceViewerConfiguration;
+import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 
+/**
+ * TypeScript editor.
+ *
+ */
 public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 
 	/** Preference key for matching brackets */
@@ -71,7 +84,7 @@ public class TypeScriptEditor extends AbstractDecoratedTextEditor {
 	private ProjectionSupport fProjectionSupport;
 
 	public TypeScriptEditor() {
-		super.setDocumentProvider(TypeScriptUIEditorPlugin.getDefault().getTypeScriptDocumentProvider());
+		super.setDocumentProvider(JSDTTypeScriptUIPlugin.getDefault().getTypeScriptDocumentProvider());
 	}
 
 	@Override

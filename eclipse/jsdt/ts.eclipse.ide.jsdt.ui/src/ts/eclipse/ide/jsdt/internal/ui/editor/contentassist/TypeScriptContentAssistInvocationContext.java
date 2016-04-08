@@ -1,4 +1,4 @@
-package ts.eclipse.ide.jsdt.ui;
+package ts.eclipse.ide.jsdt.internal.ui.editor.contentassist;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.ITextViewer;

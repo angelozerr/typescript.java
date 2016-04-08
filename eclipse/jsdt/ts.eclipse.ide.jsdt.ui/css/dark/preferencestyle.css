@@ -13,7 +13,7 @@
 
 /* ####################### JSDT syntax highlighting ###################### */
 
-IEclipsePreferences#ts-eclipse-ide-ui-editor {
+IEclipsePreferences#ts-eclipse-ide-jsdt-ui {
 	preferences:
 		'content_assist_completion_replacement_background=200,200,0'
 		'content_assist_completion_replacement_foreground=200,0,0'

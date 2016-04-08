@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.jsdt.internal.ui.hover;
+package ts.eclipse.ide.jsdt.internal.ui.editor.hover;
 
 import org.eclipse.wst.jsdt.ui.text.java.hover.IJavaEditorTextHover;
 

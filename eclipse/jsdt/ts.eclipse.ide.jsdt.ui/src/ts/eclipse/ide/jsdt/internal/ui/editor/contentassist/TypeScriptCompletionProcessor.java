@@ -1,12 +1,10 @@
-package ts.eclipse.ide.ui.editor.internal.text;
+package ts.eclipse.ide.jsdt.internal.ui.editor.contentassist;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.jsdt.internal.ui.text.java.JavaCompletionProcessor;
 import org.eclipse.wst.jsdt.ui.text.java.ContentAssistInvocationContext;
-
-import ts.eclipse.ide.jsdt.ui.TypeScriptContentAssistInvocationContext;
 
 public class TypeScriptCompletionProcessor extends JavaCompletionProcessor {
 

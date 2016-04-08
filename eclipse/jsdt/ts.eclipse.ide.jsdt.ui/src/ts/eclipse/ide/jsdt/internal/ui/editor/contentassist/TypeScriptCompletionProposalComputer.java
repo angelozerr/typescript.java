@@ -10,7 +10,7 @@
  *  Piotr Tomiak <piotr@genuitec.com> - refactoring of file management API
  *  									unified completion proposals calculation
  */
-package ts.eclipse.ide.jsdt.internal.ui.contentassist;
+package ts.eclipse.ide.jsdt.internal.ui.editor.contentassist;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +26,6 @@ import org.eclipse.wst.jsdt.ui.text.java.JavaContentAssistInvocationContext;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
-import ts.eclipse.ide.jsdt.ui.TypeScriptContentAssistInvocationContext;
 import ts.eclipse.jface.text.contentassist.CompletionProposalCollector;
 import ts.resources.ITypeScriptFile;
 

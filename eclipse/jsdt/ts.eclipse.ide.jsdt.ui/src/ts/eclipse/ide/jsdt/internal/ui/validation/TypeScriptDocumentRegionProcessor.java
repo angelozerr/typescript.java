@@ -18,7 +18,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.wst.sse.ui.internal.reconcile.DocumentRegionProcessor;
 
-import ts.eclipse.ide.jsdt.internal.ui.folding.IndentFoldingStrategy;
+import ts.eclipse.ide.jsdt.internal.ui.editor.folding.IndentFoldingStrategy;
 import ts.utils.FileUtils;
 
 /**

@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.ui.editor.internal;
+package ts.eclipse.ide.jsdt.internal.ui.editor;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
