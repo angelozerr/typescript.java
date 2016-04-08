@@ -10,6 +10,7 @@ import ts.client.completions.CompletionInfo;
 import ts.client.completions.ICompletionEntry;
 import ts.client.completions.ICompletionInfo;
 import ts.client.definition.DefinitionsInfo;
+import ts.client.format.ITypeScriptFormatCollector;
 import ts.utils.FileUtils;
 
 public class Main {
@@ -47,6 +48,14 @@ public class Main {
 		DefinitionsInfo definitionInfo = new DefinitionsInfo();
 		client.definition(fileName, 1, 12, definitionInfo);
 		display(definitionInfo);
+
+		client.format(fileName, 1, 1, 1, 12, new ITypeScriptFormatCollector() {
+			@Override
+			public void format(int startLine, int startOffset, int endLine, int endOffset, String newText)
+					throws TypeScriptException {
+				System.err.println(newText);
+			}
+		});
 
 		client.join();
 		client.dispose();

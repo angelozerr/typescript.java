@@ -45,7 +45,7 @@ import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 
 public class BracketInserter implements VerifyKeyListener, ILinkedModeListener {
 
-	private final TypeScriptEditor editor;
+	private final JavaScriptLightWeightEditor editor;
 
 	private class ExitPolicy implements IExitPolicy {
 
@@ -202,7 +202,7 @@ public class BracketInserter implements VerifyKeyListener, ILinkedModeListener {
 
 	}
 
-	public BracketInserter(TypeScriptEditor editor) {
+	public BracketInserter(JavaScriptLightWeightEditor editor) {
 		this.editor = editor;
 	}
 

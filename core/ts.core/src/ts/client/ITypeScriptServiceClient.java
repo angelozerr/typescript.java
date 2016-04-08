@@ -14,6 +14,7 @@ import ts.TypeScriptException;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
+import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
@@ -52,6 +53,8 @@ public interface ITypeScriptServiceClient {
 
 	void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException;
 
+	void format(String fileName, int line, int offset, int endLine, int endOffset, ITypeScriptFormatCollector collector) throws TypeScriptException;
+	
 	void join() throws InterruptedException;
 
 	void addClientListener(ITypeScriptClientListener listener);

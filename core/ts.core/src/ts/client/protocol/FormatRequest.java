@@ -11,17 +11,18 @@
 package ts.client.protocol;
 
 /**
- *
- * Quickinfo request; value of command field is "quickinfo". Return response
- * giving a quick type and documentation string for the symbol found in file at
- * location line, col.
+ * Format request; value of command field is "format". Return response giving
+ * zero or more edit instructions. The edit instructions will be sorted in file
+ * order. Applying the edit instructions in reverse to file will result in
+ * correctly reformatted text.
  * 
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class QuickInfoRequest extends FileLocationRequest {
+public class FormatRequest extends FileLocationRequest {
 
-	public QuickInfoRequest(String fileName, int line, int offset) {
-		super(CommandNames.QuickInfo, new FileLocationRequestArgs(fileName, line, offset));
+	public FormatRequest(String fileName, int line, int offset, int endLine, int endOffset) {
+		super(CommandNames.Format, new FormatRequestArgs(fileName, line, offset, endLine, endOffset));
 	}
+
 }

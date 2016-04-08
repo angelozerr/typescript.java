@@ -14,6 +14,7 @@ import ts.TypeScriptException;
 import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
+import ts.client.format.ITypeScriptFormatCollector;
 
 /**
  * TypeScript file API.
@@ -94,7 +95,7 @@ public interface ITypeScriptFile {
 	void completions(int position, ITypeScriptCompletionCollector collector) throws TypeScriptException;
 
 	/**
-	 * Call definitions from the tsserver.
+	 * Call definition from the tsserver.
 	 * 
 	 * @param position
 	 * @param collector
@@ -102,4 +103,13 @@ public interface ITypeScriptFile {
 	 */
 	void definition(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
 
+	/**
+	 * Format the file content according start/end position.
+	 * 
+	 * @param startPosition
+	 * @param endPosition
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
+	void format(int startPosition, int endPosition, ITypeScriptFormatCollector collector) throws TypeScriptException;
 }

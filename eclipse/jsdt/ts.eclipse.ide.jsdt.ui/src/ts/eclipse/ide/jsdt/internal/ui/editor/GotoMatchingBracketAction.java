@@ -20,9 +20,9 @@ public class GotoMatchingBracketAction extends Action {
 
 	public final static String GOTO_MATCHING_BRACKET = "GotoMatchingBracket"; //$NON-NLS-1$
 
-	private final TypeScriptEditor fEditor;
+	private final JavaScriptLightWeightEditor fEditor;
 
-	public GotoMatchingBracketAction(TypeScriptEditor editor) {
+	public GotoMatchingBracketAction(JavaScriptLightWeightEditor editor) {
 		super(TypeScriptUIMessages.GotoMatchingBracket_label);
 		Assert.isNotNull(editor);
 		fEditor = editor;

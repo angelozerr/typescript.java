@@ -16,9 +16,10 @@ package ts.client.protocol;
  */
 public enum CommandNames {
 
-	Open("open"), Close("close"), Change("change"), NavBar("navbar"), Completions("completions"), CompletionEntryDetails(
-			"completionEntryDetails"), Reload("reload"), Definition("definition"), SignatureHelp("signatureHelp"), QuickInfo(
-					"quickinfo"), Geterr("geterr");
+	Open("open"), Close("close"), Change("change"), NavBar("navbar"), Completions(
+			"completions"), CompletionEntryDetails("completionEntryDetails"), Reload("reload"), Definition(
+					"definition"), SignatureHelp(
+							"signatureHelp"), QuickInfo("quickinfo"), Geterr("geterr"), Format("format");
 
 	private final String name;
 

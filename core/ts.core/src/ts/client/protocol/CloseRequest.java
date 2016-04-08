@@ -12,7 +12,9 @@ package ts.client.protocol;
 
 /**
  * Close request.
- *
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
+ *      d.ts
  */
 public class CloseRequest extends SimpleRequest {
 

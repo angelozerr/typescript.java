@@ -10,7 +10,13 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui.editor;
 
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
+import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.ITextEditorExtension;
+
+import ts.eclipse.ide.jsdt.ui.actions.TypeScriptActionConstants;
 
 /**
  * 
@@ -18,4 +24,18 @@ import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
  */
 public class TypeScriptEditorActionContributor extends BasicTextEditorActionContributor {
 
+	public void setActiveEditor(IEditorPart part) {
+		super.setActiveEditor(part);
+
+		ITextEditor textEditor = null;
+		ITextEditorExtension textEditorExtension = null;
+		if (part instanceof ITextEditor)
+			textEditor = (ITextEditor) part;
+		if (part instanceof ITextEditorExtension)
+			textEditorExtension = (ITextEditorExtension) part;
+
+		// Source menu.
+		IActionBars bars = getActionBars();
+		bars.setGlobalActionHandler(TypeScriptActionConstants.FORMAT, getAction(textEditor, "Format")); //$NON-NLS-1$
+	}
 }

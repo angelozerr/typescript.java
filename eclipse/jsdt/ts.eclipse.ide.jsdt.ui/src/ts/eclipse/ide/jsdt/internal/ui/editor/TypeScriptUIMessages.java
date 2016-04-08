@@ -21,7 +21,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class TypeScriptUIMessages extends NLS {
 
-	private static final String BUNDLE_NAME = "ts.eclipse.ide.internal.editor.ui.TypeScriptUIMessages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptUIMessages"; //$NON-NLS-1$
 
 	private static ResourceBundle fResourceBundle;
 

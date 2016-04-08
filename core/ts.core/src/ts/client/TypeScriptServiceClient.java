@@ -30,12 +30,14 @@ import ts.TypeScriptException;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
+import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.protocol.ChangeRequest;
 import ts.client.protocol.CloseRequest;
 import ts.client.protocol.CompletionDetailsRequest;
 import ts.client.protocol.CompletionsRequest;
 import ts.client.protocol.DefinitionRequest;
+import ts.client.protocol.FormatRequest;
 import ts.client.protocol.GeterrRequest;
 import ts.client.protocol.OpenRequest;
 import ts.client.protocol.QuickInfoRequest;
@@ -316,6 +318,29 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
+	@Override
+	public void format(String fileName, int line, int offset, int endLine, int endOffset,
+			ITypeScriptFormatCollector collector) throws TypeScriptException {
+		Request request = new FormatRequest(fileName, line, offset, endLine, endOffset);
+		JsonObject response = execute(request, true, null).asObject();
+		collectFormat(response.get("body").asArray(), collector);
+	}
+
+	private void collectFormat(JsonArray body, ITypeScriptFormatCollector collector) throws TypeScriptException {
+		JsonObject item = null;
+		String newText = null;
+		JsonObject start = null;
+		JsonObject end = null;
+		for (JsonValue b : body) {
+			item = b.asObject();
+			start = item.get("start").asObject();
+			end = item.get("end").asObject();
+			newText = item.getString("newText", null);
+			collector.format(start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
+					end.getInt("offset", -1), newText);
+		}
+	}
+
 	/**
 	 * Write the buffer of editor content to a temporary file and have the
 	 * server reload it
@@ -511,7 +536,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			TypeScriptException tse = getTypeScriptException(e);
 			if (tse != null) {
 				if (tse instanceof TypeScriptTimeoutException) {
-					// when time out exception, we must be sure that the request is removed
+					// when time out exception, we must be sure that the request
+					// is removed
 					tryCancelRequest(((TypeScriptTimeoutException) tse).getRequest().getSeq());
 				}
 				throw (TypeScriptException) tse;
