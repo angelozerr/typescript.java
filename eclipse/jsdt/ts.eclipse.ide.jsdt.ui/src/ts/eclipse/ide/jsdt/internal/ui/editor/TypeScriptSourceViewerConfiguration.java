@@ -28,8 +28,8 @@ import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProcessor;
-import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptContentAssistInvocationContext;
 import ts.eclipse.ide.jsdt.internal.ui.editor.format.TypeScriptContentFormatter;
+import ts.eclipse.ide.ui.utils.EditorUtils;
 
 /**
  * Extension of JSDT {@link JavaScriptSourceViewerConfiguration}
@@ -101,6 +101,6 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 
 	@Override
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
-		return new TypeScriptContentFormatter(getEditor());
+		return new TypeScriptContentFormatter(EditorUtils.getResource(getEditor()));
 	}
 }
