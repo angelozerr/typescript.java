@@ -213,14 +213,14 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 				// int offset = dirtyRegion.getOffset();
 				// int length = dirtyRegion.getLength();
 				// int startLine = 0; //document.getLineOfOffset(offset);
-				int endLine = document.getNumberOfLines(); // startLine +
+				int endLine = document.getNumberOfLines() - 1; // startLine +
 															// document.getNumberOfLines(offset,
 															// length) - 1;
 
 				// sentinel, to make sure there's at least one entry
 				previousRegions.add(new LineIndent(endLine, -1));
 
-				for (int line = endLine - 1; line >= 0; line--) {
+				for (int line = endLine; line >= 0; line--) {
 					int lineOffset = document.getLineOffset(line);
 					String delim = document.getLineDelimiter(line);
 					int lineLength = document.getLineLength(line) - (delim != null ? delim.length() : 0);
