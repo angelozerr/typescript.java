@@ -193,6 +193,15 @@
             parentId="org.eclipse.ui.textEditorScope"
             id="ts.eclipse.ide.jsdt.ui.typeScriptEditorScope">
       </context>
+      <!-- Not really the scope for the JavScript View.. just extends the editor
+           scope for now.  
+       -->
+      <context
+            name="%context.name.0"
+            description="%context.description.0"
+            parentId="ts.eclipse.ide.jsdt.ui.typeScriptEditorScope"
+            id="ts.eclipse.ide.jsdt.ui.typeScriptViewScope">
+      </context>      
    </extension>
       
     <extension
@@ -228,14 +237,14 @@
 <!-- edit -->	
 	      <key
             sequence="M1+M2+F"
-            contextId="ts.eclipse.ide.jsdt.ui.typeScriptEditorScope"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
             commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.format"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
 	      <!-- alternative for some gtk input modes -->
 	      <key
 	            platform="gtk"
 	            sequence="ESC CTRL+F"
-	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptEditorScope"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
 	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.format"
 	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>            
 	</extension>

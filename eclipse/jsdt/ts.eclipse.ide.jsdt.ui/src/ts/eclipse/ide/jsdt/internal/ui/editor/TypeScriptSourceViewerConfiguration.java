@@ -16,6 +16,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
@@ -27,6 +28,8 @@ import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProcessor;
+import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptContentAssistInvocationContext;
+import ts.eclipse.ide.jsdt.internal.ui.editor.format.TypeScriptContentFormatter;
 
 /**
  * Extension of JSDT {@link JavaScriptSourceViewerConfiguration}
@@ -96,4 +99,8 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 		return settings;
 	}
 
+	@Override
+	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
+		return new TypeScriptContentFormatter(getEditor());
+	}
 }

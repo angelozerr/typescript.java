@@ -35,5 +35,9 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.FORMAT_ACTION);
 	}
-	
+
+	@Override
+	protected void initializeKeyBindingScopes() {
+		setKeyBindingScopes(new String[] { "ts.eclipse.ide.jsdt.ui.typeScriptViewScope" });  //$NON-NLS-1$
+	}
 }
