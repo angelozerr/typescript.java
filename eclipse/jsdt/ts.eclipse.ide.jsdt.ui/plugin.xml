@@ -2,7 +2,7 @@
 <?eclipse version="3.0"?>
 <!--
 ###############################################################################
-# Copyright (c) 2013 Angelo Zerr and others.
+# Copyright (c) 2015-2016 Angelo Zerr and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,9 +38,9 @@
             symbolicFontName="org.eclipse.wst.jsdt.ui.editors.textfont"
             id="ts.eclipse.ide.jsdt.ui.editor.TypeScriptEditor"
             extensions="ts,tsx,jsx">
-            <contentTypeBinding contentTypeId="org.eclipse.wst.jsdt.core.tsSource" /> 
-            <contentTypeBinding contentTypeId="org.eclipse.wst.jsdt.core.tsxSource" />
-            <contentTypeBinding contentTypeId="org.eclipse.wst.jsdt.core.jsxSource" />
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.jsdt.core.tsSource" /> 
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.jsdt.core.tsxSource" />
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.jsdt.core.jsxSource" />
       </editor>
    </extension>
      	
@@ -97,6 +97,53 @@
             class="ts.eclipse.ide.jsdt.internal.ui.editor.hover.JSDTTypeScriptHover"
             id="ts.eclipse.ide.jsdt.ui.hover.JSDTTypeScriptHover">
       </hover>
+	</extension>
+   
+<!-- Begin JavaScript Search action set -->
+<!-- End JavaScript Action Set (Adding the source, refactor and navigate menu -->
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="%TypeScriptSearchActionSet.label"
+            description="%TypeScriptSearchActionSet.description"
+            visible="false"
+            id="ts.eclipse.ide.jsdt.ui.SearchActionSet">
+<!-- see http://bugs.eclipse.org/bugs/show_bug.cgi?id=15684    -->
+<!-- Note: The menu (re-) definition has to be here due to bug: -->
+<!-- =================================================================== -->
+<!-- Search Menu                                                         -->
+<!-- =================================================================== -->
+         <menu
+               label="%referencesSubMenu.label"
+               path="org.eclipse.search.menu/contextMenuActionsGroup"
+               id="referencesSubMenu">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"
+               label="%InProject.label"
+               retarget="true"
+               menubarPath="org.eclipse.search.menu/referencesSubMenu/group1"
+               allowLabelUpdate="true"
+               id="ts.eclipse.ide.jsdt.ui.actions.ReferencesInProject">
+         </action>
+         
+      </actionSet>
+	</extension>
+   
+    <extension
+         point="org.eclipse.ui.commands">
+
+<!-- search -->
+      <command
+            name="%ActionDefinition.referencesInProject.name"
+            description="%ActionDefinition.referencesInProject.description"
+            categoryId="org.eclipse.search.ui.category.search"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project">
+      </command>
+
 	</extension>
    
 	 <!-- I don't know why, but startup should be done, otherwise TypeScriptCompletionProposalComputer is not registered? -->
