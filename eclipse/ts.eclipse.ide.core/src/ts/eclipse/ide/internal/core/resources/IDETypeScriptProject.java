@@ -192,6 +192,9 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public boolean canValidate(IResource resource) {
 		try {
+			if (!getProjectSettings().canValidate(resource)) {
+				return false;
+			}
 			IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
 			if (tsconfig != null) {
 				// check if the given file is declared in the "files"

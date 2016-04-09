@@ -12,6 +12,7 @@ package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
@@ -112,8 +113,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 
 	private File resolvePath(String path) {
 		if (!StringUtils.isEmpty(path)) {
-			IPath p = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getPath(path,
-					super.getProject());
+			IPath p = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getPath(path, super.getProject());
 			return p != null ? p.toFile() : new File(path);
 		}
 		return null;
@@ -156,6 +156,20 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return TypeScriptCorePreferenceConstants.TSC_USE_EMBEDDED_TYPESCRIPT.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSC_EMBEDDED_TYPESCRIPT_ID.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSC_INSTALLED_TYPESCRIPT_PATH.equals(event.getKey());
+	}
+
+	@Override
+	public boolean canValidate(IResource resource) {
+		// TODO: add a preferences to customize path to exclude for validation.
+		// today we exclude validation for files which are hosted inside
+		// node_modules.
+		IPath location = resource.getProjectRelativePath();
+		for (int i = 0; i < location.segmentCount(); i++) {
+			if ("node_modules".equals(location.segment(i))) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private ITypeScriptProject getTypeScriptProject() {

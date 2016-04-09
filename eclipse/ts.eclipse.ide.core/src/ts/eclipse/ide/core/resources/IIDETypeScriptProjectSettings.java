@@ -10,6 +10,8 @@
  */
 package ts.eclipse.ide.core.resources;
 
+import org.eclipse.core.resources.IResource;
+
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.resources.ITypeScriptProjectSettings;
 
@@ -35,5 +37,13 @@ public interface IIDETypeScriptProjectSettings extends ITypeScriptProjectSetting
 	 *         console and false otherwise.
 	 */
 	boolean isTraceOnConsole();
+
+	/**
+	 * Returns true if the given resources can be validated and false otherwise.
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	boolean canValidate(IResource resource);
 
 }
