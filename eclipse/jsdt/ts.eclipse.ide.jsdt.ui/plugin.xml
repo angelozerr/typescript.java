@@ -246,7 +246,13 @@
 	            sequence="ESC CTRL+F"
 	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
 	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.format"
-	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>            
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+<!-- search -->
+	      <key
+	            sequence="M1+M2+G"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>	                        
 	</extension>
 	   
 	 <!-- I don't know why, but startup should be done, otherwise TypeScriptCompletionProposalComputer is not registered? -->
