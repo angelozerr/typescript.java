@@ -200,6 +200,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 				} else if (tsconfig.hasExclude()) {
 					return !tsconfig.isExcluded(resource);
 				}
+			} else {
+				// tsconfig.json was not found (ex : MyProject/node_modules),
+				// validation must not be done.
+				return false;
 			}
 		} catch (CoreException e) {
 			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canValidate", e);
