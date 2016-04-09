@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.IPath;
  */
 public class WorkbenchResourceUtil {
 
-	public static IFile findFileRecursively(IResource resource, IPath name) throws CoreException {
+	public static IFile findFileInContainerOrParent(IResource resource, IPath name) throws CoreException {
 		IContainer parent = getContainer(resource);
-		return findFileRecursively(parent, name);
+		return findFileInContainerOrParent(parent, name);
 	}
 
 	private static IContainer getContainer(IResource resource) {
@@ -34,14 +34,15 @@ public class WorkbenchResourceUtil {
 		return resource.getParent();
 	}
 
-	public static IFile findFileRecursively(IContainer container, IPath name) throws CoreException {
-		if (container == null) {
+	public static IFile findFileInContainerOrParent(IContainer container, IPath name) throws CoreException {
+		if (container == null || container.getType() == IResource.ROOT) {
+			// container is null, or it's workspace root.
 			return null;
 		}
 		IFile file = container.getFile(name);
 		if (file != null && file.exists()) {
 			return file;
 		}
-		return findFileRecursively(container.getParent(), name);
+		return findFileInContainerOrParent(container.getParent(), name);
 	}
 }

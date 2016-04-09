@@ -63,7 +63,7 @@ public class JsonConfigResourcesManager {
 	 * @throws CoreException
 	 */
 	public IDETsconfigJson findTsconfig(IResource resource) throws CoreException {
-		IFile tsconfigFile = WorkbenchResourceUtil.findFileRecursively(resource, TSCONFIG_JSON_PATH);
+		IFile tsconfigFile = WorkbenchResourceUtil.findFileInContainerOrParent(resource, TSCONFIG_JSON_PATH);
 		if (tsconfigFile != null) {
 			return getTsconfig(tsconfigFile);
 		}
