@@ -260,4 +260,66 @@
 	       point="org.eclipse.ui.startup">	
 	       <startup class="ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptStartup" />       
 	 </extension>
+   
+   <!-- debugging support -->
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor"
+            class="ts.eclipse.ide.jsdt.internal.ui.editor.breakpoints.TypeScriptAdapterFactory">
+         <adapter
+               type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+         </adapter>
+      </factory>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="ts.eclipse.ide.jsdt.debug.ui.togglebreakpoint"
+            targetID="ts.eclipse.ide.jsdt.ui.editor.TypeScriptEditor">
+         <action
+               actionID="RulerDoubleClick"
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               helpContextId="editor_toggle_breakpoint_action_context"
+               icon="icons/full/obj16/brkp_obj.gif"
+               id="org.eclipse.wst.jsdt.debug.ui.RulerToggleBreakpoint"
+               label="%togglebreakpointRulerAction.name">
+         </action>
+      </editorContribution>
+   </extension>
+   
+   
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="ts.eclipse.ide.jsdt.debug.ui.ruler.popup.actions"
+            targetID="ts.eclipse.ide.jsdt.ui.editor.TypeScriptEditor.RulerContext">
+         <action
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               helpContextId="editor_toggle_breakpoint_action_context"
+               icon="icons/full/obj16/brkp_obj.gif"
+               id="org.eclipse.wst.jsdt.debug.ui.toggle.breakpoint.ruler.delegate"
+               label="%togglebreakpointRulerAction.name"
+               menubarPath="debug">
+         </action>
+         <action
+               class="org.eclipse.wst.jsdt.debug.internal.ui.breakpoints.BreakpointPropertiesEditorActionDelegate"
+               helpContextId="breakpoint_properties_editor_ruler_context"
+               id="org.eclipse.wst.jsdt.debug.ui.ruler.breakpoint.properties"
+               label="%breakpointpropertiesRulerAction.name"
+               menubarPath="group.properties"
+               tooltip="%breakpointpropertiesRulerAction.tooltip">
+         </action>
+         <action
+               class="org.eclipse.wst.jsdt.debug.internal.ui.breakpoints.ToggleBreakpointEnablementEditorDelegate"
+               helpContextId="toggle_breakpoint_anablement_ruler_context"
+               id="org.eclipse.wst.jsdt.debug.ui.toggle.breakpoint.enablement"
+               label="%togglebreakpointenablementRulerAction.name"
+               menubarPath="debug"
+               tooltip="%togglebreakpointenablementRulerAction.tooltip">
+         </action>
+      </viewerContribution>
+   </extension>
+   
 </plugin>        
