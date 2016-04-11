@@ -192,26 +192,71 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public boolean canValidate(IResource resource) {
 		try {
+			// Use project preferences, which defines exclude path
 			if (!getProjectSettings().canValidate(resource)) {
 				return false;
 			}
-			IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
-			if (tsconfig != null) {
-				// check if the given file is declared in the "files"
-				if (tsconfig.hasFiles()) {
-					return tsconfig.isInFiles(resource);
-				} else if (tsconfig.hasExclude()) {
-					return !tsconfig.isExcluded(resource);
-				}
-			} else {
-				// tsconfig.json was not found (ex : MyProject/node_modules),
-				// validation must not be done.
-				return false;
+			boolean isJSFile = IDEResourcesManager.getInstance().isJsFile(resource)
+					|| IDEResourcesManager.getInstance().isJsxFile(resource);
+			if (isJSFile) {
+				// Can validate js file?
+				return canValidateJsFile(resource);
 			}
+			// Can validate ts file?
+			return canValidateTsFile(resource);
 		} catch (CoreException e) {
 			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canValidate", e);
 		}
 		return true;
+	}
+
+	/**
+	 * Returns true if the given js, jsx file can be validated and false
+	 * otherwise.
+	 * 
+	 * @param resource
+	 * @return true if the given js, jsx file can be validated and false
+	 *         otherwise.
+	 * @throws CoreException
+	 */
+	private boolean canValidateJsFile(IResource resource) throws CoreException {
+		// Search if a jsconfig.json exists?
+		IFile jsconfigFile = JsonConfigResourcesManager.getInstance().findJsconfigFile(resource);
+		if (jsconfigFile != null) {
+			return true;
+		}
+		// Search if tsconfig.json exists and defines alloyJs
+		IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+		if (tsconfig != null && tsconfig.getCompilerOptions() != null && tsconfig.getCompilerOptions().isAlloyJs()) {
+			return true;
+		}
+		// jsconfig.json was not found (ex : MyProject/node_modules),
+		// validation must not be done.
+		return false;
+	}
+
+	/**
+	 * Returns true if the given ts, tsx file can be validated and false
+	 * otherwise.
+	 * 
+	 * @param resource
+	 * @return true if the given ts, tsx file can be validated and false
+	 *         otherwise.
+	 * @throws CoreException
+	 */
+	private boolean canValidateTsFile(IResource resource) throws CoreException {
+		IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+		if (tsconfig != null) {
+			// check if the given file is declared in the "files"
+			if (tsconfig.hasFiles()) {
+				return tsconfig.isInFiles(resource);
+			} else if (tsconfig.hasExclude()) {
+				return !tsconfig.isExcluded(resource);
+			}
+		}
+		// tsconfig.json was not found (ex : MyProject/node_modules),
+		// validation must not be done.
+		return false;
 	}
 
 	@Override

@@ -27,11 +27,21 @@ import com.google.gson.GsonBuilder;
  */
 public class TsconfigJson {
 
+	private CompilerOptions compilerOptions;
+
 	private boolean compileOnSave;
 
 	private List<String> files;
 
 	private List<String> exclude;
+
+	public void setCompilerOptions(CompilerOptions compilerOptions) {
+		this.compilerOptions = compilerOptions;
+	}
+
+	public CompilerOptions getCompilerOptions() {
+		return compilerOptions;
+	}
 
 	public boolean isCompileOnSave() {
 		return compileOnSave;

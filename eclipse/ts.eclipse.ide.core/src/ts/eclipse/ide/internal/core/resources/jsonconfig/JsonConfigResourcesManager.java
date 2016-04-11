@@ -32,6 +32,7 @@ public class JsonConfigResourcesManager {
 	private static final JsonConfigResourcesManager INSTANCE = new JsonConfigResourcesManager();
 
 	private static final IPath TSCONFIG_JSON_PATH = new Path(FileUtils.TSCONFIG_JSON);
+	private static final IPath JSCONFIG_JSON_PATH = new Path(FileUtils.JSCONFIG_JSON);
 
 	public static JsonConfigResourcesManager getInstance() {
 		return INSTANCE;
@@ -63,11 +64,16 @@ public class JsonConfigResourcesManager {
 	 * @throws CoreException
 	 */
 	public IDETsconfigJson findTsconfig(IResource resource) throws CoreException {
-		IFile tsconfigFile = WorkbenchResourceUtil.findFileInContainerOrParent(resource, TSCONFIG_JSON_PATH);
+		IFile tsconfigFile = findTsconfigFile(resource);
 		if (tsconfigFile != null) {
 			return getTsconfig(tsconfigFile);
 		}
 		return null;
+	}
+
+	public IFile findTsconfigFile(IResource resource) throws CoreException {
+		IFile tsconfigFile = WorkbenchResourceUtil.findFileInContainerOrParent(resource, TSCONFIG_JSON_PATH);
+		return tsconfigFile;
 	}
 
 	/**
@@ -103,6 +109,17 @@ public class JsonConfigResourcesManager {
 			jsconConfig.put(tsconfigFile, tsconfig);
 		}
 		return tsconfig;
+	}
+
+	/**
+	 * Find jsconfig.json
+	 * 
+	 * @param resource
+	 * @return
+	 * @throws CoreException
+	 */
+	public IFile findJsconfigFile(IResource resource) throws CoreException {
+		return WorkbenchResourceUtil.findFileInContainerOrParent(resource, JSCONFIG_JSON_PATH);
 	}
 
 }
