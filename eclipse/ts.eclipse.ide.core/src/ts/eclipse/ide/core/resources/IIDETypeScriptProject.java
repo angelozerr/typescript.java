@@ -43,6 +43,8 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 */
 	IIDETypeScriptFile openFile(IResource file, IDocument document) throws TypeScriptException;
 
+	IIDETypeScriptFile getOpenedFile(IResource resource);
+
 	/**
 	 * Mark the given resource as closed to the tsserver.
 	 * 

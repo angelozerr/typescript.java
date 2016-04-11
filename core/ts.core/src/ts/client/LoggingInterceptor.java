@@ -12,7 +12,7 @@ package ts.client;
 
 import com.eclipsesource.json.JsonObject;
 
-import ts.client.protocol.Request;
+import ts.internal.client.protocol.Request;
 
 public class LoggingInterceptor implements IInterceptor {
 

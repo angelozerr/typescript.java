@@ -25,6 +25,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.wst.jsdt.internal.ui.search.SearchMessages;
 import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.actions.IJavaEditorActionDefinitionIds;
+import org.eclipse.wst.jsdt.ui.actions.SelectionDispatchAction;
 
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;

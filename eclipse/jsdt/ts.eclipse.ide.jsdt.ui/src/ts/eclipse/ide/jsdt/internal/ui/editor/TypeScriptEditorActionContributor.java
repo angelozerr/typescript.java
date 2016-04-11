@@ -29,13 +29,20 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 
 		ITextEditor textEditor = null;
 		ITextEditorExtension textEditorExtension = null;
-		if (part instanceof ITextEditor)
+		if (part instanceof ITextEditor) {
 			textEditor = (ITextEditor) part;
-		if (part instanceof ITextEditorExtension)
+		}
+		if (part instanceof ITextEditorExtension) {
 			textEditorExtension = (ITextEditorExtension) part;
+		}
 
 		// Source menu.
 		IActionBars bars = getActionBars();
 		bars.setGlobalActionHandler(TypeScriptActionConstants.FORMAT, getAction(textEditor, "Format")); //$NON-NLS-1$
+
+		if (part instanceof TypeScriptEditor) {
+			TypeScriptEditor tsEditor = (TypeScriptEditor) part;
+			tsEditor.getActionGroup().fillActionBars(getActionBars());
+		}
 	}
 }

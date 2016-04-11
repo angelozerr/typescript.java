@@ -32,24 +32,26 @@ import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
-import ts.client.protocol.ChangeRequest;
-import ts.client.protocol.CloseRequest;
-import ts.client.protocol.CompletionDetailsRequest;
-import ts.client.protocol.CompletionsRequest;
-import ts.client.protocol.DefinitionRequest;
-import ts.client.protocol.FormatRequest;
-import ts.client.protocol.GeterrRequest;
-import ts.client.protocol.OpenRequest;
-import ts.client.protocol.QuickInfoRequest;
-import ts.client.protocol.ReloadRequest;
-import ts.client.protocol.Request;
-import ts.client.protocol.SignatureHelpRequest;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
+import ts.client.references.ITypeScriptReferencesCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
-import ts.internal.server.ICallbackItem;
-import ts.internal.server.RequestItem;
+import ts.internal.client.ICallbackItem;
+import ts.internal.client.RequestItem;
+import ts.internal.client.protocol.ChangeRequest;
+import ts.internal.client.protocol.CloseRequest;
+import ts.internal.client.protocol.CompletionDetailsRequest;
+import ts.internal.client.protocol.CompletionsRequest;
+import ts.internal.client.protocol.DefinitionRequest;
+import ts.internal.client.protocol.FormatRequest;
+import ts.internal.client.protocol.GeterrRequest;
+import ts.internal.client.protocol.OpenRequest;
+import ts.internal.client.protocol.QuickInfoRequest;
+import ts.internal.client.protocol.ReferencesRequest;
+import ts.internal.client.protocol.ReloadRequest;
+import ts.internal.client.protocol.Request;
+import ts.internal.client.protocol.SignatureHelpRequest;
 import ts.nodejs.INodejsLaunchConfiguration;
 import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
@@ -318,6 +320,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
+	// -------------------------- Format
+	
 	@Override
 	public void format(String fileName, int line, int offset, int endLine, int endOffset,
 			ITypeScriptFormatCollector collector) throws TypeScriptException {
@@ -338,6 +342,36 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			newText = item.getString("newText", null);
 			collector.format(start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
 					end.getInt("offset", -1), newText);
+		}
+	}
+	
+	// ----------------- Find References
+	
+	@Override
+	public void references(String fileName, int line, int offset,
+			ITypeScriptReferencesCollector collector) throws TypeScriptException {
+		ReferencesRequest request = new ReferencesRequest(fileName, line, offset);
+		JsonObject response = execute(request, true, null).asObject();
+		collectReferences(response, collector);
+	}
+
+	private void collectReferences(JsonObject response, ITypeScriptReferencesCollector collector) throws TypeScriptException {
+		JsonObject body = response.get("body").asObject();
+		JsonArray refs = body.get("refs").asArray();
+		JsonObject ref = null;
+		String file = null;
+		JsonObject start = null;
+		JsonObject end = null;
+		String lineText = null;
+		for (JsonValue r : refs) {
+			ref = r.asObject();
+			file = ref.getString("file", null);
+			start = ref.get("start").asObject();
+			end = ref.get("end").asObject();
+			lineText = ref.getString("lineText", null);
+			collector.ref(file, start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
+					end.getInt("offset", -1), lineText);
+			
 		}
 	}
 

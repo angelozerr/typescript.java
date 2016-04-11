@@ -209,6 +209,18 @@
       </page>            
    </extension>
 	            
+	<!-- Search -->
+	<extension
+    	id="TypeScriptSearchResultPage"
+        point="org.eclipse.search.searchResultViewPages">
+		<viewPage
+			id="ts.eclipse.ide.ui.search.TypeScriptSearchResultPage"
+			searchResultClass="ts.eclipse.ide.ui.search.TypeScriptSearchResultPage"
+			class="ts.eclipse.ide.internal.ui.search.TypeScriptSearchResultPage">
+		</viewPage>
+   </extension>	
+	
+		            
     <extension point="org.eclipse.ui.startup">
         <startup
             class="ts.eclipse.ide.internal.ui.TypeScriptIDEStartup">

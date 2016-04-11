@@ -1,7 +1,7 @@
 package ts.client;
 
 import ts.TypeScriptException;
-import ts.client.protocol.Request;
+import ts.internal.client.protocol.Request;
 
 public class TypeScriptTimeoutException extends TypeScriptException {
 

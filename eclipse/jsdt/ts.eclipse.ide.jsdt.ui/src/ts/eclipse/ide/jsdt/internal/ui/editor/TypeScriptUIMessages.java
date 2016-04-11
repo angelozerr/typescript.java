@@ -31,6 +31,9 @@ public class TypeScriptUIMessages extends NLS {
 	public static String GotoMatchingBracket_error_noMatchingBracket;
 	public static String GotoMatchingBracket_error_bracketOutsideSelectedElement;
 
+	public static String FindReferencesInProjectAction_error;
+	public static String FindReferencesInProjectAction_error_title;
+	
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

@@ -126,8 +126,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 
 	@Override
 	public synchronized IIDETypeScriptFile openFile(IResource file, IDocument document) throws TypeScriptException {
-		String fileName = TypeScriptCorePlugin.getFileName(file);
-		IIDETypeScriptFile tsFile = (IIDETypeScriptFile) super.getOpenedFile(fileName);
+		IIDETypeScriptFile tsFile = getOpenedFile(file);
 		if (tsFile == null) {
 			tsFile = new IDETypeScriptFile(file, document, this);
 		}
@@ -138,9 +137,14 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	}
 
 	@Override
-	public void closeFile(IResource file) throws TypeScriptException {
+	public IIDETypeScriptFile getOpenedFile(IResource file) {
 		String fileName = TypeScriptCorePlugin.getFileName(file);
-		IIDETypeScriptFile tsFile = (IIDETypeScriptFile) super.getOpenedFile(fileName);
+		return (IIDETypeScriptFile) super.getOpenedFile(fileName);
+	}
+
+	@Override
+	public void closeFile(IResource file) throws TypeScriptException {
+		IIDETypeScriptFile tsFile = getOpenedFile(file);
 		if (tsFile != null) {
 			tsFile.close();
 		}

@@ -15,6 +15,7 @@ import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
+import ts.client.references.ITypeScriptReferencesCollector;
 
 /**
  * TypeScript file API.
@@ -112,4 +113,14 @@ public interface ITypeScriptFile {
 	 * @throws TypeScriptException
 	 */
 	void format(int startPosition, int endPosition, ITypeScriptFormatCollector collector) throws TypeScriptException;
+
+	/**
+	 * Find references of the given position.
+	 * 
+	 * @param position
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
+	void references(int position, ITypeScriptReferencesCollector collector) throws TypeScriptException;
+
 }

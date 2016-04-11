@@ -66,6 +66,9 @@ public class TypeScriptUIMessages extends NLS {
 	public static String CompilerConfigurationBlock_embedded_checkbox_label;
 	public static String CompilerConfigurationBlock_installed_checkbox_label;
 
+	// Search
+	public static String TypeScriptSearchQuery_label;
+
 
 	public static ResourceBundle getResourceBundle() {
 		try {

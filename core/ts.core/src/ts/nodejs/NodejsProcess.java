@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ts.TypeScriptException;
-import ts.client.protocol.Request;
+import ts.internal.client.protocol.Request;
 import ts.utils.FileUtils;
 
 public class NodejsProcess extends AbstractNodejsProcess {

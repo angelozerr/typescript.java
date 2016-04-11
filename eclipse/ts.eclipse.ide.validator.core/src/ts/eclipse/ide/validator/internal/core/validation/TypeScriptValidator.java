@@ -68,16 +68,15 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 			IIDETypeScriptFile tsFile = null;
 			boolean wasOpened = false;
 			try {
-				String fileName = TypeScriptCorePlugin.getFileName(resource);
 				// open ts file if needed
-				tsFile = (IIDETypeScriptFile) tsProject.getOpenedFile(fileName);
+				tsFile = tsProject.getOpenedFile(resource);
 				if (tsFile != null) {
 					wasOpened = true;
 				} else {
 					try {
 						tsFile = tsProject.openFile(resource, null);
 					} catch (TypeScriptException e) {
-						e.printStackTrace();
+						Trace.trace(Trace.SEVERE, "Error while opening file for validation", e);
 					}
 				}
 				if (tsFile != null) {
@@ -90,7 +89,7 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 					try {
 						tsFile.close();
 					} catch (TypeScriptException e) {
-						e.printStackTrace();
+						Trace.trace(Trace.SEVERE, "Error while closing file for validation", e);
 					}
 				}
 			}

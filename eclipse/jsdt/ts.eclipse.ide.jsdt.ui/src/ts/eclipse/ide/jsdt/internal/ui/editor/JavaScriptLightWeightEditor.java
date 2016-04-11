@@ -55,6 +55,7 @@ import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptTextTools;
 
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
+import ts.eclipse.ide.jsdt.internal.ui.actions.GotoMatchingBracketAction;
 
 /**
  * TypeScript editor.
