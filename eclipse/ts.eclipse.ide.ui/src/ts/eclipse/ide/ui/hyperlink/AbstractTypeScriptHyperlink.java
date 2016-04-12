@@ -13,18 +13,14 @@ package ts.eclipse.ide.ui.hyperlink;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import ts.TypeScriptException;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.ui.utils.EditorUtils;
-import ts.utils.StringUtils;
 
 /**
  * Abstract class for TypeScript Hyperlink.
@@ -55,43 +51,15 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 	@Override
 	public void addDefinition(String filename, int startLine, int startOffset, int endLine, int endOffset)
 			throws TypeScriptException {
-		this.file = findFileFromWorkspace(filename);
+		this.file = WorkbenchResourceUtil.findFileFromWorkspace(filename);
 		if (this.file == null) {
-			this.fs = findFileFormFileSystem(filename);
+			this.fs = WorkbenchResourceUtil.findFileFormFileSystem(filename);
 		}
 		this.startLine = startLine;
 		this.startOffset = startOffset;
 		this.endLine = endLine;
 		this.endOffset = endOffset;
 
-	}
-
-	private IFile findFileFromWorkspace(String path) {
-		if (StringUtils.isEmpty(path)) {
-			return null;
-		}
-		IPath filePath = new Path(path);
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IFile file = root.getFile(filePath);
-		if (file.exists()) {
-			return file;
-		}
-		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(filePath);
-		if (files.length > 0) {
-			file = files[0];
-			if (file.exists()) {
-				return file;
-			}
-		}
-		return null;
-	}
-
-	private File findFileFormFileSystem(String path) {
-		if (StringUtils.isEmpty(path)) {
-			return null;
-		}
-		File file = new File(path);
-		return (file.exists() && file.isFile()) ? file : null;
 	}
 
 	@Override

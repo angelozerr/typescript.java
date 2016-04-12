@@ -215,7 +215,7 @@
         point="org.eclipse.search.searchResultViewPages">
 		<viewPage
 			id="ts.eclipse.ide.ui.search.TypeScriptSearchResultPage"
-			searchResultClass="ts.eclipse.ide.ui.search.TypeScriptSearchResultPage"
+			searchResultClass="ts.eclipse.ide.ui.search.TypeScriptSearchResult"
 			class="ts.eclipse.ide.internal.ui.search.TypeScriptSearchResultPage">
 		</viewPage>
    </extension>	

@@ -68,6 +68,7 @@ public class TypeScriptUIMessages extends NLS {
 
 	// Search
 	public static String TypeScriptSearchQuery_label;
+	public static String TypeScriptSearchQuery_result;
 
 
 	public static ResourceBundle getResourceBundle() {

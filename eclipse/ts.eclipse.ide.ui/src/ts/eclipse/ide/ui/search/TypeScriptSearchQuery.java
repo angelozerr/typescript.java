@@ -1,11 +1,14 @@
 package ts.eclipse.ide.ui.search;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.search.internal.ui.text.SearchResultUpdater;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
 
@@ -14,7 +17,11 @@ import ts.client.references.ITypeScriptReferencesCollector;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
+import ts.eclipse.ide.internal.ui.search.LineElement;
+import ts.eclipse.ide.internal.ui.search.TypeScriptMatch;
+import ts.eclipse.ide.ui.utils.EditorUtils;
 
 public class TypeScriptSearchQuery implements ISearchQuery {
 
@@ -22,6 +29,8 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 	private final int offset;
 
 	private TypeScriptSearchResult searchResult;
+	private long startTime = 0;
+	private long endTime = 0;
 
 	public TypeScriptSearchQuery(IResource resource, int offset) {
 		this.resource = resource;
@@ -47,7 +56,7 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 	public ISearchResult getSearchResult() {
 		if (searchResult == null) {
 			TypeScriptSearchResult result = new TypeScriptSearchResult(this);
-			new SearchResultUpdater(result);
+			// new SearchResultUpdater(result);
 			searchResult = result;
 		}
 		return searchResult;
@@ -55,6 +64,10 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 
 	@Override
 	public IStatus run(IProgressMonitor monitor) throws OperationCanceledException {
+		startTime = System.currentTimeMillis();
+		final TypeScriptSearchResult tsResult = (TypeScriptSearchResult) getSearchResult();
+		tsResult.removeAll();
+
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(resource.getProject(), false);
 			IIDETypeScriptFile tsFile = null;
@@ -71,9 +84,35 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 					// Find references
 					tsFile.references(offset, new ITypeScriptReferencesCollector() {
 						@Override
-						public void ref(String file, int startLine, int startOffset, int endLine, int endOffset,
-								String lineText) throws TypeScriptException {
-							System.err.println(file);
+						public void ref(String filename, int startLine, int startLineOffset, int endLine,
+								int endLineOffset, String lineText) throws TypeScriptException {
+
+							IFile tsFile = WorkbenchResourceUtil.findFileFromWorkspace(filename);
+							if (tsFile != null) {
+
+								try {
+									IDocument document = EditorUtils.getDocument(tsFile);
+									int lineNumber = startLine - 1;
+									int lineStartOffset = startLineOffset - 1;
+									int startOffset = document.getLineOffset(lineNumber) + lineStartOffset;
+									int endOffset = document.getLineOffset(endLine - 1) + (endLineOffset - 1);
+									int length = endOffset - startOffset;
+									lineText = document.get(startOffset, length);
+									LineElement lineEntry = new LineElement(tsFile, lineNumber, startOffset,
+											lineText);
+									tsResult.addMatch(new TypeScriptMatch(tsFile, startOffset, length, lineEntry));
+
+								} catch (BadLocationException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							}
+							// return
+							// WorkbenchResourceUtil.findFileFormFileSystem(filename);
+
+							// tsResult.addMatch(new TypeScriptMatch(filename,
+							// startLine, startOffset, endLine, endOffset,
+							// lineText));
 						}
 					});
 				}
@@ -98,6 +137,16 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 	}
 
 	public String getResultLabel(int nMatches) {
-		return nMatches + " matches in " + resource.getProject().getFullPath().toString();
+		long time = 0;
+		if (startTime > 0) {
+			if (endTime > 0) {
+				time = endTime - startTime;
+			} else {
+				time = System.currentTimeMillis() - startTime;
+			}
+		}
+		Object[] values = { nMatches, time };
+		return NLS.bind(TypeScriptUIMessages.TypeScriptSearchQuery_result, values);
 	}
+
 }

@@ -10,11 +10,18 @@
  */
 package ts.eclipse.ide.core.utils;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
+import ts.utils.StringUtils;
 
 /**
  * Utilities for Eclipse resources.
@@ -44,5 +51,33 @@ public class WorkbenchResourceUtil {
 			return file;
 		}
 		return findFileInContainerOrParent(container.getParent(), name);
+	}
+
+	public static IFile findFileFromWorkspace(String path) {
+		if (StringUtils.isEmpty(path)) {
+			return null;
+		}
+		IPath filePath = new Path(path);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IFile file = root.getFile(filePath);
+		if (file.exists()) {
+			return file;
+		}
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(filePath);
+		if (files.length > 0) {
+			file = files[0];
+			if (file.exists()) {
+				return file;
+			}
+		}
+		return null;
+	}
+
+	public static File findFileFormFileSystem(String path) {
+		if (StringUtils.isEmpty(path)) {
+			return null;
+		}
+		File file = new File(path);
+		return (file.exists() && file.isFile()) ? file : null;
 	}
 }
