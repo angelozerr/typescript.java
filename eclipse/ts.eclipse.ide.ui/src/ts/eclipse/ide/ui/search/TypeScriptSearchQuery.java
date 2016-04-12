@@ -94,11 +94,12 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 									IDocument document = EditorUtils.getDocument(tsFile);
 									int lineNumber = startLine - 1;
 									int lineStartOffset = startLineOffset - 1;
-									int startOffset = document.getLineOffset(lineNumber) + lineStartOffset;
+									int beginOfLineStartOffset = document.getLineOffset(lineNumber);
+									int startOffset = beginOfLineStartOffset + lineStartOffset;
 									int endOffset = document.getLineOffset(endLine - 1) + (endLineOffset - 1);
 									int length = endOffset - startOffset;
-									lineText = document.get(startOffset, length);
-									LineElement lineEntry = new LineElement(tsFile, lineNumber, startOffset,
+
+									LineElement lineEntry = new LineElement(tsFile, lineNumber, beginOfLineStartOffset,
 											lineText);
 									tsResult.addMatch(new TypeScriptMatch(tsFile, startOffset, length, lineEntry));
 
