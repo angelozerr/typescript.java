@@ -24,6 +24,12 @@ public class FindReferencesInProjectAction extends FindAction {
 	}
 
 	@Override
+	void init() {
+		setText(SearchMessages.Search_FindReferencesInProjectAction_label);
+		setToolTipText(SearchMessages.Search_FindReferencesInProjectAction_tooltip);
+	}
+
+	@Override
 	public void run(ITextSelection selection) {
 		findReferences(getResource(), selection.getOffset(), selection.getLength());
 	}

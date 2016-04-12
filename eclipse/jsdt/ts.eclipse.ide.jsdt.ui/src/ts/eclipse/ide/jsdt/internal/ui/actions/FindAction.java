@@ -41,7 +41,7 @@ public abstract class FindAction extends SelectionDispatchAction {
 	FindAction(IWorkbenchSite site) {
 		super(site);
 		//fValidTypes= getValidTypes();
-		//init();
+		init();
 	}
 
 	FindAction(TypeScriptEditor editor) {
@@ -54,7 +54,7 @@ public abstract class FindAction extends SelectionDispatchAction {
 //	 * Called once by the constructors to initialize label, tooltip, image and help support of the action.
 //	 * To be overridden by implementors of this action.
 //	 */
-//	abstract void init();
+	abstract void init();
 //
 //	/**
 //	 * Called once by the constructors to get the list of the valid input types of the action.
