@@ -220,7 +220,34 @@
 		</viewPage>
    </extension>	
 	
-		            
+	<!-- Customize Project Explorer -->
+    <extension
+         point="org.eclipse.ui.navigator.viewer">
+         	<viewerContentBinding 
+	         viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+	      <includes>
+	          <contentExtension pattern="ts.eclipse.ide.ui.navigator.filters.*"/>
+	      </includes>
+	    </viewerContentBinding>	
+	</extension>
+		
+	<extension  
+        point="org.eclipse.ui.navigator.navigatorContent">
+	      <commonFilter  
+            id="ts.eclipse.ide.ui.navigator.filters.HideCompiledTypeScriptResource"
+            name="%filters.HideCompiledTypeScriptResource.name"
+            description="%filters.HideCompiledTypeScriptResource.description"
+            activeByDefault="false"
+            >
+         <filterExpression>
+         	<and>
+	            <instanceof value="org.eclipse.core.resources.IFile"/>
+            	<test property="ts.eclipse.ide.core.isCompiledTypeScriptResource" />	            
+	        </and>
+         </filterExpression>
+      </commonFilter>
+   </extension>	
+			            
     <extension point="org.eclipse.ui.startup">
         <startup
             class="ts.eclipse.ide.internal.ui.TypeScriptIDEStartup">

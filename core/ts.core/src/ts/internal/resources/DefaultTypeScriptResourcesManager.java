@@ -62,6 +62,12 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 		return ext != null && FileUtils.TSX_EXTENSION.equals(ext.toLowerCase());
 	}
 
+	@Override
+	public boolean isSourceMapFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.SOURCE_MAP_EXTENSION.equals(ext.toLowerCase());
+	}
+
 	protected String getExtension(Object fileObject) {
 		if (fileObject instanceof File) {
 			return FileUtils.getFileExtension(((File) fileObject).getName());

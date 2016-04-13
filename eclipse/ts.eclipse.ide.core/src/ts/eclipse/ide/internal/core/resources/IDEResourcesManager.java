@@ -140,6 +140,12 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		String ext = getExtension(fileObject);
 		return ext != null && FileUtils.TSX_EXTENSION.equals(ext.toLowerCase());
 	}
+
+	@Override
+	public boolean isSourceMapFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.SOURCE_MAP_EXTENSION.equals(ext.toLowerCase());
+	}
 	
 	public boolean canConsumeTsserver(IProject project, Object fileObject) {
 		if (!project.isAccessible()) {
@@ -150,5 +156,6 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		}
 		return (isTsFile(fileObject) || isJsxFile(fileObject) || isTsxFile(fileObject));
 	}
+
 
 }

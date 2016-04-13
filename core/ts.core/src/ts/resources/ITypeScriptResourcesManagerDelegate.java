@@ -70,4 +70,14 @@ public interface ITypeScriptResourcesManagerDelegate {
 	 */
 	boolean isTsxFile(Object fileObject);
 
+	/**
+	 * Returns true if the given file object is a source map file and false
+	 * otherwise.
+	 * 
+	 * @param fileObject
+	 * @return true if the given file object is a source map file and false
+	 *         otherwise.
+	 */
+	boolean isSourceMapFile(Object fileObject);
+
 }

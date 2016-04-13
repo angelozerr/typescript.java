@@ -25,6 +25,7 @@ public class FileUtils {
 	public static final String TS_EXTENSION = "ts";
 	public static final String JSX_EXTENSION = "jsx";
 	public static final String TSX_EXTENSION = "tsx";
+	public static final String SOURCE_MAP_EXTENSION = "sourcemap";
 
 	/**
 	 * Configuration file
@@ -39,6 +40,13 @@ public class FileUtils {
 		if (index == fileName.length() - 1)
 			return ""; //$NON-NLS-1$
 		return fileName.substring(index + 1);
+	}
+
+	public static String getFileNameWithoutExtension(String fileName) {
+		int index = fileName.lastIndexOf('.');
+		if (index == -1)
+			return null;
+		return fileName.substring(0, index);
 	}
 
 	/**
@@ -102,4 +110,5 @@ public class FileUtils {
 		}
 		return new FileInputStream(file);
 	}
+
 }
