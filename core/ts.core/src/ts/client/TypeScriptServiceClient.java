@@ -32,6 +32,7 @@ import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
@@ -46,6 +47,7 @@ import ts.internal.client.protocol.CompletionsRequest;
 import ts.internal.client.protocol.DefinitionRequest;
 import ts.internal.client.protocol.FormatRequest;
 import ts.internal.client.protocol.GeterrRequest;
+import ts.internal.client.protocol.OccurrencesRequest;
 import ts.internal.client.protocol.OpenRequest;
 import ts.internal.client.protocol.QuickInfoRequest;
 import ts.internal.client.protocol.ReferencesRequest;
@@ -371,6 +373,35 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			lineText = ref.getString("lineText", null);
 			collector.ref(file, start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
 					end.getInt("offset", -1), lineText);
+			
+		}
+	}
+
+	// ----------------- Occurrences
+	
+	@Override
+	public void occurrences(String fileName, int line, int offset,
+			ITypeScriptOccurrencesCollector collector) throws TypeScriptException {
+		OccurrencesRequest request = new OccurrencesRequest(fileName, line, offset);
+		JsonObject response = execute(request, true, null).asObject();
+		collectOccurrences(response, collector);
+	}
+
+	private void collectOccurrences(JsonObject response, ITypeScriptOccurrencesCollector collector) throws TypeScriptException {
+		JsonArray body = response.get("body").asArray();
+		JsonObject occurrence = null;
+		String file = null;
+		JsonObject start = null;
+		JsonObject end = null;
+		boolean isWriteAccess = false;
+		for (JsonValue b : body) {
+			occurrence = b.asObject();
+			file = occurrence.getString("file", null);
+			start = occurrence.get("start").asObject();
+			end = occurrence.get("end").asObject();
+			isWriteAccess= occurrence.getBoolean("isWriteAccess", false);
+			collector.addOccurrence(file, start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
+					end.getInt("offset", -1), isWriteAccess);
 			
 		}
 	}

@@ -16,6 +16,7 @@ import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
+import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.internal.LocationReader;
 
@@ -122,6 +123,16 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		client.references(this.getName(), line, offset, collector);
 	}
 
+	@Override
+	public void occurrences(int position, ITypeScriptOccurrencesCollector collector) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		Location location = this.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
+		client.occurrences(this.getName(), line, offset, collector);
+	}
+	
 	@Override
 	public synchronized void synch() throws TypeScriptException {
 		if (!isDirty()) {

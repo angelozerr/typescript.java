@@ -19,9 +19,9 @@ import org.eclipse.osgi.util.NLS;
  * TypeScript UI messages.
  *
  */
-public class TypeScriptUIMessages extends NLS {
+public class TypeScriptEditorMessages extends NLS {
 
-	private static final String BUNDLE_NAME = "ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptUIMessages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditorMessages"; //$NON-NLS-1$
 
 	private static ResourceBundle fResourceBundle;
 
@@ -33,6 +33,8 @@ public class TypeScriptUIMessages extends NLS {
 
 	public static String FindReferencesInProjectAction_error;
 	public static String FindReferencesInProjectAction_error_title;
+
+	public static String TypeScriptEditor_markOccurrences_job_name;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {
@@ -45,6 +47,6 @@ public class TypeScriptUIMessages extends NLS {
 	}
 
 	static {
-		NLS.initializeMessages(BUNDLE_NAME, TypeScriptUIMessages.class);
+		NLS.initializeMessages(BUNDLE_NAME, TypeScriptEditorMessages.class);
 	}
 }

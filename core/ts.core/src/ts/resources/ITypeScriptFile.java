@@ -15,6 +15,7 @@ import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
+import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 
 /**
@@ -123,4 +124,12 @@ public interface ITypeScriptFile {
 	 */
 	void references(int position, ITypeScriptReferencesCollector collector) throws TypeScriptException;
 
+	/**
+	 * Find occurrences of the given position.
+	 * 
+	 * @param position
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
+	void occurrences(int position, ITypeScriptOccurrencesCollector collector) throws TypeScriptException;
 }

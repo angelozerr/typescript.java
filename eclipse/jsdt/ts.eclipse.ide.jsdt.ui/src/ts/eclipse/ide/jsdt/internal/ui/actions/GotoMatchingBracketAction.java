@@ -17,7 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.jsdt.internal.ui.IJavaHelpContextIds;
 
 import ts.eclipse.ide.jsdt.internal.ui.editor.JavaScriptLightWeightEditor;
-import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptUIMessages;
+import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditorMessages;
 
 public class GotoMatchingBracketAction extends Action {
 
@@ -26,7 +26,7 @@ public class GotoMatchingBracketAction extends Action {
 	private final JavaScriptLightWeightEditor fEditor;
 
 	public GotoMatchingBracketAction(JavaScriptLightWeightEditor editor) {
-		super(TypeScriptUIMessages.GotoMatchingBracket_label);
+		super(TypeScriptEditorMessages.GotoMatchingBracket_label);
 		Assert.isNotNull(editor);
 		fEditor = editor;
 		setEnabled(true);

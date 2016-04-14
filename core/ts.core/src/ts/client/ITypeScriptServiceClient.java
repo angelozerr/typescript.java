@@ -16,6 +16,7 @@ import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
@@ -58,6 +59,9 @@ public interface ITypeScriptServiceClient {
 			throws TypeScriptException;
 
 	void references(String fileName, int line, int offset, ITypeScriptReferencesCollector collector)
+			throws TypeScriptException;
+
+	void occurrences(String fileName, int line, int offset, ITypeScriptOccurrencesCollector collector)
 			throws TypeScriptException;
 
 	void join() throws InterruptedException;

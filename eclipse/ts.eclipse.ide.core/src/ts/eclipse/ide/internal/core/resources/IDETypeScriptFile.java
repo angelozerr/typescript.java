@@ -18,7 +18,6 @@ import org.eclipse.jface.text.IDocumentListener;
 
 import ts.TypeScriptException;
 import ts.client.Location;
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;

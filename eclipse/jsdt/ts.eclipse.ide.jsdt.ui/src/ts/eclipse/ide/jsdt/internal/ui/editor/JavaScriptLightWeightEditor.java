@@ -39,6 +39,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
@@ -243,7 +246,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 
 		int selectionLength = Math.abs(selection.getLength());
 		if (selectionLength > 1) {
-			setStatusLineErrorMessage(TypeScriptUIMessages.GotoMatchingBracket_error_invalidSelection);
+			setStatusLineErrorMessage(TypeScriptEditorMessages.GotoMatchingBracket_error_invalidSelection);
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}
@@ -255,7 +258,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 
 		IRegion region = fBracketMatcher.match(document, sourceCaretOffset);
 		if (region == null) {
-			setStatusLineErrorMessage(TypeScriptUIMessages.GotoMatchingBracket_error_noMatchingBracket);
+			setStatusLineErrorMessage(TypeScriptEditorMessages.GotoMatchingBracket_error_noMatchingBracket);
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}
@@ -282,7 +285,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		}
 
 		if (!visible) {
-			setStatusLineErrorMessage(TypeScriptUIMessages.GotoMatchingBracket_error_bracketOutsideSelectedElement);
+			setStatusLineErrorMessage(TypeScriptEditorMessages.GotoMatchingBracket_error_bracketOutsideSelectedElement);
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}
@@ -494,4 +497,22 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		return JavaScriptPlugin.getDefault().getPreferenceStore()
 				.getBoolean(PreferenceConstants.EDITOR_FOLDING_ENABLED);
 	}
+
+	protected boolean isActivePart() {
+		IWorkbenchPart part = getActivePart();
+		return part != null && part.equals(this);
+	}
+
+	private IWorkbenchPart getActivePart() {
+		IWorkbenchWindow window = getSite().getWorkbenchWindow();
+		IPartService service = window.getPartService();
+		IWorkbenchPart part = service.getActivePart();
+		return part;
+	}
+
+	protected boolean isMarkingOccurrences() {
+		IPreferenceStore store = getPreferenceStore();
+		return store != null && store.getBoolean(PreferenceConstants.EDITOR_MARK_OCCURRENCES);
+	}
+
 }
