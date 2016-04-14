@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
 /**
@@ -28,6 +29,10 @@ import ts.utils.StringUtils;
  *
  */
 public class WorkbenchResourceUtil {
+
+	public static String getFileName(IResource file) {
+		return FileUtils.normalizeSlashes(file.getLocation().toString());
+	}
 
 	public static IFile findFileInContainerOrParent(IResource resource, IPath name) throws CoreException {
 		IContainer parent = getContainer(resource);
@@ -79,5 +84,9 @@ public class WorkbenchResourceUtil {
 		}
 		File file = new File(path);
 		return (file.exists() && file.isFile()) ? file : null;
+	}
+	
+	public static IPath getRelativePath(IResource resource, IContainer parent) {
+		return resource.getLocation().makeRelativeTo(parent.getLocation());
 	}
 }

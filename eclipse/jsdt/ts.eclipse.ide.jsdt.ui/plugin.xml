@@ -21,7 +21,7 @@
          name="%javaDocumentSetupParticipant"
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
-            contentTypeId="ts.eclipse.ide.jsdt.core.tsSource"
+            contentTypeId="ts.eclipse.ide.core.tsSource"
             extensions="ts,tsx,jsx"
             class="org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaDocumentSetupParticipant">
       </participant>
@@ -38,9 +38,9 @@
             symbolicFontName="org.eclipse.wst.jsdt.ui.editors.textfont"
             id="ts.eclipse.ide.jsdt.ui.editor.TypeScriptEditor"
             extensions="ts,tsx,jsx">
-            <contentTypeBinding contentTypeId="ts.eclipse.ide.jsdt.core.tsSource" /> 
-            <contentTypeBinding contentTypeId="ts.eclipse.ide.jsdt.core.tsxSource" />
-            <contentTypeBinding contentTypeId="ts.eclipse.ide.jsdt.core.jsxSource" />
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.core.tsSource" /> 
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.core.tsxSource" />
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.core.jsxSource" />
       </editor>
    </extension>
      	

@@ -29,7 +29,7 @@
 				<partitionType id="__java_character"/>				
 			    <partitionType id="__dftl_partition_content_type"/>
 			</contentTypeIdentifier>
-			<contentTypeIdentifier id="ts.eclipse.ide.jsdt.core.tsSource">
+			<contentTypeIdentifier id="ts.eclipse.ide.core.tsSource">
 				<partitionType id="___java_partitioning"/>
 				<partitionType id="__java_singleline_comment"/>
 				<partitionType id="__java_multiline_comment"/>
@@ -38,7 +38,7 @@
 				<partitionType id="__java_character"/>				
 			    <partitionType id="__dftl_partition_content_type"/>
 			</contentTypeIdentifier>
-			<contentTypeIdentifier id="ts.eclipse.ide.jsdt.core.jsxSource">
+			<contentTypeIdentifier id="ts.eclipse.ide.core.jsxSource">
 				<partitionType id="___java_partitioning"/>
 				<partitionType id="__java_singleline_comment"/>
 				<partitionType id="__java_multiline_comment"/>
@@ -47,7 +47,7 @@
 				<partitionType id="__java_character"/>				
 			    <partitionType id="__dftl_partition_content_type"/>
 			</contentTypeIdentifier>			
-			<contentTypeIdentifier id="ts.eclipse.ide.jsdt.core.tsxSource">
+			<contentTypeIdentifier id="ts.eclipse.ide.core.tsxSource">
 				<partitionType id="___java_partitioning"/>
 				<partitionType id="__java_singleline_comment"/>
 				<partitionType id="__java_multiline_comment"/>

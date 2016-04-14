@@ -14,9 +14,9 @@ import org.eclipse.text.edits.TextEdit;
 
 import ts.TypeScriptException;
 import ts.client.format.ITypeScriptFormatCollector;
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 
 /**
  * Content formatter which consumes tsserver "format" command to format an
@@ -37,8 +37,7 @@ public class TypeScriptContentFormatter implements IContentFormatter {
 	@Override
 	public void format(IDocument document, IRegion region) {
 		try {
-			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getDefault()
-					.getTypeScriptProject(resource.getProject());
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(resource.getProject());
 			final IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);
 
 			final MultiTextEdit textEdit = new MultiTextEdit();

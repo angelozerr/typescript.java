@@ -19,9 +19,9 @@ import org.eclipse.ui.views.contentoutline.ContentOutline;
  */
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
@@ -49,12 +49,12 @@ public class TypeScriptOutlineView extends ContentOutline {
 	private IContentOutlinePage getOutlinePage(IWorkbenchPart part) {
 		if (part != null && part instanceof IEditorPart) {
 			IFile file = EditorUtils.getFile((IEditorPart) part);
-			if (file != null && TypeScriptCorePlugin.canConsumeTsserver(file)) {
+			if (file != null && TypeScriptResourceUtil.canConsumeTsserver(file)) {
 				IDocument document = EditorUtils.getDocument(file);
 				if (document != null) {
 					try {
 						IProject project = file.getProject();
-						IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
+						IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
 						IIDETypeScriptFile tsFile = tsProject.openFile(file, document);
 						return new TypeScriptContentOutlinePage(tsFile);
 					} catch (Throwable e) {

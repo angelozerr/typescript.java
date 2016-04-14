@@ -29,6 +29,8 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
@@ -138,7 +140,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 
 	@Override
 	public IIDETypeScriptFile getOpenedFile(IResource file) {
-		String fileName = TypeScriptCorePlugin.getFileName(file);
+		String fileName = WorkbenchResourceUtil.getFileName(file);
 		return (IIDETypeScriptFile) super.getOpenedFile(fileName);
 	}
 
@@ -249,7 +251,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * @throws CoreException
 	 */
 	private boolean canValidateTsFile(IResource resource) throws CoreException {
-		IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
 		if (tsconfig != null) {
 			// check if the given file is declared in the "files"
 			if (tsconfig.hasFiles()) {
@@ -266,7 +268,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public boolean canCompileOnSave(IResource resource) {
 		try {
-			TsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+			TsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
 			return tsconfig != null ? tsconfig.isCompileOnSave() : null;
 		} catch (CoreException e) {
 			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canCompileOnSave", e);

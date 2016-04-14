@@ -118,12 +118,6 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	}
 
 	@Override
-	public boolean isTsFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
-	}
-
-	@Override
 	public boolean isJsFile(Object fileObject) {
 		String ext = getExtension(fileObject);
 		return ext != null && FileUtils.JS_EXTENSION.equals(ext.toLowerCase());
@@ -134,7 +128,13 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		String ext = getExtension(fileObject);
 		return ext != null && FileUtils.JSX_EXTENSION.equals(ext.toLowerCase());
 	}
-	
+
+	@Override
+	public boolean isTsFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
+	}
+
 	@Override
 	public boolean isTsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
@@ -142,11 +142,31 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	}
 
 	@Override
-	public boolean isSourceMapFile(Object fileObject) {
+	public boolean isTsOrTsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.SOURCE_MAP_EXTENSION.equals(ext.toLowerCase());
+		ext = ext != null ? ext.toLowerCase() : null;
+		return ext != null && (FileUtils.TS_EXTENSION.equals(ext) || FileUtils.TSX_EXTENSION.equals(ext));
 	}
-	
+
+	@Override
+	public boolean isTsOrTsxOrJsxFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		ext = ext != null ? ext.toLowerCase() : null;
+		return ext != null && (FileUtils.TS_EXTENSION.equals(ext) || FileUtils.TSX_EXTENSION.equals(ext)
+				|| FileUtils.JSX_EXTENSION.equals(ext));
+	}
+
+	public boolean isJsOrJsMapFile(Object fileObject) {
+		if (fileObject instanceof IFile) {
+			return FileUtils.isJsOrJsMapFile(((IFile) fileObject).getName());
+		} else if (fileObject instanceof File) {
+			return FileUtils.isJsOrJsMapFile(((File) fileObject).getName());
+		} else if (fileObject instanceof String) {
+			return FileUtils.isJsOrJsMapFile((String) fileObject);
+		}
+		return false;
+	}
+
 	public boolean canConsumeTsserver(IProject project, Object fileObject) {
 		if (!project.isAccessible()) {
 			return false;
@@ -154,8 +174,19 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		if (isJsFile(fileObject)) {
 			return hasSalsaNature(project);
 		}
-		return (isTsFile(fileObject) || isJsxFile(fileObject) || isTsxFile(fileObject));
+		return (isTsOrTsxOrJsxFile(fileObject));
 	}
 
+	@Override
+	public String getTypeScriptFilename(Object fileObject) {
+		if (fileObject instanceof IFile) {
+			return FileUtils.getTypeScriptFilename(((IFile) fileObject).getName());
+		} else if (fileObject instanceof File) {
+			return FileUtils.getTypeScriptFilename(((File) fileObject).getName());
+		} else if (fileObject instanceof String) {
+			return FileUtils.getTypeScriptFilename((String) fileObject);
+		}
+		return null;
+	}
 
 }

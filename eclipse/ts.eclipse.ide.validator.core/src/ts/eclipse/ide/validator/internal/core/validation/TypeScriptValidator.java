@@ -16,9 +16,9 @@ import org.eclipse.wst.validation.internal.provisional.core.IValidationContext;
 import org.eclipse.wst.validation.internal.provisional.core.IValidatorJob;
 
 import ts.TypeScriptException;
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.validator.core.validation.TypeScriptValidationHelper;
 import ts.eclipse.ide.validator.internal.core.Trace;
 
@@ -33,9 +33,9 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 
 	@Override
 	public void validationStarting(IProject project, ValidationState state, IProgressMonitor monitor) {
-		if (project != null && TypeScriptCorePlugin.hasTypeScriptNature(project)) {
+		if (project != null && TypeScriptResourceUtil.hasTypeScriptNature(project)) {
 			try {
-				IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project, false);
+				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project, false);
 				state.put(TYPESCRIPT_VALIDATOR_CONTEXT, tsProject);
 				super.validationStarting(project, state, monitor);
 			} catch (CoreException e) {
@@ -46,7 +46,7 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 
 	@Override
 	public void validationFinishing(IProject project, ValidationState state, IProgressMonitor monitor) {
-		if (project != null && TypeScriptCorePlugin.hasTypeScriptNature(project)) {
+		if (project != null && TypeScriptResourceUtil.hasTypeScriptNature(project)) {
 			super.validationFinishing(project, state, monitor);
 			state.put(TYPESCRIPT_VALIDATOR_CONTEXT, null);
 		}
@@ -59,7 +59,8 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 	public ValidationResult validate(IResource resource, int kind, ValidationState state, IProgressMonitor monitor) {
 		ValidationResult result = new ValidationResult();
 		IIDETypeScriptProject tsProject = (IIDETypeScriptProject) state.get(TYPESCRIPT_VALIDATOR_CONTEXT);
-		if (tsProject != null && TypeScriptCorePlugin.canConsumeTsserver(resource) && tsProject.canValidate(resource)) {
+		if (tsProject != null && TypeScriptResourceUtil.canConsumeTsserver(resource)
+				&& tsProject.canValidate(resource)) {
 			IReporter reporter = result.getReporter(monitor);
 
 			// Here we call geterr from tsserver for the given file IResource.

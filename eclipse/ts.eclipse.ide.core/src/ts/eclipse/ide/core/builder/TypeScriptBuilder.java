@@ -8,8 +8,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import ts.TypeScriptException;
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 
 /**
  * Builder to transpiles TypeScript files into JavaScript files and source map
@@ -23,17 +23,17 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args, final IProgressMonitor monitor)
 			throws CoreException {
-		
+
 		IProject project = this.getProject();
-		if (TypeScriptCorePlugin.hasTypeScriptNature(project)) {
-			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
+		if (TypeScriptResourceUtil.hasTypeScriptNature(project)) {
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
 			try {
 				tsProject.getCompiler().compile(null);
 			} catch (TypeScriptException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}		
+		}
 		return null;
 	}
 

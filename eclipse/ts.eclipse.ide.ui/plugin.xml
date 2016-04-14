@@ -226,26 +226,49 @@
          	<viewerContentBinding 
 	         viewerId="org.eclipse.ui.navigator.ProjectExplorer">
 	      <includes>
-	          <contentExtension pattern="ts.eclipse.ide.ui.navigator.filters.*"/>
+	          <contentExtension pattern="ts.eclipse.ide.ui.typeScriptContent" />
+	          <contentExtension pattern="ts.eclipse.ide.ui.filters.*"/>
 	      </includes>
 	    </viewerContentBinding>	
 	</extension>
 		
 	<extension  
         point="org.eclipse.ui.navigator.navigatorContent">
+          <navigatorContent
+				activeByDefault="true"
+				contentProvider="ts.eclipse.ide.internal.ui.navigator.TypeScriptNavigatorContentProvider"
+				icon="$nl$/icons/full/obj16/logo.png"
+				id="ts.eclipse.ide.ui.typeScriptContent"
+				labelProvider="ts.eclipse.ide.internal.ui.navigator.TypeScriptNavigatorLabelProvider"
+				name="%commonNavigatorContentName"
+				priority="high">
+			<triggerPoints>
+			     <or>
+					<and>
+						<instanceof	value="org.eclipse.core.resources.IResource" />
+						<adapt type="org.eclipse.core.resources.IProject">
+							<test property="ts.eclipse.ide.core.isTypeScriptProject" />
+						</adapt>
+					</and>
+					<and>
+						<instanceof value="org.eclipse.core.resources.IFile" />
+      					<test property="org.eclipse.core.resources.contentTypeId" value="ts.eclipse.ide.core.tsSource" args="useFilenameOnly"/>
+      				</and>
+					<and>
+						<instanceof value="org.eclipse.core.resources.IFile" />
+      					<test property="org.eclipse.core.resources.contentTypeId" value="ts.eclipse.ide.core.tsxSource" args="useFilenameOnly"/>
+      				</and>      				
+				</or>
+			</triggerPoints>				
+		  </navigatorContent>	
+          <!-- Hide/Show *.js, *.js.map file if ts file exists -->
 	      <commonFilter  
-            id="ts.eclipse.ide.ui.navigator.filters.HideCompiledTypeScriptResource"
+            id="ts.eclipse.ide.ui.filters.HideCompiledTypeScriptResource"
             name="%filters.HideCompiledTypeScriptResource.name"
             description="%filters.HideCompiledTypeScriptResource.description"
             activeByDefault="false"
-            >
-         <filterExpression>
-         	<and>
-	            <instanceof value="org.eclipse.core.resources.IFile"/>
-            	<test property="ts.eclipse.ide.core.isCompiledTypeScriptResource" />	            
-	        </and>
-         </filterExpression>
-      </commonFilter>
+            class="ts.eclipse.ide.internal.ui.viewer.TypeScriptFilter" >
+      	  </commonFilter>
    </extension>	
 			            
     <extension point="org.eclipse.ui.startup">

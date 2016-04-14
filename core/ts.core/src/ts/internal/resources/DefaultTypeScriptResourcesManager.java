@@ -45,15 +45,15 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 	}
 
 	@Override
-	public boolean isTsFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
-	}
-
-	@Override
 	public boolean isJsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
 		return ext != null && FileUtils.JSX_EXTENSION.equals(ext.toLowerCase());
+	}
+
+	@Override
+	public boolean isTsFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
 	}
 
 	@Override
@@ -63,9 +63,18 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 	}
 
 	@Override
-	public boolean isSourceMapFile(Object fileObject) {
+	public boolean isTsOrTsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.SOURCE_MAP_EXTENSION.equals(ext.toLowerCase());
+		ext = ext != null ? ext.toLowerCase() : null;
+		return ext != null && (FileUtils.TS_EXTENSION.equals(ext) || FileUtils.TSX_EXTENSION.equals(ext));
+	}
+
+	@Override
+	public boolean isTsOrTsxOrJsxFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		ext = ext != null ? ext.toLowerCase() : null;
+		return ext != null && (FileUtils.TS_EXTENSION.equals(ext) || FileUtils.TSX_EXTENSION.equals(ext)
+				|| FileUtils.JSX_EXTENSION.equals(ext));
 	}
 
 	protected String getExtension(Object fileObject) {
@@ -73,6 +82,16 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 			return FileUtils.getFileExtension(((File) fileObject).getName());
 		} else if (fileObject instanceof String) {
 			return FileUtils.getFileExtension((String) fileObject);
+		}
+		return null;
+	}
+
+	@Override
+	public String getTypeScriptFilename(Object fileObject) {
+		if (fileObject instanceof File) {
+			return FileUtils.getTypeScriptFilename(((File) fileObject).getName());
+		} else if (fileObject instanceof String) {
+			return FileUtils.getTypeScriptFilename((String) fileObject);
 		}
 		return null;
 	}

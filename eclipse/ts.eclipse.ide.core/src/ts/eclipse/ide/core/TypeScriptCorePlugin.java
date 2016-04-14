@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -29,10 +30,12 @@ import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.repository.IIDETypeScriptRepositoryManager;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IResourcesWatcher;
 import ts.eclipse.ide.internal.core.nodejs.NodejsInstallManager;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
+import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
 import ts.eclipse.ide.internal.core.resources.watcher.ResourcesWatcher;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
 import ts.resources.TypeScriptResourcesManager;
@@ -82,83 +85,7 @@ public class TypeScriptCorePlugin extends Plugin {
 		super.stop(context);
 	}
 
-	/**
-	 * Return true if the given project contains a "tsconfig.json" file false
-	 * otherwise.
-	 * 
-	 * @param project
-	 *            Eclipse project.
-	 * @return true if the given project contains a "tsconfig.json" file and
-	 *         false otherwise.
-	 */
-	public static boolean hasTypeScriptNature(IProject project) {
-		return IDEResourcesManager.getInstance().hasTypeScriptNature(project);
-	}
-
-	public static boolean canConsumeTsserver(IProject project, Object fileObject) {
-		return IDEResourcesManager.getInstance().canConsumeTsserver(project, fileObject);
-	}
-
-	public static boolean canConsumeTsserver(IResource resource) {
-		if (resource == null) {
-			return false;
-		}
-		return canConsumeTsserver(resource.getProject(), resource);
-	}
-
-	public static boolean hasTypeScriptBuilder(IProject project) {
-		try {
-			IProjectDescription description = project.getDescription();
-			ICommand[] commands = description.getBuildSpec();
-			for (int i = 0; i < commands.length; i++) {
-				if (TypeScriptBuilder.ID.equals(commands[i].getBuilderName())) {
-					return true;
-				}
-			}
-		} catch (CoreException e) {
-			return false;
-		}
-		return false;
-	}
-
-	/**
-	 * Returns the TypeScript project of the given eclipse project and throws
-	 * exception if the eclipse project has not TypeScript nature.
-	 * 
-	 * @param project
-	 *            eclipse project.
-	 * @return the TypeScript project of the given eclipse projectand throws
-	 *         exception if the eclipse project has not TypeScript nature.
-	 * @throws CoreException
-	 */
-	public static IIDETypeScriptProject getTypeScriptProject(IProject project, boolean force) throws CoreException {
-		try {
-			return (IIDETypeScriptProject) TypeScriptResourcesManager.getTypeScriptProject(project, force);
-		} catch (Exception e) {
-			throw new CoreException(new Status(IStatus.ERROR, TypeScriptCorePlugin.PLUGIN_ID,
-					"The project " + project.getName() + " cannot be converted as TypeScript project.", e));
-		}
-	}
-
-	/**
-	 * Returns the TypeScript project of the given eclipse project and throws
-	 * exception if the eclipse project has not TypeScript nature.
-	 * 
-	 * @param project
-	 *            eclipse project.
-	 * @return the TypeScript project of the given eclipse projectand throws
-	 *         exception if the eclipse project has not TypeScript nature.
-	 * @throws CoreException
-	 */
-	public static IIDETypeScriptProject getTypeScriptProject(IProject project) throws CoreException {
-		IIDETypeScriptProject result = (IIDETypeScriptProject) TypeScriptResourcesManager.getTypeScriptProject(project);
-		if (result == null) {
-			throw new CoreException(new Status(IStatus.ERROR, TypeScriptCorePlugin.PLUGIN_ID,
-					"The project " + project.getName() + " is not a TypeScript project."));
-		}
-		return result;
-	}
-
+	
 	/**
 	 * Returns the shared instance
 	 * 
@@ -209,10 +136,6 @@ public class TypeScriptCorePlugin extends Plugin {
 
 	public static IResourcesWatcher getResourcesWatcher() {
 		return ResourcesWatcher.getInstance();
-	}
-
-	public static String getFileName(IResource file) {
-		return FileUtils.normalizeSlashes(file.getLocation().toString());
 	}
 
 }

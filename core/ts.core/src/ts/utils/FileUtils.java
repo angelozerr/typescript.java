@@ -25,7 +25,7 @@ public class FileUtils {
 	public static final String TS_EXTENSION = "ts";
 	public static final String JSX_EXTENSION = "jsx";
 	public static final String TSX_EXTENSION = "tsx";
-	public static final String SOURCE_MAP_EXTENSION = "sourcemap";
+	public static final String MAP_EXTENSION = "map";
 
 	/**
 	 * Configuration file
@@ -42,11 +42,35 @@ public class FileUtils {
 		return fileName.substring(index + 1);
 	}
 
-	public static String getFileNameWithoutExtension(String fileName) {
+	public static String getTypeScriptFilename(String fileName) {
 		int index = fileName.lastIndexOf('.');
-		if (index == -1)
+		if (index == -1 || index == fileName.length() - 1) {
 			return null;
-		return fileName.substring(0, index);
+		}
+		String ext = fileName.substring(index + 1);
+		if (FileUtils.JS_EXTENSION.equals(ext)) {
+			StringBuilder tsFileName = new StringBuilder(fileName.substring(0, index));
+			tsFileName.append('.');
+			tsFileName.append(FileUtils.TS_EXTENSION);
+			return tsFileName.toString();
+		} else if (FileUtils.MAP_EXTENSION.equals(ext)) {
+			return getTypeScriptFilename(fileName.substring(0, index));
+		}
+		return null;
+	}
+
+	public static boolean isJsOrJsMapFile(String fileName) {
+		int index = fileName.lastIndexOf('.');
+		if (index == -1 || index == fileName.length() - 1) {
+			return false;
+		}
+		String ext = fileName.substring(index + 1);
+		if (FileUtils.JS_EXTENSION.equals(ext)) {
+			return true;
+		} else if (FileUtils.MAP_EXTENSION.equals(ext)) {
+			return isJsOrJsMapFile(fileName.substring(0, index));
+		}
+		return false;
 	}
 
 	/**

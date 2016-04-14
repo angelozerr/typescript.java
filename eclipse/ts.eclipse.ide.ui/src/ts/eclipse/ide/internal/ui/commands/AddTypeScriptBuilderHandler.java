@@ -12,8 +12,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 
 public class AddTypeScriptBuilderHandler extends AbstractHandler {
 
@@ -26,7 +26,7 @@ public class AddTypeScriptBuilderHandler extends AbstractHandler {
 					IProject project = (IProject) ((IAdaptable) obj).getAdapter(IProject.class);
 					if (project != null) {
 						try {
-							if (TypeScriptCorePlugin.hasTypeScriptBuilder(project)) {
+							if (TypeScriptResourceUtil.hasTypeScriptBuilder(project)) {
 								return null;
 							}
 							IProjectDescription description = project.getDescription();

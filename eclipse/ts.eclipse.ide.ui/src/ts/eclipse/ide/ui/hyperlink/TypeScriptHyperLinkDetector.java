@@ -14,9 +14,9 @@ import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.hyperlink.TypeScriptHyperlink;
 import ts.eclipse.ide.ui.JavaWordFinder;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -34,13 +34,13 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 		if (resource == null) {
 			return null;
 		}
-		if (TypeScriptCorePlugin.canConsumeTsserver(resource)) {
+		if (TypeScriptResourceUtil.canConsumeTsserver(resource)) {
 			// the project of the resource has typescript nature, execute
 			// typescript
 			// hyperlink.
 			try {
 				IProject project = resource.getProject();
-				IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
+				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
 				IDocument document = textViewer.getDocument();
 				IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);
 				IRegion wordRegion = JavaWordFinder.findWord(document, region.getOffset());

@@ -10,31 +10,49 @@
  */
 package ts.eclipse.ide.core.resources.jsconfig;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
+import ts.eclipse.ide.internal.core.Trace;
+import ts.resources.jsonconfig.CompilerOptions;
 import ts.resources.jsonconfig.TsconfigJson;
+import ts.utils.StringUtils;
 
 /**
- * tsconfig.json loadef from {@link IFile} tsconfig.json.
- * 
- * @author azerr
+ * tsconfig.json loade from {@link IFile} tsconfig.json.
  *
  */
 public class IDETsconfigJson extends TsconfigJson {
 
 	private IFile tsconfigFile;
+	private IContainer outDir;
 
-	public IFile getTsconfigFile() {
-		return tsconfigFile;
-	}
-
+	/**
+	 * Load tsconfig.json.
+	 * 
+	 * @param tsconfigFile
+	 * @return
+	 * @throws CoreException
+	 */
 	public static IDETsconfigJson load(IFile tsconfigFile) throws CoreException {
 		IDETsconfigJson tsconfig = load(tsconfigFile.getContents(), IDETsconfigJson.class);
 		tsconfig.tsconfigFile = tsconfigFile;
+		tsconfig.outDir = computeOutDir(tsconfig);
 		return tsconfig;
+	}
+
+	/**
+	 * Returns the tsconfig.json Eclipse file.
+	 * 
+	 * @return the tsconfig.json Eclipse file.
+	 */
+	public IFile getTsconfigFile() {
+		return tsconfigFile;
 	}
 
 	/**
@@ -49,7 +67,7 @@ public class IDETsconfigJson extends TsconfigJson {
 		if (!hasFiles()) {
 			return false;
 		}
-		String filename = getRelativePath(resource);
+		String filename = getRelativePath(resource).toString();
 		return getFiles().contains(filename);
 	}
 
@@ -65,7 +83,7 @@ public class IDETsconfigJson extends TsconfigJson {
 		if (!hasExclude()) {
 			return false;
 		}
-		String filename = getRelativePath(resource);
+		String filename = getRelativePath(resource).toString();
 		for (String exclude : getExclude()) {
 			if (filename.startsWith(exclude)) {
 				return true;
@@ -75,14 +93,43 @@ public class IDETsconfigJson extends TsconfigJson {
 	}
 
 	/**
-	 * Returns the relative path of teh given resource to tsconfig.json folder.
+	 * Returns the relative path of the given resource to tsconfig.json folder.
 	 * 
 	 * @param resource
-	 * @return the relative path of teh given resource to tsconfig.json folder.
+	 * @return the relative path of the given resource to tsconfig.json folder.
 	 */
-	private String getRelativePath(IResource resource) {
-		IPath path = resource.getLocation().makeRelativeTo(tsconfigFile.getParent().getLocation());
-		return path.toString();
+	public IPath getRelativePath(IResource resource) {
+		return WorkbenchResourceUtil.getRelativePath(resource, tsconfigFile.getParent());
+	}
+
+	/**
+	 * Returns the compilerOptions/outDir as Eclipse folder and null otherwise.
+	 * 
+	 * @return the compilerOptions/outDir as Eclipse folder and null otherwise.
+	 */
+	public IContainer getOutDirContainer() {
+		return outDir;
+	}
+
+	/**
+	 * Compute compilerOptions/outDir as Eclipse folder and null otherwise.
+	 * 
+	 * @return compilerOptions/outDir as Eclipse folder and null otherwise
+	 */
+	private static IContainer computeOutDir(IDETsconfigJson tsconfig) {
+		CompilerOptions options = tsconfig.getCompilerOptions();
+		if (options != null) {
+			String outDir = options.getOutDir();
+			if (StringUtils.isEmpty(outDir)) {
+				return null;
+			}
+			try {
+				return tsconfig.getTsconfigFile().getParent().getFolder(new Path(outDir));
+			} catch (Throwable e) {
+				Trace.trace(Trace.SEVERE, "Error while getting compilerOption/outDir", e);
+			}
+		}
+		return null;
 	}
 
 }

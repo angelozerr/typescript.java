@@ -43,16 +43,6 @@ public interface ITypeScriptResourcesManagerDelegate {
 	boolean isJsFile(Object fileObject);
 
 	/**
-	 * Returns true if the given file object is a TypeScript file and false
-	 * otherwise.
-	 * 
-	 * @param fileObject
-	 * @return true if the given file object is a TypeScript file and false
-	 *         otherwise.
-	 */
-	boolean isTsFile(Object fileObject);
-
-	/**
 	 * Returns true if the given file object is a JXS file and false otherwise.
 	 * 
 	 * @param fileObject
@@ -71,13 +61,44 @@ public interface ITypeScriptResourcesManagerDelegate {
 	boolean isTsxFile(Object fileObject);
 
 	/**
-	 * Returns true if the given file object is a source map file and false
+	 * Returns true if the given file object is a TypeScript file and false
 	 * otherwise.
 	 * 
 	 * @param fileObject
-	 * @return true if the given file object is a source map file and false
+	 * @return true if the given file object is a TypeScript file and false
 	 *         otherwise.
 	 */
-	boolean isSourceMapFile(Object fileObject);
+	boolean isTsFile(Object fileObject);
+
+	/**
+	 * Returns true if the given file object is a TypeScript or TypeScript/JSX
+	 * file and false otherwise.
+	 * 
+	 * @param fileObject
+	 * @return true if the given file object is a TypeScript or TypeScript/JSX
+	 *         file and false otherwise.
+	 */
+	boolean isTsOrTsxFile(Object fileObject);
+
+	/**
+	 * Returns true if the given file object is a TypeScript or TypeScript/JSX
+	 * or JSX file and false otherwise.
+	 * 
+	 * @param fileObject
+	 * @return true if the given file object is a TypeScript or TypeScript/JSX
+	 *         or JSX file and false otherwise.
+	 */
+	boolean isTsOrTsxOrJsxFile(Object fileObject);
+
+	/**
+	 * Returns the corresponding TypeScript file from the js or js.map file and
+	 * null otherwise.
+	 * 
+	 * @param file
+	 *            *.js or *.js.map file
+	 * @return the corresponding TypeScript file from the js or js.map file and
+	 *         null otherwise.
+	 */
+	String getTypeScriptFilename(Object file);
 
 }

@@ -14,9 +14,9 @@ import org.eclipse.search.ui.ISearchResult;
 
 import ts.TypeScriptException;
 import ts.client.references.ITypeScriptReferencesCollector;
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.search.LineElement;
@@ -69,7 +69,7 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 		tsResult.removeAll();
 
 		try {
-			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(resource.getProject(), false);
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(resource.getProject(), false);
 			IIDETypeScriptFile tsFile = null;
 			boolean wasOpened = false;
 			try {

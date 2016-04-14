@@ -16,8 +16,8 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.ui.IEditorPart;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.eclipse.jface.text.html.TypeScriptBrowserInformationControlInput;
@@ -43,10 +43,10 @@ public class TypeScriptHover extends AbstractTypeScriptHover {
 		if (scriptFile == null) {
 			return null;
 		}
-		if (TypeScriptCorePlugin.canConsumeTsserver(scriptFile)) {
+		if (TypeScriptResourceUtil.canConsumeTsserver(scriptFile)) {
 			try {
 				IProject project = scriptFile.getProject();
-				tsProject = TypeScriptCorePlugin.getTypeScriptProject(project);
+				tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
 				int position = hoverRegion.getOffset();
 				ITypeScriptFile tsFile = tsProject.openFile(scriptFile, textViewer.getDocument());
 

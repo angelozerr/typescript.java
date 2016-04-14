@@ -28,7 +28,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
@@ -149,7 +149,7 @@ public class JSDTEditorTracker implements IWindowListener, IPageListener, IPartL
 	private void editorOpened(IEditorPart part) {
 		if (part instanceof ITextEditor) {
 			IResource resource = EditorUtils.getResource(part);
-			if (resource != null && TypeScriptCorePlugin.canConsumeTsserver(resource)) {
+			if (resource != null && TypeScriptResourceUtil.canConsumeTsserver(resource)) {
 				ISourceViewer viewer = EditorUtils.getSourceViewer(part);
 				if (viewer != null) {
 					TypeScriptDocumentRegionProcessor processor = fAsYouTypeValidators.get(part);

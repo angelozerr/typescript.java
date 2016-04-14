@@ -27,10 +27,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import ts.TypeScriptException;
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
-import ts.resources.TypeScriptResourcesManager;
 
 /**
  * This class is responsible for tracking currently activated editors and
@@ -76,12 +75,12 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 	}
 
 	private void openTypeScriptFile(IWorkbenchPart part) {
-		final IFile file = getFile(part);		
-		if (TypeScriptCorePlugin.canConsumeTsserver(file)) {
+		final IFile file = getFile(part);
+		if (TypeScriptResourceUtil.canConsumeTsserver(file)) {
 			// Ensure that everything is synchronized when TypeScript file is
 			// opened
 			try {
-				final IIDETypeScriptProject project = TypeScriptCorePlugin.getTypeScriptProject(file.getProject());
+				final IIDETypeScriptProject project = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 				if (project != null) {
 					final IDocument document = getDocument(part);
 					if (document != null) {
@@ -108,11 +107,11 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 	@Override
 	public void partClosed(IWorkbenchPart part) {
 		final IFile file = getFile(part);
-		if (TypeScriptCorePlugin.canConsumeTsserver(file)) {
+		if (TypeScriptResourceUtil.canConsumeTsserver(file)) {
 			// Ensure that everything is synchronized when TypeScript file is
 			// opened
 			try {
-				final IIDETypeScriptProject project = TypeScriptCorePlugin.getTypeScriptProject(file.getProject());
+				final IIDETypeScriptProject project = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 				if (project != null) {
 					new Job("Closing TypeScript file with tsserver...") {
 						@Override

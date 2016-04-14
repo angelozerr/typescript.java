@@ -40,9 +40,9 @@
 		<include>
             <rules>
               <contentType id="org.eclipse.wst.jsdt.core.jsSource"></contentType>                        
-              <contentType id="ts.eclipse.ide.jsdt.core.tsSource"></contentType>
-              <contentType id="ts.eclipse.ide.jsdt.core.jsxSource"></contentType>
-              <contentType id="ts.eclipse.ide.jsdt.core.tsxSource"></contentType>
+              <contentType id="ts.eclipse.ide.core.tsSource"></contentType>
+              <contentType id="ts.eclipse.ide.core.jsxSource"></contentType>
+              <contentType id="ts.eclipse.ide.core.tsxSource"></contentType>
               <!--<contentType id="org.eclipse.wst.html.core.htmlsource"></contentType>
                <contentType id="org.eclipse.jst.jsp.core.jspsource"></contentType>
                -->

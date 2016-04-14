@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.validator.internal.ui.validation;
 
 import org.eclipse.core.resources.IFile;
@@ -10,9 +20,9 @@ import org.eclipse.wst.validation.internal.provisional.core.IReporter;
 import org.eclipse.wst.validation.internal.provisional.core.IValidationContext;
 import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.eclipse.ide.validator.core.validation.TypeScriptValidationHelper;
 import ts.eclipse.ide.validator.internal.ui.Trace;
@@ -43,12 +53,12 @@ public class TypeScriptSourceValidator implements IValidator, ISourceValidator {
 		// ReconcileStepForValidator#getFile())
 		// and JSDT JavaScript Editor doesn't manage IStructuredModel
 		IFile file = EditorUtils.getFile(document);
-		if (file == null || !TypeScriptCorePlugin.canConsumeTsserver(file)) {
+		if (file == null || !TypeScriptResourceUtil.canConsumeTsserver(file)) {
 			return;
 		}
 
 		try {
-			IIDETypeScriptProject tsProject = TypeScriptCorePlugin.getTypeScriptProject(file.getProject());
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 			IIDETypeScriptFile tsFile = tsProject.openFile(file, document);
 			TypeScriptValidationHelper.validate(tsFile, reporter, this);
 		} catch (Exception e) {
