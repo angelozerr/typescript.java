@@ -12,16 +12,21 @@ package ts.internal.client.protocol;
 
 import com.eclipsesource.json.JsonObject;
 
+import ts.TypeScriptException;
+import ts.client.ITypeScriptAsynchCollector;
+import ts.client.ITypeScriptCollector;
 import ts.client.TypeScriptTimeoutException;
 import ts.internal.SequenceHelper;
 import ts.internal.client.ICallbackItem;
 
-public abstract class Request<T> extends Message implements ICallbackItem<T> {
+public abstract class Request<T, C extends ITypeScriptCollector> extends Message implements ICallbackItem<T> {
 
 	private static final long TIMEOUT = 10000L * 1000000L; // wait 10 second
 															// before timeout.
 
 	private long startTime;
+
+	private C collector;
 
 	public Request(CommandNames command, JsonObject args, Integer seq) {
 		this(command.getName(), args, seq);
@@ -35,6 +40,14 @@ public abstract class Request<T> extends Message implements ICallbackItem<T> {
 		}
 	}
 
+	public void setCollector(C collector) {
+		this.collector = collector;
+	}
+
+	public C getCollector() {
+		return collector;
+	}
+
 	public String getCommand() {
 		return super.getString("command", null);
 	}
@@ -45,6 +58,9 @@ public abstract class Request<T> extends Message implements ICallbackItem<T> {
 
 	@Override
 	public final T call() throws Exception {
+		if (isAsynch()) {
+			return null;
+		}
 		this.startTime = System.nanoTime();
 		while (!isCompleted()) {
 			synchronized (this) {
@@ -65,8 +81,18 @@ public abstract class Request<T> extends Message implements ICallbackItem<T> {
 		return startTime;
 	}
 
+	public boolean isAsynch() {
+		return collector != null && (collector instanceof ITypeScriptAsynchCollector);
+	}
+	
+	@Override
+	public void error(Throwable e) {
+		
+	}
+
 	protected abstract boolean isCompleted();
 
 	protected abstract T getResult() throws Exception;
 
+	public abstract void collect(JsonObject response) throws TypeScriptException;
 }

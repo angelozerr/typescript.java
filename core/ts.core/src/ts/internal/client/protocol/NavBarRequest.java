@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * NavBar itesm request; value of command field is "navbar". Return response
  * giving the list of navigation bar entries extracted from the requested file.
@@ -20,4 +24,8 @@ public class NavBarRequest extends FileRequest {
 		super(CommandNames.NavBar.getName(), new FileRequestArgs(fileName), null);
 	}
 
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
+	}
 }

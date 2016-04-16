@@ -10,13 +10,15 @@
  */
 package ts.internal.client.protocol;
 
+import ts.client.ITypeScriptCollector;
+
 /**
  * Request whose sole parameter is a file name.
  * 
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class FileRequest extends SimpleRequest {
+public abstract class FileRequest<C extends ITypeScriptCollector> extends SimpleRequest<C> {
 
 	public FileRequest(CommandNames command, FileRequestArgs args, Integer seq) {
 		super(command, args, seq);

@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Open request; value of command field is "open". Notify the server that the
  * client has file open. The server will not monitor the filesystem for changes
@@ -26,4 +30,8 @@ public class OpenRequest extends SimpleRequest {
 		super(CommandNames.Open, new OpenRequestArgs(file, fileContent), null);
 	}
 
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
+	}
 }

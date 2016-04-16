@@ -7,5 +7,9 @@ import com.eclipsesource.json.JsonObject;
 public interface ICallbackItem<T> extends Callable<T> {
 
 	boolean complete(JsonObject response);
+	
+	void error(Throwable e);
+	
+	boolean isAsynch();
 
 }

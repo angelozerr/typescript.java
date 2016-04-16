@@ -13,11 +13,13 @@ package ts.internal.client.protocol;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TypeScriptException;
+import ts.client.ITypeScriptAsynchCollector;
+import ts.client.ITypeScriptCollector;
 
 /**
  * Client-initiated request message
  */
-public class SimpleRequest extends Request<JsonObject> {
+public abstract class SimpleRequest<C extends ITypeScriptCollector> extends Request<JsonObject, C> {
 
 	private JsonObject response;
 
@@ -31,6 +33,18 @@ public class SimpleRequest extends Request<JsonObject> {
 
 	@Override
 	public boolean complete(JsonObject response) {
+		if (isAsynch()) {
+			ITypeScriptAsynchCollector collector = (ITypeScriptAsynchCollector) super.getCollector();
+			try {
+				throwExceptionIfNeeded(response);
+				collector.startCollect();
+				collect(response);
+				collector.endCollect();
+			} catch (TypeScriptException e) {
+				collector.onError(e);
+			}
+			return true;
+		}
 		this.response = response;
 		synchronized (this) {
 			this.notifyAll();
@@ -45,10 +59,14 @@ public class SimpleRequest extends Request<JsonObject> {
 
 	@Override
 	protected JsonObject getResult() throws Exception {
+		throwExceptionIfNeeded(response);
+		return response;
+	}
+
+	private void throwExceptionIfNeeded(JsonObject response) throws TypeScriptException {
 		if (!response.getBoolean("success", true)) {
 			throw new TypeScriptException(response.getString("message", ""));
 		}
-		return response;
 	}
 
 }

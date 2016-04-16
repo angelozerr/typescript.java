@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Go to definition request; value of command field is "definition". Return
  * response giving the file locations that define the symbol found in file at
@@ -22,6 +26,11 @@ public class DefinitionRequest extends FileLocationRequest {
 
 	public DefinitionRequest(String fileName, int line, int offset) {
 		super(CommandNames.Definition, new FileLocationRequestArgs(fileName, line, offset));
+	}
+	
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
 	}
 
 }

@@ -323,7 +323,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	// -------------------------- Format
-	
+
 	@Override
 	public void format(String fileName, int line, int offset, int endLine, int endOffset,
 			ITypeScriptFormatCollector collector) throws TypeScriptException {
@@ -346,63 +346,31 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 					end.getInt("offset", -1), newText);
 		}
 	}
-	
-	// ----------------- Find References
-	
-	@Override
-	public void references(String fileName, int line, int offset,
-			ITypeScriptReferencesCollector collector) throws TypeScriptException {
-		ReferencesRequest request = new ReferencesRequest(fileName, line, offset);
-		JsonObject response = execute(request, true, null).asObject();
-		collectReferences(response, collector);
-	}
 
-	private void collectReferences(JsonObject response, ITypeScriptReferencesCollector collector) throws TypeScriptException {
-		JsonObject body = response.get("body").asObject();
-		JsonArray refs = body.get("refs").asArray();
-		JsonObject ref = null;
-		String file = null;
-		JsonObject start = null;
-		JsonObject end = null;
-		String lineText = null;
-		for (JsonValue r : refs) {
-			ref = r.asObject();
-			file = ref.getString("file", null);
-			start = ref.get("start").asObject();
-			end = ref.get("end").asObject();
-			lineText = ref.getString("lineText", null);
-			collector.ref(file, start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
-					end.getInt("offset", -1), lineText);
-			
-		}
+	// ----------------- Find References
+
+	@Override
+	public void references(String fileName, int line, int offset, ITypeScriptReferencesCollector collector)
+			throws TypeScriptException {
+		ReferencesRequest request = new ReferencesRequest(fileName, line, offset, collector);
+		execute(request);
 	}
 
 	// ----------------- Occurrences
-	
+
 	@Override
-	public void occurrences(String fileName, int line, int offset,
-			ITypeScriptOccurrencesCollector collector) throws TypeScriptException {
-		OccurrencesRequest request = new OccurrencesRequest(fileName, line, offset);
-		JsonObject response = execute(request, true, null).asObject();
-		collectOccurrences(response, collector);
+	public void occurrences(String fileName, int line, int offset, ITypeScriptOccurrencesCollector collector)
+			throws TypeScriptException {
+		OccurrencesRequest request = new OccurrencesRequest(fileName, line, offset, collector);
+		execute(request);
 	}
 
-	private void collectOccurrences(JsonObject response, ITypeScriptOccurrencesCollector collector) throws TypeScriptException {
-		JsonArray body = response.get("body").asArray();
-		JsonObject occurrence = null;
-		String file = null;
-		JsonObject start = null;
-		JsonObject end = null;
-		boolean isWriteAccess = false;
-		for (JsonValue b : body) {
-			occurrence = b.asObject();
-			file = occurrence.getString("file", null);
-			start = occurrence.get("start").asObject();
-			end = occurrence.get("end").asObject();
-			isWriteAccess= occurrence.getBoolean("isWriteAccess", false);
-			collector.addOccurrence(file, start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
-					end.getInt("offset", -1), isWriteAccess);
-			
+	private void execute(Request request) throws TypeScriptException {
+		if (!request.isAsynch()) {
+			JsonObject response = execute(request, true, null).asObject();
+			request.collect(response);
+		} else {
+			execute(request, true, null);
 		}
 	}
 
@@ -575,7 +543,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	 * @return the result of the request if it needed and null otherwise.
 	 * @throws TypeScriptException
 	 */
-	private JsonValue execute(Request request, boolean expectsResult, CancellationToken token)
+	private JsonValue execute(Request request, boolean expectsResult, ICancellationToken token)
 			throws TypeScriptException {
 		boolean eventRequest = (request instanceof GeterrRequest);
 		RequestItem requestInfo = null;
@@ -600,11 +568,11 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			handleError(request, e, request.getStartTime());
 			TypeScriptException tse = getTypeScriptException(e);
 			if (tse != null) {
-				if (tse instanceof TypeScriptTimeoutException) {
-					// when time out exception, we must be sure that the request
-					// is removed
-					tryCancelRequest(((TypeScriptTimeoutException) tse).getRequest().getSeq());
-				}
+//				if (tse instanceof TypeScriptTimeoutException) {
+//					// when time out exception, we must be sure that the request
+//					// is removed
+//					tryCancelRequest(((TypeScriptTimeoutException) tse).getRequest().getSeq());
+//				}
 				throw (TypeScriptException) tse;
 			}
 			throw new TypeScriptException(e);
@@ -633,7 +601,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		return false;
 	}
 
-	private void sendNextRequests() throws TypeScriptException {
+	private void sendNextRequests() {
 		RequestItem requestItem = null;
 		while (this.pendingResponses.get() == 0 && !this.requestQueue.isEmpty()) {
 			synchronized (requestQueue) {
@@ -643,7 +611,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
-	private void sendRequest(RequestItem requestItem) throws TypeScriptException {
+	private void sendRequest(RequestItem requestItem) {
 		Request serverRequest = requestItem.request;
 		// log request
 		handleRequest(serverRequest);
@@ -680,18 +648,18 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 				synchronized (this.callbacks) {
 					ICallbackItem callback = this.callbacks.get(serverRequest.getSeq());
 					if (callback != null) {
-						// callback.e(err);
+						callback.error(e);
 						this.callbacks.remove(serverRequest.getSeq());
 					}
 					this.pendingResponses.getAndDecrement();
 				}
 			}
-			throw e;
 		}
 
 	}
 
 	private void dispatchMessage(JsonObject response) {
+		try {
 		String type = response.getString("type", null);
 		if ("response".equals(type)) {
 			int seq = response.getInt("request_seq", -1);
@@ -724,6 +692,10 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 					}
 				}
 			}
+		}
+		}
+		finally {
+			this.sendNextRequests();
 		}
 	}
 

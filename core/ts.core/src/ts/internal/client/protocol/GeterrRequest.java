@@ -99,4 +99,8 @@ public class GeterrRequest extends Request {
 		return result;
 	}
 
+	@Override
+	public void collect(JsonObject response) {
+		
+	}
 }

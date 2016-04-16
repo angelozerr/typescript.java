@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  *
  * Quickinfo request; value of command field is "quickinfo". Return response
@@ -23,5 +27,10 @@ public class QuickInfoRequest extends FileLocationRequest {
 
 	public QuickInfoRequest(String fileName, int line, int offset) {
 		super(CommandNames.QuickInfo, new FileLocationRequestArgs(fileName, line, offset));
+	}
+	
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
 	}
 }

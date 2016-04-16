@@ -10,13 +10,15 @@
  */
 package ts.internal.client.protocol;
 
+import ts.client.ITypeScriptCollector;
+
 /**
  * A request whose arguments specify a file location (file, line, col).
  * 
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class FileLocationRequest extends FileRequest {
+public abstract class FileLocationRequest<C extends ITypeScriptCollector> extends FileRequest<C> {
 
 	public FileLocationRequest(CommandNames command, FileLocationRequestArgs args) {
 		super(command, args, null);

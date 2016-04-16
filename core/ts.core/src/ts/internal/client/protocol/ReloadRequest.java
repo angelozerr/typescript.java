@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Reload request message; value of command field is "reload". Reload contents
  * of file with name given by the 'file' argument from temporary file with name
@@ -23,5 +27,8 @@ public class ReloadRequest extends FileRequest {
 	public ReloadRequest(String fileName, String tmpfile, int seq) {
 		super(CommandNames.Reload, new ReloadRequestArgs(fileName, tmpfile), seq);
 	}
-
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
+	}
 }

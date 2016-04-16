@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Change request message; value of command field is "change". Update the
  * server's view of the file named by argument 'file'. Server does not currently
@@ -22,6 +26,11 @@ public class ChangeRequest extends FileLocationRequest {
 
 	public ChangeRequest(String fileName, int line, int offset, int endLine, int endOffset, String insertString) {
 		super(CommandNames.Change, new ChangeRequestArgs(fileName, line, offset, endLine, endOffset, insertString));
+	}
+
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
 	}
 
 }

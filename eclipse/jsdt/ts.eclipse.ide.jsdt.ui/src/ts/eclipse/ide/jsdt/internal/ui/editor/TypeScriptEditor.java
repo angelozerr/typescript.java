@@ -62,6 +62,8 @@ import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
 import ts.TypeScriptException;
+import ts.client.ICancellationToken;
+import ts.client.ITypeScriptAsynchCollector;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -81,6 +83,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	protected CompositeActionGroup fActionGroups;
 	private CompositeActionGroup fContextMenuGroup;
 
+	private OccurrencesCollector occurrencesCollector;
 	private OccurrencesFinderJob fOccurrencesFinderJob;
 	/** The occurrences finder job canceler */
 	private OccurrencesFinderJobCanceler fOccurrencesFinderJobCanceler;
@@ -515,6 +518,59 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		}
 	}
 
+	class OccurrencesCollector
+			implements ITypeScriptOccurrencesCollector, ITypeScriptAsynchCollector, ICancellationToken {
+
+		private final IDocument document;
+		private List<Position> positions;
+		private ITextSelection selection;
+		private boolean canceled;
+
+		public OccurrencesCollector(IDocument document) {
+			this.document = document;
+			this.positions = new ArrayList<Position>();
+		}
+
+		@Override
+		public void startCollect() {
+			this.positions.clear();
+		}
+
+		@Override
+		public void endCollect() {
+			fOccurrencesFinderJob = new OccurrencesFinderJob(document, positions.toArray(new Position[0]), selection);
+			fOccurrencesFinderJob.run(new NullProgressMonitor());
+		}
+
+		@Override
+		public void addOccurrence(String file, int startLine, int startOffset, int endLine, int endOffset,
+				boolean isWriteAccess) throws TypeScriptException {
+			try {
+				int start = document.getLineOffset(startLine - 1) + startOffset - 1;
+				int end = document.getLineOffset(endLine - 1) + endOffset - 1;
+				int offset = start;
+				int length = end - start;
+				positions.add(new Position(offset, length));
+			} catch (BadLocationException e) {
+				Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
+			}
+		}
+
+		public void setSelection(ITextSelection selection) {
+			this.selection = selection;
+		}
+
+		@Override
+		public boolean isCancellationRequested() {
+			return canceled;
+		}
+
+		@Override
+		public void onError(TypeScriptException e) {
+			Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
+		}
+	}
+
 	/**
 	 * Updates the occurrences annotations based on the current selection.
 	 *
@@ -538,38 +594,21 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		if (document == null)
 			return;
 
-		final List<Position> positions = new ArrayList<Position>();
-
+		if (occurrencesCollector == null) {
+			occurrencesCollector = new OccurrencesCollector(document);
+		}
 		try {
-			ITypeScriptFile tsFile = getTypeScriptFile();
-			tsFile.occurrences(selection.getOffset(), new ITypeScriptOccurrencesCollector() {
-
-				@Override
-				public void addOccurrence(String file, int startLine, int startOffset, int endLine, int endOffset,
-						boolean isWriteAccess) throws TypeScriptException {
-					try {
-						int start = document.getLineOffset(startLine - 1) + startOffset - 1;
-						int end = document.getLineOffset(endLine - 1) + endOffset - 1;
-						int offset = start;
-						int length = end - start;
-						positions.add(new Position(offset, length));
-					} catch (BadLocationException e) {
-						Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
-					}
-
-				}
-			});
+			ITypeScriptFile tsFile = getTypeScriptFile(document);
+			occurrencesCollector.setSelection(selection);
+			tsFile.occurrences(selection.getOffset(), occurrencesCollector);
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
 		}
 
-		fOccurrencesFinderJob = new OccurrencesFinderJob(document, positions.toArray(new Position[0]), selection);
-		fOccurrencesFinderJob.run(new NullProgressMonitor());
 	}
 
-	private ITypeScriptFile getTypeScriptFile() throws CoreException, TypeScriptException {
+	private ITypeScriptFile getTypeScriptFile(IDocument document) throws CoreException, TypeScriptException {
 		IResource file = EditorUtils.getResource(this);
-		IDocument document = getDocumentProvider().getDocument(this);
 		IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 		return tsProject.openFile(file, document);
 	}

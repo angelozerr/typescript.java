@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Format request; value of command field is "format". Return response giving
  * zero or more edit instructions. The edit instructions will be sorted in file
@@ -25,4 +29,8 @@ public class FormatRequest extends FileLocationRequest {
 		super(CommandNames.Format, new FormatRequestArgs(fileName, line, offset, endLine, endOffset));
 	}
 
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
+	}
 }

@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Completion entry details request; value of command field is
  * "completionEntryDetails". Given a file location (file, line, col) and an
@@ -20,5 +24,10 @@ public class CompletionDetailsRequest extends FileLocationRequest {
 
 	public CompletionDetailsRequest(String fileName, int line, int offset, String[] entryNames) {
 		super(CommandNames.CompletionEntryDetails, new CompletionDetailsRequestArgs(fileName, line, offset, entryNames));
+	}
+	
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
 	}
 }

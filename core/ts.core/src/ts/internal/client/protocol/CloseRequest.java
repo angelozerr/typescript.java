@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Close request.
  * 
@@ -22,4 +26,8 @@ public class CloseRequest extends SimpleRequest {
 		super(CommandNames.Close, new FileRequestArgs(fileName), null);
 	}
 
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
+	}
 }

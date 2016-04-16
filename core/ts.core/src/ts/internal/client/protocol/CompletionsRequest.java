@@ -10,6 +10,10 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonObject;
+
+import ts.TypeScriptException;
+
 /**
  * Completions request; value of command field is "completions". Given a file
  * location (file, line, col) and a prefix (which may be the empty string),
@@ -22,6 +26,11 @@ public class CompletionsRequest extends FileLocationRequest {
 
 	public CompletionsRequest(String fileName, int line, int offset, String prefix) {
 		super(CommandNames.Completions, new CompletionsRequestArgs(fileName, line, offset, prefix));
+	}
+	
+	@Override
+	public void collect(JsonObject response) throws TypeScriptException {
+		// None response
 	}
 
 }
