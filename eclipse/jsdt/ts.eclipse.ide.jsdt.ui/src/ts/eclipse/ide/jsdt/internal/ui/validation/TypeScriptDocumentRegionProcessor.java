@@ -42,7 +42,7 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 		if (FileUtils.JS_EXTENSION.equals(extension)) {
 			return "org.eclipse.wst.jsdt.core.jsSource";
 		}
-		return new StringBuilder("ts.eclipse.ide.jsdt.core.").append(extension).append("Source").toString();
+		return new StringBuilder("ts.eclipse.ide.core.").append(extension).append("Source").toString();
 	}
 
 	@Override
