@@ -647,6 +647,8 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 			fOccurrencesFinderJobCanceler.uninstall();
 			fOccurrencesFinderJobCanceler = null;
 		}
+		
+		occurrencesCollector = null;
 
 		// if (fPostSelectionListenerWithAST != null) {
 		// SelectionListenerWithASTManager.getDefault().removeListener(this,
