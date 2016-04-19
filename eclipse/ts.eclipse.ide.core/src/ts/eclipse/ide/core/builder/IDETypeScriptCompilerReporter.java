@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import ts.compiler.AbstractTypeScriptCompilerReporter;
+import ts.nodejs.INodejsProcess;
 
 public class IDETypeScriptCompilerReporter extends AbstractTypeScriptCompilerReporter {
 
@@ -18,6 +19,18 @@ public class IDETypeScriptCompilerReporter extends AbstractTypeScriptCompilerRep
 	public IDETypeScriptCompilerReporter(IContainer container) {
 		this.container = container;
 		this.filesToRefresh = new ArrayList<IFile>();
+	}
+
+	@Override
+	public void onStart(INodejsProcess process) {
+		System.out.println("start tsc");
+		super.onStart(process);
+	}
+
+	@Override
+	public void onStop(INodejsProcess process) {
+		System.out.println("stop tsc");
+		super.onStop(process);
 	}
 
 	@Override

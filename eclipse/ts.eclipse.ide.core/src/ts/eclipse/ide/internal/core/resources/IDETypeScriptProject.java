@@ -36,7 +36,6 @@ import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
 import ts.resources.TypeScriptProject;
-import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.FileUtils;
 
 /**
@@ -199,20 +198,20 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	}
 
 	@Override
-	public boolean canValidate(IResource resource) {
+	public boolean isInScope(IResource resource) {
 		try {
-			// Use project preferences, which defines exclude path
-			if (!getProjectSettings().canValidate(resource)) {
+			// Use project preferences, which defines include/exclude path
+			if (!getTypeScriptBuildPath().isInScope(resource)) {
 				return false;
 			}
 			boolean isJSFile = IDEResourcesManager.getInstance().isJsFile(resource)
 					|| IDEResourcesManager.getInstance().isJsxFile(resource);
 			if (isJSFile) {
 				// Can validate js file?
-				return canValidateJsFile(resource);
+				return isJsFileIsInScope(resource);
 			}
-			// Can validate ts file?
-			return canValidateTsFile(resource);
+			// is ts file is included ?
+			return isTsFileIsInScope(resource);
 		} catch (CoreException e) {
 			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canValidate", e);
 		}
@@ -228,7 +227,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean canValidateJsFile(IResource resource) throws CoreException {
+	private boolean isJsFileIsInScope(IResource resource) throws CoreException {
 		// Search if a jsconfig.json exists?
 		IFile jsconfigFile = JsonConfigResourcesManager.getInstance().findJsconfigFile(resource);
 		if (jsconfigFile != null) {
@@ -236,7 +235,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		}
 		// Search if tsconfig.json exists and defines alloyJs
 		IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
-		if (tsconfig != null && tsconfig.getCompilerOptions() != null && tsconfig.getCompilerOptions().isAlloyJs()) {
+		if (tsconfig != null && tsconfig.getCompilerOptions() != null && tsconfig.getCompilerOptions().isAllowJs()) {
 			return true;
 		}
 		// jsconfig.json was not found (ex : MyProject/node_modules),
@@ -253,7 +252,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean canValidateTsFile(IResource resource) throws CoreException {
+	private boolean isTsFileIsInScope(IResource resource) throws CoreException {
 		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
 		if (tsconfig != null) {
 			// check if the given file is declared in the "files"
@@ -266,17 +265,6 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		// tsconfig.json was not found (ex : MyProject/node_modules),
 		// validation must not be done.
 		return false;
-	}
-
-	@Override
-	public boolean canCompileOnSave(IResource resource) {
-		try {
-			TsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
-			return tsconfig != null ? tsconfig.isCompileOnSave() : null;
-		} catch (CoreException e) {
-			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canCompileOnSave", e);
-			return false;
-		}
 	}
 
 	@Override

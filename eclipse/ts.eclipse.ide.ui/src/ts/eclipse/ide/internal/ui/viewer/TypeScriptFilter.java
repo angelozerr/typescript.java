@@ -33,7 +33,7 @@ public class TypeScriptFilter extends ViewerFilter {
 	public boolean select(Viewer viewer, Object parent, Object element) {
 		if (element instanceof IFile) {
 			IFile file = (IFile) element;
-			if (!TypeScriptResourceUtil.isCompiledTypeScriptResource(file)) {
+			if (!TypeScriptResourceUtil.isEmittedFile(file)) {
 				return true;
 			}
 			return hasParentTypeScriptFile(parent);

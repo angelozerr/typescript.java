@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
@@ -17,6 +18,7 @@ import com.eclipsesource.json.JsonObject.Member;
 
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPathEntry;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.utils.FileUtils;
 
 public class TypeScriptBuildPath implements ITypeScriptBuildPath {
@@ -79,6 +81,17 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 	public void removeEntry(ITypeScriptBuildPathEntry entry) {
 		entries.remove(entry);
 		this.containers = null;
+	}
+
+	@Override
+	public boolean isInScope(IResource resource) {
+		return getContainer(resource) != null;
+	}
+
+	@Override
+	public IContainer getContainer(IResource resource) {
+		List<IContainer> containers = getContainers();
+		return WorkbenchResourceUtil.getContainer(resource, containers);
 	}
 
 	public void save(Writer writer) throws IOException {

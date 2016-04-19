@@ -11,6 +11,7 @@
 package ts.eclipse.ide.core.utils;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -85,8 +86,33 @@ public class WorkbenchResourceUtil {
 		File file = new File(path);
 		return (file.exists() && file.isFile()) ? file : null;
 	}
-	
+
 	public static IPath getRelativePath(IResource resource, IContainer parent) {
 		return resource.getLocation().makeRelativeTo(parent.getLocation());
+	}
+
+	public static boolean isContainedIn(IResource resource, IContainer container) {
+		for (IContainer parent = resource.getParent(); parent != null; parent = parent.getParent()) {
+			if (parent.equals(container)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isContainedIn(IResource resource, List<IContainer> containers) {
+		return getContainer(resource, containers) != null;
+	}
+
+	public static IContainer getContainer(IResource resource, List<IContainer> containers) {
+		if (resource instanceof IContainer && containers.contains(resource)) {
+			return (IContainer) resource;
+		}
+		for (IContainer parent = resource.getParent(); parent != null; parent = parent.getParent()) {
+			if (containers.contains(parent)) {
+				return parent;
+			}
+		}
+		return null;
 	}
 }

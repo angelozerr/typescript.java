@@ -12,7 +12,6 @@ package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
@@ -164,19 +163,19 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH.equals(event.getKey());
 	}
 
-	@Override
-	public boolean canValidate(IResource resource) {
-		// TODO: add a preferences to customize path to exclude for validation.
-		// today we exclude validation for files which are hosted inside
-		// node_modules.
-		IPath location = resource.getProjectRelativePath();
-		for (int i = 0; i < location.segmentCount(); i++) {
-			if ("node_modules".equals(location.segment(i))) {
-				return false;
-			}
-		}
-		return true;
-	}
+//	@Override
+//	public boolean canValidate(IResource resource) {
+//		// TODO: add a preferences to customize path to exclude for validation.
+//		// today we exclude validation for files which are hosted inside
+//		// node_modules.
+//		IPath location = resource.getProjectRelativePath();
+//		for (int i = 0; i < location.segmentCount(); i++) {
+//			if ("node_modules".equals(location.segment(i))) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
 	private IDETypeScriptProject getTypeScriptProject() {
 		return tsProject;

@@ -44,7 +44,7 @@ public class TypeScriptResourceUtil {
 	public static boolean isTsOrTsxFile(Object element) {
 		return IDEResourcesManager.getInstance().isTsOrTsxFile(element);
 	}
-
+	
 	public static boolean isTsOrTsxOrJsxFile(Object element) {
 		return IDEResourcesManager.getInstance().isTsOrTsxOrJsxFile(element);
 	}
@@ -139,7 +139,7 @@ public class TypeScriptResourceUtil {
 	 * @return true if the given *.js file or *.js.map have a corresponding *.ts
 	 *         file in the same folder and false otherwise.
 	 */
-	public static boolean isCompiledTypeScriptResource(IFile jsOrJsMapFile) {
+	public static boolean isEmittedFile(IFile jsOrJsMapFile) {
 		if (!isJsOrJsMapFile(jsOrJsMapFile)) {
 			return false;
 		}
@@ -150,16 +150,16 @@ public class TypeScriptResourceUtil {
 		return jsOrJsMapFile.getParent().exists(new Path(tsFilename));
 	}
 
-	public static Object[] getCompiledTypesScriptResources(IFile tsFile) throws CoreException {
+	public static Object[] getEmittedFiles(IFile tsFile) throws CoreException {
 		if (!isTsOrTsxFile(tsFile)) {
 			return null;
 		}
-		List<IFile> compiledFiles = new ArrayList<IFile>();
-		refreshAndCollectCompiledFiles(tsFile, false, compiledFiles);
-		return compiledFiles.toArray();
+		List<IFile> emittedFiles = new ArrayList<IFile>();
+		refreshAndCollectEmittedFiles(tsFile, false, emittedFiles);
+		return emittedFiles.toArray();
 	}
 
-	public static void refreshAndCollectCompiledFiles(IFile tsFile, boolean refresh, List<IFile> compiledFiles)
+	public static void refreshAndCollectEmittedFiles(IFile tsFile, boolean refresh, List<IFile> emittedFiles)
 			throws CoreException {
 		if (!isTsOrTsxFile(tsFile)) {
 			return;
@@ -167,11 +167,11 @@ public class TypeScriptResourceUtil {
 
 		// Find tsconfig.json
 		IDETsconfigJson tsconfig = findTsconfig(tsFile);
-		refreshAndCollectCompiledFiles(tsFile, tsconfig, refresh, compiledFiles);
+		refreshAndCollectEmittedFiles(tsFile, tsconfig, refresh, emittedFiles);
 	}
 
-	public static void refreshAndCollectCompiledFiles(IFile tsFile, IDETsconfigJson tsconfig, boolean refresh,
-			List<IFile> compiledFiles) throws CoreException {
+	public static void refreshAndCollectEmittedFiles(IFile tsFile, IDETsconfigJson tsconfig, boolean refresh,
+			List<IFile> emittedFiles) throws CoreException {
 		IContainer baseDir = tsFile.getParent();
 		IContainer outDir = tsFile.getParent();
 		if (tsconfig != null) {
@@ -186,33 +186,31 @@ public class TypeScriptResourceUtil {
 		IPath tsFileNamePath = WorkbenchResourceUtil.getRelativePath(tsFile, baseDir).removeFileExtension();
 		// Check if *js file compiled exists
 		IPath jsFilePath = tsFileNamePath.addFileExtension(FileUtils.JS_EXTENSION);
-		refreshAndCollect(jsFilePath, outDir, refresh, compiledFiles);
+		refreshAndCollect(jsFilePath, outDir, refresh, emittedFiles);
 		// Check if *js.map file compiled exists
 		IPath jsMapFilePath = tsFileNamePath.addFileExtension(FileUtils.JS_EXTENSION)
 				.addFileExtension(FileUtils.MAP_EXTENSION);
-		refreshAndCollect(jsMapFilePath, outDir, refresh, compiledFiles);
+		refreshAndCollect(jsMapFilePath, outDir, refresh, emittedFiles);
 
 		if (refresh) {
 			tsFile.refreshLocal(IResource.DEPTH_INFINITE, null);
 		}
 	}
 
-	private static void refreshAndCollect(IPath jsFilePath, IContainer baseDir, boolean refresh,
-			List<IFile> compiledFiles) throws CoreException {
+	private static void refreshAndCollect(IPath filePath, IContainer baseDir, boolean refresh,
+			List<IFile> emittedFiles) throws CoreException {
 		IFile file = null;
 		if (refresh) {
-			file = baseDir.getFile(jsFilePath);
-			if (!file.exists()) {
-				file.refreshLocal(IResource.DEPTH_INFINITE, null);
-			}
+			file = baseDir.getFile(filePath);
+			file.refreshLocal(IResource.DEPTH_INFINITE, null);
 		}
 
-		if (compiledFiles != null) {
-			if (file == null && baseDir.exists(jsFilePath)) {
-				file = baseDir.getFile(jsFilePath);
+		if (emittedFiles != null) {
+			if (file == null && baseDir.exists(filePath)) {
+				file = baseDir.getFile(filePath);
 			}
 			if (file != null) {
-				compiledFiles.add(file);
+				emittedFiles.add(file);
 			}
 		}
 	}

@@ -38,7 +38,7 @@ public class TypeScriptNavigatorContentProvider implements ITreeContentProvider 
 		}
 		IFile resource = (IFile) element;
 		try {
-			Object[] children = TypeScriptResourceUtil.getCompiledTypesScriptResources(resource);
+			Object[] children = TypeScriptResourceUtil.getEmittedFiles(resource);
 			return children != null ? children : NO_CHILDREN;
 		} catch (CoreException e) {
 		}

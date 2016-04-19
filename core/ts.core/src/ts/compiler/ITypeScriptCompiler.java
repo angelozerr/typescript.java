@@ -11,12 +11,13 @@
 package ts.compiler;
 
 import java.io.File;
+import java.util.List;
 
 import ts.TypeScriptException;
 import ts.nodejs.INodejsProcessListener;
 
 /**
- * TypeScript compiler which uses 'tsc'
+ * API for TypeScript compiler which uses 'tsc'
  *
  */
 public interface ITypeScriptCompiler {
@@ -28,7 +29,8 @@ public interface ITypeScriptCompiler {
 	 *            teh directory where 'tsc' must be executed.
 	 * @throws TypeScriptException
 	 */
-	void compile(File baseDir, INodejsProcessListener listener) throws TypeScriptException;
+	void compile(File baseDir, CompilerOptions options, List<String> filenames, INodejsProcessListener listener)
+			throws TypeScriptException;
 
 	/**
 	 * Dispose the compiler.

@@ -31,9 +31,12 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 
 	private static final String TYPESCRIPT_VALIDATOR_CONTEXT = "ts.eclipse.ide.validator.internal.core.validation.validatorContext"; //$NON-NLS-1$
 
+	private long startTime;
+
 	@Override
 	public void validationStarting(IProject project, ValidationState state, IProgressMonitor monitor) {
 		if (project != null && TypeScriptResourceUtil.hasTypeScriptNature(project)) {
+			startTime = System.currentTimeMillis();
 			try {
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project, false);
 				state.put(TYPESCRIPT_VALIDATOR_CONTEXT, tsProject);
@@ -49,6 +52,7 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 		if (project != null && TypeScriptResourceUtil.hasTypeScriptNature(project)) {
 			super.validationFinishing(project, state, monitor);
 			state.put(TYPESCRIPT_VALIDATOR_CONTEXT, null);
+			System.err.println("Validated in " + (System.currentTimeMillis() - startTime) + "ms");
 		}
 	}
 
@@ -59,8 +63,7 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 	public ValidationResult validate(IResource resource, int kind, ValidationState state, IProgressMonitor monitor) {
 		ValidationResult result = new ValidationResult();
 		IIDETypeScriptProject tsProject = (IIDETypeScriptProject) state.get(TYPESCRIPT_VALIDATOR_CONTEXT);
-		if (tsProject != null && TypeScriptResourceUtil.canConsumeTsserver(resource)
-				&& tsProject.canValidate(resource)) {
+		if (tsProject != null && TypeScriptResourceUtil.canConsumeTsserver(resource) && tsProject.isInScope(resource)) {
 			IReporter reporter = result.getReporter(monitor);
 
 			// Here we call geterr from tsserver for the given file IResource.
