@@ -26,6 +26,7 @@ import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
@@ -70,6 +71,8 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	};
 
 	private final IProject project;
+
+	private ITypeScriptBuildPath buildPath;
 
 	public IDETypeScriptProject(IProject project) throws CoreException {
 		super(project.getLocation().toFile(), null);
@@ -276,4 +279,15 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		}
 	}
 
+	@Override
+	public ITypeScriptBuildPath getTypeScriptBuildPath() {
+		if (buildPath == null) {
+			buildPath = ((IDETypeScriptProjectSettings) getProjectSettings()).getTypeScriptBuildPath();
+		}
+		return buildPath;
+	}
+
+	public void disposeBuildPath() {
+		buildPath = null;
+	}
 }

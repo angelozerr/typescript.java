@@ -52,7 +52,7 @@ public class TypeScriptResourceUtil {
 	public static boolean isJsOrJsMapFile(Object element) {
 		return IDEResourcesManager.getInstance().isJsOrJsMapFile(element);
 	}
-	
+
 	/**
 	 * Return true if the given project contains a "tsconfig.json" file false
 	 * otherwise.
@@ -154,36 +154,63 @@ public class TypeScriptResourceUtil {
 		if (!isTsOrTsxFile(tsFile)) {
 			return null;
 		}
+		List<IFile> compiledFiles = new ArrayList<IFile>();
+		refreshAndCollectCompiledFiles(tsFile, false, compiledFiles);
+		return compiledFiles.toArray();
+	}
+
+	public static void refreshAndCollectCompiledFiles(IFile tsFile, boolean refresh, List<IFile> compiledFiles)
+			throws CoreException {
+		if (!isTsOrTsxFile(tsFile)) {
+			return;
+		}
+
+		IContainer baseDir = tsFile.getParent();
+		IContainer outDir = tsFile.getParent();
+
 		// Find tsconfig.json
 		IDETsconfigJson tsconfig = findTsconfig(tsFile);
 		if (tsconfig != null) {
 			// tsconfig.json is found and "outDir" is setted, check if *.js and
 			// *.js.map file in the "outDir" folder.
-			IContainer outDir = tsconfig.getOutDirContainer();
-			if (outDir != null && outDir.exists()) {
-				return getCompiledTypeScriptResources(tsFile, tsconfig.getTsconfigFile().getParent(), outDir);
+			IContainer configOutDir = tsconfig.getOutDirContainer();
+			if (configOutDir != null && configOutDir.exists()) {
+				outDir = configOutDir;
 			}
 		}
-		// otherwise, check if *.js and *.js.map file in the same folder than
-		// the given *.ts file
-		return getCompiledTypeScriptResources(tsFile, tsFile.getParent(), tsFile.getParent());
-	}
 
-	private static Object[] getCompiledTypeScriptResources(IFile tsFile, IContainer baseDir, IContainer outDir) {
 		IPath tsFileNamePath = WorkbenchResourceUtil.getRelativePath(tsFile, baseDir).removeFileExtension();
 		// Check if *js file compiled exists
-		List<IFile> files = new ArrayList<IFile>();
 		IPath jsFilePath = tsFileNamePath.addFileExtension(FileUtils.JS_EXTENSION);
-		if (outDir.exists(jsFilePath)) {
-			files.add(outDir.getFile(jsFilePath));
-		}
+		refreshAndCollect(jsFilePath, outDir, refresh, compiledFiles);
 		// Check if *js.map file compiled exists
 		IPath jsMapFilePath = tsFileNamePath.addFileExtension(FileUtils.JS_EXTENSION)
 				.addFileExtension(FileUtils.MAP_EXTENSION);
-		if (outDir.exists(jsMapFilePath)) {
-			files.add(outDir.getFile(jsMapFilePath));
+		refreshAndCollect(jsMapFilePath, outDir, refresh, compiledFiles);
+
+		if (refresh) {
+			tsFile.refreshLocal(IResource.DEPTH_INFINITE, null);
 		}
-		return files.toArray(new Object[0]);
+	}
+
+	private static void refreshAndCollect(IPath jsFilePath, IContainer baseDir, boolean refresh,
+			List<IFile> compiledFiles) throws CoreException {
+		IFile file = null;
+		if (refresh) {
+			file = baseDir.getFile(jsFilePath);
+			if (!file.exists()) {
+				file.refreshLocal(IResource.DEPTH_INFINITE, null);
+			}
+		}
+
+		if (compiledFiles != null) {
+			if (file == null && baseDir.exists(jsFilePath)) {
+				file = baseDir.getFile(jsFilePath);
+			}
+			if (file != null) {
+				compiledFiles.add(file);
+			}
+		}
 	}
 
 	public static IDETsconfigJson findTsconfig(IResource resource) throws CoreException {

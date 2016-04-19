@@ -58,7 +58,10 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		// files)
 		initializeSalsa(node);
 
-		// Initialize default path for TypeScript/Salsa nature
+		// Initialize default path where TypeScript files *.ts, *.tsx must be
+		// searched for compilation and validation must be done
+		initializeTypeScriptPaths(node);
+
 		// node.put(TypeScriptCorePreferenceConstants.NATURE_TYPESCRIPT_PATHS,
 		// TypeScriptCorePreferenceConstants.DEFAULT_NATURE_TYPESCRIPT_PATHS);
 		// node.put(TypeScriptCorePreferenceConstants.NATURE_SALSA_PATHS,
@@ -110,4 +113,9 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		node.put(TypeScriptCorePreferenceConstants.USE_SALSA_AS_JS_INFERENCE, UseSalsa.WhenNoJSDTNature.name());
 	}
 
+	private void initializeTypeScriptPaths(IEclipsePreferences node) {
+		node.put(TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH,
+				TypeScriptCorePreferenceConstants.DEFAULT_TYPESCRIPT_BUILD_PATH);
+
+	}
 }

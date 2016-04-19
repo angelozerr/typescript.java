@@ -100,8 +100,10 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 
 		public void onMessage(INodejsProcess process, String message) {
-			JsonObject response = Json.parse(message).asObject();
-			TypeScriptServiceClient.this.dispatchMessage(response);
+			if (message.startsWith("{")) {
+				JsonObject response = Json.parse(message).asObject();
+				TypeScriptServiceClient.this.dispatchMessage(response);
+			}
 		};
 
 	};
@@ -568,11 +570,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			handleError(request, e, request.getStartTime());
 			TypeScriptException tse = getTypeScriptException(e);
 			if (tse != null) {
-//				if (tse instanceof TypeScriptTimeoutException) {
-//					// when time out exception, we must be sure that the request
-//					// is removed
-//					tryCancelRequest(((TypeScriptTimeoutException) tse).getRequest().getSeq());
-//				}
+				// if (tse instanceof TypeScriptTimeoutException) {
+				// // when time out exception, we must be sure that the request
+				// // is removed
+				// tryCancelRequest(((TypeScriptTimeoutException)
+				// tse).getRequest().getSeq());
+				// }
 				throw (TypeScriptException) tse;
 			}
 			throw new TypeScriptException(e);
@@ -660,41 +663,40 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	private void dispatchMessage(JsonObject response) {
 		try {
-		String type = response.getString("type", null);
-		if ("response".equals(type)) {
-			int seq = response.getInt("request_seq", -1);
-			ICallbackItem p = null;
-			synchronized (callbacks) {
-				p = this.callbacks.remove(seq);
-			}
-			if (p != null) {
-				this.pendingResponses.getAndDecrement();
-				p.complete(response);
-				handleResponse(((Request) p), response, ((Request) p).getStartTime());
-			}
-		} else if ("event".equals(type)) {
-			String event = response.getString("event", null);
-			if ("syntaxDiag".equals(event) || "semanticDiag".equals(event)) {
-				JsonObject body = response.get("body").asObject();
-				if (body != null) {
-					String file = body.getString("file", null);
-					if (file != null) {
-						ICallbackItem p = null;
-						synchronized (diagCallbacks) {
-							p = diagCallbacks.get(file);
-							if (p != null) {
-								if (p.complete(response)) {
-									diagCallbacks.remove(file);
+			String type = response.getString("type", null);
+			if ("response".equals(type)) {
+				int seq = response.getInt("request_seq", -1);
+				ICallbackItem p = null;
+				synchronized (callbacks) {
+					p = this.callbacks.remove(seq);
+				}
+				if (p != null) {
+					this.pendingResponses.getAndDecrement();
+					p.complete(response);
+					handleResponse(((Request) p), response, ((Request) p).getStartTime());
+				}
+			} else if ("event".equals(type)) {
+				String event = response.getString("event", null);
+				if ("syntaxDiag".equals(event) || "semanticDiag".equals(event)) {
+					JsonObject body = response.get("body").asObject();
+					if (body != null) {
+						String file = body.getString("file", null);
+						if (file != null) {
+							ICallbackItem p = null;
+							synchronized (diagCallbacks) {
+								p = diagCallbacks.get(file);
+								if (p != null) {
+									if (p.complete(response)) {
+										diagCallbacks.remove(file);
+									}
+									handleResponse(((Request) p), response, ((Request) p).getStartTime());
 								}
-								handleResponse(((Request) p), response, ((Request) p).getStartTime());
 							}
 						}
 					}
 				}
 			}
-		}
-		}
-		finally {
+		} finally {
 			this.sendNextRequests();
 		}
 	}

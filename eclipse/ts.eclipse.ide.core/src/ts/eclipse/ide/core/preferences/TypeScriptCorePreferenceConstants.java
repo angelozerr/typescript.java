@@ -10,8 +10,7 @@
  */
 package ts.eclipse.ide.core.preferences;
 
-import static ts.utils.FileUtils.JSCONFIG_JSON;
-import static ts.utils.FileUtils.TSCONFIG_JSON;
+import ts.eclipse.ide.internal.core.resources.buildpath.DefaultTypeScriptBuildPath;
 
 /**
  * TypeScript preferences core constants.
@@ -46,18 +45,26 @@ public class TypeScriptCorePreferenceConstants {
 	public static final String TSC_INSTALLED_TYPESCRIPT_PATH = "tscInstalledTypeScriptPath"; //$NON-NLS-1$
 
 	// Salsa
-	
+
 	public static final String USE_SALSA_AS_JS_INFERENCE = "useSalsaAsJSInference"; //$NON-NLS-1$
-	
+
 	// TypeScript/Salsa nature paths
 
-//	public static final String NATURE_TYPESCRIPT_PATHS = "natureTypescriptPaths"; //$NON-NLS-1$
-//
-//	public static final String DEFAULT_NATURE_TYPESCRIPT_PATHS = TSCONFIG_JSON + ",src/" + TSCONFIG_JSON; //$NON-NLS-1$
-//
-//	public static final String NATURE_SALSA_PATHS = "natureSalsaPaths"; //$NON-NLS-1$
-//
-//	public static final String DEFAULT_NATURE_SALSA_PATHS = JSCONFIG_JSON + ",src/" + JSCONFIG_JSON; //$NON-NLS-1$
+	// public static final String NATURE_TYPESCRIPT_PATHS =
+	// "natureTypescriptPaths"; //$NON-NLS-1$
+	//
+	// public static final String DEFAULT_NATURE_TYPESCRIPT_PATHS =
+	// TSCONFIG_JSON + ",src/" + TSCONFIG_JSON; //$NON-NLS-1$
+	//
+	// public static final String NATURE_SALSA_PATHS = "natureSalsaPaths";
+	// //$NON-NLS-1$
+	//
+	// public static final String DEFAULT_NATURE_SALSA_PATHS = JSCONFIG_JSON +
+	// ",src/" + JSCONFIG_JSON; //$NON-NLS-1$
+
+	public static final String TYPESCRIPT_BUILD_PATH = "typeBuildScriptPath"; //$NON-NLS-1$
+
+	public static final String DEFAULT_TYPESCRIPT_BUILD_PATH = new DefaultTypeScriptBuildPath().toString(); // $NON-NLS-1$
 
 	private TypeScriptCorePreferenceConstants() {
 	}

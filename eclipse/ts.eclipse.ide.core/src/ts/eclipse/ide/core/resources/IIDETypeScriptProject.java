@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.resources.ITypeScriptProject;
 
 /**
@@ -101,4 +102,6 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 *         it is saved and false otherwise.
 	 */
 	boolean canCompileOnSave(IResource resource);
+
+	ITypeScriptBuildPath getTypeScriptBuildPath();
 }

@@ -20,8 +20,6 @@ import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 /**
  * TypeScript navigator used to display for *.ts file, *.js and *.js.map files
  * as children.
- * 
- * @author azerr
  *
  */
 public class TypeScriptNavigatorContentProvider implements ITreeContentProvider {

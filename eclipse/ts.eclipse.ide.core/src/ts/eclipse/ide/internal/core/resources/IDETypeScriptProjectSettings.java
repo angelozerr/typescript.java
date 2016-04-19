@@ -20,11 +20,11 @@ import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.AbstractTypeScriptSettings;
-import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
+import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPath;
 import ts.repository.ITypeScriptRepository;
-import ts.resources.ITypeScriptProject;
 import ts.resources.SynchStrategy;
 import ts.utils.StringUtils;
 
@@ -34,9 +34,9 @@ import ts.utils.StringUtils;
  */
 public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings implements IIDETypeScriptProjectSettings {
 
-	private final IIDETypeScriptProject tsProject;
+	private final IDETypeScriptProject tsProject;
 
-	public IDETypeScriptProjectSettings(IIDETypeScriptProject tsProject) {
+	public IDETypeScriptProjectSettings(IDETypeScriptProject tsProject) {
 		super(tsProject.getProject(), TypeScriptCorePlugin.PLUGIN_ID);
 		this.tsProject = tsProject;
 	}
@@ -136,6 +136,8 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 			getTypeScriptProject().disposeServer();
 		} else if (isTscPreferencesChanged(event)) {
 			getTypeScriptProject().disposeCompiler();
+		} else if (isTypeScriptBuildPathPreferencesChanged(event)) {
+			getTypeScriptProject().disposeBuildPath();
 		}
 	}
 
@@ -158,6 +160,10 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 				|| TypeScriptCorePreferenceConstants.TSC_INSTALLED_TYPESCRIPT_PATH.equals(event.getKey());
 	}
 
+	private boolean isTypeScriptBuildPathPreferencesChanged(PreferenceChangeEvent event) {
+		return TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH.equals(event.getKey());
+	}
+
 	@Override
 	public boolean canValidate(IResource resource) {
 		// TODO: add a preferences to customize path to exclude for validation.
@@ -172,7 +178,13 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return true;
 	}
 
-	private ITypeScriptProject getTypeScriptProject() {
+	private IDETypeScriptProject getTypeScriptProject() {
 		return tsProject;
+	}
+
+	public ITypeScriptBuildPath getTypeScriptBuildPath() {
+		String buildPaths = getStringPreferencesValue(TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH,
+				TypeScriptCorePreferenceConstants.DEFAULT_TYPESCRIPT_BUILD_PATH);
+		return TypeScriptBuildPath.load(getTypeScriptProject().getProject(), buildPaths);
 	}
 }

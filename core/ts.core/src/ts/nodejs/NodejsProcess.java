@@ -74,9 +74,7 @@ public class NodejsProcess extends AbstractNodejsProcess {
 					BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					String line = null;
 					while ((line = r.readLine()) != null) {
-						if (line.startsWith("{")) {
-							notifyMessage(line);
-						}
+						notifyMessage(line);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -125,13 +123,13 @@ public class NodejsProcess extends AbstractNodejsProcess {
 			this.process = builder.start();
 			this.out = new PrintStream(process.getOutputStream());
 
-			outThread = new Thread(new StdOut());
-			outThread.setDaemon(true);
-			outThread.start();
-
 			errThread = new Thread(new StdErr());
 			errThread.setDaemon(true);
 			errThread.start();
+
+			outThread = new Thread(new StdOut());
+			outThread.setDaemon(true);
+			outThread.start();
 
 			// add a shutdown hook to destroy the node process in case its not
 			// properly disposed
