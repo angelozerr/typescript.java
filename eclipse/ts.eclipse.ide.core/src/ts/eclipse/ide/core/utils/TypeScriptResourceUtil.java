@@ -165,11 +165,15 @@ public class TypeScriptResourceUtil {
 			return;
 		}
 
-		IContainer baseDir = tsFile.getParent();
-		IContainer outDir = tsFile.getParent();
-
 		// Find tsconfig.json
 		IDETsconfigJson tsconfig = findTsconfig(tsFile);
+		refreshAndCollectCompiledFiles(tsFile, tsconfig, refresh, compiledFiles);
+	}
+
+	public static void refreshAndCollectCompiledFiles(IFile tsFile, IDETsconfigJson tsconfig, boolean refresh,
+			List<IFile> compiledFiles) throws CoreException {
+		IContainer baseDir = tsFile.getParent();
+		IContainer outDir = tsFile.getParent();
 		if (tsconfig != null) {
 			// tsconfig.json is found and "outDir" is setted, check if *.js and
 			// *.js.map file in the "outDir" folder.

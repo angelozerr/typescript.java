@@ -35,6 +35,10 @@ public class TsconfigJson {
 
 	private List<String> exclude;
 
+	public TsconfigJson() {
+		this.compileOnSave = true;
+	}
+
 	public void setCompilerOptions(CompilerOptions compilerOptions) {
 		this.compilerOptions = compilerOptions;
 	}
