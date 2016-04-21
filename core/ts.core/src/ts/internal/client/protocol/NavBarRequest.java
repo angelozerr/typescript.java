@@ -48,7 +48,6 @@ public class NavBarRequest extends FileRequest<ITypeScriptNavBarCollector> {
 		NavBarResponse a = gson.fromJson(response.toString(), NavBarResponse.class);
 		getCollector().setNavBar(a.getBody());
 //
-		System.err.println(a);
 //		JsonArray array = response.get("body").asArray();
 //
 //		List<NavigationBarItem> items = createChildItems(array);
