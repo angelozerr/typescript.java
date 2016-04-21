@@ -15,6 +15,7 @@ import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
+import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 
@@ -132,4 +133,12 @@ public interface ITypeScriptFile {
 	 * @throws TypeScriptException
 	 */
 	void occurrences(int position, ITypeScriptOccurrencesCollector collector) throws TypeScriptException;
+
+	/**
+	 * Nav bar for the file.
+	 * 
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
+	void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException;
 }

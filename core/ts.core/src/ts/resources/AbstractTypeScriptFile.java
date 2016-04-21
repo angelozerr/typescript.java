@@ -16,6 +16,7 @@ import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
+import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.internal.LocationReader;
@@ -131,6 +132,13 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		int line = location.getLine();
 		int offset = location.getOffset();
 		client.occurrences(this.getName(), line, offset, collector);
+	}
+
+	@Override
+	public void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		client.navbar(this.getName(), collector);
 	}
 	
 	@Override
