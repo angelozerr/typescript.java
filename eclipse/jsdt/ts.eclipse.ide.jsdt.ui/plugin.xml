@@ -226,7 +226,14 @@
             categoryId="org.eclipse.search.ui.category.search"
             id="ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project">
       </command>
-
+<!-- navigate -->
+      <command
+            name="%ActionDefinition.show.outline.name"
+            description="%ActionDefinition.show.outline.description"
+            categoryId="org.eclipse.ui.category.navigate"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline">
+      </command>
+                  
 	</extension>
 	
    <extension
@@ -252,7 +259,14 @@
 	            sequence="M1+M2+G"
 	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
 	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"
-	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>	                        
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+<!-- navigate -->
+      <key
+            sequence="M1+O"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+            	            	                        
 	</extension>
 	   
 	 <!-- I don't know why, but startup should be done, otherwise TypeScriptCompletionProposalComputer is not registered? -->
