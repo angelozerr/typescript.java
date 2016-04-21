@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.internal.ui.viewer;
+package ts.eclipse.ide.internal.ui.viewers;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.TreePath;

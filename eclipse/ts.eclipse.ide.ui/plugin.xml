@@ -28,19 +28,9 @@
 	 </extension>
 
 	<!--======================================================================================-->
-	<!-- TypeScript Outline View                                      						             -->
+	<!-- TypeScript Outline                                 						          -->
 	<!--======================================================================================-->
 	
-   <extension
-         point="org.eclipse.ui.views">
-      <view
-            name="%TypeScriptOutlineView.name"
-            icon="$nl$/icons/full/eview16/outline.png"
-            category="org.eclipse.wst.jsdt.ui.java"
-            class="ts.eclipse.ide.internal.ui.views.TypeScriptOutlineView"
-            id="ts.eclipse.ide.ui.views.TypeScriptOutlineView">
-      </view>
-  </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
@@ -267,7 +257,7 @@
             name="%filters.HideCompiledTypeScriptResource.name"
             description="%filters.HideCompiledTypeScriptResource.description"
             activeByDefault="false"
-            class="ts.eclipse.ide.internal.ui.viewer.TypeScriptFilter" >
+            class="ts.eclipse.ide.internal.ui.viewers.TypeScriptFilter" >
       	  </commonFilter>
    </extension>	
 			            
