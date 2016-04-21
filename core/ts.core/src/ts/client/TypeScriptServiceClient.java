@@ -567,7 +567,6 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			}
 		}
 		try {
-			System.err.println("request:" + serverRequest);
 			getProcess().sendRequest(serverRequest);
 		} catch (TypeScriptException e) {
 			if (eventRequest) {
