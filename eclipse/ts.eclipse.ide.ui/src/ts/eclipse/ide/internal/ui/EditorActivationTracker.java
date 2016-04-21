@@ -83,7 +83,7 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 				final IIDETypeScriptProject project = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 				if (project != null) {
 					final IDocument document = getDocument(part);
-					if (document != null) {
+					if (document != null && project.getOpenedFile(file) == null) {
 						new Job("Opening TypeScript file with tsserver...") {
 							@Override
 							protected IStatus run(IProgressMonitor monitor) {
@@ -112,7 +112,7 @@ public class EditorActivationTracker extends AllInOneWorkbenchListener {
 			// opened
 			try {
 				final IIDETypeScriptProject project = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
-				if (project != null) {
+				if (project != null && project.getOpenedFile(file) != null) {
 					new Job("Closing TypeScript file with tsserver...") {
 						@Override
 						protected IStatus run(IProgressMonitor monitor) {
