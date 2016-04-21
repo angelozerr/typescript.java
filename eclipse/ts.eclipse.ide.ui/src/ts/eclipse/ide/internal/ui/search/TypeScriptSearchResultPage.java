@@ -131,8 +131,8 @@ public class TypeScriptSearchResultPage extends AbstractTextSearchViewPage imple
 	};
 
 	public TypeScriptSearchResultPage() {
-		fSortByNameAction= new SortAction(SearchMessages.FileSearchPage_sort_name_label, this, TypeScriptLabelProvider.SHOW_LABEL_PATH);
-		fSortByPathAction= new SortAction(SearchMessages.FileSearchPage_sort_path_label, this, TypeScriptLabelProvider.SHOW_PATH_LABEL);
+		fSortByNameAction= new SortAction(SearchMessages.FileSearchPage_sort_name_label, this, TypeScriptSearchLabelProvider.SHOW_LABEL_PATH);
+		fSortByPathAction= new SortAction(SearchMessages.FileSearchPage_sort_path_label, this, TypeScriptSearchLabelProvider.SHOW_PATH_LABEL);
 
 		setElementLimit(new Integer(DEFAULT_ELEMENT_LIMIT));
 	}
@@ -155,9 +155,9 @@ public class TypeScriptSearchResultPage extends AbstractTextSearchViewPage imple
 
 	protected void configureTableViewer(TableViewer viewer) {
 		viewer.setUseHashlookup(true);
-		TypeScriptLabelProvider innerLabelProvider= new TypeScriptLabelProvider(this, fCurrentSortOrder);
+		TypeScriptSearchLabelProvider innerLabelProvider= new TypeScriptSearchLabelProvider(this, fCurrentSortOrder);
 		viewer.setLabelProvider(new DecoratingTypeScriptSearchLabelProvider(innerLabelProvider));
-		viewer.setContentProvider(new TypeScriptTableContentProvider(this));
+		viewer.setContentProvider(new TypeScriptSearchTableContentProvider(this));
 		viewer.setComparator(new DecoratorIgnoringViewerSorter(innerLabelProvider));
 		fContentProvider= (ITypeScriptSearchContentProvider) viewer.getContentProvider();
 		addDragAdapters(viewer);
@@ -165,9 +165,9 @@ public class TypeScriptSearchResultPage extends AbstractTextSearchViewPage imple
 
 	protected void configureTreeViewer(TreeViewer viewer) {
 		viewer.setUseHashlookup(true);
-		TypeScriptLabelProvider innerLabelProvider= new TypeScriptLabelProvider(this, TypeScriptLabelProvider.SHOW_LABEL);
+		TypeScriptSearchLabelProvider innerLabelProvider= new TypeScriptSearchLabelProvider(this, TypeScriptSearchLabelProvider.SHOW_LABEL);
 		viewer.setLabelProvider(new DecoratingTypeScriptSearchLabelProvider(innerLabelProvider));
-		viewer.setContentProvider(new TypeScriptTreeContentProvider(this, viewer));
+		viewer.setContentProvider(new TypeScriptSearchTreeContentProvider(this, viewer));
 		viewer.setComparator(new DecoratorIgnoringViewerSorter(innerLabelProvider));
 		fContentProvider= (ITypeScriptSearchContentProvider) viewer.getContentProvider();
 		addDragAdapters(viewer);
@@ -262,7 +262,7 @@ public class TypeScriptSearchResultPage extends AbstractTextSearchViewPage imple
 	public void setSortOrder(int sortOrder) {
 		fCurrentSortOrder= sortOrder;
 		DecoratingTypeScriptSearchLabelProvider lpWrapper= (DecoratingTypeScriptSearchLabelProvider)getViewer().getLabelProvider();
-		((TypeScriptLabelProvider)lpWrapper.getStyledStringProvider()).setOrder(sortOrder);
+		((TypeScriptSearchLabelProvider)lpWrapper.getStyledStringProvider()).setOrder(sortOrder);
 		getViewer().refresh();
 		getSettings().put(KEY_SORTING, fCurrentSortOrder);
 	}

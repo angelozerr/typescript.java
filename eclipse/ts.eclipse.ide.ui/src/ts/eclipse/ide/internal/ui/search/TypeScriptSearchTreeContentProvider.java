@@ -29,7 +29,7 @@ import org.eclipse.search.ui.text.Match;
 import ts.eclipse.ide.ui.search.TypeScriptSearchResult;
 
 
-public class TypeScriptTreeContentProvider implements ITreeContentProvider, ITypeScriptSearchContentProvider {
+public class TypeScriptSearchTreeContentProvider implements ITreeContentProvider, ITypeScriptSearchContentProvider {
 
 	private final Object[] EMPTY_ARR= new Object[0];
 
@@ -38,7 +38,7 @@ public class TypeScriptTreeContentProvider implements ITreeContentProvider, ITyp
 	private AbstractTreeViewer fTreeViewer;
 	private Map fChildrenMap;
 	
-	TypeScriptTreeContentProvider(TypeScriptSearchResultPage page, AbstractTreeViewer viewer) {
+	TypeScriptSearchTreeContentProvider(TypeScriptSearchResultPage page, AbstractTreeViewer viewer) {
 		fPage= page;
 		fTreeViewer= viewer;
 	}

@@ -35,7 +35,7 @@ public class DecoratingTypeScriptSearchLabelProvider extends DecoratingStyledCel
 
 	public static final Styler HIGHLIGHT_STYLE= StyledString.createColorRegistryStyler(null, HIGHLIGHT_BG_COLOR_NAME);
 
-	public DecoratingTypeScriptSearchLabelProvider(TypeScriptLabelProvider provider) {
+	public DecoratingTypeScriptSearchLabelProvider(TypeScriptSearchLabelProvider provider) {
 		super(provider, PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator(), null);
 	}
 

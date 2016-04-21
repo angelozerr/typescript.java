@@ -37,7 +37,7 @@ import org.eclipse.search.ui.text.AbstractTextSearchResult;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.search.ui.text.Match;
 
-public class TypeScriptLabelProvider extends LabelProvider implements IStyledLabelProvider {
+public class TypeScriptSearchLabelProvider extends LabelProvider implements IStyledLabelProvider {
 
 	public static final int SHOW_LABEL= 1;
 	public static final int SHOW_LABEL_PATH= 2;
@@ -55,7 +55,7 @@ public class TypeScriptLabelProvider extends LabelProvider implements IStyledLab
 
 	private int fOrder;
 
-	public TypeScriptLabelProvider(AbstractTextSearchViewPage page, int orderFlag) {
+	public TypeScriptSearchLabelProvider(AbstractTextSearchViewPage page, int orderFlag) {
 		fLabelProvider= new WorkbenchLabelProvider();
 		fOrder= orderFlag;
 		fPage= page;

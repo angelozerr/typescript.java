@@ -17,14 +17,14 @@ import org.eclipse.search.ui.text.AbstractTextSearchResult;
 
 import ts.eclipse.ide.ui.search.TypeScriptSearchResult;
 
-public class TypeScriptTableContentProvider implements IStructuredContentProvider, ITypeScriptSearchContentProvider {
+public class TypeScriptSearchTableContentProvider implements IStructuredContentProvider, ITypeScriptSearchContentProvider {
 
 	private final Object[] EMPTY_ARR = new Object[0];
 
 	private TypeScriptSearchResultPage fPage;
 	private AbstractTextSearchResult fResult;
 
-	public TypeScriptTableContentProvider(TypeScriptSearchResultPage page) {
+	public TypeScriptSearchTableContentProvider(TypeScriptSearchResultPage page) {
 		fPage = page;
 	}
 
