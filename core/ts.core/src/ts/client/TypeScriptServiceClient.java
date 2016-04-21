@@ -32,6 +32,7 @@ import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
@@ -47,6 +48,7 @@ import ts.internal.client.protocol.CompletionsRequest;
 import ts.internal.client.protocol.DefinitionRequest;
 import ts.internal.client.protocol.FormatRequest;
 import ts.internal.client.protocol.GeterrRequest;
+import ts.internal.client.protocol.NavBarRequest;
 import ts.internal.client.protocol.OccurrencesRequest;
 import ts.internal.client.protocol.OpenRequest;
 import ts.internal.client.protocol.QuickInfoRequest;
@@ -367,6 +369,15 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		execute(request);
 	}
 
+	// ----------------- Navbar
+	
+	@Override
+	public void navbar(String fileName, ITypeScriptNavBarCollector collector)
+			throws TypeScriptException {
+		NavBarRequest request = new NavBarRequest(fileName, collector);
+		execute(request);
+	}
+	
 	private void execute(Request request) throws TypeScriptException {
 		if (!request.isAsynch()) {
 			JsonObject response = execute(request, true, null).asObject();
@@ -376,6 +387,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
+	
 	/**
 	 * Write the buffer of editor content to a temporary file and have the
 	 * server reload it
