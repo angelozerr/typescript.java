@@ -10,13 +10,18 @@
  */
 package ts.resources;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ts.TypeScriptException;
+import ts.client.ITypeScriptAsynchCollector;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
+import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.internal.LocationReader;
@@ -32,8 +37,14 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	protected final Object synchLock = new Object();
 	private boolean opened;
 
+	private final List<INavbarListener> listeners;
+	private List<NavigationBarItem> navbar;
+	private TypeScriptNavBarCollector navBarCollector;
+
 	public AbstractTypeScriptFile(ITypeScriptProject tsProject) {
 		this.tsProject = tsProject;
+		this.listeners = new ArrayList<INavbarListener>();
+		this.navBarCollector = new TypeScriptNavBarCollector();
 		this.setDirty(false);
 	}
 
@@ -140,7 +151,78 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		ITypeScriptServiceClient client = tsProject.getClient();
 		client.navbar(this.getName(), collector);
 	}
-	
+
+	private class TypeScriptNavBarCollector implements ITypeScriptNavBarCollector, ITypeScriptAsynchCollector {
+
+		@Override
+		public void setNavBar(List<NavigationBarItem> list) {
+			navbar = list;
+			fireNavBarListeners(list);
+		}
+
+		@Override
+		public void startCollect() {
+
+		}
+
+		@Override
+		public void endCollect() {
+
+		}
+
+		@Override
+		public void onError(TypeScriptException e) {
+
+		}
+	}
+
+	@Override
+	public void addNavbarListener(INavbarListener listener) {
+		synchronized (listeners) {
+			if (!listeners.contains(listener)) {
+				listeners.add(listener);
+			}
+		}
+		if (navbar != null) {
+			listener.navBarChanged(navbar);
+		} else {
+			fireNavBarListenersIfNeeded();
+		}
+	}
+
+	private void fireNavBarListeners(List<NavigationBarItem> items) {
+		synchronized (listeners) {
+			for (INavbarListener listener : listeners) {
+				listener.navBarChanged(items);
+			}
+		}
+	}
+
+	protected void fireNavBarListenersIfNeeded() {
+		if (!listeners.isEmpty()) {
+			try {
+				navbar(navBarCollector);
+			} catch (TypeScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void removeNavbarListener(INavbarListener listener) {
+		synchronized (listeners) {
+			listeners.remove(listener);
+		}
+	}
+
+	// @Override
+	// public List<NavigationBarItem> getNavBar() throws TypeScriptException {
+	// TypeScriptNavBarCollector c = new TypeScriptNavBarCollector();
+	// navbar(c);
+	// return c.getNavBar();
+	// }
+
 	@Override
 	public synchronized void synch() throws TypeScriptException {
 		if (!isDirty()) {
@@ -158,7 +240,9 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 			// change strategy: wait until "change" command is not finished.
 			while (isDirty()) {
 				try {
-					synchLock.wait(5);
+					synchronized (synchLock) {
+						synchLock.wait(5);
+					}
 				} catch (InterruptedException e) {
 					throw new TypeScriptException(e);
 				}

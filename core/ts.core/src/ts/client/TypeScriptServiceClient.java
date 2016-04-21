@@ -62,7 +62,6 @@ import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 import ts.nodejs.NodejsProcessManager;
 import ts.utils.FileUtils;
-import ts.utils.JsonHelper;
 
 /**
  * TypeScript service client implementation.
@@ -169,54 +168,15 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void completions(String fileName, int line, int offset, String prefix,
 			ITypeScriptCompletionCollector collector) throws TypeScriptException {
-		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix);
-		JsonObject response = execute(request, true, null).asObject();
-		collectCompletions(response, fileName, line, offset, collector);
-	}
-
-	private void collectCompletions(JsonObject response, String fileName, int line, int offset,
-			ITypeScriptCompletionCollector collector) {
-		JsonArray items = response.get("body").asArray();
-		JsonObject obj = null;
-		for (JsonValue item : items) {
-			obj = (JsonObject) item;
-			collector.addCompletionEntry(obj.getString("name", ""), obj.getString("kind", ""),
-					obj.getString("kindModifiers", ""), obj.getString("sortText", ""), fileName, line, offset, this);
-		}
+		CompletionsRequest request = new CompletionsRequest(fileName, line, offset, prefix, collector, this);
+		execute(request);
 	}
 
 	@Override
 	public void completionEntryDetails(String fileName, int line, int offset, String[] entryNames,
 			ITypeScriptCompletionEntryDetailsCollector collector) throws TypeScriptException {
-		CompletionDetailsRequest request = new CompletionDetailsRequest(fileName, line, offset, entryNames);
-		JsonObject response = execute(request, true, null).asObject();
-		collectCompletionDetails(response, collector);
-	}
-
-	private void collectCompletionDetails(JsonObject response, ITypeScriptCompletionEntryDetailsCollector collector) {
-		JsonArray body = response.get("body").asArray();
-		if (body != null && body.size() > 0) {
-			JsonObject obj = body.get(0).asObject();
-			collector.setEntryDetails(obj.getString("name", ""), obj.getString("kind", ""),
-					obj.getString("kindModifiers", ""));
-			// displayParts
-			JsonArray displayParts = JsonHelper.getArray(obj, "displayParts");
-			JsonObject o = null;
-			if (displayParts != null) {
-				for (JsonValue part : displayParts) {
-					o = part.asObject();
-					collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
-				}
-			}
-			// documentation
-			JsonArray documentation = JsonHelper.getArray(obj, "documentation");
-			if (documentation != null) {
-				for (JsonValue part : documentation) {
-					o = part.asObject();
-					collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
-				}
-			}
-		}
+		CompletionDetailsRequest request = new CompletionDetailsRequest(fileName, line, offset, entryNames, collector);
+		execute(request);
 	}
 
 	// ---------------- Definition
@@ -224,24 +184,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
 			throws TypeScriptException {
-		DefinitionRequest request = new DefinitionRequest(fileName, line, offset);
-		JsonObject response = execute(request, true, null).asObject();
-		collectDefinition(response, collector);
-	}
-
-	private void collectDefinition(JsonObject response, ITypeScriptDefinitionCollector collector)
-			throws TypeScriptException {
-		JsonArray items = response.get("body").asArray();
-		JsonObject def = null;
-		JsonObject start = null;
-		JsonObject end = null;
-		for (JsonValue item : items) {
-			def = (JsonObject) item;
-			start = def.get("start").asObject();
-			end = def.get("end").asObject();
-			collector.addDefinition(def.getString("file", null), start.getInt("line", -1), start.getInt("offset", -1),
-					end.getInt("line", -1), end.getInt("offset", -1));
-		}
+		DefinitionRequest request = new DefinitionRequest(fileName, line, offset, collector);
+		execute(request);
 	}
 
 	// ---------------- Signature Help
@@ -249,14 +193,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
 			throws TypeScriptException {
-		SignatureHelpRequest request = new SignatureHelpRequest(fileName, line, offset);
-		JsonObject response = execute(request, true, null).asObject();
-		collectSignatureHelp(response, collector);
-	}
-
-	private void collectSignatureHelp(JsonObject response, ITypeScriptSignatureHelpCollector collector) {
-		// TODO Auto-generated method stub
-
+		SignatureHelpRequest request = new SignatureHelpRequest(fileName, line, offset, collector);
+		execute(request);
 	}
 
 	// ---------------- QuickInfo
@@ -264,23 +202,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
 			throws TypeScriptException {
-		QuickInfoRequest request = new QuickInfoRequest(fileName, line, offset);
-		JsonObject response = execute(request, true, null).asObject();
-		collectQuickInfo(response, collector);
-	}
-
-	private void collectQuickInfo(JsonObject response, ITypeScriptQuickInfoCollector collector) {
-		JsonObject body = response.get("body").asObject();
-		if (body != null) {
-			String kind = body.getString("kind", null);
-			String kindModifiers = body.getString("kindModifiers", null);
-			JsonObject start = body.get("start").asObject();
-			JsonObject end = body.get("end").asObject();
-			String displayString = body.getString("displayString", null);
-			String documentation = body.getString("documentation", null);
-			collector.setInfo(kind, kindModifiers, start.getInt("line", -1), start.getInt("offset", -1),
-					end.getInt("line", -1), end.getInt("offset", -1), displayString, documentation);
-		}
+		QuickInfoRequest request = new QuickInfoRequest(fileName, line, offset, collector);
+		execute(request);
 	}
 
 	@Override
@@ -292,13 +215,17 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException {
-		Request request = new GeterrRequest(files, delay);
+		Request request = new GeterrRequest(files, delay, collector);
 		if (delay == 0) {
-			JsonObject response;
-			JsonArray result = execute(request, true, null).asArray();
-			for (JsonValue r : result) {
-				response = (JsonObject) r;
-				collect(response, collector);
+			try {
+				JsonObject response;
+				JsonArray result = execute(request, true, null).get().asArray();
+				for (JsonValue r : result) {
+					response = (JsonObject) r;
+					collect(response, collector);
+				}
+			} catch (Exception e) {
+				throwTypeScriptException(request, e);
 			}
 		} else {
 			// TODO
@@ -332,23 +259,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public void format(String fileName, int line, int offset, int endLine, int endOffset,
 			ITypeScriptFormatCollector collector) throws TypeScriptException {
 		Request request = new FormatRequest(fileName, line, offset, endLine, endOffset);
-		JsonObject response = execute(request, true, null).asObject();
-		collectFormat(response.get("body").asArray(), collector);
-	}
-
-	private void collectFormat(JsonArray body, ITypeScriptFormatCollector collector) throws TypeScriptException {
-		JsonObject item = null;
-		String newText = null;
-		JsonObject start = null;
-		JsonObject end = null;
-		for (JsonValue b : body) {
-			item = b.asObject();
-			start = item.get("start").asObject();
-			end = item.get("end").asObject();
-			newText = item.getString("newText", null);
-			collector.format(start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
-					end.getInt("offset", -1), newText);
-		}
+		execute(request);
 	}
 
 	// ----------------- Find References
@@ -370,24 +281,26 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	// ----------------- Navbar
-	
+
 	@Override
-	public void navbar(String fileName, ITypeScriptNavBarCollector collector)
-			throws TypeScriptException {
+	public void navbar(String fileName, ITypeScriptNavBarCollector collector) throws TypeScriptException {
 		NavBarRequest request = new NavBarRequest(fileName, collector);
 		execute(request);
 	}
-	
+
 	private void execute(Request request) throws TypeScriptException {
 		if (!request.isAsynch()) {
-			JsonObject response = execute(request, true, null).asObject();
-			request.collect(response);
+			try {
+				JsonObject response = execute(request, true, null).get().asObject();
+				request.collect(response);
+			} catch (Exception e) {
+				throwTypeScriptException(request, e);
+			}
 		} else {
 			execute(request, true, null);
 		}
 	}
 
-	
 	/**
 	 * Write the buffer of editor content to a temporary file and have the
 	 * server reload it
@@ -400,11 +313,14 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		int seq = SequenceHelper.getRequestSeq();
 		String tempFileName = null;
 		int requestSeq = -1;
+		Request request = null;
 		try {
 			tempFileName = FileTempHelper.updateTempFile(newText, seq);
-			Request request = new ReloadRequest(fileName, tempFileName, seq);
-			JsonObject response = execute(request, true, null).asObject();
+			request = new ReloadRequest(fileName, tempFileName, seq);
+			JsonObject response = execute(request, true, null).get().asObject();
 			requestSeq = response.getInt("request_seq", -1);
+		} catch (Exception e) {
+			throwTypeScriptException(request, e);
 		} finally {
 			if (requestSeq != -1) {
 				FileTempHelper.freeTempFile(requestSeq);
@@ -557,17 +473,19 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	 * @return the result of the request if it needed and null otherwise.
 	 * @throws TypeScriptException
 	 */
-	private JsonValue execute(Request request, boolean expectsResult, ICancellationToken token)
+	private Future<JsonValue> execute(Request request, boolean expectsResult, ICancellationToken token)
 			throws TypeScriptException {
 		boolean eventRequest = (request instanceof GeterrRequest);
 		RequestItem requestInfo = null;
 		Future<JsonValue> result = null;
 		if (expectsResult) {
 			requestInfo = new RequestItem(request, request);
-			if (eventRequest) {
-				result = diagPool.submit(requestInfo.callbacks);
-			} else {
-				result = pool.submit(requestInfo.callbacks);
+			if (!request.isAsynch()) {
+				if (eventRequest) {
+					result = diagPool.submit(requestInfo.callbacks);
+				} else {
+					result = pool.submit(requestInfo.callbacks);
+				}
 			}
 		} else {
 			requestInfo = new RequestItem(request, null);
@@ -576,22 +494,23 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			this.requestQueue.add(requestInfo);
 		}
 		this.sendNextRequests();
-		try {
-			return result == null ? null : result.get();
-		} catch (Exception e) {
-			handleError(request, e, request.getStartTime());
-			TypeScriptException tse = getTypeScriptException(e);
-			if (tse != null) {
-				// if (tse instanceof TypeScriptTimeoutException) {
-				// // when time out exception, we must be sure that the request
-				// // is removed
-				// tryCancelRequest(((TypeScriptTimeoutException)
-				// tse).getRequest().getSeq());
-				// }
-				throw (TypeScriptException) tse;
-			}
-			throw new TypeScriptException(e);
+		return result;
+
+	}
+
+	private void throwTypeScriptException(Request request, Exception e) throws TypeScriptException {
+		handleError(request, e, request.getStartTime());
+		TypeScriptException tse = getTypeScriptException(e);
+		if (tse != null) {
+			// if (tse instanceof TypeScriptTimeoutException) {
+			// // when time out exception, we must be sure that the request
+			// // is removed
+			// tryCancelRequest(((TypeScriptTimeoutException)
+			// tse).getRequest().getSeq());
+			// }
+			throw (TypeScriptException) tse;
 		}
+		throw new TypeScriptException(e);
 	}
 
 	private TypeScriptException getTypeScriptException(Exception e) {
@@ -616,7 +535,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		return false;
 	}
 
-	private void sendNextRequests() {
+	private synchronized void sendNextRequests() {
 		RequestItem requestItem = null;
 		while (this.pendingResponses.get() == 0 && !this.requestQueue.isEmpty()) {
 			synchronized (requestQueue) {
@@ -648,6 +567,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			}
 		}
 		try {
+			System.err.println("request:" + serverRequest);
 			getProcess().sendRequest(serverRequest);
 		} catch (TypeScriptException e) {
 			if (eventRequest) {

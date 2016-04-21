@@ -8,10 +8,14 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.internal.ui.views;
+package ts.eclipse.ide.ui.outline;
+
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+
+import ts.client.navbar.NavigationBarItem;
 
 /**
  * TypeScript outline content provider.
@@ -22,24 +26,36 @@ public class TypeScriptOutlineContentProvider implements ITreeContentProvider {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void inputChanged(Viewer arg0, Object arg1, Object arg2) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public Object[] getChildren(Object arg0) {
-		// TODO Auto-generated method stub
+	public Object[] getChildren(Object element) {
+		if (element instanceof NavigationBarItem) {
+			return ((NavigationBarItem) element).getChildItems().toArray();
+		}
 		return null;
 	}
 
 	@Override
-	public Object[] getElements(Object arg0) {
-		// TODO Auto-generated method stub
+	public Object[] getElements(Object element) {
+		if (element instanceof List<?>) {
+			return ((List<?>) element).toArray();
+//			try {
+//				long start = System.currentTimeMillis();
+//				Object[]  o =  ((ITypeScriptFile) element).getNavBar().toArray();
+//				System.err.println(System.currentTimeMillis() - start);
+//				return o;
+//			} catch (TypeScriptException e) {
+//				e.printStackTrace();
+//			}
+		}
 		return null;
 	}
 
@@ -50,8 +66,10 @@ public class TypeScriptOutlineContentProvider implements ITreeContentProvider {
 	}
 
 	@Override
-	public boolean hasChildren(Object arg0) {
-		// TODO Auto-generated method stub
+	public boolean hasChildren(Object element) {
+		if (element instanceof NavigationBarItem) {
+			return ((NavigationBarItem) element).hasChildItems();
+		}
 		return false;
 	}
 

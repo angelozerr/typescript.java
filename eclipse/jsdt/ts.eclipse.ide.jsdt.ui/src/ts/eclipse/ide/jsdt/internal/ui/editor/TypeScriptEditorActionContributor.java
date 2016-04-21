@@ -10,12 +10,16 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui.editor;
 
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
+import org.eclipse.ui.texteditor.RetargetTextEditorAction;
 
+import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.jsdt.ui.actions.TypeScriptActionConstants;
 
 /**
@@ -23,6 +27,13 @@ import ts.eclipse.ide.jsdt.ui.actions.TypeScriptActionConstants;
  * Action contributor for TypeScript.
  */
 public class TypeScriptEditorActionContributor extends BasicTextEditorActionContributor {
+
+	private RetargetTextEditorAction fShowOutline;
+
+	public TypeScriptEditorActionContributor() {
+		fShowOutline = new RetargetTextEditorAction(TypeScriptEditorMessages.getResourceBundle(), "ShowOutline."); //$NON-NLS-1$
+		fShowOutline.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
+	}
 
 	public void setActiveEditor(IEditorPart part) {
 		super.setActiveEditor(part);
@@ -40,9 +51,21 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 		IActionBars bars = getActionBars();
 		bars.setGlobalActionHandler(TypeScriptActionConstants.FORMAT, getAction(textEditor, "Format")); //$NON-NLS-1$
 
+		fShowOutline.setAction(getAction(textEditor, ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE));
+
 		if (part instanceof TypeScriptEditor) {
 			TypeScriptEditor tsEditor = (TypeScriptEditor) part;
 			tsEditor.getActionGroup().fillActionBars(getActionBars());
+		}
+	}
+
+	@Override
+	public void contributeToMenu(IMenuManager menu) {
+		super.contributeToMenu(menu);
+
+		IMenuManager navigateMenu = menu.findMenuUsingPath(IWorkbenchActionConstants.M_NAVIGATE);
+		if (navigateMenu != null) {
+			navigateMenu.appendToGroup(IWorkbenchActionConstants.SHOW_EXT, fShowOutline);
 		}
 	}
 }

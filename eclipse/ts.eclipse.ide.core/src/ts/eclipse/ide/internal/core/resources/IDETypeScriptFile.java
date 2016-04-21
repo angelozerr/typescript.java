@@ -79,7 +79,7 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 
 	@Override
 	public void documentChanged(DocumentEvent event) {
-
+		fireNavBarListenersIfNeeded();
 	}
 
 	@Override

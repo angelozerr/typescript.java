@@ -17,4 +17,12 @@ public interface ITypeScriptEditorActionDefinitionIds extends ITextEditorActionD
 	 */
 	public static final String SEARCH_REFERENCES_IN_PROJECT = "ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"; //$NON-NLS-1$
 
+	/**
+	 * Action definition ID of the navigate -> Show Outline action
+	 * (value <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline"</code>).
+	 * 
+	 * 
+	 */
+	public static final String SHOW_OUTLINE= "ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline"; //$NON-NLS-1$
+	
 }

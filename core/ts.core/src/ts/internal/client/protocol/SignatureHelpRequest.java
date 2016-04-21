@@ -13,6 +13,7 @@ package ts.internal.client.protocol;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TypeScriptException;
+import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 
 /**
  * Signature help request; value of command field is "signatureHelp". Given a
@@ -21,12 +22,13 @@ import ts.TypeScriptException;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class SignatureHelpRequest extends FileLocationRequest {
+public class SignatureHelpRequest extends FileLocationRequest<ITypeScriptSignatureHelpCollector> {
 
-	public SignatureHelpRequest(String fileName, int line, int offset) {
+	public SignatureHelpRequest(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector) {
 		super(CommandNames.SignatureHelp, new SignatureHelpRequestArgs(fileName, line, offset));
+		super.setCollector(collector);
 	}
-	
+
 	@Override
 	public void collect(JsonObject response) throws TypeScriptException {
 		// None response

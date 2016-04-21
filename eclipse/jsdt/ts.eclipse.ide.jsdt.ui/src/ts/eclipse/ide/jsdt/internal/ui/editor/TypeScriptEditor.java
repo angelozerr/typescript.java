@@ -50,6 +50,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -58,6 +59,7 @@ import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.TextOperationAction;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
@@ -65,12 +67,14 @@ import ts.TypeScriptException;
 import ts.client.ICancellationToken;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.ide.jsdt.internal.ui.actions.CompositeActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.JavaSearchActionGroup;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
+import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
 
@@ -109,6 +113,23 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	 */
 	private ActivationListener fActivationListener = new ActivationListener();
 
+	/**
+	 * Outline page
+	 */
+	private TypeScriptContentOutlinePage contentOutlinePage;
+
+	/**
+	 * Selection changed listener for the outline view.
+	 */
+	private ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			// selectionSetFromOutline = false;
+			// doSelectionChanged(event);
+			// selectionSetFromOutline = true;
+		}
+	};
+
 	protected ActionGroup getActionGroup() {
 		return fActionGroups;
 	}
@@ -135,6 +156,13 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		markAsSelectionDependentAction("Format", true); //$NON-NLS-1$
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.FORMAT_ACTION);
+
+		action = new TextOperationAction(TypeScriptEditorMessages.getResourceBundle(), "ShowOutline.", this, //$NON-NLS-1$
+				TypeScriptSourceViewer.SHOW_OUTLINE, true);
+		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
+		setAction(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE, action);
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
+		// IJavaHelpContextIds.SHOW_OUTLINE_ACTION);
 	}
 
 	@Override
@@ -154,9 +182,8 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		fContextMenuGroup.setContext(null);
 
 		// Quick views
-		// IAction action=
-		// getAction(IJavaEditorActionDefinitionIds.SHOW_OUTLINE);
-		// menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, action);
+		IAction action = getAction(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
+		menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, action);
 		// action= getAction(IJavaEditorActionDefinitionIds.OPEN_HIERARCHY);
 		// menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, action);
 
@@ -607,10 +634,18 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 
 	}
 
-	private ITypeScriptFile getTypeScriptFile(IDocument document) throws CoreException, TypeScriptException {
+	private IIDETypeScriptFile getTypeScriptFile(IDocument document) throws CoreException, TypeScriptException {
 		IResource file = EditorUtils.getResource(this);
 		IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 		return tsProject.openFile(file, document);
+	}
+
+	public IIDETypeScriptFile getTypeScriptFile() throws CoreException, TypeScriptException {
+		final IDocument document = getSourceViewer().getDocument();
+		if (document == null) {
+			return null;
+		}
+		return getTypeScriptFile(document);
 	}
 
 	protected void installOccurrencesFinder(boolean forceUpdate) {
@@ -647,7 +682,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 			fOccurrencesFinderJobCanceler.uninstall();
 			fOccurrencesFinderJobCanceler = null;
 		}
-		
+
 		occurrencesCollector = null;
 
 		// if (fPostSelectionListenerWithAST != null) {
@@ -699,4 +734,62 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		}
 		return annotationModel;
 	}
+
+	@Override
+	protected void doSetInput(IEditorInput input) throws CoreException {
+		super.doSetInput(input);
+
+		// try {
+		// //IDocument document = getSourceViewer().getDocument();
+		// //setOutlinePageInput(getTypeScriptFile(document));
+		// } catch (TypeScriptException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+
+	}
+	// -------------- Outline
+
+	@Override
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class key) {
+		if (key.equals(IContentOutlinePage.class)) {
+			return getOutlinePage();
+		} else {
+			return super.getAdapter(key);
+		}
+	}
+
+	/**
+	 * Gets an outline page
+	 * 
+	 * @return an outline page
+	 */
+	public TypeScriptContentOutlinePage getOutlinePage() {
+		if (contentOutlinePage == null) {
+			contentOutlinePage = new TypeScriptContentOutlinePage();
+			// contentOutlinePage.addPostSelectionChangedListener(selectionChangedListener);
+			IDocument document = getSourceViewer().getDocument();
+			try {
+				setOutlinePageInput(getTypeScriptFile(document));
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TypeScriptException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return contentOutlinePage;
+	}
+
+	private void setOutlinePageInput(IIDETypeScriptFile tsFile) {
+		// try {
+		contentOutlinePage.setInput(tsFile);
+		// } catch (TypeScriptException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+
+	}
+
 }

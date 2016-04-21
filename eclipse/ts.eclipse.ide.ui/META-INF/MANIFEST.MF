@@ -31,5 +31,6 @@ Export-Package: ts.eclipse.ide.ui,
  ts.eclipse.ide.ui.folding,
  ts.eclipse.ide.ui.hover,
  ts.eclipse.ide.ui.hyperlink,
+ ts.eclipse.ide.ui.outline,
  ts.eclipse.ide.ui.search,
  ts.eclipse.ide.ui.utils

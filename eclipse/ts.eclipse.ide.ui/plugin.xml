@@ -34,10 +34,10 @@
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
-            contentProvider="ts.eclipse.ide.internal.ui.views.TypeScriptOutlineContentProvider"
+            contentProvider="ts.eclipse.ide.ui.outline.TypeScriptOutlineContentProvider"
             icon="icons/full/obj16/logo.png"
             id="ts.eclipse.ide.ui.navigatorContent"
-            labelProvider="ts.eclipse.ide.internal.ui.views.TypeScriptOutlineLabelProvider"
+            labelProvider="ts.eclipse.ide.ui.outline.TypeScriptOutlineLabelProvider"
             name="%testNavigatorContent_name">
          <triggerPoints>
          </triggerPoints>

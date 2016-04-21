@@ -10,9 +10,12 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import ts.TypeScriptException;
+import ts.client.format.ITypeScriptFormatCollector;
 
 /**
  * Format request; value of command field is "format". Return response giving
@@ -23,7 +26,7 @@ import ts.TypeScriptException;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class FormatRequest extends FileLocationRequest {
+public class FormatRequest extends FileLocationRequest<ITypeScriptFormatCollector> {
 
 	public FormatRequest(String fileName, int line, int offset, int endLine, int endOffset) {
 		super(CommandNames.Format, new FormatRequestArgs(fileName, line, offset, endLine, endOffset));
@@ -31,6 +34,20 @@ public class FormatRequest extends FileLocationRequest {
 
 	@Override
 	public void collect(JsonObject response) throws TypeScriptException {
-		// None response
+		ITypeScriptFormatCollector collector = getCollector();
+		JsonObject item = null;
+		String newText = null;
+		JsonObject start = null;
+		JsonObject end = null;
+		JsonArray body = response.get("body").asArray();
+		for (JsonValue b : body) {
+			item = b.asObject();
+			start = item.get("start").asObject();
+			end = item.get("end").asObject();
+			newText = item.getString("newText", null);
+			collector.format(start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
+					end.getInt("offset", -1), newText);
+		}
 	}
+
 }

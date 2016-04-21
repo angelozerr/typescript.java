@@ -40,7 +40,7 @@ public class NavBarRequest extends FileRequest<ITypeScriptNavBarCollector> {
 	public void collect(JsonObject response) throws TypeScriptException {
 		// None response
 
-		System.err.println(response);
+		//System.err.println(response);
 
 //		Type myType = new TypeToken<List<NavigationBarItem>>() {
 //		}.getType();

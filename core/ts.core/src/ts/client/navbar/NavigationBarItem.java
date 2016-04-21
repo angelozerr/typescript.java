@@ -18,13 +18,13 @@ public class NavigationBarItem implements INavigationBarItem {
 		this.text = text;
 	}
 
-//	public void setSpansA(List<TextSpan> spans) {
-//		this.spans = spans;
-//	}
-//
-//	public List<TextSpan> getSpansA() {
-//		return spans;
-//	}
+	// public void setSpansA(List<TextSpan> spans) {
+	// this.spans = spans;
+	// }
+	//
+	// public List<TextSpan> getSpansA() {
+	// return spans;
+	// }
 
 	public List<NavigationBarItem> getChildItems() {
 		return childItems;
@@ -32,6 +32,10 @@ public class NavigationBarItem implements INavigationBarItem {
 
 	public void setChildItems(List<NavigationBarItem> childItems) {
 		this.childItems = childItems;
+	}
+
+	public boolean hasChildItems() {
+		return childItems != null && childItems.size() > 0;
 	}
 
 }

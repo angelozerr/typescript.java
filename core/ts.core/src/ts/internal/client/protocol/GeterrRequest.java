@@ -17,6 +17,8 @@ import java.util.Map;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
+import ts.client.geterr.ITypeScriptGeterrCollector;
+
 /**
  * Geterr request; value of command field is "geterr". Wait for delay
  * milliseconds and then, if during the wait no change or reload messages have
@@ -26,7 +28,7 @@ import com.eclipsesource.json.JsonObject;
  * practice for an editor is to send a file list containing each file that is
  * currently visible, in most-recently-used order.
  */
-public class GeterrRequest extends Request {
+public class GeterrRequest extends Request<JsonArray, ITypeScriptGeterrCollector> {
 
 	private final static int EVENT_INIT = 0;
 	private final static int EVENT_SYNTAX_DIAG = 4;
@@ -37,7 +39,7 @@ public class GeterrRequest extends Request {
 	private final JsonArray result;
 	private int delay;
 
-	public GeterrRequest(String[] files, int delay) {
+	public GeterrRequest(String[] files, int delay, ITypeScriptGeterrCollector collector) {
 		super(CommandNames.Geterr, new GeterrRequestArgs(files, delay), null);
 		this.stateFiles = createStateFiles(files);
 		this.delay = delay;
@@ -95,7 +97,7 @@ public class GeterrRequest extends Request {
 	}
 
 	@Override
-	protected Object getResult() throws Exception {
+	protected JsonArray getResult() throws Exception {
 		return result;
 	}
 

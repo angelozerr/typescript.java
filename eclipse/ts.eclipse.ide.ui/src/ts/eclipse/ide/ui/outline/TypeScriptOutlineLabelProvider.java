@@ -8,9 +8,11 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.internal.ui.views;
+package ts.eclipse.ide.ui.outline;
 
 import org.eclipse.jface.viewers.LabelProvider;
+
+import ts.client.navbar.NavigationBarItem;
 
 /**
  * TypeScript outline label provider.
@@ -18,4 +20,11 @@ import org.eclipse.jface.viewers.LabelProvider;
  */
 public class TypeScriptOutlineLabelProvider extends LabelProvider {
 
+	@Override
+	public String getText(Object element) {
+		if (element instanceof NavigationBarItem) {
+			return ((NavigationBarItem) element).getText();
+		}
+		return super.getText(element);
+	}
 }

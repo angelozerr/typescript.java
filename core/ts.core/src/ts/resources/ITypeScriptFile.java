@@ -10,12 +10,15 @@
  */
 package ts.resources;
 
+import java.util.List;
+
 import ts.TypeScriptException;
 import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
+import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 
@@ -141,4 +144,8 @@ public interface ITypeScriptFile {
 	 * @throws TypeScriptException
 	 */
 	void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException;
+
+	void addNavbarListener(INavbarListener listener);
+	
+	void removeNavbarListener(INavbarListener listener);
 }

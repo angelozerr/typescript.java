@@ -10,9 +10,12 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import ts.TypeScriptException;
+import ts.client.definition.ITypeScriptDefinitionCollector;
 
 /**
  * Go to definition request; value of command field is "definition". Return
@@ -22,15 +25,27 @@ import ts.TypeScriptException;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
  *      d.ts
  */
-public class DefinitionRequest extends FileLocationRequest {
+public class DefinitionRequest extends FileLocationRequest<ITypeScriptDefinitionCollector> {
 
-	public DefinitionRequest(String fileName, int line, int offset) {
+	public DefinitionRequest(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector) {
 		super(CommandNames.Definition, new FileLocationRequestArgs(fileName, line, offset));
+		super.setCollector(collector);
 	}
-	
+
 	@Override
 	public void collect(JsonObject response) throws TypeScriptException {
-		// None response
+		ITypeScriptDefinitionCollector collector = super.getCollector();
+		JsonArray items = response.get("body").asArray();
+		JsonObject def = null;
+		JsonObject start = null;
+		JsonObject end = null;
+		for (JsonValue item : items) {
+			def = (JsonObject) item;
+			start = def.get("start").asObject();
+			end = def.get("end").asObject();
+			collector.addDefinition(def.getString("file", null), start.getInt("line", -1), start.getInt("offset", -1),
+					end.getInt("line", -1), end.getInt("offset", -1));
+		}
 	}
 
 }

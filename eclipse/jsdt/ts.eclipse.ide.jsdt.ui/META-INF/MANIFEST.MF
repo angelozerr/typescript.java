@@ -28,7 +28,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.debug.ui,
  org.eclipse.wst.jsdt.debug.ui,
- org.eclipse.wst.jsdt.debug.core
+ org.eclipse.wst.jsdt.debug.core,
+ org.eclipse.ui.views
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
