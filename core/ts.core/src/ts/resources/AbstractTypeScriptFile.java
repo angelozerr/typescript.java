@@ -216,6 +216,11 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		}
 	}
 
+	@Override
+	public List<NavigationBarItem> getNavBar() {
+		return navbar;
+	}
+	
 	// @Override
 	// public List<NavigationBarItem> getNavBar() throws TypeScriptException {
 	// TypeScriptNavBarCollector c = new TypeScriptNavBarCollector();

@@ -1,5 +1,7 @@
 package ts.eclipse.ide.ui.outline;
 
+import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.text.IInformationControl;
@@ -40,10 +42,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.internal.ide.StringMatcher;
 
+import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
+import ts.resources.INavbarListener;
 
-public class TypeScriptQuickOutlineDialog extends PopupDialog
-		implements IInformationControl, IInformationControlExtension, IInformationControlExtension2, DisposeListener {
+public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInformationControl,
+		IInformationControlExtension, IInformationControlExtension2, DisposeListener, INavbarListener {
 
 	/**
 	 * Current tree viewer for the dialog
@@ -78,11 +82,6 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 	 */
 	private ILabelProvider treeLabelProvider;
 
-	/**
-	 * Outline page
-	 */
-	private TypeScriptContentOutlinePage outlinePage;
-
 	private IIDETypeScriptFile tsFile;
 
 	/**
@@ -98,6 +97,7 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 	public TypeScriptQuickOutlineDialog(Shell parent, int shellStyle, IIDETypeScriptFile tsFile) {
 		super(parent, shellStyle, true, true, false, true, true, null, null);
 		this.tsFile = tsFile;
+		this.tsFile.addNavbarListener(this);
 		initialize();
 		// Create all controls early to preserve the life cycle of the original
 		// implementation.
@@ -120,7 +120,7 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		// Create an empty dialog area, if the source page is not defined
-		if (outlinePage == null) {
+		if (tsFile == null) {
 			return super.createDialogArea(parent);
 		}
 		createTreeViewer(parent);
@@ -166,7 +166,7 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 		treeViewer.setLabelProvider(treeLabelProvider);
 		treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		treeViewer.setUseHashlookup(true);
-		treeViewer.setInput(tsFile);
+		treeViewer.setInput(tsFile.getNavBar());
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 			return;
 		}
 		dispose();
-		//outlinePage.setSelection(new StructuredSelection(selectedElement));
+		// outlinePage.setSelection(new StructuredSelection(selectedElement));
 	}
 
 	@Override
@@ -474,7 +474,7 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 		// Input comes from PDESourceInfoProvider.getInformation2()
 		// The input should be a model object of some sort
 		// Turn it into a structured selection and set the selection in the tree
-		if (input != null&&  treeViewer != null) {
+		if (input != null && treeViewer != null) {
 			treeViewer.setSelection(new StructuredSelection(input));
 		}
 	}
@@ -542,6 +542,9 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 
 	@Override
 	public void dispose() {
+		if (tsFile != null) {
+			this.tsFile.removeNavbarListener(this);
+		}
 		close();
 	}
 
@@ -657,5 +660,18 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog
 			stringMatcher = newStringMatcher;
 		}
 
+	}
+
+	@Override
+	public void navBarChanged(final List<NavigationBarItem> items) {
+		if (treeViewer != null) {
+			treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					treeViewer.setInput(items);
+				}
+			});
+		}
 	}
 }

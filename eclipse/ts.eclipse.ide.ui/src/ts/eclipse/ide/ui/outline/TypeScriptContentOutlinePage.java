@@ -84,7 +84,7 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 			}
 		});
 		viewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
-		viewer.setInput(tsFile);
+		//viewer.setInput(tsFile);
 
 	}
 

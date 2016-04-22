@@ -148,4 +148,6 @@ public interface ITypeScriptFile {
 	void addNavbarListener(INavbarListener listener);
 	
 	void removeNavbarListener(INavbarListener listener);
+	
+	List<NavigationBarItem> getNavBar();
 }
