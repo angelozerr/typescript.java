@@ -11,8 +11,10 @@
 package ts.eclipse.ide.ui.outline;
 
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.swt.graphics.Image;
 
 import ts.client.navbar.NavigationBarItem;
+import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 
 /**
  * TypeScript outline label provider.
@@ -26,5 +28,13 @@ public class TypeScriptOutlineLabelProvider extends LabelProvider {
 			return ((NavigationBarItem) element).getText();
 		}
 		return super.getText(element);
+	}
+
+	@Override
+	public Image getImage(Object element) {
+		if (element instanceof NavigationBarItem) {
+			return TypeScriptImagesRegistry.getImage(((NavigationBarItem) element));
+		}
+		return super.getImage(element);
 	}
 }

@@ -43,10 +43,9 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
@@ -66,6 +65,8 @@ import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 import ts.TypeScriptException;
 import ts.client.ICancellationToken;
 import ts.client.ITypeScriptAsynchCollector;
+import ts.client.Location;
+import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
@@ -114,21 +115,46 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	private ActivationListener fActivationListener = new ActivationListener();
 
 	/**
+	 * Updates the Java outline page selection and this editor's range
+	 * indicator.
+	 *
+	 * 
+	 */
+	private class EditorSelectionChangedListener extends AbstractSelectionChangedListener {
+
+		/*
+		 * @see
+		 * org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(
+		 * org.eclipse.jface.viewers.SelectionChangedEvent)
+		 */
+		public void selectionChanged(SelectionChangedEvent event) {
+			// TypeScriptEditor.this.selectionChanged();
+
+			ISelection selection = event.getSelection();
+			if (selection instanceof ITextSelection) {
+				ITextSelection textSelection = (ITextSelection) selection;
+				updateOccurrenceAnnotations(textSelection);
+			}
+		}
+	}
+
+	/**
+	 * Updates the selection in the editor's widget with the selection of the
+	 * outline page.
+	 */
+	class OutlineSelectionChangedListener extends AbstractSelectionChangedListener {
+		public void selectionChanged(SelectionChangedEvent event) {
+			doSelectionChanged(event);
+		}
+	}
+
+	/** The selection changed listener */
+	protected AbstractSelectionChangedListener fOutlineSelectionChangedListener = new OutlineSelectionChangedListener();
+
+	/**
 	 * Outline page
 	 */
 	private TypeScriptContentOutlinePage contentOutlinePage;
-
-	/**
-	 * Selection changed listener for the outline view.
-	 */
-	private ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			// selectionSetFromOutline = false;
-			// doSelectionChanged(event);
-			// selectionSetFromOutline = true;
-		}
-	};
 
 	protected ActionGroup getActionGroup() {
 		return fActionGroups;
@@ -273,44 +299,6 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	}
 
 	// ---------------------- Occurrences
-
-	private class EditorSelectionChangedListener implements ISelectionChangedListener {
-
-		public void install(ISelectionProvider selectionProvider) {
-			if (selectionProvider == null) {
-				return;
-			}
-
-			if (selectionProvider instanceof IPostSelectionProvider) {
-				IPostSelectionProvider provider = (IPostSelectionProvider) selectionProvider;
-				provider.addPostSelectionChangedListener(this);
-			} else {
-				selectionProvider.addSelectionChangedListener(this);
-			}
-		}
-
-		public void uninstall(ISelectionProvider selectionProvider) {
-			if (selectionProvider == null) {
-				return;
-			}
-
-			if (selectionProvider instanceof IPostSelectionProvider) {
-				IPostSelectionProvider provider = (IPostSelectionProvider) selectionProvider;
-				provider.removePostSelectionChangedListener(this);
-			} else {
-				selectionProvider.removeSelectionChangedListener(this);
-			}
-		}
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			ISelection selection = event.getSelection();
-			if (selection instanceof ITextSelection) {
-				ITextSelection textSelection = (ITextSelection) selection;
-				updateOccurrenceAnnotations(textSelection);
-			}
-		}
-	}
 
 	private EditorSelectionChangedListener editorSelectionChangedListener;
 
@@ -767,7 +755,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	public TypeScriptContentOutlinePage getOutlinePage() {
 		if (contentOutlinePage == null) {
 			contentOutlinePage = new TypeScriptContentOutlinePage();
-			// contentOutlinePage.addPostSelectionChangedListener(selectionChangedListener);
+			fOutlineSelectionChangedListener.install(contentOutlinePage);
 			IDocument document = getSourceViewer().getDocument();
 			try {
 				setOutlinePageInput(getTypeScriptFile(document));
@@ -790,6 +778,124 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		// e.printStackTrace();
 		// }
 
+	}
+
+	/**
+	 * React to changed selection.
+	 *
+	 * 
+	 */
+	protected void selectionChanged() {
+		if (getSelectionProvider() == null) {
+			return;
+		}
+	}
+
+	protected void doSelectionChanged(SelectionChangedEvent event) {
+		ISelection selection = event.getSelection();
+		NavigationBarItem item = null;
+		Iterator iter = ((IStructuredSelection) selection).iterator();
+		while (iter.hasNext()) {
+			Object o = iter.next();
+			if (o instanceof NavigationBarItem) {
+				item = (NavigationBarItem) o;
+				break;
+			}
+		}
+
+		setSelection(item, !isActivePart());
+
+		ISelectionProvider selectionProvider = getSelectionProvider();
+		if (selectionProvider == null)
+			return;
+
+		ISelection textSelection = selectionProvider.getSelection();
+		if (!(textSelection instanceof ITextSelection))
+			return;
+
+		fForcedMarkOccurrencesSelection = textSelection;
+		updateOccurrenceAnnotations((ITextSelection) textSelection);
+
+	}
+
+	/**
+	 * Highlights and moves to a corresponding element in editor
+	 * 
+	 * @param reference
+	 *            corresponding entity in editor
+	 * @param moveCursor
+	 *            if true, moves cursor to the reference
+	 */
+	private void setSelection(NavigationBarItem reference, boolean moveCursor) {
+		if (reference == null) {
+			return;
+		}
+
+		if (moveCursor) {
+			markInNavigationHistory();
+		}
+
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer == null) {
+			return;
+		}
+		StyledText textWidget = sourceViewer.getTextWidget();
+		if (textWidget == null) {
+			return;
+		}
+		try {
+			Location start = reference.getSpans().get(0).getStart();
+			Location end = reference.getSpans().get(0).getEnd();
+
+			if (start == null || end == null)
+				return;
+
+			IIDETypeScriptFile tsFile = getTypeScriptFile();
+
+			int offset = tsFile.getPosition(start);
+			int length = tsFile.getPosition(end) - offset;
+
+			if (offset < 0 || length < 0 || length > sourceViewer.getDocument().getLength()) {
+				return;
+			}
+			textWidget.setRedraw(false);
+
+			// Uncomment that if we wish to select only variable and not the
+			// whole block.
+			// but there is a bug with this code with
+			// private a: string. it's the first 'a' (of private) which is
+			// selected and not the second.
+			// String documentPart = sourceViewer.getDocument().get(offset,
+			// length);
+			//
+			// // Try to find name because position returns for whole block
+			// String name = reference.getText();
+			// if (name != null) {
+			// int nameoffset = documentPart.indexOf(name);
+			// if (nameoffset != -1) {
+			// offset += nameoffset;
+			// length = name.length();
+			// }
+			// }
+			if (length > 0) {
+				setHighlightRange(offset, length, moveCursor);
+			}
+
+			if (!moveCursor) {
+				return;
+			}
+
+			if (offset > -1 && length > 0) {
+				sourceViewer.revealRange(offset, length);
+				// Selected region begins one index after offset
+				sourceViewer.setSelectedRange(offset, length);
+				markInNavigationHistory();
+			}
+		} catch (Exception e) {
+
+		} finally {
+			textWidget.setRedraw(true);
+		}
 	}
 
 }

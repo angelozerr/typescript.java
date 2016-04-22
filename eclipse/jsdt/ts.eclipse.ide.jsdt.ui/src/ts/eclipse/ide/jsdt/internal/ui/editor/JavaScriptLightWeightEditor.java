@@ -34,6 +34,9 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -80,6 +83,52 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 	private final static String CLOSE_BRACKETS = PreferenceConstants.EDITOR_CLOSE_BRACKETS;
 	/** The bracket inserter. */
 	private BracketInserter fBracketInserter = new BracketInserter(this);
+
+	/**
+	 * Internal implementation class for a change listener.
+	 * 
+	 */
+	protected abstract class AbstractSelectionChangedListener implements ISelectionChangedListener {
+
+		/**
+		 * Installs this selection changed listener with the given selection
+		 * provider. If the selection provider is a post selection provider,
+		 * post selection changed events are the preferred choice, otherwise
+		 * normal selection changed events are requested.
+		 *
+		 * @param selectionProvider
+		 */
+		public void install(ISelectionProvider selectionProvider) {
+			if (selectionProvider == null)
+				return;
+
+			if (selectionProvider instanceof IPostSelectionProvider) {
+				IPostSelectionProvider provider = (IPostSelectionProvider) selectionProvider;
+				provider.addPostSelectionChangedListener(this);
+			} else {
+				selectionProvider.addSelectionChangedListener(this);
+			}
+		}
+
+		/**
+		 * Removes this selection changed listener from the given selection
+		 * provider.
+		 *
+		 * @param selectionProvider
+		 *            the selection provider
+		 */
+		public void uninstall(ISelectionProvider selectionProvider) {
+			if (selectionProvider == null)
+				return;
+
+			if (selectionProvider instanceof IPostSelectionProvider) {
+				IPostSelectionProvider provider = (IPostSelectionProvider) selectionProvider;
+				provider.removePostSelectionChangedListener(this);
+			} else {
+				selectionProvider.removeSelectionChangedListener(this);
+			}
+		}
+	}
 
 	/**
 	 * This editor's projection support

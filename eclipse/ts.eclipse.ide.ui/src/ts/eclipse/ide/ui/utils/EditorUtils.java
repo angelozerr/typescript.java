@@ -27,6 +27,8 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.TextSpan;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 public class EditorUtils {
@@ -190,6 +192,20 @@ public class EditorUtils {
 				}
 			}
 		}
+	}
+
+	public static void openInEditor(IFile file, NavigationBarItem item) {
+		if (!item.hasSpans()) {
+			return;
+		}
+
+		TextSpan span = item.getSpans().get(0);
+		openInEditor(file, span);
+	}
+
+	public static void openInEditor(IFile file, TextSpan span) {
+		openInEditor(file, span.getStart().getLine(), span.getStart().getOffset(), span.getEnd().getLine(),
+				span.getEnd().getOffset(), true);
 	}
 
 }

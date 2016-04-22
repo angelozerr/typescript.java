@@ -31,6 +31,23 @@
 	<!-- TypeScript Outline                                 						          -->
 	<!--======================================================================================-->
 	
+	<extension
+         point="org.eclipse.ui.navigator.linkHelper">
+      <linkHelper
+            class="ts.eclipse.ide.ui.outline.TextSpanLinkHelper"
+            id="ts.eclipse.ide.ui.outline.linkHelper">
+         <editorInputEnablement>
+            <instanceof
+                  value="java.lang.Object">
+            </instanceof></editorInputEnablement>
+         <selectionEnablement>
+            <instanceof
+                  value="java.lang.Object">
+            </instanceof>
+         </selectionEnablement>
+      </linkHelper>
+   </extension>
+   	
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
@@ -43,6 +60,7 @@
          </triggerPoints>
       </navigatorContent>
    </extension>
+   
    <extension
          point="org.eclipse.ui.navigator.viewer">
       <viewerContentBinding
@@ -50,6 +68,9 @@
          <includes>
             <contentExtension
                   pattern="ts.eclipse.ide.ui.navigatorContent">
+            </contentExtension>                  
+            <contentExtension
+                  pattern="ts.eclipse.ide.ui.outline.linkHelper">                  
             </contentExtension>
          </includes>
       </viewerContentBinding>

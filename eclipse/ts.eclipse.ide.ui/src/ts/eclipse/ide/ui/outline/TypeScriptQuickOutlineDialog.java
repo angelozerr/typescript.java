@@ -2,6 +2,7 @@ package ts.eclipse.ide.ui.outline;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.text.IInformationControl;
@@ -44,6 +45,7 @@ import org.eclipse.ui.internal.ide.StringMatcher;
 
 import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
+import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.INavbarListener;
 
 public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInformationControl,
@@ -287,7 +289,9 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInform
 			return;
 		}
 		dispose();
-		// outlinePage.setSelection(new StructuredSelection(selectedElement));
+		if (selectedElement instanceof NavigationBarItem) {
+			EditorUtils.openInEditor((IFile) tsFile.getResource(), (NavigationBarItem) selectedElement);
+		}
 	}
 
 	@Override

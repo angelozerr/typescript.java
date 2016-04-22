@@ -20,7 +20,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.Image;
 
 import ts.TypeScriptKind;
-import ts.client.completions.ICompletionEntry;
+import ts.client.IKindProvider;
 import ts.utils.StringUtils;
 
 /**
@@ -45,22 +45,22 @@ public class TypeScriptImagesRegistry {
 	public static final String IMG_TYPE_DEFAULT = "ts.eclipse.jface.IMG_TYPE_DEFAULT";
 	public static final String IMG_TYPE_PRIVATE = "ts.eclipse.jface.IMG_TYPE_PRIVATE";
 	public static final String IMG_TYPE_PUBLIC = "ts.eclipse.jface.IMG_TYPE_PUBLIC";
-	
+
 	static {
 		registerImageDescriptor(IMG_KEYWORD,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "keyword_obj.png"));
 		registerImageDescriptor(IMG_PACKAGE,
-				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "package_obj.gif"));		
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "package_obj.gif"));
 		registerImageDescriptor(IMG_CLASS,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "class_obj.gif"));
 		registerImageDescriptor(IMG_ALIAS,
-				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "alias_obj.gif"));		
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "alias_obj.gif"));
 		registerImageDescriptor(IMG_INTERFACE,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "int_obj.gif"));
 		registerImageDescriptor(IMG_ENUM_DEFAULT,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "enum_default_obj.gif"));
 		registerImageDescriptor(IMG_ENUM_PRIVATE,
-				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "enum_private_obj.gif"));		
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "enum_private_obj.gif"));
 		registerImageDescriptor(IMG_FIELD_DEFAULT,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "field_default_obj.gif"));
 		registerImageDescriptor(IMG_FIELD_PRIVATE,
@@ -78,7 +78,7 @@ public class TypeScriptImagesRegistry {
 		registerImageDescriptor(IMG_TYPE_PRIVATE,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_private_obj.gif"));
 		registerImageDescriptor(IMG_TYPE_PUBLIC,
-				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_public_obj.gif"));		
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_public_obj.gif"));
 	}
 
 	/**
@@ -105,174 +105,12 @@ public class TypeScriptImagesRegistry {
 		return imageRegistry.getDescriptor(key);
 	}
 
-	// public static String getJSType(String jsType, boolean isFunction, boolean
-	// isArray, boolean returnNullIfUnknown) {
-	// if (isFunction) {
-	// return TernImagesRegistry.IMG_FN;
-	// }
-	// if (isArray) {
-	// return TernImagesRegistry.IMG_ARRAY;
-	// }
-	// if (TernTypeHelper.isStringType(jsType)) {
-	// return TernImagesRegistry.IMG_STRING;
-	// } else if (TernTypeHelper.isNumberType(jsType)) {
-	// return TernImagesRegistry.IMG_NUMBER;
-	// } else if (TernTypeHelper.isBoolType(jsType)) {
-	// return TernImagesRegistry.IMG_BOOLEAN;
-	// }
-	// if (TernTypeHelper.isFunctionRefType(jsType)) {
-	// return TernImagesRegistry.IMG_FN;
-	// }
-	// if (returnNullIfUnknown) {
-	// return null;
-	// }
-	// return TernImagesRegistry.IMG_UNKNOWN;
-	// }
-	//
-	// public static Image getImage(String jsType, boolean isFunction, boolean
-	// isArray, boolean returnNullIfUnknown) {
-	// String key = getJSType(jsType, isFunction, isArray, returnNullIfUnknown);
-	// return key != null ? getImage(key) : null;
-	// }
-	//
-	// public static String getJSType(TernCompletionItem item, boolean
-	// returnNullIfUnknown) {
-	// return getJSType(item.getJsType(), item.isFunction(), item.isArray(),
-	// returnNullIfUnknown);
-	// }
-	//
-	// public static Image getImage(TernCompletionItem item,
-	// boolean returnNullIfUnknown) {
-	// String key = getJSType(item, returnNullIfUnknown);
-	// return key != null ? getImage(key) : null;
-	// }
-	//
-	// public static ImageDescriptor getImageDescriptor(TernCompletionItem item,
-	// boolean returnNullIfUnknown) {
-	// String key = getJSType(item, returnNullIfUnknown);
-	// return key != null ? getImageDescriptor(key) : null;
-	// }
-	//
 	private static void registerImageDescriptor(String key, ImageDescriptor descriptor) {
 		ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
 		imageRegistry.put(key, descriptor);
 	}
-	//
-	// static String getOvr(String typeKey) {
-	// return new StringBuilder(typeKey).append("_ovr").toString();
-	// }
-	//
-	// public static Image getImage(ITernModule module) {
-	// TernModuleMetadata metadata = module.getMetadata();
-	// if (metadata == null) {
-	// return null;
-	// }
-	// File icon = metadata.getFileIcon();
-	// if (icon == null) {
-	// return null;
-	// }
-	// String key = icon.getPath();
-	// Image image = getImage(key);
-	// if (image != null) {
-	// return image;
-	// }
-	// ImageDescriptor desc = ImageDescriptor.createFromFile(null,
-	// icon.getPath());
-	// registerImageDescriptor(key, desc);
-	// return TernImagesRegistry.getImage(key);
-	// }
-	//
-	// public static Image getImage(String jsType, ITernModule module) {
-	// boolean hasJSType = !StringUtils.isEmpty(jsType);
-	// boolean hasOrigin = module != null;
-	// if (!hasJSType) {
-	// // JS type is unknown, try to retrieve the image of the origin tern
-	// // module
-	// Image originImage = hasOrigin ? getImage(module) : null;
-	// return originImage != null ? originImage : TernImagesRegistry
-	// .getImage(TernImagesRegistry.IMG_UNKNOWN);
-	// }
-	// // here JS Type is known, try to retrieve the image of the origin tern
-	// // module
-	// if (!hasOrigin) {
-	// // None origin, returns the JS type
-	// return TernImagesRegistry.getImage(jsType);
-	// }
-	// // origin + js type is known, try to merge
-	// String imageKey = getImageKey(jsType, module.getOrigin());
-	// Image image = TernImagesRegistry.getImage(imageKey);
-	// if (image != null) {
-	// return image;
-	// }
-	// ImageDescriptor originImageDescriptor = getImageDescriptor(module);
-	// if (originImageDescriptor == null) {
-	// return TernImagesRegistry.getImage(jsType);
-	// }
-	// TernCompositeImageDescriptor desc = new TernCompositeImageDescriptor(
-	// originImageDescriptor, jsType);
-	// TernImagesRegistry.registerImageDescriptor(imageKey, desc);
-	// return TernImagesRegistry.getImage(imageKey);
-	// }
-	//
-	// public static ImageDescriptor getImageDescriptor(ITernModule module) {
-	// TernModuleMetadata metadata = module.getMetadata();
-	// if (metadata == null) {
-	// return null;
-	// }
-	// File icon = metadata.getFileIcon();
-	// if (icon == null) {
-	// return null;
-	// }
-	// String key = icon.getPath();
-	// ImageDescriptor desc = getImageDescriptor(key);
-	// if (desc != null) {
-	// return desc;
-	// }
-	// desc = ImageDescriptor.createFromFile(null, icon.getPath());
-	// registerImageDescriptor(key, desc);
-	// return desc;
-	// }
-	//
-	// private static String getImageKey(String jsType, String origin) {
-	// return jsType + "_" + origin;
-	// }
-	//
-	// public static ImageDescriptor getImageDescriptor(String jsType,
-	// ITernModule module) {
-	// boolean hasJSType = !StringUtils.isEmpty(jsType);
-	// boolean hasOrigin = module != null;
-	// if (!hasJSType) {
-	// // JS type is unknown, try to retrieve the image of the origin tern
-	// // module
-	// ImageDescriptor originImage = hasOrigin ? getImageDescriptor(module)
-	// : null;
-	// return originImage != null ? originImage : TernImagesRegistry
-	// .getImageDescriptor(TernImagesRegistry.IMG_UNKNOWN);
-	// }
-	// // here JS Type is known, try to retrieve the image of the origin tern
-	// // module
-	// if (!hasOrigin) {
-	// // None origin, returns the JS type
-	// return TernImagesRegistry.getImageDescriptor(jsType);
-	// }
-	// // origin + js type is known, try to merge
-	// String imageKey = getImageKey(jsType, module.getOrigin());
-	// ImageDescriptor image = TernImagesRegistry.getImageDescriptor(imageKey);
-	// if (image != null) {
-	// return image;
-	// }
-	// ImageDescriptor originImageDescriptor = getImageDescriptor(module);
-	// if (originImageDescriptor == null) {
-	// return TernImagesRegistry
-	// .getImageDescriptor(TernImagesRegistry.IMG_UNKNOWN);
-	// }
-	// TernCompositeImageDescriptor desc = new TernCompositeImageDescriptor(
-	// originImageDescriptor, jsType);
-	// TernImagesRegistry.registerImageDescriptor(imageKey, desc);
-	// return TernImagesRegistry.getImageDescriptor(imageKey);
-	// }
 
-	public static Image getImage(ICompletionEntry entry) {
+	public static Image getImage(IKindProvider entry) {
 		return getTypeScriptImage(entry.getKind(), entry.getKindModifiers(), null);
 	}
 
@@ -284,14 +122,15 @@ public class TypeScriptImagesRegistry {
 		return null;
 	}
 
-	public static ImageDescriptor getTypeScriptImageDescriptor(String kind, String kindModifiers, String containerKind) {
+	public static ImageDescriptor getTypeScriptImageDescriptor(String kind, String kindModifiers,
+			String containerKind) {
 		String imageKey = getImageKey(kind, kindModifiers, containerKind);
 		if (imageKey != null) {
 			return getImageDescriptor(imageKey);
 		}
 		return null;
 	}
-	
+
 	private static String getImageKey(String kind, String kindModifiers, String containerKind) {
 		TypeScriptKind tsKind = TypeScriptKind.getKind(kind);
 		if (tsKind == null) {
@@ -305,26 +144,26 @@ public class TypeScriptImagesRegistry {
 		switch (tsKind) {
 		case KEYWORD:
 			imageKey = IMG_KEYWORD;
-			break;	
+			break;
 		case ALIAS:
 			imageKey = IMG_ALIAS;
-			break;			
+			break;
 		case MODULE:
 			imageKey = IMG_PACKAGE;
 			break;
-		case ENUM:			
+		case ENUM:
 			imageKey = getKey(parts, IMG_ENUM_DEFAULT, IMG_ENUM_PRIVATE, null);
-			break;			
+			break;
 		case VAR:
 		case PROPERTY:
-		case LET:			
+		case LET:
 			imageKey = getKey(parts, IMG_FIELD_DEFAULT, IMG_FIELD_PRIVATE, IMG_FIELD_PUBLIC);
 			break;
-		case TYPE:			
+		case TYPE:
 			imageKey = getKey(parts, IMG_TYPE_DEFAULT, IMG_TYPE_PRIVATE, IMG_TYPE_PUBLIC);
-			break;			
+			break;
 		case METHOD:
-		case FUNCTION:			
+		case FUNCTION:
 			imageKey = getKey(parts, IMG_METHOD_DEFAULT, IMG_METHOD_PRIVATE, IMG_METHOD_PUBLIC);
 			break;
 		case CLASS:

@@ -64,8 +64,10 @@ public interface ITypeScriptFile {
 	String getPrefix(int position);
 
 	Location getLocation(int position) throws TypeScriptException;
-
+	
 	int getPosition(int line, int offset) throws TypeScriptException;
+
+	int getPosition(Location loc) throws TypeScriptException;
 
 	String getContents();
 

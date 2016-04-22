@@ -16,8 +16,12 @@ package ts.client;
  */
 public class Location {
 
-	private final int line;
-	private final int offset;
+	private int line;
+	private int offset;
+
+	public Location() {
+
+	}
 
 	public Location(int line, int offset) {
 		this.line = line;

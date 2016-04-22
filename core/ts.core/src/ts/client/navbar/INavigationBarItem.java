@@ -1,5 +1,7 @@
 package ts.client.navbar;
 
-public interface INavigationBarItem {
+import ts.client.IKindProvider;
+
+public interface INavigationBarItem extends IKindProvider{
 
 }

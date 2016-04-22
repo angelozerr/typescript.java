@@ -2,12 +2,12 @@ package ts.eclipse.ide.ui.outline;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -22,69 +22,39 @@ import ts.resources.INavbarListener;
 
 public class TypeScriptContentOutlinePage extends Page implements IContentOutlinePage, INavbarListener {
 
-	// private final ITypeScriptFile tsFile;
-	private CommonViewer viewer;
+	private static final String OUTLINE_COMMON_NAVIGATOR_ID = TypeScriptUIPlugin.PLUGIN_ID + ".outline"; //$NON-NLS-1$
+
+	private CommonViewer fOutlineViewer;
 	private IIDETypeScriptFile tsFile;
 
+	private ListenerList fSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList fPostSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
+
 	public TypeScriptContentOutlinePage() {
-		// this.tsFile = tsFile;
-	}
-
-	@Override
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
-		this.viewer.addSelectionChangedListener(listener);
-	}
-
-	@Override
-	public ISelection getSelection() {
-		return this.viewer.getSelection();
-	}
-
-	@Override
-	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-		this.viewer.removePostSelectionChangedListener(listener);
-	}
-
-	@Override
-	public void setSelection(ISelection selection) {
-		this.viewer.setSelection(selection);
-	}
-
-	@Override
-	public Control getControl() {
-		return this.viewer.getControl();
-	}
-
-	@Override
-	public void setFocus() {
-		getControl().setFocus();
 	}
 
 	@Override
 	public void createControl(Composite parent) {
-		viewer = new CommonViewer(TypeScriptUIPlugin.PLUGIN_ID + ".outline", parent, SWT.MULTI);
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				if (!selection.isEmpty()) {
-					// if (selection.getFirstElement() instanceof JSNode) {
-					// JSNode node = (JSNode) selection.getFirstElement();
-					// IFile file = getFile(node);
-					// if (file != null && file.exists()) {
-					// Long start = node.getStart();
-					// Long end = node.getEnd();
-					// EditorUtils.openInEditor(file, start != null ?
-					// start.intValue() : -1,
-					// start != null && end != null ? end.intValue() -
-					// start.intValue() : -1, true);
-					// }
-					// }
-				}
-			}
-		});
-		viewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
-		//viewer.setInput(tsFile);
+		fOutlineViewer = new CommonViewer(OUTLINE_COMMON_NAVIGATOR_ID, parent, SWT.MULTI);
+		// seems like common filters need to be explicitly added
+		for (ViewerFilter filter : fOutlineViewer.getNavigatorContentService().getFilterService()
+				.getVisibleFilters(true)) {
+			this.fOutlineViewer.addFilter(filter);
+		}
+
+		Object[] listeners = fSelectionChangedListeners.getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			fSelectionChangedListeners.remove(listeners[i]);
+			fOutlineViewer.addSelectionChangedListener((ISelectionChangedListener) listeners[i]);
+		}
+
+		listeners = fPostSelectionChangedListeners.getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			fPostSelectionChangedListeners.remove(listeners[i]);
+			fOutlineViewer.addPostSelectionChangedListener((ISelectionChangedListener) listeners[i]);
+		}
+
+		fOutlineViewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
 
 	}
 
@@ -97,31 +67,105 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 		this.tsFile.addNavbarListener(this);
 	}
 
+	public Control getControl() {
+		if (fOutlineViewer != null)
+			return fOutlineViewer.getControl();
+		return null;
+	}
+
+	@Override
+	public void setFocus() {
+		if (fOutlineViewer != null) {
+			fOutlineViewer.getControl().setFocus();
+		}
+	}
+
 	@Override
 	public void navBarChanged(final List<NavigationBarItem> items) {
-		if (viewer != null) {
-			viewer.getTree().getDisplay().asyncExec(new Runnable() {
+		if (fOutlineViewer != null) {
+			fOutlineViewer.getTree().getDisplay().asyncExec(new Runnable() {
 
 				@Override
 				public void run() {
-					viewer.setInput(items);
+					fOutlineViewer.setInput(items);
 				}
 			});
 		}
 	}
 
-	// private IFile getFile(JSNode node) {
-	// if (node.isFile()) {
-	// IProject project = tsFile.getFile().getProject();
-	// try {
-	// IIDETypeScriptProject ternProject =
-	// TypeScriptCorePlugin.getTypeScriptProject(project);
-	// return ternProject.getIDEFile(node.getFile());
-	// } catch (CoreException e) {
-	// Trace.trace(Trace.SEVERE, "Error while getting tern project", e);
-	// }
-	// }
-	// return tsFile.getFile();
-	// }
+	/*
+	 * @see
+	 * ISelectionProvider#addSelectionChangedListener(ISelectionChangedListener)
+	 */
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		if (fOutlineViewer != null)
+			fOutlineViewer.addSelectionChangedListener(listener);
+		else
+			fSelectionChangedListeners.add(listener);
+	}
+
+	/*
+	 * @see ISelectionProvider#removeSelectionChangedListener(
+	 * ISelectionChangedListener)
+	 */
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		if (fOutlineViewer != null)
+			fOutlineViewer.removeSelectionChangedListener(listener);
+		else
+			fSelectionChangedListeners.remove(listener);
+	}
+
+	/*
+	 * @see ISelectionProvider#setSelection(ISelection)
+	 */
+	public void setSelection(ISelection selection) {
+		if (fOutlineViewer != null)
+			fOutlineViewer.setSelection(selection);
+	}
+
+	/*
+	 * @see ISelectionProvider#getSelection()
+	 */
+	public ISelection getSelection() {
+		if (fOutlineViewer == null)
+			return StructuredSelection.EMPTY;
+		return fOutlineViewer.getSelection();
+	}
+
+	/*
+	 * @see org.eclipse.jface.text.IPostSelectionProvider#
+	 * addPostSelectionChangedListener(org.eclipse.jface.viewers.
+	 * ISelectionChangedListener)
+	 */
+	public void addPostSelectionChangedListener(ISelectionChangedListener listener) {
+		if (fOutlineViewer != null)
+			fOutlineViewer.addPostSelectionChangedListener(listener);
+		else
+			fPostSelectionChangedListeners.add(listener);
+	}
+
+	/*
+	 * @see org.eclipse.jface.text.IPostSelectionProvider#
+	 * removePostSelectionChangedListener(org.eclipse.jface.viewers.
+	 * ISelectionChangedListener)
+	 */
+	public void removePostSelectionChangedListener(ISelectionChangedListener listener) {
+		if (fOutlineViewer != null)
+			fOutlineViewer.removePostSelectionChangedListener(listener);
+		else
+			fPostSelectionChangedListeners.remove(listener);
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+
+		fSelectionChangedListeners.clear();
+		fSelectionChangedListeners = null;
+
+		fPostSelectionChangedListeners.clear();
+		fPostSelectionChangedListeners = null;
+
+	}
 
 }

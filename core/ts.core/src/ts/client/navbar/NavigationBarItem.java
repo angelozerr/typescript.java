@@ -14,17 +14,31 @@ public class NavigationBarItem implements INavigationBarItem {
 		return text;
 	}
 
+	@Override
+	public String getKind() {
+		return kind;
+	}
+
+	@Override
+	public String getKindModifiers() {
+		return kindModifiers;
+	}
+
 	public void setText(String text) {
 		this.text = text;
 	}
 
-	// public void setSpansA(List<TextSpan> spans) {
-	// this.spans = spans;
-	// }
-	//
-	// public List<TextSpan> getSpansA() {
-	// return spans;
-	// }
+	public void setSpans(List<TextSpan> spans) {
+		this.spans = spans;
+	}
+
+	public List<TextSpan> getSpans() {
+		return spans;
+	}
+
+	public boolean hasSpans() {
+		return spans != null && spans.size() > 0;
+	}
 
 	public List<NavigationBarItem> getChildItems() {
 		return childItems;

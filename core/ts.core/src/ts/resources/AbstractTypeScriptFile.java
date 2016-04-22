@@ -74,6 +74,11 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
+	public int getPosition(Location loc) throws TypeScriptException {
+		return getPosition(loc.getLine(), loc.getOffset());
+	}
+
+	@Override
 	public void open() throws TypeScriptException {
 		((TypeScriptProject) tsProject).openFile(this);
 		this.opened = true;
@@ -220,7 +225,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	public List<NavigationBarItem> getNavBar() {
 		return navbar;
 	}
-	
+
 	// @Override
 	// public List<NavigationBarItem> getNavBar() throws TypeScriptException {
 	// TypeScriptNavBarCollector c = new TypeScriptNavBarCollector();
