@@ -10,7 +10,4 @@ public interface ITypeScriptBuildPathEntry {
 
 	IPath getPath();
 
-	IPath[] getInclusionPatterns();
-
-	IPath[] getExclusionPatterns();
 }

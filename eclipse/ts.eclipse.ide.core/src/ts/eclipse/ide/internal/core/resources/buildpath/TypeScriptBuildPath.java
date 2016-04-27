@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.internal.core.resources.buildpath;
 
 import java.io.IOException;
@@ -21,6 +31,10 @@ import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPathEntry;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.utils.FileUtils;
 
+/**
+ * TypeScript build path implementation.
+ *
+ */
 public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 
 	private final IProject project;
@@ -53,11 +67,6 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		return containers;
 	}
 
-	@Override
-	public List<ITypeScriptBuildPathEntry> getEntries() {
-		return entries;
-	}
-
 	public static ITypeScriptBuildPath load(IProject project, String json) {
 		TypeScriptBuildPath buildPath = new TypeScriptBuildPath(project);
 		JsonObject object = Json.parse(json).asObject();
@@ -71,6 +80,7 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		return buildPath;
 	}
 
+	@Override
 	public void addEntry(ITypeScriptBuildPathEntry entry) {
 		if (!entries.contains(entry)) {
 			entries.add(entry);
@@ -78,6 +88,7 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		}
 	}
 
+	@Override
 	public void removeEntry(ITypeScriptBuildPathEntry entry) {
 		entries.remove(entry);
 		this.containers = null;
@@ -103,9 +114,6 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 			}
 			addJsonFieldName(writer, entry.getPath().toString());
 			startJsonObject(writer);
-			savePatterns("includes", entry.getInclusionPatterns(), writer);
-			writer.append(",");
-			savePatterns("excludes", entry.getExclusionPatterns(), writer);
 			endJsonObject(writer);
 			i++;
 		}
@@ -117,22 +125,6 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		writer.append(name);
 		writer.append("\"");
 		writer.append(":");
-	}
-
-	private void savePatterns(String name, IPath[] patterns, Writer writer) throws IOException {
-		int i = 0;
-		addJsonFieldName(writer, name);
-		writer.append("\"");
-		if (patterns != null) {
-			for (IPath pattern : patterns) {
-				if (i > 0) {
-					writer.append(",");
-				}
-				writer.append(pattern.toString());
-				i++;
-			}
-		}
-		writer.append("\"");
 	}
 
 	private void endJsonObject(Writer writer) throws IOException {

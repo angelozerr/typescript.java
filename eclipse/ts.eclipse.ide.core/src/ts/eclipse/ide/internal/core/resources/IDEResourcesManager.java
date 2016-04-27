@@ -17,10 +17,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import ts.eclipse.ide.core.resources.TypeScriptSettingsHelper;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.UseSalsa;
+import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
 import ts.eclipse.ide.internal.core.Trace;
-import ts.resources.ITypeScriptProject;
 import ts.resources.ITypeScriptResourcesManagerDelegate;
 import ts.utils.FileUtils;
 
@@ -33,7 +33,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	}
 
 	@Override
-	public ITypeScriptProject getTypeScriptProject(Object obj, boolean force) throws IOException {
+	public IDETypeScriptProject getTypeScriptProject(Object obj, boolean force) throws IOException {
 		if (obj instanceof IProject) {
 			IProject project = (IProject) obj;
 			try {
@@ -72,21 +72,34 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		return tsProject;
 	}
 
-	public boolean hasTypeScriptNature(IProject project) {
-		// see https://github.com/angelozerr/typescript.java/issues/12
-		// FIXME: All projects can be a TypeScript project. It means that
-		// project
-		// properties display every time "TypeScript" menu item. But is it a
-		// problem?
-		// To hide the TypeScript menu item we could check that project contains
-		// tsconfig.json or src/tsconfig.json
-		// User could add a new path for tsconfig.json in the preferences but
-		// I'm afrais that it's a little complex.
-		return true;
+	/**
+	 * Returns true if the given project contains one or several "tsconfig.json"
+	 * file(s) false otherwise.
+	 * 
+	 * To have a very good performance, "tsconfig.json" is not searched by
+	 * scanning the whole files of the project but it checks if "tsconfig.json"
+	 * exists in several folders ('/tsconfig.json' or '/src/tsconfig.json).
+	 * Those folders can be customized with preferences buildpath
+	 * {@link TypeScriptCorePreferenceConstants#TYPESCRIPT_BUILD_PATH}.
+	 * 
+	 * @param project
+	 *            Eclipse project.
+	 * @return true if the given project contains one or several "tsconfig.json"
+	 *         file(s) false otherwise.
+	 */
+	public boolean isTypeScriptProject(IProject project) {
+		// check that TypeScript project have build path.
+		try {
+			IDETypeScriptProject tsProject = getTypeScriptProject(project, false);
+			return tsProject != null && tsProject.getTypeScriptBuildPath().getContainers().size() > 0;
+		} catch (Exception e) {
+			Trace.trace(Trace.SEVERE, "Error while getting TypeScript project", e);
+		}
+		return false;
 	}
 
 	public boolean hasSalsaNature(IProject project) {
-		UseSalsa useSalsa = TypeScriptSettingsHelper.getUseSalsa();
+		UseSalsa useSalsa = WorkspaceTypeScriptSettingsHelper.getUseSalsa();
 		switch (useSalsa) {
 		case Never:
 			return false;

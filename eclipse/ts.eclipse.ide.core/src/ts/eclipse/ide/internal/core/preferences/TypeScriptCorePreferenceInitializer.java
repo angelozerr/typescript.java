@@ -22,7 +22,7 @@ import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
-import ts.eclipse.ide.core.resources.TypeScriptSettingsHelper;
+import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
 import ts.eclipse.ide.core.resources.UseSalsa;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.repository.ITypeScriptRepository;
@@ -35,7 +35,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = TypeScriptSettingsHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
+		IEclipsePreferences node = WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
 
 		// initialize properties for direct access of node.js server (start an
 		// internal process)
@@ -60,7 +60,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 		// Initialize default path where TypeScript files *.ts, *.tsx must be
 		// searched for compilation and validation must be done
-		initializeTypeScriptPaths(node);
+		initializeTypeScriptBuildPath(node);
 
 		// node.put(TypeScriptCorePreferenceConstants.NATURE_TYPESCRIPT_PATHS,
 		// TypeScriptCorePreferenceConstants.DEFAULT_NATURE_TYPESCRIPT_PATHS);
@@ -113,7 +113,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		node.put(TypeScriptCorePreferenceConstants.USE_SALSA_AS_JS_INFERENCE, UseSalsa.WhenNoJSDTNature.name());
 	}
 
-	private void initializeTypeScriptPaths(IEclipsePreferences node) {
+	private void initializeTypeScriptBuildPath(IEclipsePreferences node) {
 		node.put(TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH,
 				TypeScriptCorePreferenceConstants.DEFAULT_TYPESCRIPT_BUILD_PATH);
 

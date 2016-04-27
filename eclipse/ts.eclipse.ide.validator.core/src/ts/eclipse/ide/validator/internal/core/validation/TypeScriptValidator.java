@@ -35,7 +35,7 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 
 	@Override
 	public void validationStarting(IProject project, ValidationState state, IProgressMonitor monitor) {
-		if (project != null && TypeScriptResourceUtil.hasTypeScriptNature(project)) {
+		if (project != null && TypeScriptResourceUtil.isTypeScriptProject(project)) {
 			startTime = System.currentTimeMillis();
 			try {
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project, false);
@@ -49,7 +49,7 @@ public class TypeScriptValidator extends AbstractValidator implements IValidator
 
 	@Override
 	public void validationFinishing(IProject project, ValidationState state, IProgressMonitor monitor) {
-		if (project != null && TypeScriptResourceUtil.hasTypeScriptNature(project)) {
+		if (project != null && TypeScriptResourceUtil.isTypeScriptProject(project)) {
 			super.validationFinishing(project, state, monitor);
 			state.put(TYPESCRIPT_VALIDATOR_CONTEXT, null);
 			System.err.println("Validated in " + (System.currentTimeMillis() - startTime) + "ms");

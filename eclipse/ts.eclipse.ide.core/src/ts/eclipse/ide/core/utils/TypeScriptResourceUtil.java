@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Status;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
@@ -44,7 +45,7 @@ public class TypeScriptResourceUtil {
 	public static boolean isTsOrTsxFile(Object element) {
 		return IDEResourcesManager.getInstance().isTsOrTsxFile(element);
 	}
-	
+
 	public static boolean isTsOrTsxOrJsxFile(Object element) {
 		return IDEResourcesManager.getInstance().isTsOrTsxOrJsxFile(element);
 	}
@@ -54,16 +55,22 @@ public class TypeScriptResourceUtil {
 	}
 
 	/**
-	 * Return true if the given project contains a "tsconfig.json" file false
-	 * otherwise.
+	 * Returns true if the given project contains one or several "tsconfig.json"
+	 * file(s) false otherwise.
+	 * 
+	 * To have a very good performance, "tsconfig.json" is not searched by
+	 * scanning the whole files of the project but it checks if "tsconfig.json"
+	 * exists in several folders ('/tsconfig.json' or '/src/tsconfig.json).
+	 * Those folders can be customized with preferences buildpath
+	 * {@link TypeScriptCorePreferenceConstants#TYPESCRIPT_BUILD_PATH}.
 	 * 
 	 * @param project
 	 *            Eclipse project.
-	 * @return true if the given project contains a "tsconfig.json" file and
-	 *         false otherwise.
+	 * @return true if the given project contains one or several "tsconfig.json"
+	 *         file(s) false otherwise.
 	 */
-	public static boolean hasTypeScriptNature(IProject project) {
-		return IDEResourcesManager.getInstance().hasTypeScriptNature(project);
+	public static boolean isTypeScriptProject(IProject project) {
+		return IDEResourcesManager.getInstance().isTypeScriptProject(project);
 	}
 
 	public static boolean canConsumeTsserver(IProject project, Object fileObject) {
@@ -197,8 +204,8 @@ public class TypeScriptResourceUtil {
 		}
 	}
 
-	private static void refreshAndCollect(IPath filePath, IContainer baseDir, boolean refresh,
-			List<IFile> emittedFiles) throws CoreException {
+	private static void refreshAndCollect(IPath filePath, IContainer baseDir, boolean refresh, List<IFile> emittedFiles)
+			throws CoreException {
 		IFile file = null;
 		if (refresh) {
 			file = baseDir.getFile(filePath);

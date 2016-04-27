@@ -8,12 +8,12 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 
-public class TypeScriptSettingsHelper {
+public class WorkspaceTypeScriptSettingsHelper {
 
 	private static UseSalsa useSalsa;
 
 	static {
-		IEclipsePreferences preferences = TypeScriptSettingsHelper
+		IEclipsePreferences preferences = WorkspaceTypeScriptSettingsHelper
 				.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
 		String name = preferences.get(TypeScriptCorePreferenceConstants.USE_SALSA_AS_JS_INFERENCE,
 				UseSalsa.WhenNoJSDTNature.name());

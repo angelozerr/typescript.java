@@ -93,7 +93,7 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 	}
 
 	protected IEclipsePreferences getWorkspacePreferences() {
-		return TypeScriptSettingsHelper.getWorkspacePreferences(pluginId);
+		return WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(pluginId);
 	}
 
 	public void dispose() {

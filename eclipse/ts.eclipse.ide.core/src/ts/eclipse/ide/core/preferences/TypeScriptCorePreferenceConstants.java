@@ -62,7 +62,7 @@ public class TypeScriptCorePreferenceConstants {
 	// public static final String DEFAULT_NATURE_SALSA_PATHS = JSCONFIG_JSON +
 	// ",src/" + JSCONFIG_JSON; //$NON-NLS-1$
 
-	public static final String TYPESCRIPT_BUILD_PATH = "typeBuildScriptPath"; //$NON-NLS-1$
+	public static final String TYPESCRIPT_BUILD_PATH = "typeScriptBuildPath"; //$NON-NLS-1$
 
 	public static final String DEFAULT_TYPESCRIPT_BUILD_PATH = new DefaultTypeScriptBuildPath().toString(); // $NON-NLS-1$
 

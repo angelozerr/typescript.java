@@ -11,6 +11,8 @@
 package ts.eclipse.ide.internal.ui.navigator;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -33,16 +35,37 @@ public class TypeScriptNavigatorContentProvider implements ITreeContentProvider 
 
 	@Override
 	public Object[] getChildren(Object element) {
-		if (!(element instanceof IFile)) {
-			return NO_CHILDREN;
-		}
-		IFile resource = (IFile) element;
-		try {
-			Object[] children = TypeScriptResourceUtil.getEmittedFiles(resource);
+		if (element instanceof IResource) {
+			IResource resource = (IResource) element;
+			Object[] children = getChildren(resource);
 			return children != null ? children : NO_CHILDREN;
-		} catch (CoreException e) {
 		}
 		return NO_CHILDREN;
+	}
+
+	private Object[] getChildren(IResource resource) {
+		switch (resource.getType()) {
+		case IResource.PROJECT:
+			return getTypescriptResources((IProject) resource);
+		case IResource.FILE:
+			return getEmmitedFiles((IFile) resource);
+		}
+		return null;
+	}
+
+	private Object[] getTypescriptResources(IProject project) {
+		if (TypeScriptResourceUtil.isTypeScriptProject(project)) {
+			
+		}
+		return null;
+	}
+
+	private Object[] getEmmitedFiles(IFile file) {
+		try {
+			return TypeScriptResourceUtil.getEmittedFiles(file);
+		} catch (CoreException e) {
+			return null;
+		}
 	}
 
 	@Override

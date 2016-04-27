@@ -193,6 +193,11 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 		case IResource.ROOT:
 			return true;
 		case IResource.PROJECT:
+			IProject project = (IProject) resource;
+			if (project.isOpen() && delta.getKind() == IResourceDelta.CHANGED
+                    && ((delta.getFlags() & IResourceDelta.OPEN) != 0)) {
+				
+			}
 			// Continue if project has defined file listeners.
 			return fileListeners.containsKey(resource);
 		case IResource.FOLDER:

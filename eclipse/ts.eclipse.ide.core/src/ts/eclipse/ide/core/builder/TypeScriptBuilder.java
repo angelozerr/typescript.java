@@ -38,7 +38,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 	protected IProject[] build(int kind, Map<String, String> args, final IProgressMonitor monitor)
 			throws CoreException {
 		IProject project = this.getProject();
-		if (!TypeScriptResourceUtil.hasTypeScriptNature(project)) {
+		if (!TypeScriptResourceUtil.isTypeScriptProject(project)) {
 			return null;
 		}
 
@@ -103,7 +103,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 				case IResource.ROOT:
 					return true;
 				case IResource.PROJECT:
-					return TypeScriptResourceUtil.hasTypeScriptNature((IProject) resource);
+					return TypeScriptResourceUtil.isTypeScriptProject((IProject) resource);
 				case IResource.FOLDER:
 					return buildPath.isInScope(resource);
 				case IResource.FILE:

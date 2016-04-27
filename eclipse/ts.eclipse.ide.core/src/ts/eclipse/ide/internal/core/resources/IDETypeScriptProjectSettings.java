@@ -12,7 +12,9 @@ package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
@@ -34,6 +36,8 @@ import ts.utils.StringUtils;
 public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings implements IIDETypeScriptProjectSettings {
 
 	private final IDETypeScriptProject tsProject;
+	private SaveProjectPreferencesJob savePreferencesJob;
+	private boolean updatingBuildPath;
 
 	public IDETypeScriptProjectSettings(IDETypeScriptProject tsProject) {
 		super(tsProject.getProject(), TypeScriptCorePlugin.PLUGIN_ID);
@@ -135,7 +139,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 			getTypeScriptProject().disposeServer();
 		} else if (isTscPreferencesChanged(event)) {
 			getTypeScriptProject().disposeCompiler();
-		} else if (isTypeScriptBuildPathPreferencesChanged(event)) {
+		} else if (isTypeScriptBuildPathPreferencesChanged(event) && !updatingBuildPath) {
 			getTypeScriptProject().disposeBuildPath();
 		}
 	}
@@ -163,22 +167,28 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH.equals(event.getKey());
 	}
 
-//	@Override
-//	public boolean canValidate(IResource resource) {
-//		// TODO: add a preferences to customize path to exclude for validation.
-//		// today we exclude validation for files which are hosted inside
-//		// node_modules.
-//		IPath location = resource.getProjectRelativePath();
-//		for (int i = 0; i < location.segmentCount(); i++) {
-//			if ("node_modules".equals(location.segment(i))) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
-
 	private IDETypeScriptProject getTypeScriptProject() {
 		return tsProject;
+	}
+
+	public void updateBuildPath(ITypeScriptBuildPath buildPath) {
+		IEclipsePreferences preferences = getProjectPreferences();
+		preferences.put(TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH, buildPath.toString());
+		try {
+			this.updatingBuildPath = true;
+			save();
+		} finally {
+			this.updatingBuildPath = false;
+		}
+	}
+
+	private void save() {
+		IProject project = getTypeScriptProject().getProject();
+		if (savePreferencesJob == null) {
+			savePreferencesJob = new SaveProjectPreferencesJob(getProjectPreferences(), project);
+		}
+		savePreferencesJob.setRule(project.getWorkspace().getRoot());
+		savePreferencesJob.schedule();
 	}
 
 	public ITypeScriptBuildPath getTypeScriptBuildPath() {

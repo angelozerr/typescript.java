@@ -23,7 +23,6 @@ public class TypeScriptNatureTester extends PropertyTester {
 	 */
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-
 		if (IS_TYPESCRIPT_PROJECT_PROPERTY.equals(property)) {
 			return testIsTypeScriptProject(receiver);
 		} else if (HAS_TYPESCRIPT_BUILDER_PROPERTY.equals(property)) {
@@ -36,7 +35,7 @@ public class TypeScriptNatureTester extends PropertyTester {
 		if (receiver instanceof IAdaptable) {
 			IProject project = (IProject) ((IAdaptable) receiver).getAdapter(IProject.class);
 			if (project != null) {
-				return TypeScriptResourceUtil.hasTypeScriptNature(project);
+				return TypeScriptResourceUtil.isTypeScriptProject(project);
 			}
 		}
 		return false;

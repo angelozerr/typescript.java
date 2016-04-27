@@ -11,12 +11,13 @@
 package ts.eclipse.ide.internal.core.resources;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
@@ -34,6 +35,7 @@ import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
+import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPathEntry;
 import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
 import ts.resources.TypeScriptProject;
 import ts.utils.FileUtils;
@@ -44,22 +46,34 @@ import ts.utils.FileUtils;
  */
 public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeScriptProject {
 
-	private static final QualifiedName TYPESCRIPT_PROJECT = new QualifiedName(
-			TypeScriptCorePlugin.PLUGIN_ID + ".sessionprops", //$NON-NLS-1$
-			"TypeScriptProject"); //$NON-NLS-1$
+	private final static Map<IProject, IDETypeScriptProject> tsProjects = new HashMap<IProject, IDETypeScriptProject>();
 
 	private IFileWatcherListener tsconfigFileListener = new IFileWatcherListener() {
 
 		@Override
 		public void onDeleted(IFile file) {
+			// on delete of "tsconfig.json"
+			// stope the tsserver
 			IDETypeScriptProject.this.disposeServer();
+			// Remove cache of tsconfig.json Pojo
 			JsonConfigResourcesManager.getInstance().remove(file);
+			// Update build path
+			ITypeScriptBuildPath buildPath = getTypeScriptBuildPath();
+			buildPath.removeEntry(new TypeScriptBuildPathEntry(file.getParent().getProjectRelativePath()));
+			((IDETypeScriptProjectSettings) getProjectSettings()).updateBuildPath(buildPath);
 		}
 
 		@Override
 		public void onCreate(IFile file) {
+			// on create of "tsconfig.json"
+			// stope the tsserver
 			IDETypeScriptProject.this.disposeServer();
+			// Remove cache of tsconfig.json Pojo
 			JsonConfigResourcesManager.getInstance().remove(file);
+			// Update build path
+			ITypeScriptBuildPath buildPath = getTypeScriptBuildPath();
+			buildPath.addEntry(new TypeScriptBuildPathEntry(file.getParent().getProjectRelativePath()));
+			((IDETypeScriptProjectSettings) getProjectSettings()).updateBuildPath(buildPath);
 		}
 
 		@Override
@@ -77,14 +91,17 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		super(project.getLocation().toFile(), null);
 		this.project = project;
 		super.setProjectSettings(new IDETypeScriptProjectSettings(this));
-		project.setSessionProperty(TYPESCRIPT_PROJECT, this);
+		synchronized (tsProjects) {
+			tsProjects.put(project, this);
+		}
 		// Stop tsserver + dispose settings when project is closed, deleted.
 		TypeScriptCorePlugin.getResourcesWatcher().addProjectWatcherListener(getProject(),
 				new ProjectWatcherListenerAdapter() {
+
 					@Override
 					public void onClosed(IProject project) {
 						try {
-							IDETypeScriptProject.this.dispose();
+							dispose();
 						} catch (TypeScriptException e) {
 							Trace.trace(Trace.SEVERE, "Error while closing project", e);
 						}
@@ -93,11 +110,19 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 					@Override
 					public void onDeleted(IProject project) {
 						try {
-							IDETypeScriptProject.this.dispose();
+							dispose();
 						} catch (TypeScriptException e) {
 							Trace.trace(Trace.SEVERE, "Error while deleting project", e);
 						}
 					}
+
+					private void dispose() throws TypeScriptException {
+						IDETypeScriptProject.this.dispose();
+						synchronized (tsProjects) {
+							tsProjects.remove(IDETypeScriptProject.this.getProject());
+						}
+					}
+
 				});
 		// Stop tsserver when tsconfig.json/jsconfig.json of the project is
 		// created, deleted or modified
@@ -118,10 +143,9 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	}
 
 	public static IDETypeScriptProject getTypeScriptProject(IProject project) throws CoreException {
-		if (!project.isAccessible()) {
-			return null;
+		synchronized (tsProjects) {
+			return tsProjects.get(project);
 		}
-		return (IDETypeScriptProject) project.getSessionProperty(TYPESCRIPT_PROJECT);
 	}
 
 	public void load() throws IOException {
