@@ -239,12 +239,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 							e.printStackTrace();
 						}
 					}
-					// // notify uploader that we are going to dispose the
-					// server,
-					// // so that it can finish gracefully
-					// ((IDETernFileUploader) ((TernFileSynchronizer)
-					// getFileSynchronizer()).getTernFileUploader())
-					// .serverToBeDisposed();
+					openedFiles.clear();
 					client.dispose();
 					client = null;
 				}

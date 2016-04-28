@@ -82,7 +82,7 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 
 	@Override
 	public void navBarChanged(final List<NavigationBarItem> items) {
-		if (fOutlineViewer != null) {
+		if (fOutlineViewer != null && !fOutlineViewer.getTree().isDisposed()) {
 			fOutlineViewer.getTree().getDisplay().asyncExec(new Runnable() {
 
 				@Override

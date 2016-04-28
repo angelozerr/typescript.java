@@ -10,7 +10,16 @@ public class TypeScriptBuildPathEntry implements ITypeScriptBuildPathEntry {
 	private final IPath path;
 
 	public TypeScriptBuildPathEntry(String path) {
-		this(new Path(path));
+		this(new Path(removeFirstSlash(path)));
+	}
+
+	private static String removeFirstSlash(String path) {
+		if (path.length() > 0 && path.charAt(0) == '/') {
+			// remove first '/', because IResource#getProjectRelativePath()
+			// returns a path without starting with '/'
+			return path.substring(1, path.length());
+		}
+		return path;
 	}
 
 	public TypeScriptBuildPathEntry(IPath path) {

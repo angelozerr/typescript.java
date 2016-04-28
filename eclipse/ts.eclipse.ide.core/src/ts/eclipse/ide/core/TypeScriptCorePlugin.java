@@ -13,33 +13,20 @@ package ts.eclipse.ide.core;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
-import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.repository.IIDETypeScriptRepositoryManager;
-import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
+import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
 import ts.eclipse.ide.core.resources.watcher.IResourcesWatcher;
 import ts.eclipse.ide.internal.core.nodejs.NodejsInstallManager;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
-import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
 import ts.eclipse.ide.internal.core.resources.watcher.ResourcesWatcher;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
-import ts.resources.TypeScriptResourcesManager;
-import ts.utils.FileUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -85,7 +72,6 @@ public class TypeScriptCorePlugin extends Plugin {
 		super.stop(context);
 	}
 
-	
 	/**
 	 * Returns the shared instance
 	 * 
@@ -138,4 +124,11 @@ public class TypeScriptCorePlugin extends Plugin {
 		return ResourcesWatcher.getInstance();
 	}
 
+	public void addTypeScriptElementChangedListener(ITypeScriptElementChangedListener listener) {
+		IDEResourcesManager.getInstance().addTypeScriptElementChangedListener(listener);
+	}
+
+	public void removeTypeScriptElementChangedListener(ITypeScriptElementChangedListener listener) {
+		IDEResourcesManager.getInstance().removeTypeScriptElementChangedListener(listener);
+	}
 }

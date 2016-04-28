@@ -20,7 +20,7 @@ public interface IFileWatcherListener {
 
 	void onDeleted(IFile file);
 
-	void onCreate(IFile file);
+	void onAdded(IFile file);
 
 	void onChanged(IFile file);
 

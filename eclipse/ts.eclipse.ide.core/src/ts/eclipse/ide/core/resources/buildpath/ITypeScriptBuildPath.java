@@ -44,4 +44,8 @@ public interface ITypeScriptBuildPath {
 
 	void removeEntry(ITypeScriptBuildPathEntry entry);
 
+	boolean isContainer(IResource resource);
+
+	ITypeScriptBuildPath copy();
+
 }

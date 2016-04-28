@@ -196,7 +196,7 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 			IProject project = (IProject) resource;
 			if (project.isOpen() && delta.getKind() == IResourceDelta.CHANGED
                     && ((delta.getFlags() & IResourceDelta.OPEN) != 0)) {
-				
+				System.err.println("Open");
 			}
 			// Continue if project has defined file listeners.
 			return fileListeners.containsKey(resource);
@@ -210,9 +210,9 @@ public class ResourcesWatcher implements IResourcesWatcher, IResourceChangeListe
 				if (listeners != null) {
 					for (IFileWatcherListener listener : listeners) {
 						switch (delta.getKind()) {
-						case IResourceDelta.ADDED:
+						case IResourceDelta.ADDED:							
 							// handle added resource
-							listener.onCreate(file);
+							listener.onAdded(file);
 							break;
 						case IResourceDelta.REMOVED:
 							// handle removed resource

@@ -12,14 +12,19 @@ package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
 import ts.eclipse.ide.core.resources.UseSalsa;
 import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.resources.ITypeScriptResourcesManagerDelegate;
 import ts.utils.FileUtils;
@@ -27,6 +32,12 @@ import ts.utils.FileUtils;
 public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate {
 
 	private static IDEResourcesManager instance = new IDEResourcesManager();
+
+	private final List<ITypeScriptElementChangedListener> listeners;
+
+	public IDEResourcesManager() {
+		this.listeners = new ArrayList<ITypeScriptElementChangedListener>();
+	}
 
 	public static IDEResourcesManager getInstance() {
 		return instance;
@@ -202,4 +213,26 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		return null;
 	}
 
+	public void addTypeScriptElementChangedListener(ITypeScriptElementChangedListener listener) {
+		synchronized (listeners) {
+			if (!listeners.contains(listener)) {
+				listeners.add(listener);
+			}
+		}
+	}
+
+	public void fireBuildPathChanged(IIDETypeScriptProject tsProject, ITypeScriptBuildPath oldBuildPath,
+			ITypeScriptBuildPath newBuildPath) {
+		synchronized (listeners) {
+			for (ITypeScriptElementChangedListener listener : listeners) {
+				listener.buildPathChanged(tsProject, oldBuildPath, newBuildPath);
+			}
+		}
+	}
+
+	public void removeTypeScriptElementChangedListener(ITypeScriptElementChangedListener listener) {
+		synchronized (listeners) {
+			listeners.remove(listener);
+		}
+	}
 }

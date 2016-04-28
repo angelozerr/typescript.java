@@ -255,12 +255,8 @@
 				priority="high">
 			<triggerPoints>
 			     <or>
-					<and>
-						<instanceof	value="org.eclipse.core.resources.IResource" />
-						<adapt type="org.eclipse.core.resources.IProject">
-							<test property="ts.eclipse.ide.core.isTypeScriptProject" />
-						</adapt>
-					</and>
+			        <instanceof value="org.eclipse.core.resources.IProject" />
+			        <instanceof value="ts.resources.ITypeScriptProject" />
 					<and>
 						<instanceof value="org.eclipse.core.resources.IFile" />
       					<test property="org.eclipse.core.resources.contentTypeId" value="ts.eclipse.ide.core.tsSource" args="useFilenameOnly"/>
@@ -268,7 +264,7 @@
 					<and>
 						<instanceof value="org.eclipse.core.resources.IFile" />
       					<test property="org.eclipse.core.resources.contentTypeId" value="ts.eclipse.ide.core.tsxSource" args="useFilenameOnly"/>
-      				</and>      				
+      				</and>
 				</or>
 			</triggerPoints>				
 		  </navigatorContent>	
@@ -281,7 +277,26 @@
             class="ts.eclipse.ide.internal.ui.viewers.TypeScriptFilter" >
       	  </commonFilter>
    </extension>	
-			            
+	
+	<extension
+		point="org.eclipse.ui.decorators">
+		<decorator
+			label="%BuildpathIndicatorLabelDecorator.label"
+			lightweight="true"
+			location="TOP_RIGHT"
+			state="true"
+			class="ts.eclipse.ide.internal.ui.navigator.BuildpathIndicatorLabelDecorator"
+			id="ts.eclipse.ide.ui.buildpath.decorator">
+			<description>
+				%BuildpathIndicatorLabelDecorator.description
+			</description>
+			<enablement>
+				<objectClass
+					name="org.eclipse.core.resources.IResource">
+				</objectClass>
+			</enablement>
+		</decorator>
+	</extension>				            
     <extension point="org.eclipse.ui.startup">
         <startup
             class="ts.eclipse.ide.internal.ui.TypeScriptIDEStartup">

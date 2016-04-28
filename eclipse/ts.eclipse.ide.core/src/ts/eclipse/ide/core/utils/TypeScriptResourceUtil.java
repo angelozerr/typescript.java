@@ -70,6 +70,9 @@ public class TypeScriptResourceUtil {
 	 *         file(s) false otherwise.
 	 */
 	public static boolean isTypeScriptProject(IProject project) {
+		if(!project.isAccessible()) {
+			return false;
+		}
 		return IDEResourcesManager.getInstance().isTypeScriptProject(project);
 	}
 

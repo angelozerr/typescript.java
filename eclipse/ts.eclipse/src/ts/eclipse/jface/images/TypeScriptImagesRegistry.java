@@ -56,7 +56,7 @@ public class TypeScriptImagesRegistry {
 		registerImageDescriptor(IMG_ALIAS,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "alias_obj.gif"));
 		registerImageDescriptor(IMG_INTERFACE,
-				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "int_obj.gif"));
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "int_obj.png"));
 		registerImageDescriptor(IMG_ENUM_DEFAULT,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "enum_default_obj.gif"));
 		registerImageDescriptor(IMG_ENUM_PRIVATE,

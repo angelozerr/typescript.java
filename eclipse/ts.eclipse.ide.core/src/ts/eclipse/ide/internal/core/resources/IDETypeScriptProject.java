@@ -58,22 +58,27 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			// Remove cache of tsconfig.json Pojo
 			JsonConfigResourcesManager.getInstance().remove(file);
 			// Update build path
-			ITypeScriptBuildPath buildPath = getTypeScriptBuildPath();
+			ITypeScriptBuildPath buildPath = getTypeScriptBuildPath().copy();
 			buildPath.removeEntry(new TypeScriptBuildPathEntry(file.getParent().getProjectRelativePath()));
 			((IDETypeScriptProjectSettings) getProjectSettings()).updateBuildPath(buildPath);
 		}
 
 		@Override
-		public void onCreate(IFile file) {
+		public void onAdded(IFile file) {
 			// on create of "tsconfig.json"
 			// stope the tsserver
 			IDETypeScriptProject.this.disposeServer();
 			// Remove cache of tsconfig.json Pojo
 			JsonConfigResourcesManager.getInstance().remove(file);
 			// Update build path
-			ITypeScriptBuildPath buildPath = getTypeScriptBuildPath();
-			buildPath.addEntry(new TypeScriptBuildPathEntry(file.getParent().getProjectRelativePath()));
-			((IDETypeScriptProjectSettings) getProjectSettings()).updateBuildPath(buildPath);
+			// Cannot update build path when tsconfig.json file is created
+			// because
+			// when project is opening, it is called too
+			// ITypeScriptBuildPath buildPath = getTypeScriptBuildPath().copy();
+			// buildPath.addEntry(new
+			// TypeScriptBuildPathEntry(file.getParent().getProjectRelativePath()));
+			// ((IDETypeScriptProjectSettings)
+			// getProjectSettings()).updateBuildPath(buildPath);
 		}
 
 		@Override
@@ -285,6 +290,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			} else if (tsconfig.hasExclude()) {
 				return !tsconfig.isExcluded(resource);
 			}
+			return true;
 		}
 		// tsconfig.json was not found (ex : MyProject/node_modules),
 		// validation must not be done.
@@ -300,6 +306,9 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	}
 
 	public void disposeBuildPath() {
+		ITypeScriptBuildPath oldBuildPath = getTypeScriptBuildPath();
 		buildPath = null;
+		ITypeScriptBuildPath newBuildPath = getTypeScriptBuildPath();
+		IDEResourcesManager.getInstance().fireBuildPathChanged(this, oldBuildPath, newBuildPath);
 	}
 }

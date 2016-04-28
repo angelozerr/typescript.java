@@ -30,6 +30,7 @@ import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPathEntry;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.utils.FileUtils;
+import ts.utils.StringUtils;
 
 /**
  * TypeScript build path implementation.
@@ -57,11 +58,13 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 
 	private List<IContainer> buildContainers(List<ITypeScriptBuildPathEntry> entries, IProject project) {
 		List<IContainer> containers = new ArrayList<IContainer>(entries.size());
+		String path = null;
 		for (ITypeScriptBuildPathEntry entry : entries) {
-			if ("/".equals(entry.getPath().toString())) {
+			path = entry.getPath().toString();
+			if (StringUtils.isEmpty(path)) {
 				containers.add(project);
 			} else {
-				containers.add(project.getFolder(entry.getPath()));
+				containers.add(project.getFolder(path));
 			}
 		}
 		return containers;
@@ -97,6 +100,11 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 	@Override
 	public boolean isInScope(IResource resource) {
 		return getContainer(resource) != null;
+	}
+
+	@Override
+	public boolean isContainer(IResource resource) {
+		return getContainers().contains(resource);
 	}
 
 	@Override
@@ -144,5 +152,14 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 			// should never done
 		}
 		return result.toString();
+	}
+
+	@Override
+	public ITypeScriptBuildPath copy() {
+		TypeScriptBuildPath buildPath = new TypeScriptBuildPath(project);
+		for (ITypeScriptBuildPathEntry entry : entries) {
+			buildPath.addEntry(entry);
+		}
+		return buildPath;
 	}
 }

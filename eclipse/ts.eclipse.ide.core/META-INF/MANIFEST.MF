@@ -21,6 +21,7 @@ Export-Package: ts.eclipse.ide.core,
  ts.eclipse.ide.core.preferences,
  ts.eclipse.ide.core.repository,
  ts.eclipse.ide.core.resources,
+ ts.eclipse.ide.core.resources.buildpath,
  ts.eclipse.ide.core.resources.jsconfig,
  ts.eclipse.ide.core.utils
 Bundle-ActivationPolicy: lazy

@@ -24,7 +24,7 @@ public class FileWatcherListenerAdapter implements IFileWatcherListener {
 	}
 
 	@Override
-	public void onCreate(IFile file) {
+	public void onAdded(IFile file) {
 
 	}
 
