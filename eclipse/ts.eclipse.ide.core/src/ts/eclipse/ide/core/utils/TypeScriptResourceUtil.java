@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -227,5 +228,26 @@ public class TypeScriptResourceUtil {
 
 	public static IDETsconfigJson findTsconfig(IResource resource) throws CoreException {
 		return JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+	}
+	
+	public static IContainer getBuildPathContainer(Object receiver) {
+		if (receiver instanceof IAdaptable) {
+			IResource resource = (IResource) ((IAdaptable) receiver).getAdapter(IResource.class);
+			if (resource != null) {
+				switch (resource.getType()) {
+				case IResource.PROJECT:
+				case IResource.FOLDER:
+					IContainer container = (IContainer) resource;
+					if (container.exists(new Path(FileUtils.TSCONFIG_JSON))) {
+						return container;
+					}
+				case IResource.FILE:
+					if (FileUtils.TSCONFIG_JSON.equals(resource.getName())) {
+						return resource.getParent();
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

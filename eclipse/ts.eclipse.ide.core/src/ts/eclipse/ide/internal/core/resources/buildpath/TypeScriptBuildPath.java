@@ -28,7 +28,9 @@ import com.eclipsesource.json.JsonObject.Member;
 
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPathEntry;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
+import ts.eclipse.ide.internal.core.resources.IDETypeScriptProjectSettings;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
@@ -92,9 +94,26 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 	}
 
 	@Override
+	public void addEntry(IResource resource) {
+		addEntry(createEntry(resource));
+	}
+
+	@Override
 	public void removeEntry(ITypeScriptBuildPathEntry entry) {
 		entries.remove(entry);
 		this.containers = null;
+	}
+
+	@Override
+	public void removeEntry(IResource resource) {
+		removeEntry(createEntry(resource));
+	}
+
+	private ITypeScriptBuildPathEntry createEntry(IResource resource) {
+		if (resource.getType() == IResource.FILE) {
+			return new TypeScriptBuildPathEntry(resource.getParent().getProjectRelativePath());
+		}
+		return new TypeScriptBuildPathEntry(resource.getProjectRelativePath());
 	}
 
 	@Override
@@ -162,4 +181,19 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		}
 		return buildPath;
 	}
+
+	@Override
+	public void save() {
+		getProjectSettings().updateBuildPath(this);
+	}
+
+	private IDETypeScriptProjectSettings getProjectSettings() {
+		try {
+			return (IDETypeScriptProjectSettings) TypeScriptResourceUtil.getTypeScriptProject(project)
+					.getProjectSettings();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 }

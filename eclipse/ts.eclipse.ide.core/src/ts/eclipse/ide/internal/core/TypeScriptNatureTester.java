@@ -1,15 +1,20 @@
 package ts.eclipse.ide.internal.core;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 
 public class TypeScriptNatureTester extends PropertyTester {
 
 	private static final String IS_TYPESCRIPT_PROJECT_PROPERTY = "isTypeScriptProject";
 	private static final String HAS_TYPESCRIPT_BUILDER_PROPERTY = "hasTypeScriptBuilder";
+	private static final String CAN_ADD_TO_BUILDPATH_PROPERTY = "canAddToBuildPath";
+	private static final String CAN_REMOVE_TO_BUILDPATH_PROPERTY = "canRemoveToBuildPath";
 
 	public TypeScriptNatureTester() {
 		// Default constructor is required for property tester
@@ -27,6 +32,10 @@ public class TypeScriptNatureTester extends PropertyTester {
 			return testIsTypeScriptProject(receiver);
 		} else if (HAS_TYPESCRIPT_BUILDER_PROPERTY.equals(property)) {
 			return testHasTypeScriptBuilder(receiver);
+		} else if (CAN_ADD_TO_BUILDPATH_PROPERTY.equals(property)) {
+			return testCanAddToBuildPath(receiver);
+		} else if (CAN_REMOVE_TO_BUILDPATH_PROPERTY.equals(property)) {
+			return testCanRemoveToBuildPath(receiver);
 		}
 		return false;
 	}
@@ -50,4 +59,28 @@ public class TypeScriptNatureTester extends PropertyTester {
 		}
 		return false;
 	}
+
+	private boolean testCanAddToBuildPath(Object receiver) {
+		return checkBuildPath(receiver, false);
+	}
+
+	private boolean testCanRemoveToBuildPath(Object receiver) {
+		return checkBuildPath(receiver, true);
+	}
+
+	private boolean checkBuildPath(Object receiver, boolean trueIfBuildPathExists) {
+		IContainer container = TypeScriptResourceUtil.getBuildPathContainer(receiver);
+		if (container == null) {
+			return false;
+		}
+		try {
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(container.getProject());
+			boolean buildPathExists = tsProject.getTypeScriptBuildPath().getContainers().contains(container);
+			return trueIfBuildPathExists ? buildPathExists : !buildPathExists;
+
+		} catch (CoreException e) {
+		}
+		return true;
+	}
+
 }

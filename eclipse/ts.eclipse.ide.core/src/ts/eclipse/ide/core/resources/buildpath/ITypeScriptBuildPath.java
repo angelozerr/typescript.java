@@ -42,10 +42,16 @@ public interface ITypeScriptBuildPath {
 
 	void addEntry(ITypeScriptBuildPathEntry entry);
 
+	void addEntry(IResource resource);
+
 	void removeEntry(ITypeScriptBuildPathEntry entry);
+
+	void removeEntry(IResource resource);
 
 	boolean isContainer(IResource resource);
 
 	ITypeScriptBuildPath copy();
+
+	void save();
 
 }

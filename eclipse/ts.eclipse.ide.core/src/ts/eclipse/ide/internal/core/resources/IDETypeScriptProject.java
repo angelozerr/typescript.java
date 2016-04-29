@@ -59,8 +59,8 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			JsonConfigResourcesManager.getInstance().remove(file);
 			// Update build path
 			ITypeScriptBuildPath buildPath = getTypeScriptBuildPath().copy();
-			buildPath.removeEntry(new TypeScriptBuildPathEntry(file.getParent().getProjectRelativePath()));
-			((IDETypeScriptProjectSettings) getProjectSettings()).updateBuildPath(buildPath);
+			buildPath.removeEntry(file);
+			buildPath.save();
 		}
 
 		@Override

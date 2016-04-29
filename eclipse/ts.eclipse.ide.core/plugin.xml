@@ -59,7 +59,7 @@
 			id="ts.eclipse.ide.core.TypeScriptNatureTester"
 			type="org.eclipse.core.resources.IResource"
 			namespace="ts.eclipse.ide.core"
-			properties="isTypeScriptProject,hasTypeScriptBuilder,isCompiledTypeScriptResource"
+			properties="isTypeScriptProject,hasTypeScriptBuilder,canAddToBuildPath,canRemoveToBuildPath"
 			class="ts.eclipse.ide.internal.core.TypeScriptNatureTester">
 		</propertyTester>
 	</extension>
