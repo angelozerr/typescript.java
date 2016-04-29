@@ -71,7 +71,7 @@ public class TypeScriptResourceUtil {
 	 *         file(s) false otherwise.
 	 */
 	public static boolean isTypeScriptProject(IProject project) {
-		if(!project.isAccessible()) {
+		if (!project.isAccessible()) {
 			return false;
 		}
 		return IDEResourcesManager.getInstance().isTypeScriptProject(project);
@@ -229,7 +229,7 @@ public class TypeScriptResourceUtil {
 	public static IDETsconfigJson findTsconfig(IResource resource) throws CoreException {
 		return JsonConfigResourcesManager.getInstance().findTsconfig(resource);
 	}
-	
+
 	public static IContainer getBuildPathContainer(Object receiver) {
 		if (receiver instanceof IAdaptable) {
 			IResource resource = (IResource) ((IAdaptable) receiver).getAdapter(IResource.class);
@@ -242,12 +242,16 @@ public class TypeScriptResourceUtil {
 						return container;
 					}
 				case IResource.FILE:
-					if (FileUtils.TSCONFIG_JSON.equals(resource.getName())) {
+					if (isTsConfigFile(resource)) {
 						return resource.getParent();
 					}
 				}
 			}
 		}
 		return null;
+	}
+
+	public static boolean isTsConfigFile(IResource resource) {
+		return resource.getType() == IResource.FILE && FileUtils.TSCONFIG_JSON.equals(resource.getName());
 	}
 }

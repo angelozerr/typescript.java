@@ -110,8 +110,7 @@
 		<menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
             <command label="%AddTypeScriptBuildPath.name" 
             		 commandId="ts.eclipse.ide.ui.commands.AddTypeScriptBuildPath">
-                <!-- Visible every time, because if tsconfig.json is not present in the selected folder, a search is done -->
-                <!-- <visibleWhen>
+                <visibleWhen>
                     <with variable="activeMenuSelection">
                         <iterate ifEmpty="false">
                             <adapt type="org.eclipse.core.resources.IResource">
@@ -121,7 +120,7 @@
                             </adapt>
                         </iterate>
                     </with> 
-                </visibleWhen> -->
+                </visibleWhen>
             </command>
 			<command label="%RemoveTypeScriptBuildPath.name" 
             		 commandId="ts.eclipse.ide.ui.commands.RemoveTypeScriptBuildPath">

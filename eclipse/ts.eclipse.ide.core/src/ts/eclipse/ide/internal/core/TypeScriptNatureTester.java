@@ -3,6 +3,7 @@ package ts.eclipse.ide.internal.core;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
@@ -61,22 +62,29 @@ public class TypeScriptNatureTester extends PropertyTester {
 	}
 
 	private boolean testCanAddToBuildPath(Object receiver) {
-		return checkBuildPath(receiver, false);
+		if (receiver instanceof IAdaptable) {
+			IResource resource = (IResource) ((IAdaptable) receiver).getAdapter(IResource.class);
+			if (resource != null) {
+				switch (resource.getType()) {
+				case IResource.PROJECT:
+				case IResource.FOLDER:
+					return true;
+				case IResource.FILE:
+					return TypeScriptResourceUtil.isTsConfigFile(resource);
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean testCanRemoveToBuildPath(Object receiver) {
-		return checkBuildPath(receiver, true);
-	}
-
-	private boolean checkBuildPath(Object receiver, boolean trueIfBuildPathExists) {
 		IContainer container = TypeScriptResourceUtil.getBuildPathContainer(receiver);
 		if (container == null) {
 			return false;
 		}
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(container.getProject());
-			boolean buildPathExists = tsProject.getTypeScriptBuildPath().getContainers().contains(container);
-			return trueIfBuildPathExists ? buildPathExists : !buildPathExists;
+			return tsProject.getTypeScriptBuildPath().getContainers().contains(container);
 
 		} catch (CoreException e) {
 		}
