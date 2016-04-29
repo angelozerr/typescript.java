@@ -102,7 +102,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		// check that TypeScript project have build path.
 		try {
 			IDETypeScriptProject tsProject = getTypeScriptProject(project, false);
-			return tsProject != null && tsProject.getTypeScriptBuildPath().getContainers().size() > 0;
+			return tsProject != null && tsProject.getTypeScriptBuildPath().hasRootContainers();
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while getting TypeScript project", e);
 		}

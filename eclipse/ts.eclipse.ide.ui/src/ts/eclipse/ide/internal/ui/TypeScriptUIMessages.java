@@ -48,7 +48,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptMainPreferencePage_useSalsa_Never;
 	public static String TypeScriptMainPreferencePage_useSalsa_EveryTime;
 	public static String TypeScriptMainPreferencePage_useSalsa_WhenNoJSDTNature;
-			
+
 	public static String PropertyAndPreferencePage_useprojectsettings_label;
 	public static String PropertyAndPreferencePage_useworkspacesettings_change;
 	public static String PropertyAndPreferencePage_showprojectspecificsettings_label;
@@ -61,7 +61,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String ServerConfigurationBlock_embedded_checkbox_label;
 	public static String ServerConfigurationBlock_installed_checkbox_label;
 	public static String ServerConfigurationBlock_traceOnConsole_label;
-	
+
 	public static String CompilerConfigurationBlock_typescript_group_label;
 	public static String CompilerConfigurationBlock_embedded_checkbox_label;
 	public static String CompilerConfigurationBlock_installed_checkbox_label;
@@ -70,6 +70,11 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptSearchQuery_label;
 	public static String TypeScriptSearchQuery_result;
 
+	// Build path
+	public static String TypeScriptResources;
+	public static String DiscoverBuildPathDialog_title;
+	public static String DiscoverBuildPathDialog_message;
+	public static String DiscoverBuildPathDialog_SearchBuildPathJob_name;
 
 	public static ResourceBundle getResourceBundle() {
 		try {

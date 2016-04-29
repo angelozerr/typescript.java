@@ -20,6 +20,7 @@ import ts.TypeScriptException;
 import ts.compiler.CompilerOptions;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
@@ -58,8 +59,9 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 
 	private void fullBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
 		ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
-		List<IContainer> containers = buildPath.getContainers();
-		for (IContainer container : containers) {
+		ITypeScriptRootContainer[] containers = buildPath.getRootContainers();
+		for (int i = 0; i < containers.length; i++) {
+			IContainer container = containers[i].getContainer();
 			try {
 				IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(container);
 				if (tsconfig == null || tsconfig.isCompileOnSave()) {
@@ -112,12 +114,12 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 					case IResourceDelta.ADDED:
 					case IResourceDelta.CHANGED:
 						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)) {
-							IContainer container = buildPath.getContainer(resource);
-							if (container != null) {
-								List<IFile> deltas = deltaFiles.get(container);
+							ITypeScriptRootContainer tsContainer = buildPath.getRootContainer(resource);
+							if (tsContainer != null) {
+								List<IFile> deltas = deltaFiles.get(tsContainer.getContainer());
 								if (deltas == null) {
 									deltas = new ArrayList<IFile>();
-									deltaFiles.put(container, deltas);
+									deltaFiles.put(tsContainer.getContainer(), deltas);
 								}
 								deltas.add((IFile) resource);
 							}

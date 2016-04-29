@@ -254,4 +254,11 @@ public class TypeScriptResourceUtil {
 	public static boolean isTsConfigFile(IResource resource) {
 		return resource.getType() == IResource.FILE && FileUtils.TSCONFIG_JSON.equals(resource.getName());
 	}
+
+	public static String getBuildPathLabel(IContainer container) {
+		if (container.getType() == IResource.PROJECT) {
+			return container.getName();
+		}
+		return new StringBuilder("").append(container.getProjectRelativePath().toString()).toString();
+	}
 }

@@ -13,7 +13,10 @@ package ts.eclipse.ide.internal.core.resources.buildpath;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -28,8 +31,8 @@ import com.eclipsesource.json.JsonObject.Member;
 
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPathEntry;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
-import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.resources.IDETypeScriptProjectSettings;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
@@ -41,34 +44,55 @@ import ts.utils.StringUtils;
 public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 
 	private final IProject project;
-	private List<IContainer> containers;
+	private List<ITypeScriptRootContainer> tsContainers;
 	private final List<ITypeScriptBuildPathEntry> entries;
+
+	private static final Comparator<ITypeScriptRootContainer> CONTAINER_COMPARATOR = new Comparator<ITypeScriptRootContainer>() {
+
+		@Override
+		public int compare(ITypeScriptRootContainer o1, ITypeScriptRootContainer o2) {
+			IContainer c1 = o1.getContainer();
+			IContainer c2 = o2.getContainer();
+			return Collator.getInstance().compare(c1.getProjectRelativePath().toString(),
+					c2.getProjectRelativePath().toString());
+		}
+	};
 
 	public TypeScriptBuildPath(IProject project) {
 		this.project = project;
 		this.entries = new ArrayList<ITypeScriptBuildPathEntry>();
-		this.containers = null;
+		this.tsContainers = null;
 	}
 
 	@Override
-	public List<IContainer> getContainers() {
-		if (containers == null) {
-			containers = buildContainers(entries, project);
-		}
-		return containers;
+	public ITypeScriptRootContainer[] getRootContainers() {
+		return getRootContainersList().toArray(ITypeScriptRootContainer.EMPTY_CONTAINER);
 	}
 
-	private List<IContainer> buildContainers(List<ITypeScriptBuildPathEntry> entries, IProject project) {
-		List<IContainer> containers = new ArrayList<IContainer>(entries.size());
+	@Override
+	public boolean hasRootContainers() {
+		return getRootContainersList().size() > 0;
+	}
+
+	private List<ITypeScriptRootContainer> getRootContainersList() {
+		if (tsContainers == null) {
+			tsContainers = buildContainers(entries, project);
+		}
+		return tsContainers;
+	}
+
+	private List<ITypeScriptRootContainer> buildContainers(List<ITypeScriptBuildPathEntry> entries, IProject project) {
+		List<ITypeScriptRootContainer> containers = new ArrayList<ITypeScriptRootContainer>(entries.size());
 		String path = null;
 		for (ITypeScriptBuildPathEntry entry : entries) {
 			path = entry.getPath().toString();
 			if (StringUtils.isEmpty(path)) {
-				containers.add(project);
+				containers.add(new TypeScriptRootContainer(project));
 			} else {
-				containers.add(project.getFolder(path));
+				containers.add(new TypeScriptRootContainer(project.getFolder(path)));
 			}
 		}
+		Collections.sort(containers, CONTAINER_COMPARATOR);
 		return containers;
 	}
 
@@ -89,7 +113,7 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 	public void addEntry(ITypeScriptBuildPathEntry entry) {
 		if (!entries.contains(entry)) {
 			entries.add(entry);
-			this.containers = null;
+			this.tsContainers = null;
 		}
 	}
 
@@ -101,7 +125,7 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 	@Override
 	public void removeEntry(ITypeScriptBuildPathEntry entry) {
 		entries.remove(entry);
-		this.containers = null;
+		this.tsContainers = null;
 	}
 
 	@Override
@@ -118,18 +142,37 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 
 	@Override
 	public boolean isInScope(IResource resource) {
-		return getContainer(resource) != null;
+		return getRootContainer(resource) != null;
 	}
 
 	@Override
-	public boolean isContainer(IResource resource) {
-		return getContainers().contains(resource);
+	public void clear() {
+		entries.clear();
+		this.tsContainers = null;
 	}
 
 	@Override
-	public IContainer getContainer(IResource resource) {
-		List<IContainer> containers = getContainers();
-		return WorkbenchResourceUtil.getContainer(resource, containers);
+	public boolean isRootContainer(IResource resource) {
+		if (!(resource.getType() == IResource.PROJECT || resource.getType() == IResource.FOLDER)) {
+			return false;
+		}
+		for (ITypeScriptRootContainer tsContainer : getRootContainersList()) {
+			if (tsContainer.getContainer().equals(resource)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public ITypeScriptRootContainer getRootContainer(IResource resource) {
+		for (ITypeScriptRootContainer tsContainer : getRootContainersList()) {
+			IContainer container = tsContainer.getContainer();
+			if (container.getFullPath().isPrefixOf(resource.getFullPath())) {
+				return tsContainer;
+			}
+		}
+		return null;
 	}
 
 	public void save(Writer writer) throws IOException {

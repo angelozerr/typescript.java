@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c)s 2015-2016 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,9 +10,6 @@
  */
 package ts.eclipse.ide.core.resources.buildpath;
 
-import java.util.List;
-
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 
 /**
@@ -26,7 +23,7 @@ public interface ITypeScriptBuildPath {
 	 * 
 	 * @return list of folders root of the project which hosts "tsconfig.json".
 	 */
-	List<IContainer> getContainers();
+	ITypeScriptRootContainer[] getRootContainers();
 
 	/**
 	 * Returns true if the given resource is in the scope of the build path and
@@ -38,7 +35,7 @@ public interface ITypeScriptBuildPath {
 	 */
 	boolean isInScope(IResource resource);
 
-	IContainer getContainer(IResource resource);
+	ITypeScriptRootContainer getRootContainer(IResource resource);
 
 	void addEntry(ITypeScriptBuildPathEntry entry);
 
@@ -48,10 +45,14 @@ public interface ITypeScriptBuildPath {
 
 	void removeEntry(IResource resource);
 
-	boolean isContainer(IResource resource);
+	boolean isRootContainer(IResource resource);
 
 	ITypeScriptBuildPath copy();
+	
+	void clear();
 
 	void save();
+
+	boolean hasRootContainers();
 
 }

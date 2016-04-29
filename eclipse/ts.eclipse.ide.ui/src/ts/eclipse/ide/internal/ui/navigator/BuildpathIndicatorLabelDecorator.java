@@ -15,36 +15,37 @@ import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 
 public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecorator {
 
-//	private class DecoratorElementChangeListener implements ITypeScriptBuildPathChangedListener {
-//
-//		/**
-//		 * {@inheritDoc}
-//		 */
-//		public void elementChanged(ElementChangedEvent event) {
-//			List<IJavaElement> changed= new ArrayList<IJavaElement>();
-//			processDelta(event.getDelta(), changed);
-//			if (changed.size() == 0)
-//				return;
-//
-//			fireChange(changed.toArray(new IJavaElement[changed.size()]));
-//		}
-//
-//	}
+	// private class DecoratorElementChangeListener implements
+	// ITypeScriptBuildPathChangedListener {
+	//
+	// /**
+	// * {@inheritDoc}
+	// */
+	// public void elementChanged(ElementChangedEvent event) {
+	// List<IJavaElement> changed= new ArrayList<IJavaElement>();
+	// processDelta(event.getDelta(), changed);
+	// if (changed.size() == 0)
+	// return;
+	//
+	// fireChange(changed.toArray(new IJavaElement[changed.size()]));
+	// }
+	//
+	// }
 
 	private ListenerList fListeners;
-	//private IElementChangedListener fChangeListener;
+	// private IElementChangedListener fChangeListener;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addListener(ILabelProviderListener listener) {
-//		if (fChangeListener == null) {
-//			fChangeListener= new DecoratorElementChangeListener();
-//			TypeScriptCorePlugin.addBuildPathChangedListener(fChangeListener);
-//		}
+		// if (fChangeListener == null) {
+		// fChangeListener= new DecoratorElementChangeListener();
+		// TypeScriptCorePlugin.addBuildPathChangedListener(fChangeListener);
+		// }
 
 		if (fListeners == null) {
-			fListeners= new ListenerList();
+			fListeners = new ListenerList();
 		}
 
 		fListeners.add(listener);
@@ -52,16 +53,17 @@ public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecora
 
 	@Override
 	public void dispose() {
-		/*if (fChangeListener != null) {
-			JavaCore.removeElementChangedListener(fChangeListener);
-			fChangeListener= null;
-		}*/
+		/*
+		 * if (fChangeListener != null) {
+		 * JavaCore.removeElementChangedListener(fChangeListener);
+		 * fChangeListener= null; }
+		 */
 		if (fListeners != null) {
-			Object[] listeners= fListeners.getListeners();
-			for (int i= 0; i < listeners.length; i++) {
+			Object[] listeners = fListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
 				fListeners.remove(listeners[i]);
 			}
-			fListeners= null;
+			fListeners = null;
 		}
 	}
 
@@ -77,25 +79,24 @@ public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecora
 
 		fListeners.remove(listener);
 
-//		if (fListeners.isEmpty() && fChangeListener != null) {
-//			JavaCore.removeElementChangedListener(fChangeListener);
-//			fChangeListener= null;
-//		}
+		// if (fListeners.isEmpty() && fChangeListener != null) {
+		// JavaCore.removeElementChangedListener(fChangeListener);
+		// fChangeListener= null;
+		// }
 	}
-	
-	/*private void fireChange(IJavaElement[] elements) {
-		if (fListeners != null && !fListeners.isEmpty()) {
-			LabelProviderChangedEvent event= new LabelProviderChangedEvent(this, elements);
-			Object[] listeners= fListeners.getListeners();
-			for (int i= 0; i < listeners.length; i++) {
-				((ILabelProviderListener) listeners[i]).labelProviderChanged(event);
-			}
-		}
-	}*/
+
+	/*
+	 * private void fireChange(IJavaElement[] elements) { if (fListeners != null
+	 * && !fListeners.isEmpty()) { LabelProviderChangedEvent event= new
+	 * LabelProviderChangedEvent(this, elements); Object[] listeners=
+	 * fListeners.getListeners(); for (int i= 0; i < listeners.length; i++) {
+	 * ((ILabelProviderListener) listeners[i]).labelProviderChanged(event); } }
+	 * }
+	 */
 
 	@Override
 	public void decorate(Object element, IDecoration decoration) {
-		ImageDescriptor overlay= getOverlay(element);
+		ImageDescriptor overlay = getOverlay(element);
 		if (overlay != null) {
 			decoration.addOverlay(overlay, IDecoration.TOP_RIGHT);
 		}
@@ -103,31 +104,20 @@ public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecora
 
 	private ImageDescriptor getOverlay(Object element) {
 		if (element instanceof IResource) {
-			IResource resource= (IResource) element;
-			IProject project= resource.getProject();
+			IResource resource = (IResource) element;
+			IProject project = resource.getProject();
 			if (project != null && TypeScriptResourceUtil.isTypeScriptProject(project)) {
 				try {
 					IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
-					if  (tsProject.getTypeScriptBuildPath().isContainer(resource)) {
+					if (tsProject.getTypeScriptBuildPath().isRootContainer(resource)) {
 						return TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.DESC_OVR_LIBRARY);
 					}
 				} catch (CoreException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}				
+				}
 			}
 		}
 		return null;
 	}
-
-	//protected abstract void processDelta(IJavaElementDelta delta, List<IJavaElement> result);
-
-//	protected boolean processChildrenDelta(IJavaElementDelta delta, List<IJavaElement> result) {
-//		IJavaElementDelta[] children= delta.getAffectedChildren();
-//		for (int i= 0; i < children.length; i++) {
-//			processDelta(children[i], result);
-//		}
-//		return false;
-//	}
 
 }

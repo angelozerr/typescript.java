@@ -70,7 +70,15 @@ public class TypeScriptNatureTester extends PropertyTester {
 				case IResource.FOLDER:
 					return true;
 				case IResource.FILE:
-					return TypeScriptResourceUtil.isTsConfigFile(resource);
+					if (TypeScriptResourceUtil.isTsConfigFile(resource)) {
+						try {
+							IIDETypeScriptProject tsProject = TypeScriptResourceUtil
+									.getTypeScriptProject(resource.getProject());
+							return !tsProject.getTypeScriptBuildPath().isRootContainer(resource.getParent());
+
+						} catch (CoreException e) {
+						}
+					}
 				}
 			}
 		}
@@ -84,7 +92,7 @@ public class TypeScriptNatureTester extends PropertyTester {
 		}
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(container.getProject());
-			return tsProject.getTypeScriptBuildPath().getContainers().contains(container);
+			return tsProject.getTypeScriptBuildPath().isRootContainer(container);
 
 		} catch (CoreException e) {
 		}

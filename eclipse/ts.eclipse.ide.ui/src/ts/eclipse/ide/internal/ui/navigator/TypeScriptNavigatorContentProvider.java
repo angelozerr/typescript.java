@@ -12,9 +12,7 @@ package ts.eclipse.ide.internal.ui.navigator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -29,6 +27,7 @@ import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.resources.ITypeScriptProject;
 
@@ -53,26 +52,6 @@ public class TypeScriptNavigatorContentProvider
 		return NO_CHILDREN;
 	}
 
-	// @Override
-	// public boolean hasChildren(TreePath treePath) {
-	// return hasChildren(treePath.getLastSegment(), treePath);
-	// }
-
-	@Override
-	public boolean hasChildren(Object element) {
-		if (element instanceof IResource) {
-			// for performance, returns true to avoid loading twice compiled
-			// resources *.js and *.js.map
-			return TypeScriptResourceUtil.isTsOrTsxFile(element);
-		} else if (element instanceof ITypeScriptProject) {
-			return true;
-		} else if ((element instanceof ContainerWrapper)) {
-			return false; // super.hasChildren(((ContainerWrapper)
-							// element).getContainer());
-		}
-		return false;
-	}
-
 	@Override
 	public Object[] getChildren(Object element) {
 		Object[] children = getChildrenOrNull(element);
@@ -86,24 +65,12 @@ public class TypeScriptNavigatorContentProvider
 			return children;
 		} else if ((element instanceof IIDETypeScriptProject)) {
 			IIDETypeScriptProject tsProject = (IIDETypeScriptProject) element;
-			return getTypescriptResourcesChildren(tsProject);
-		} else if ((element instanceof ContainerWrapper)) {
+			return tsProject.getTypeScriptBuildPath().getRootContainers();
+		} else if ((element instanceof ITypeScriptRootContainer)) {
 			return null; // super.getChildren(((ContainerWrapper)
 							// element).getContainer());
 		}
 		return null;
-	}
-
-	private Object[] getTypescriptResourcesChildren(IIDETypeScriptProject tsProject) {
-		ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
-		List<IContainer> containers = buildPath.getContainers();
-		int i = 0;
-		Object[] children = new Object[containers.size()];
-		for (IContainer container : containers) {
-			children[i] = new ContainerWrapper(container);
-			i++;
-		}
-		return children;
 	}
 
 	private Object[] getChildren(IResource resource) {
@@ -134,6 +101,22 @@ public class TypeScriptNavigatorContentProvider
 		} catch (CoreException e) {
 			return null;
 		}
+	}
+
+	@Override
+	public boolean hasChildren(Object element) {
+		if (element instanceof IResource) {
+			// for performance, returns true to avoid loading twice compiled
+			// resources *.js and *.js.map
+			return TypeScriptResourceUtil.isTsOrTsxFile(element);
+		} else if (element instanceof ITypeScriptProject) {
+			return true;
+		} else if ((element instanceof ITypeScriptRootContainer)) {
+			// TODO: fill with *.ts files according tsconfig.json config (files,
+			// exclude).
+			return false;
+		}
+		return false;
 	}
 
 	@Override
@@ -235,7 +218,7 @@ public class TypeScriptNavigatorContentProvider
 			}
 
 			private boolean hasBuildPath(final ITypeScriptBuildPath buildPath) {
-				return buildPath != null && buildPath.getContainers().size() > 0;
+				return buildPath != null && buildPath.hasRootContainers();
 			}
 		};
 		runnables.add(addAndRemove);
