@@ -1,5 +1,8 @@
 package ts.eclipse.ide.internal.ui.navigator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -8,41 +11,54 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
+import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 
+/**
+ * Display an overlay icon on the bottom top for
+ * {@link ITypeScriptRootContainer}.
+ */
 public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecorator {
 
-	// private class DecoratorElementChangeListener implements
-	// ITypeScriptBuildPathChangedListener {
-	//
-	// /**
-	// * {@inheritDoc}
-	// */
-	// public void elementChanged(ElementChangedEvent event) {
-	// List<IJavaElement> changed= new ArrayList<IJavaElement>();
-	// processDelta(event.getDelta(), changed);
-	// if (changed.size() == 0)
-	// return;
-	//
-	// fireChange(changed.toArray(new IJavaElement[changed.size()]));
-	// }
-	//
-	// }
+	private class DecoratorElementChangeListener implements ITypeScriptElementChangedListener {
+
+		@Override
+		public void buildPathChanged(IIDETypeScriptProject tsProject, ITypeScriptBuildPath newBuildPath,
+				ITypeScriptBuildPath oldBuildPath) {
+			List<IResource> changed = new ArrayList<IResource>();
+			addResource(newBuildPath, changed);
+			addResource(oldBuildPath, changed);
+			fireChange(changed.toArray(new IResource[changed.size()]));
+		}
+
+		private void addResource(ITypeScriptBuildPath buildPath, List<IResource> resources) {
+			if (buildPath == null) {
+				return;
+			}
+			ITypeScriptRootContainer[] containers = buildPath.getRootContainers();
+			for (int i = 0; i < containers.length; i++) {
+				resources.add(containers[i].getContainer());
+			}
+		}
+
+	}
 
 	private ListenerList fListeners;
-	// private IElementChangedListener fChangeListener;
+	private ITypeScriptElementChangedListener fChangeListener;
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void addListener(ILabelProviderListener listener) {
-		// if (fChangeListener == null) {
-		// fChangeListener= new DecoratorElementChangeListener();
-		// TypeScriptCorePlugin.addBuildPathChangedListener(fChangeListener);
-		// }
+		if (fChangeListener == null) {
+			fChangeListener = new DecoratorElementChangeListener();
+			TypeScriptCorePlugin.getDefault().addTypeScriptElementChangedListener(fChangeListener);
+		}
 
 		if (fListeners == null) {
 			fListeners = new ListenerList();
@@ -53,11 +69,12 @@ public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecora
 
 	@Override
 	public void dispose() {
-		/*
-		 * if (fChangeListener != null) {
-		 * JavaCore.removeElementChangedListener(fChangeListener);
-		 * fChangeListener= null; }
-		 */
+
+		if (fChangeListener != null) {
+			TypeScriptCorePlugin.getDefault().removeTypeScriptElementChangedListener(fChangeListener);
+			fChangeListener = null;
+		}
+
 		if (fListeners != null) {
 			Object[] listeners = fListeners.getListeners();
 			for (int i = 0; i < listeners.length; i++) {
@@ -79,20 +96,21 @@ public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecora
 
 		fListeners.remove(listener);
 
-		// if (fListeners.isEmpty() && fChangeListener != null) {
-		// JavaCore.removeElementChangedListener(fChangeListener);
-		// fChangeListener= null;
-		// }
+		if (fListeners.isEmpty() && fChangeListener != null) {
+			TypeScriptCorePlugin.getDefault().removeTypeScriptElementChangedListener(fChangeListener);
+			fChangeListener = null;
+		}
 	}
 
-	/*
-	 * private void fireChange(IJavaElement[] elements) { if (fListeners != null
-	 * && !fListeners.isEmpty()) { LabelProviderChangedEvent event= new
-	 * LabelProviderChangedEvent(this, elements); Object[] listeners=
-	 * fListeners.getListeners(); for (int i= 0; i < listeners.length; i++) {
-	 * ((ILabelProviderListener) listeners[i]).labelProviderChanged(event); } }
-	 * }
-	 */
+	private void fireChange(IResource[] elements) {
+		if (fListeners != null && !fListeners.isEmpty()) {
+			LabelProviderChangedEvent event = new LabelProviderChangedEvent(this, elements);
+			Object[] listeners = fListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				((ILabelProviderListener) listeners[i]).labelProviderChanged(event);
+			}
+		}
+	}
 
 	@Override
 	public void decorate(Object element, IDecoration decoration) {
