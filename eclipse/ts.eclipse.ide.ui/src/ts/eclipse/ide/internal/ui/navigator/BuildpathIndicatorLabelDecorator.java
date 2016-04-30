@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.internal.ui.navigator;
 
 import java.util.ArrayList;
@@ -22,8 +32,8 @@ import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 
 /**
- * Display an overlay icon on the bottom top for
- * {@link ITypeScriptRootContainer}.
+ * Display an overlay icon on the right top for {@link ITypeScriptRootContainer}
+ *
  */
 public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecorator {
 
