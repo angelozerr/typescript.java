@@ -185,7 +185,11 @@ public class TypeScriptProject implements ITypeScriptProject {
 	protected ITypeScriptCompiler createCompiler() throws TypeScriptException {
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File tscFile = getProjectSettings().getTscFile();
-		return new TypeScriptCompiler(tscFile, nodeFile);
+		return createCompiler(tscFile, nodeFile);
+	}
+
+	protected ITypeScriptCompiler createCompiler(File tscFile, File nodejsFile) {
+		return new TypeScriptCompiler(tscFile, nodejsFile);
 	}
 
 	// ----------------------- TypeScript server listeners.

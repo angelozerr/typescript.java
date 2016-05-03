@@ -26,4 +26,5 @@ public class TypeScriptRootContainer implements ITypeScriptRootContainer {
 		}
 		return false;
 	}
+
 }

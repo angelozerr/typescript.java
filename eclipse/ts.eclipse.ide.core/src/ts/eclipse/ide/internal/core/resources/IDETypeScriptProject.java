@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.internal.core.resources;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,9 @@ import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
+import ts.compiler.ITypeScriptCompiler;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
@@ -34,8 +37,8 @@ import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
+import ts.eclipse.ide.internal.core.compiler.IDETypeScriptCompiler;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
-import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPathEntry;
 import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
 import ts.resources.TypeScriptProject;
 import ts.utils.FileUtils;
@@ -310,5 +313,15 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		buildPath = null;
 		ITypeScriptBuildPath newBuildPath = getTypeScriptBuildPath();
 		IDEResourcesManager.getInstance().fireBuildPathChanged(this, oldBuildPath, newBuildPath);
+	}
+	
+	@Override
+	public IIDETypeScriptCompiler getCompiler() throws TypeScriptException {
+		return (IIDETypeScriptCompiler) super.getCompiler();
+	}
+	
+	@Override
+	protected ITypeScriptCompiler createCompiler(File tscFile, File nodejsFile) {
+		return new IDETypeScriptCompiler(tscFile, nodejsFile);
 	}
 }

@@ -142,7 +142,7 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 
 	@Override
 	public boolean isInScope(IResource resource) {
-		return getRootContainer(resource) != null;
+		return findRootContainer(resource) != null;
 	}
 
 	@Override
@@ -156,19 +156,25 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		if (!(resource.getType() == IResource.PROJECT || resource.getType() == IResource.FOLDER)) {
 			return false;
 		}
-		for (ITypeScriptRootContainer tsContainer : getRootContainersList()) {
-			if (tsContainer.getContainer().equals(resource)) {
-				return true;
-			}
-		}
-		return false;
+		return getRootContainer((IContainer) resource) != null;
 	}
 
 	@Override
-	public ITypeScriptRootContainer getRootContainer(IResource resource) {
+	public ITypeScriptRootContainer findRootContainer(IResource resource) {
 		for (ITypeScriptRootContainer tsContainer : getRootContainersList()) {
 			IContainer container = tsContainer.getContainer();
 			if (container.getFullPath().isPrefixOf(resource.getFullPath())) {
+				return tsContainer;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public ITypeScriptRootContainer getRootContainer(IContainer resource) {
+		for (ITypeScriptRootContainer tsContainer : getRootContainersList()) {
+			IContainer container = tsContainer.getContainer();
+			if (container.equals(resource)) {
 				return tsContainer;
 			}
 		}

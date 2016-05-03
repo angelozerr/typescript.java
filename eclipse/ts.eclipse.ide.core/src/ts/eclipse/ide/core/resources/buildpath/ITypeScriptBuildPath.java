@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.core.resources.buildpath;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 
 /**
@@ -35,7 +36,7 @@ public interface ITypeScriptBuildPath {
 	 */
 	boolean isInScope(IResource resource);
 
-	ITypeScriptRootContainer getRootContainer(IResource resource);
+	ITypeScriptRootContainer findRootContainer(IResource resource);
 
 	void addEntry(ITypeScriptBuildPathEntry entry);
 
@@ -47,6 +48,8 @@ public interface ITypeScriptBuildPath {
 
 	boolean isRootContainer(IResource resource);
 
+	ITypeScriptRootContainer getRootContainer(IContainer resource);
+	
 	ITypeScriptBuildPath copy();
 	
 	void clear();

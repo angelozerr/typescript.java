@@ -44,21 +44,25 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 						if (filenames != null) {
 							args.addAll(filenames);
 						}
-						if (options.isListFiles()) {
-							args.add("--listFiles");
-						}
-						if (!StringUtils.isEmpty(options.getOutDir())) {
-							args.add("--outDir");
-							args.add(options.getOutDir());
-						}
-						if (options.isSourceMap()) {
-							args.add("--sourceMap");
+						if (options != null) {
+							if (options.isListFiles()) {
+								args.add("--listFiles");
+							}
+							if (!StringUtils.isEmpty(options.getOutDir())) {
+								args.add("--outDir");
+								args.add(options.getOutDir());
+							}
+							if (options.isSourceMap()) {
+								args.add("--sourceMap");
+							}
 						}
 						return args;
 					}
 				}, TSC_FILE_TYPE);
 
-		process.addProcessListener(listener);
+		if (listener != null) {
+			process.addProcessListener(listener);
+		}
 		process.start();
 		try {
 			process.join();
@@ -70,7 +74,6 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 
 	}
 }

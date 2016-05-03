@@ -26,7 +26,7 @@ public interface ITypeScriptCompiler {
 	 * Execute 'tsc' command from the given directory.
 	 * 
 	 * @param baseDir
-	 *            teh directory where 'tsc' must be executed.
+	 *            the directory where 'tsc' must be executed.
 	 * @throws TypeScriptException
 	 */
 	void compile(File baseDir, CompilerOptions options, List<String> filenames, INodejsProcessListener listener)

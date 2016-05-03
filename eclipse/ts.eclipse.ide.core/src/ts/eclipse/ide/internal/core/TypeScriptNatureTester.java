@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 
 public class TypeScriptNatureTester extends PropertyTester {
@@ -16,6 +17,7 @@ public class TypeScriptNatureTester extends PropertyTester {
 	private static final String HAS_TYPESCRIPT_BUILDER_PROPERTY = "hasTypeScriptBuilder";
 	private static final String CAN_ADD_TO_BUILDPATH_PROPERTY = "canAddToBuildPath";
 	private static final String CAN_REMOVE_TO_BUILDPATH_PROPERTY = "canRemoveToBuildPath";
+	private static final String CAN_RUN_COMPILE_PROPERTY = "canRunCompile";
 
 	public TypeScriptNatureTester() {
 		// Default constructor is required for property tester
@@ -37,6 +39,8 @@ public class TypeScriptNatureTester extends PropertyTester {
 			return testCanAddToBuildPath(receiver);
 		} else if (CAN_REMOVE_TO_BUILDPATH_PROPERTY.equals(property)) {
 			return testCanRemoveToBuildPath(receiver);
+		} else if (CAN_RUN_COMPILE_PROPERTY.equals(property)) {
+			return testCanRunCompile(receiver);
 		}
 		return false;
 	}
@@ -99,4 +103,14 @@ public class TypeScriptNatureTester extends PropertyTester {
 		return true;
 	}
 
+	private boolean testCanRunCompile(Object receiver) {
+		if (receiver instanceof ITypeScriptRootContainer) {
+			return true;
+		}
+		IContainer container = TypeScriptResourceUtil.getBuildPathContainer(receiver);
+		if (container != null) {
+			return true;
+		}
+		return false;
+	}
 }

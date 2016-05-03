@@ -90,6 +90,12 @@
             defaultHandler="ts.eclipse.ide.internal.ui.commands.RemoveTypeScriptBuildPathHandler"
             name="%RemoveTypeScriptBuildPath.name">
       </command>
+      <!-- TypeScript Compilation -->
+      <command
+            id="ts.eclipse.ide.ui.commands.TypeScriptCompile"
+            defaultHandler="ts.eclipse.ide.internal.ui.commands.TypeScriptCompileHandler"
+            name="%TypeScriptCompile.name">
+      </command>      
       <!-- soon @deprecated -->
       <command
             id="ts.eclipse.ide.ui.commands.AddTypeScriptBuilder"
@@ -106,8 +112,20 @@
   	</extension>
     
 	<extension point="org.eclipse.ui.menus">
+	   <!-- TypeScript menu root -->
+	   <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+	     <menu
+	       id="ts.eclipse.ide.ui.root"
+	       label="%TypeScript.root.name">
+	     </menu>
+	     <enabledWhen>
+            <count
+                  value="1">
+            </count>
+         </enabledWhen>
+ 	   </menuContribution>
 	   <!-- Add/Remove build path -->
-		<menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+		<menuContribution locationURI="popup:ts.eclipse.ide.ui.root">
             <command label="%AddTypeScriptBuildPath.name" 
             		 commandId="ts.eclipse.ide.ui.commands.AddTypeScriptBuildPath">
                 <visibleWhen>
@@ -136,8 +154,27 @@
                     </with> 
                 </visibleWhen>
             </command>            
-        </menuContribution>    
-        
+        </menuContribution>
+
+	   <!-- Compile menu -->
+		<menuContribution locationURI="popup:ts.eclipse.ide.ui.root">
+            <command label="%TypeScriptCompile.name" 
+            		 commandId="ts.eclipse.ide.ui.commands.TypeScriptCompile">
+                <visibleWhen>
+                    <with variable="activeMenuSelection">
+                        <iterate ifEmpty="false">
+                        	<or>
+                        	    <instanceof value="ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer" />
+	                        	<adapt type="org.eclipse.core.resources.IResource">
+	                        		<test property="ts.eclipse.ide.core.canRunCompile"/>
+	                        	</adapt>
+	                        </or>                        
+                        </iterate>
+                    </with> 
+                </visibleWhen>
+            </command>      
+        </menuContribution>
+                
       <!-- soon @deprecated -->
         <menuContribution locationURI="popup:org.eclipse.ui.projectConfigure">
             <command label="%AddTypeScriptBuilder.name" 
@@ -312,7 +349,7 @@
       				</and>
 				</or>
 			</triggerPoints>				
-		  </navigatorContent>	
+		  </navigatorContent>
           <!-- Hide/Show *.js, *.js.map file if ts file exists -->
 	      <commonFilter  
             id="ts.eclipse.ide.ui.filters.HideCompiledTypeScriptResource"

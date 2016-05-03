@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
+import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.resources.ITypeScriptProject;
 
@@ -73,8 +74,7 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 * A file is in the scope if :
 	 * 
 	 * <ul>
-	 * <li>it is included by buildpath and.
-	 * </li>
+	 * <li>it is included by buildpath and.</li>
 	 * <li>it doesn't exists tsconfig.json in the folder (and parent) of the
 	 * file.</li>
 	 * <li>it exists a tsconfig.json in the folder (or parent) of the file and:
@@ -93,4 +93,6 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	boolean isInScope(IResource resource);
 
 	ITypeScriptBuildPath getTypeScriptBuildPath();
+
+	IIDETypeScriptCompiler getCompiler() throws TypeScriptException;
 }

@@ -65,28 +65,12 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			try {
 				IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(container);
 				if (tsconfig == null || tsconfig.isCompileOnSave()) {
-					IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container);
-					CompilerOptions options = createCompilerOptions(tsconfig);
-					tsProject.getCompiler().compile(container.getLocation().toFile(), options, null, reporter);
-					for (IFile tsFile : reporter.getFilesToRefresh()) {
-						try {
-							TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, true, null);
-						} catch (CoreException e) {
-							Trace.trace(Trace.SEVERE, "Error while tsc compilation when ts file is refreshed", e);
-						}
-					}
+					tsProject.getCompiler().compile(tsconfig);
 				}
 			} catch (TypeScriptException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
 			}
 		}
-	}
-
-	private CompilerOptions createCompilerOptions(IDETsconfigJson tsconfig) {
-		CompilerOptions options = tsconfig != null && tsconfig.getCompilerOptions() != null
-				? new CompilerOptions(tsconfig.getCompilerOptions()) : new CompilerOptions();
-		options.setListFiles(true);
-		return options;
 	}
 
 	private void incrementalBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
@@ -114,7 +98,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 					case IResourceDelta.ADDED:
 					case IResourceDelta.CHANGED:
 						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)) {
-							ITypeScriptRootContainer tsContainer = buildPath.getRootContainer(resource);
+							ITypeScriptRootContainer tsContainer = buildPath.findRootContainer(resource);
 							if (tsContainer != null) {
 								List<IFile> deltas = deltaFiles.get(tsContainer.getContainer());
 								if (deltas == null) {
@@ -136,21 +120,12 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			try {
 				IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(container);
 				if (tsconfig == null || tsconfig.isCompileOnSave()) {
-					IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container);
 					List<IFile> deltas = entries.getValue();
 					List<String> filenames = new ArrayList<String>();
 					for (IFile file : deltas) {
 						filenames.add(WorkbenchResourceUtil.getRelativePath(file, container).toString());
 					}
-					CompilerOptions options = createCompilerOptions(tsconfig);
-					tsProject.getCompiler().compile(container.getLocation().toFile(), options, filenames, reporter);
-					for (IFile tsFile : reporter.getFilesToRefresh()) {
-						try {
-							TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, true, null);
-						} catch (CoreException e) {
-							Trace.trace(Trace.SEVERE, "Error while tsc compilation when ts file is refreshed", e);
-						}
-					}
+					tsProject.getCompiler().compile(tsconfig, filenames);					
 				}
 			} catch (TypeScriptException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
