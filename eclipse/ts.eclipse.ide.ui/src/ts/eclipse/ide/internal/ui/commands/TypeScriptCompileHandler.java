@@ -28,7 +28,6 @@ public class TypeScriptCompileHandler extends AbstractHandler {
 							tsProject.getCompiler().compile(container);
 						}
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.List;
 
 import ts.TypeScriptException;
+import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
 
 /**
@@ -27,13 +28,16 @@ public interface ITypeScriptCompiler {
 	 * 
 	 * @param baseDir
 	 *            the directory where 'tsc' must be executed.
+	 * @return
 	 * @throws TypeScriptException
 	 */
-	void compile(File baseDir, CompilerOptions options, List<String> filenames, INodejsProcessListener listener)
-			throws TypeScriptException;
+	INodejsProcess compile(File baseDir, CompilerOptions options, List<String> filenames,
+			INodejsProcessListener listener) throws TypeScriptException;
 
 	/**
 	 * Dispose the compiler.
 	 */
 	void dispose();
+
+	List<String> createCommands(CompilerOptions options, List<String> filenames);
 }

@@ -14,8 +14,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
@@ -131,4 +133,13 @@ public class TypeScriptCorePlugin extends Plugin {
 	public void removeTypeScriptElementChangedListener(ITypeScriptElementChangedListener listener) {
 		IDEResourcesManager.getInstance().removeTypeScriptElementChangedListener(listener);
 	}
+
+	public static void logError(Throwable e) {
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+	}
+
+	public static void logError(Throwable e, String message) {
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
+	}
+
 }

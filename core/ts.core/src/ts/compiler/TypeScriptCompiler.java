@@ -18,6 +18,7 @@ import ts.TypeScriptException;
 import ts.nodejs.INodejsLaunchConfiguration;
 import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
+import ts.nodejs.NodejsProcess;
 import ts.nodejs.NodejsProcessManager;
 import ts.utils.StringUtils;
 
@@ -33,7 +34,14 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 	}
 
 	@Override
-	public void compile(File baseDir, final CompilerOptions options, final List<String> filenames,
+	public List<String> createCommands(CompilerOptions options, List<String> filenames) {
+		List<String> cmds = NodejsProcess.createNodeCommands(nodejsFile, tscFile);
+		fillOptions(options, filenames, cmds);
+		return cmds;
+	}
+
+	@Override
+	public INodejsProcess compile(File baseDir, final CompilerOptions options, final List<String> filenames,
 			INodejsProcessListener listener) throws TypeScriptException {
 		INodejsProcess process = NodejsProcessManager.getInstance().create(baseDir, tscFile, nodejsFile,
 				new INodejsLaunchConfiguration() {
@@ -41,21 +49,7 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 					@Override
 					public List<String> createNodeArgs() {
 						List<String> args = new ArrayList<String>();
-						if (filenames != null) {
-							args.addAll(filenames);
-						}
-						if (options != null) {
-							if (options.isListFiles()) {
-								args.add("--listFiles");
-							}
-							if (!StringUtils.isEmpty(options.getOutDir())) {
-								args.add("--outDir");
-								args.add(options.getOutDir());
-							}
-							if (options.isSourceMap()) {
-								args.add("--sourceMap");
-							}
-						}
+						fillOptions(options, filenames, args);
 						return args;
 					}
 				}, TSC_FILE_TYPE);
@@ -67,13 +61,31 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 		try {
 			process.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new TypeScriptException(e);
 		}
+		return process;
 	}
 
 	@Override
 	public void dispose() {
 
+	}
+
+	private void fillOptions(final CompilerOptions options, final List<String> filenames, List<String> args) {
+		if (filenames != null) {
+			args.addAll(filenames);
+		}
+		if (options != null) {
+			if (options.isListFiles()) {
+				args.add("--listFiles");
+			}
+			if (!StringUtils.isEmpty(options.getOutDir())) {
+				args.add("--outDir");
+				args.add(options.getOutDir());
+			}
+			if (options.isSourceMap()) {
+				args.add("--sourceMap");
+			}
+		}
 	}
 }

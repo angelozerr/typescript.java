@@ -78,6 +78,26 @@ public class WorkbenchResourceUtil {
 		return null;
 	}
 
+	public static IContainer findContainerFromWorkspace(String path) {
+		if (StringUtils.isEmpty(path)) {
+			return null;
+		}
+		IPath containerPath = new Path(path);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IContainer container = root.getContainerForLocation(containerPath);
+		if (container.exists()) {
+			return container;
+		}
+		IContainer[] containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocation(containerPath);
+		if (containers.length > 0) {
+			container = containers[0];
+			if (container.exists()) {
+				return container;
+			}
+		}
+		return null;
+	}
+
 	public static File findFileFormFileSystem(String path) {
 		if (StringUtils.isEmpty(path)) {
 			return null;

@@ -162,6 +162,15 @@ public class NodejsProcess extends AbstractNodejsProcess {
 	 * @throws IOException
 	 */
 	private List<String> createCommands() {
+		List<String> commands = createNodeCommands(nodejsFile, tsFile);
+		List<String> args = createNodeArgs();
+		if (args != null) {
+			commands.addAll(args);
+		}
+		return commands;
+	}
+
+	public static List<String> createNodeCommands(File nodejsFile, File tsFile) {
 		List<String> commands = new LinkedList<String>();
 		if (nodejsFile == null) {
 			// for osx, path of node.js should be setted?
@@ -180,10 +189,6 @@ public class NodejsProcess extends AbstractNodejsProcess {
 			commands.add(tsFile.getCanonicalPath());
 		} catch (IOException e) {
 			commands.add(tsFile.getPath());
-		}
-		List<String> args = createNodeArgs();
-		if (args != null) {
-			commands.addAll(args);
 		}
 		return commands;
 	}

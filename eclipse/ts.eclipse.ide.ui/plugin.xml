@@ -385,4 +385,35 @@
         </startup>
     </extension> 
            
+	<!-- Launch -->
+	<extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+     	 <shortcut
+            class="ts.eclipse.ide.internal.ui.launch.shortcut.TypeScriptCompilerLaunchShortcut"
+            description="%TypeScriptCompilerLaunchShortcut.description"
+            helpContextId="org.eclipse.ui.externaltools.launchShortcutHelpContext.tscShortcut"
+            icon="icons/full/obj16/logo.png"
+            id="ts.eclipse.ide.ui.launch.shortcut.TypeScriptCompilerLaunch"
+            label="%TypeScriptCompilerLaunchShortcut.label"
+            modes="run">
+        <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+                <iterate ifEmpty="false">
+                  <or>
+                    <instanceof value="ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer" />
+                    <adapt type="org.eclipse.core.resources.IResource">
+                    	<test property="ts.eclipse.ide.core.canRunCompile"/>
+                    </adapt>
+                 </or>
+               </iterate>
+             </with>
+           </enablement>
+           <contextLabel
+         	  mode="run"
+         	  label="%TypeScriptCompilerLaunchShortcut.label"/>
+  		 </contextualLaunch>
+    	</shortcut>
+    </extension>
 </plugin>        

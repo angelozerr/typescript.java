@@ -90,4 +90,15 @@
       </builder>
    </extension>
 
+	<!-- Launch -->
+	<extension
+       point="org.eclipse.debug.core.launchConfigurationTypes">
+	    <launchConfigurationType
+	          id="ts.eclipse.ide.core.tscLaunchConfigurationType"
+	          delegate="ts.eclipse.ide.internal.core.launch.TypeScriptCompilerLaunchConfigurationDelegate"
+	          modes="run"
+	          name="%TypeScriptCompilerLaunchConfigurationDelegate.label">
+	    </launchConfigurationType>
+	</extension>
+		
 </plugin>        

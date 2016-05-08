@@ -17,6 +17,7 @@ public class CompilerOptions {
 
 	private String outDir;
 	private boolean allowJs;
+	private boolean watch;
 
 	public CompilerOptions() {
 	}
@@ -28,7 +29,7 @@ public class CompilerOptions {
 		this.setListFiles(options.isListFiles());
 
 		this.setSourceMap(options.isSourceMap());
-		
+
 		this.setOutDir(options.getOutDir());
 	}
 
@@ -118,6 +119,14 @@ public class CompilerOptions {
 
 	public void setAllowJs(boolean allowJs) {
 		this.allowJs = allowJs;
+	}
+
+	public void setWatch(boolean watch) {
+		this.watch = watch;
+	}
+
+	public boolean isWatch() {
+		return watch;
 	}
 
 }
