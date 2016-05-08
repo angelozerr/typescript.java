@@ -33,6 +33,12 @@ public class FileUtils {
 	public static final String TSCONFIG_JSON = "tsconfig.json";
 	public static final String JSCONFIG_JSON = "jsconfig.json";
 
+	/**
+	 * Folders
+	 */
+	public static final String NODE_MODULES = "node_modules";
+	public static final String BOWER_COMPONENTS = "bower_components";
+
 	public static String getFileExtension(String fileName) {
 		int index = fileName.lastIndexOf('.');
 		if (index == -1)

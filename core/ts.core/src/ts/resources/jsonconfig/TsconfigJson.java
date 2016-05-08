@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import ts.compiler.CompilerOptions;
+import ts.utils.FileUtils;
+import ts.utils.StringUtils;
 
 /**
  * Pojo for tsconfig.json
@@ -30,8 +33,6 @@ import ts.compiler.CompilerOptions;
  */
 public class TsconfigJson {
 
-	private static final List<String> DEFAULT_EXCLUDE = Arrays.asList("node_modules", "bower_components");
-
 	private CompilerOptions compilerOptions;
 
 	private boolean compileOnSave;
@@ -39,6 +40,8 @@ public class TsconfigJson {
 	private List<String> files;
 
 	private List<String> exclude;
+
+	private List<String> defaultExclude;
 
 	public TsconfigJson() {
 		this.compileOnSave = true;
@@ -95,7 +98,17 @@ public class TsconfigJson {
 		if (exclude != null) {
 			return exclude;
 		}
-		return DEFAULT_EXCLUDE;
+		if (defaultExclude != null) {
+			return defaultExclude;
+		}
+		// by default exclude node_modules, bower_components and any specificied
+		// output directory (see this rule used in the tsc.js)
+		this.defaultExclude = new ArrayList<String>(Arrays.asList(FileUtils.NODE_MODULES, FileUtils.BOWER_COMPONENTS));
+		CompilerOptions options = getCompilerOptions();
+		if (options != null && !StringUtils.isEmpty(options.getOutDir())) {
+			defaultExclude.add(options.getOutDir());
+		}
+		return defaultExclude;
 	}
 
 	/**
