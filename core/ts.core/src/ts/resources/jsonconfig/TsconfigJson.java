@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -28,6 +29,8 @@ import ts.compiler.CompilerOptions;
  *
  */
 public class TsconfigJson {
+
+	private static final List<String> DEFAULT_EXCLUDE = Arrays.asList("node_modules", "bower_components");
 
 	private CompilerOptions compilerOptions;
 
@@ -79,6 +82,20 @@ public class TsconfigJson {
 
 	public boolean hasExclude() {
 		return exclude != null;
+	}
+
+	/**
+	 * Returns the defined "exclude" list from the tsconfig.json other exclude
+	 * by default "node_modules" and "bower_components".
+	 * 
+	 * @return the defined "exclude" list from the tsconfig.json other exclude
+	 *         by default "node_modules" and "bower_components".
+	 */
+	protected List<String> getDefaultOrDefinedExclude() {
+		if (exclude != null) {
+			return exclude;
+		}
+		return DEFAULT_EXCLUDE;
 	}
 
 	/**

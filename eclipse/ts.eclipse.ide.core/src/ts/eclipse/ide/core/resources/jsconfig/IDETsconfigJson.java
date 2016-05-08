@@ -80,11 +80,8 @@ public class IDETsconfigJson extends TsconfigJson {
 	 *         section) and false otherwise.
 	 */
 	public boolean isExcluded(IResource resource) {
-		if (!hasExclude()) {
-			return false;
-		}
 		String filename = getRelativePath(resource).toString();
-		for (String exclude : getExclude()) {
+		for (String exclude : getDefaultOrDefinedExclude()) {
 			if (filename.startsWith(exclude)) {
 				return true;
 			}

@@ -290,10 +290,9 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			// check if the given file is declared in the "files"
 			if (tsconfig.hasFiles()) {
 				return tsconfig.isInFiles(resource);
-			} else if (tsconfig.hasExclude()) {
+			} else {
 				return !tsconfig.isExcluded(resource);
 			}
-			return true;
 		}
 		// tsconfig.json was not found (ex : MyProject/node_modules),
 		// validation must not be done.
