@@ -93,7 +93,7 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 		int nColumns = 2;
 		GridLayout layout = new GridLayout();
 		layout.numColumns = nColumns;
-
+		
 		Group group = new Group(parent, SWT.NONE);
 		group.setFont(controlsComposite.getFont());
 		group.setText(getTypeScriptGroupLabel());

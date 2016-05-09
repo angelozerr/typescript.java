@@ -90,12 +90,7 @@
             defaultHandler="ts.eclipse.ide.internal.ui.commands.RemoveTypeScriptBuildPathHandler"
             name="%RemoveTypeScriptBuildPath.name">
       </command>
-      <!-- TypeScript Compilation -->
-      <command
-            id="ts.eclipse.ide.ui.commands.TypeScriptCompile"
-            defaultHandler="ts.eclipse.ide.internal.ui.commands.TypeScriptCompileHandler"
-            name="%TypeScriptCompile.name">
-      </command>      
+      
       <!-- soon @deprecated -->
       <command
             id="ts.eclipse.ide.ui.commands.AddTypeScriptBuilder"
@@ -156,26 +151,7 @@
             </command>            
         </menuContribution>
 
-	   <!-- Compile menu -->
-		<menuContribution locationURI="popup:ts.eclipse.ide.ui.root">
-            <command label="%TypeScriptCompile.name" 
-            		 commandId="ts.eclipse.ide.ui.commands.TypeScriptCompile">
-                <visibleWhen>
-                    <with variable="activeMenuSelection">
-                        <iterate ifEmpty="false">
-                        	<or>
-                        	    <instanceof value="ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer" />
-	                        	<adapt type="org.eclipse.core.resources.IResource">
-	                        		<test property="ts.eclipse.ide.core.canRunCompile"/>
-	                        	</adapt>
-	                        </or>                        
-                        </iterate>
-                    </with> 
-                </visibleWhen>
-            </command>      
-        </menuContribution>
-                
-      <!-- soon @deprecated -->
+      <!-- @deprecated 
         <menuContribution locationURI="popup:org.eclipse.ui.projectConfigure">
             <command label="%AddTypeScriptBuilder.name" 
             		 commandId="ts.eclipse.ide.ui.commands.AddTypeScriptBuilder">
@@ -208,6 +184,8 @@
                 </visibleWhen>
             </command>
         </menuContribution>
+        -->
+        
     </extension>
 
   <!-- Preference Pages -->          		
@@ -416,4 +394,13 @@
   		 </contextualLaunch>
     	</shortcut>
     </extension>
+    
+    <extension point="org.eclipse.core.runtime.adapters">	
+		<factory
+		    class="ts.eclipse.ide.internal.ui.TypeScriptUIAdapterFactory"             
+            adaptableType="ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer">
+            <adapter type="org.eclipse.debug.ui.actions.ILaunchable" />
+		</factory>		
+	</extension>
+	    
 </plugin>        

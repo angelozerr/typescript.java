@@ -47,6 +47,8 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 	private List<ITypeScriptRootContainer> tsContainers;
 	private final List<ITypeScriptBuildPathEntry> entries;
 
+	private static final ITypeScriptRootContainer[] EMPTY_CONTAINER = new ITypeScriptRootContainer[0];
+
 	private static final Comparator<ITypeScriptRootContainer> CONTAINER_COMPARATOR = new Comparator<ITypeScriptRootContainer>() {
 
 		@Override
@@ -66,7 +68,7 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 
 	@Override
 	public ITypeScriptRootContainer[] getRootContainers() {
-		return getRootContainersList().toArray(ITypeScriptRootContainer.EMPTY_CONTAINER);
+		return getRootContainersList().toArray(EMPTY_CONTAINER);
 	}
 
 	@Override

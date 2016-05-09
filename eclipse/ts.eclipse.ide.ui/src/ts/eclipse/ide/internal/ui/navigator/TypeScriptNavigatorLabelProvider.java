@@ -8,6 +8,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.ICommonLabelProvider;
 
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptContainer;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
@@ -22,8 +23,8 @@ public class TypeScriptNavigatorLabelProvider implements ICommonLabelProvider {
 	public Image getImage(Object element) {
 		if (element instanceof ITypeScriptProject) {
 			return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_TYPESCRIPT_RESOURCES);
-		} else if (element instanceof ITypeScriptRootContainer) {
-			IContainer container = ((ITypeScriptRootContainer) element).getContainer();
+		} else if (element instanceof ITypeScriptContainer) {
+			IContainer container = ((ITypeScriptContainer) element).getContainer();
 			return INSTANCE.getImage(container);
 		}
 		return null;
@@ -36,6 +37,9 @@ public class TypeScriptNavigatorLabelProvider implements ICommonLabelProvider {
 		} else if (element instanceof ITypeScriptRootContainer) {
 			IContainer container = ((ITypeScriptRootContainer) element).getContainer();
 			return TypeScriptResourceUtil.getBuildPathLabel(container);
+		} else if (element instanceof ITypeScriptContainer) {
+			IContainer container = ((ITypeScriptContainer) element).getContainer();
+			return INSTANCE.getText(container);
 		}
 		return null;
 	}

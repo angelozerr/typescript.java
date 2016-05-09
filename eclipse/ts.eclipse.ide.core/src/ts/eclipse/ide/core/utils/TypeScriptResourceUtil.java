@@ -88,6 +88,13 @@ public class TypeScriptResourceUtil {
 		return canConsumeTsserver(resource.getProject(), resource);
 	}
 
+	// --------------------------- TypeScript Builder
+
+	/**
+	 * 
+	 * @param project
+	 * @return
+	 */
 	public static boolean hasTypeScriptBuilder(IProject project) {
 		try {
 			IProjectDescription description = project.getDescription();
@@ -101,6 +108,33 @@ public class TypeScriptResourceUtil {
 			return false;
 		}
 		return false;
+	}
+
+	public static void removeTypeScriptBuilder(IProject project) throws CoreException {
+		IProjectDescription description = project.getDescription();
+		ICommand[] commands = description.getBuildSpec();
+		for (int i = 0; i < commands.length; i++) {
+			if (TypeScriptBuilder.ID.equals(commands[i].getBuilderName())) {
+				// Remove the builder
+				ICommand[] newCommands = new ICommand[commands.length - 1];
+				System.arraycopy(commands, 0, newCommands, 0, i);
+				System.arraycopy(commands, i + 1, newCommands, i, commands.length - i - 1);
+				description.setBuildSpec(newCommands);
+				project.setDescription(description, null);
+			}
+		}
+	}
+
+	public static void addTypeScriptBuilder(IProject project) throws CoreException {
+		IProjectDescription description = project.getDescription();
+		ICommand[] commands = description.getBuildSpec();
+		ICommand[] newCommands = new ICommand[commands.length + 1];
+		System.arraycopy(commands, 0, newCommands, 0, commands.length);
+		ICommand command = description.newCommand();
+		command.setBuilderName(TypeScriptBuilder.ID);
+		newCommands[newCommands.length - 1] = command;
+		description.setBuildSpec(newCommands);
+		project.setDescription(description, null);
 	}
 
 	/**
@@ -261,4 +295,5 @@ public class TypeScriptResourceUtil {
 		}
 		return new StringBuilder("").append(container.getProjectRelativePath().toString()).toString();
 	}
+
 }

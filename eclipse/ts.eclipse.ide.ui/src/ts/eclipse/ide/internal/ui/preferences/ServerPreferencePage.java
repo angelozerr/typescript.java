@@ -39,7 +39,7 @@ public class ServerPreferencePage extends PropertyAndPreferencePage {
 	}
 
 	@Override
-	protected Control createPreferenceContent(Composite composite) {
+	protected Control createPreferenceBodyContent(Composite composite) {
 		return configurationBlock.createContents(composite);
 	}
 

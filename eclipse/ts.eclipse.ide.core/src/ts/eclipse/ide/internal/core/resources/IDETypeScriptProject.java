@@ -266,7 +266,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			return true;
 		}
 		// Search if tsconfig.json exists and defines alloyJs
-		IDETsconfigJson tsconfig = JsonConfigResourcesManager.getInstance().findTsconfig(resource);
+		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
 		if (tsconfig != null && tsconfig.getCompilerOptions() != null && tsconfig.getCompilerOptions().isAllowJs()) {
 			return true;
 		}
@@ -287,12 +287,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	private boolean isTsFileIsInScope(IResource resource) throws CoreException {
 		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
 		if (tsconfig != null) {
-			// check if the given file is declared in the "files"
-			if (tsconfig.hasFiles()) {
-				return tsconfig.isInFiles(resource);
-			} else {
-				return !tsconfig.isExcluded(resource);
-			}
+			return tsconfig.isInScope(resource);			
 		}
 		// tsconfig.json was not found (ex : MyProject/node_modules),
 		// validation must not be done.

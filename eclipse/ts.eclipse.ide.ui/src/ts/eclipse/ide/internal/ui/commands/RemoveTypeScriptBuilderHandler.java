@@ -14,6 +14,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 
+@Deprecated
 public class RemoveTypeScriptBuilderHandler extends AbstractHandler {
 
 	@Override

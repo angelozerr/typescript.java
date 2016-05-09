@@ -62,6 +62,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String ServerConfigurationBlock_installed_checkbox_label;
 	public static String ServerConfigurationBlock_traceOnConsole_label;
 
+	public static String CompilerConfigurationBlock_enable_builder_checkbox_label;
+	public static String TypeScriptBuilder_Error_title;
+	public static String TypeScriptBuilder_enable_Error_message;
+	public static String TypeScriptBuilder_disable_Error_message;
 	public static String CompilerConfigurationBlock_typescript_group_label;
 	public static String CompilerConfigurationBlock_embedded_checkbox_label;
 	public static String CompilerConfigurationBlock_installed_checkbox_label;

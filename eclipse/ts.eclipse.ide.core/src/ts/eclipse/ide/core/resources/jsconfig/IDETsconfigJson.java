@@ -68,7 +68,16 @@ public class IDETsconfigJson extends TsconfigJson {
 			return false;
 		}
 		String filename = getRelativePath(resource).toString();
-		return getFiles().contains(filename);
+		if (resource.getType() == IResource.FILE) {
+			return getFiles().contains(filename);
+		}
+		// folder or project
+		for (String name : getFiles()) {
+			if (name.startsWith(filename)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -127,6 +136,14 @@ public class IDETsconfigJson extends TsconfigJson {
 			}
 		}
 		return null;
+	}
+
+	public boolean isInScope(IResource resource) {
+		// check if the given file is declared in the "files"
+		if (hasFiles()) {
+			return isInFiles(resource);
+		}
+		return !isExcluded(resource);
 	}
 
 }
