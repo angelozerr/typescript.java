@@ -31,10 +31,10 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
-import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.compiler.IDETypeScriptCompiler;
@@ -73,15 +73,16 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			IDETypeScriptProject.this.disposeServer();
 			// Remove cache of tsconfig.json Pojo
 			JsonConfigResourcesManager.getInstance().remove(file);
-			// Update build path
-			// Cannot update build path when tsconfig.json file is created
-			// because
-			// when project is opening, it is called too
-			// ITypeScriptBuildPath buildPath = getTypeScriptBuildPath().copy();
-			// buildPath.addEntry(new
-			// TypeScriptBuildPathEntry(file.getParent().getProjectRelativePath()));
-			// ((IDETypeScriptProjectSettings)
-			// getProjectSettings()).updateBuildPath(buildPath);
+
+			// When new project is imported, there are none build path
+			// check if the tsconfig.json which is added is a default build path
+			// (like tsconfig.json or src/tsconfig.json)
+			if (!getTypeScriptBuildPath().hasRootContainers()) {
+				ITypeScriptBuildPath tempBuildPath = createBuildPath();
+				if (tempBuildPath.hasRootContainers()) {
+					buildPath = tempBuildPath;
+				}
+			}
 		}
 
 		@Override
@@ -233,17 +234,18 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	public boolean isInScope(IResource resource) {
 		try {
 			// Use project preferences, which defines include/exclude path
-			if (!getTypeScriptBuildPath().isInScope(resource)) {
+			ITypeScriptRootContainer tsContainer = getTypeScriptBuildPath().findRootContainer(resource);
+			if (tsContainer == null) {
 				return false;
 			}
 			boolean isJSFile = IDEResourcesManager.getInstance().isJsFile(resource)
 					|| IDEResourcesManager.getInstance().isJsxFile(resource);
 			if (isJSFile) {
 				// Can validate js file?
-				return isJsFileIsInScope(resource);
+				return isJsFileIsInScope(resource, tsContainer);
 			}
 			// is ts file is included ?
-			return isTsFileIsInScope(resource);
+			return isTsFileIsInScope(resource, tsContainer);
 		} catch (CoreException e) {
 			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canValidate", e);
 		}
@@ -259,14 +261,14 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean isJsFileIsInScope(IResource resource) throws CoreException {
+	private boolean isJsFileIsInScope(IResource resource, ITypeScriptRootContainer tsContainer) throws CoreException {
 		// Search if a jsconfig.json exists?
 		IFile jsconfigFile = JsonConfigResourcesManager.getInstance().findJsconfigFile(resource);
 		if (jsconfigFile != null) {
 			return true;
 		}
 		// Search if tsconfig.json exists and defines alloyJs
-		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
+		IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 		if (tsconfig != null && tsconfig.getCompilerOptions() != null && tsconfig.getCompilerOptions().isAllowJs()) {
 			return true;
 		}
@@ -284,10 +286,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean isTsFileIsInScope(IResource resource) throws CoreException {
-		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(resource);
+	private boolean isTsFileIsInScope(IResource resource, ITypeScriptRootContainer tsContainer) throws CoreException {
+		IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 		if (tsconfig != null) {
-			return tsconfig.isInScope(resource);			
+			return tsconfig.isInScope(resource);
 		}
 		// tsconfig.json was not found (ex : MyProject/node_modules),
 		// validation must not be done.
@@ -297,9 +299,13 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public ITypeScriptBuildPath getTypeScriptBuildPath() {
 		if (buildPath == null) {
-			buildPath = ((IDETypeScriptProjectSettings) getProjectSettings()).getTypeScriptBuildPath();
+			buildPath = createBuildPath();
 		}
 		return buildPath;
+	}
+
+	private ITypeScriptBuildPath createBuildPath() {
+		return ((IDETypeScriptProjectSettings) getProjectSettings()).getTypeScriptBuildPath();
 	}
 
 	public void disposeBuildPath() {
@@ -308,12 +314,12 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		ITypeScriptBuildPath newBuildPath = getTypeScriptBuildPath();
 		IDEResourcesManager.getInstance().fireBuildPathChanged(this, oldBuildPath, newBuildPath);
 	}
-	
+
 	@Override
 	public IIDETypeScriptCompiler getCompiler() throws TypeScriptException {
 		return (IIDETypeScriptCompiler) super.getCompiler();
 	}
-	
+
 	@Override
 	protected ITypeScriptCompiler createCompiler(File tscFile, File nodejsFile) {
 		return new IDETypeScriptCompiler(tscFile, nodejsFile);

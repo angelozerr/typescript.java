@@ -67,8 +67,8 @@ public class TypeScriptContainer implements ITypeScriptContainer, IResourceProxy
 		}
 		if (tsconfig.isInScope(resource)) {
 			if (type == IResource.FOLDER) {
-				members.add(new TypeScriptContainer((IContainer) resource));
-				return false;
+				// members.add(new TypeScriptContainer((IContainer) resource));
+				return true;
 			} else {
 				members.add(resource);
 			}

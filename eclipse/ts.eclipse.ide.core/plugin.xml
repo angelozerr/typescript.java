@@ -80,7 +80,7 @@
 	</extension>
 			
 	<!-- Builder to compile TypeScript -> JavaScript with tsc -->			
-   <!--<extension
+   <extension
          id="typeScriptBuilder"
          name="%TypeScriptBuilder.name"
          point="org.eclipse.core.resources.builders">
@@ -89,7 +89,6 @@
          </run>
       </builder>
    </extension>
--->
 
 	<!-- Launch -->
 	<extension

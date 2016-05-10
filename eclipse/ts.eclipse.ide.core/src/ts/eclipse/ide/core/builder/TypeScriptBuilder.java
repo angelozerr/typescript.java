@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -50,7 +49,9 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			this.incrementalBuild(tsProject, monitor);
 			break;
 		case IncrementalProjectBuilder.FULL_BUILD:
-			this.fullBuild(tsProject, monitor);
+			// TODO: how it works? Start several tsc for each TypeScript Root
+			// container?
+			// this.fullBuild(tsProject, monitor);
 			break;
 		}
 		return null;
@@ -58,11 +59,11 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 
 	private void fullBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
 		ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
-		ITypeScriptRootContainer[] containers = buildPath.getRootContainers();
-		for (int i = 0; i < containers.length; i++) {
-			IContainer container = containers[i].getContainer();
+		ITypeScriptRootContainer[] tsContainers = buildPath.getRootContainers();
+		for (int i = 0; i < tsContainers.length; i++) {
+			ITypeScriptRootContainer tsContainer = tsContainers[i];
 			try {
-				IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(container);
+				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 				if (tsconfig == null || tsconfig.isCompileOnSave()) {
 					tsProject.getCompiler().compile(tsconfig);
 				}
@@ -74,7 +75,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 
 	private void incrementalBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
 		final ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
-		final Map<IContainer, List<IFile>> deltaFiles = new HashMap<IContainer, List<IFile>>();
+		final Map<ITypeScriptRootContainer, List<IFile>> deltaFiles = new HashMap<ITypeScriptRootContainer, List<IFile>>();
 		IResourceDelta delta = getDelta(tsProject.getProject());
 		delta.accept(new IResourceDeltaVisitor() {
 
@@ -102,7 +103,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 								List<IFile> deltas = deltaFiles.get(tsContainer.getContainer());
 								if (deltas == null) {
 									deltas = new ArrayList<IFile>();
-									deltaFiles.put(tsContainer.getContainer(), deltas);
+									deltaFiles.put(tsContainer, deltas);
 								}
 								deltas.add((IFile) resource);
 							}
@@ -114,17 +115,18 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			}
 		});
 
-		for (Entry<IContainer, List<IFile>> entries : deltaFiles.entrySet()) {
-			IContainer container = entries.getKey();
+		for (Entry<ITypeScriptRootContainer, List<IFile>> entries : deltaFiles.entrySet()) {
+			ITypeScriptRootContainer tsContainer = entries.getKey();
 			try {
-				IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(container);
+				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 				if (tsconfig == null || tsconfig.isCompileOnSave()) {
 					List<IFile> deltas = entries.getValue();
 					List<String> filenames = new ArrayList<String>();
 					for (IFile file : deltas) {
-						filenames.add(WorkbenchResourceUtil.getRelativePath(file, container).toString());
+						filenames.add(
+								WorkbenchResourceUtil.getRelativePath(file, tsContainer.getContainer()).toString());
 					}
-					tsProject.getCompiler().compile(tsconfig, filenames);					
+					tsProject.getCompiler().compile(tsconfig, filenames);
 				}
 			} catch (TypeScriptException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);

@@ -55,8 +55,8 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		public int compare(ITypeScriptRootContainer o1, ITypeScriptRootContainer o2) {
 			IContainer c1 = o1.getContainer();
 			IContainer c2 = o2.getContainer();
-			return Collator.getInstance().compare(c1.getProjectRelativePath().toString(),
-					c2.getProjectRelativePath().toString());
+			return Collator.getInstance().compare(c2.getProjectRelativePath().toString(),
+					c1.getProjectRelativePath().toString());
 		}
 	};
 
