@@ -17,9 +17,11 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import ts.TypeScriptException;
+import ts.TypeScriptNoContentAvailableException;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
 /**
@@ -86,7 +88,12 @@ public abstract class AbstractTypeScriptHyperlink implements IHyperlink, ITypeSc
 	public boolean isValid() {
 		try {
 			findDef();
+		} catch (TypeScriptNoContentAvailableException e) {
+			// tsserver throws this error when the tsserver returns nothing
+			// Ignore this error
+			return false;
 		} catch (Exception e) {
+			TypeScriptUIPlugin.log("Error while TypeScript hyperlink", e);
 			return false;
 		}
 		return isFileExists(file) || isFileExists(fs);

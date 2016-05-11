@@ -16,6 +16,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.ui.IEditorPart;
 
+import ts.TypeScriptNoContentAvailableException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -55,6 +56,9 @@ public class TypeScriptHover extends AbstractTypeScriptHover {
 
 				String text = collector.getInfo();
 				return StringUtils.isEmpty(text) ? null : new TypeScriptBrowserInformationControlInput(null, text, 20);
+			} catch (TypeScriptNoContentAvailableException e) {
+				// tsserver throws this error when the tsserver returns nothing
+				// Ignore this error
 			} catch (Exception e) {
 				TypeScriptUIPlugin.log("Error while TypeScript hover", e);
 			}

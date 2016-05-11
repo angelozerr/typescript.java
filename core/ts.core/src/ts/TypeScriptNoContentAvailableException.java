@@ -11,18 +11,15 @@
 package ts;
 
 /**
- * TypeScript Exception.
+ * TypeScript exception thown when tsserver throws error "No content
+ * available."
  *
  */
 @SuppressWarnings("serial")
-public class TypeScriptException extends Exception {
+public class TypeScriptNoContentAvailableException extends TypeScriptException {
 
-	public TypeScriptException(String message) {
+	public TypeScriptNoContentAvailableException(String message) {
 		super(message);
-	}
-
-	public TypeScriptException(Throwable e) {
-		super(e);
 	}
 
 }

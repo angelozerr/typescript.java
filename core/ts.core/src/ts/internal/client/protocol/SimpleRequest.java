@@ -13,6 +13,7 @@ package ts.internal.client.protocol;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TypeScriptException;
+import ts.TypeScriptNoContentAvailableException;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.ITypeScriptCollector;
 
@@ -21,6 +22,7 @@ import ts.client.ITypeScriptCollector;
  */
 public abstract class SimpleRequest<C extends ITypeScriptCollector> extends Request<JsonObject, C> {
 
+	private static final String NO_CONTENT_AVAILABLE = "No content available.";
 	private JsonObject response;
 
 	public SimpleRequest(CommandNames command, JsonObject args, Integer seq) {
@@ -65,7 +67,11 @@ public abstract class SimpleRequest<C extends ITypeScriptCollector> extends Requ
 
 	private void throwExceptionIfNeeded(JsonObject response) throws TypeScriptException {
 		if (!response.getBoolean("success", true)) {
-			throw new TypeScriptException(response.getString("message", ""));
+			String message = response.getString("message", "");
+			if (NO_CONTENT_AVAILABLE.equals(message)) {
+				throw new TypeScriptNoContentAvailableException(message);
+			}
+			throw new TypeScriptException(message);
 		}
 	}
 
