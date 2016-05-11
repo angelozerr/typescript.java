@@ -35,6 +35,9 @@ public class TypeScriptEditorMessages extends NLS {
 	public static String FindReferencesInProjectAction_error_title;
 
 	public static String TypeScriptEditor_markOccurrences_job_name;
+
+	public static String TypeScriptContentFormatter_Error_title;
+	public static String TypeScriptContentFormatter_Error_message;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

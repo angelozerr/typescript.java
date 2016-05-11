@@ -28,8 +28,9 @@ import ts.client.format.ITypeScriptFormatCollector;
  */
 public class FormatRequest extends FileLocationRequest<ITypeScriptFormatCollector> {
 
-	public FormatRequest(String fileName, int line, int offset, int endLine, int endOffset) {
+	public FormatRequest(String fileName, int line, int offset, int endLine, int endOffset, ITypeScriptFormatCollector collector) {
 		super(CommandNames.Format, new FormatRequestArgs(fileName, line, offset, endLine, endOffset));
+		super.setCollector(collector);
 	}
 
 	@Override

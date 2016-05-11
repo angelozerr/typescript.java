@@ -258,7 +258,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void format(String fileName, int line, int offset, int endLine, int endOffset,
 			ITypeScriptFormatCollector collector) throws TypeScriptException {
-		Request request = new FormatRequest(fileName, line, offset, endLine, endOffset);
+		Request request = new FormatRequest(fileName, line, offset, endLine, endOffset, collector);
 		execute(request);
 	}
 
