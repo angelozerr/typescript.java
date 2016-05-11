@@ -48,6 +48,7 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container);
 		CompilerOptions options = new CompilerOptions();
 		options.setListFiles(true);
+		options.setWatch(false);
 		super.compile(container.getLocation().toFile(), options, null, reporter);
 		for (IFile tsFile : reporter.getFilesToRefresh()) {
 			try {
