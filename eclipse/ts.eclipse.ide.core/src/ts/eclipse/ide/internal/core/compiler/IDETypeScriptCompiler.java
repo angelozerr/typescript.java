@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.CoreException;
 import ts.TypeScriptException;
 import ts.compiler.CompilerOptions;
 import ts.compiler.TypeScriptCompiler;
-import ts.eclipse.ide.core.builder.IDETypeScriptCompilerReporter;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -34,18 +33,18 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 	}
 
 	@Override
-	public void compile(IDETsconfigJson tsconfig) throws TypeScriptException {
+	public void compile(IDETsconfigJson tsconfig) throws TypeScriptException, CoreException {
 		compile(tsconfig, null);
 	}
 
 	@Override
-	public void compile(IDETsconfigJson tsconfig, List<String> filenames) throws TypeScriptException {
+	public void compile(IDETsconfigJson tsconfig, List<String> filenames) throws TypeScriptException, CoreException {
 		IContainer container = tsconfig.getTsconfigFile().getParent();
 		compile(tsconfig, container, filenames);
 	}
 
 	private void compile(IDETsconfigJson tsconfig, IContainer container, List<String> filenames)
-			throws TypeScriptException {
+			throws TypeScriptException, CoreException {
 		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container);
 		CompilerOptions options = new CompilerOptions();
 		options.setListFiles(true);

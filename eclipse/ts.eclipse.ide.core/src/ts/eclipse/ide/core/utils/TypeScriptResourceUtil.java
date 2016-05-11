@@ -248,6 +248,9 @@ public class TypeScriptResourceUtil {
 		if (refresh) {
 			file = baseDir.getFile(filePath);
 			file.refreshLocal(IResource.DEPTH_INFINITE, null);
+			if (file.exists()) {
+				file.setDerived(true, null);
+			}
 		}
 
 		if (emittedFiles != null) {

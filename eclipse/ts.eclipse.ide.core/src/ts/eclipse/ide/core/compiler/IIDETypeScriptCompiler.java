@@ -12,10 +12,10 @@ import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 public interface IIDETypeScriptCompiler extends ITypeScriptCompiler {
 
 	public void compile(IContainer container) throws TypeScriptException, CoreException;
-	
+
 	public void compile(IContainer container, List<String> filenames) throws TypeScriptException, CoreException;
 
-	public void compile(IDETsconfigJson tsconfig) throws TypeScriptException;
-	
-	public void compile(IDETsconfigJson tsconfig, List<String> filenames) throws TypeScriptException;
+	public void compile(IDETsconfigJson tsconfig) throws TypeScriptException, CoreException;
+
+	public void compile(IDETsconfigJson tsconfig, List<String> filenames) throws TypeScriptException, CoreException;
 }
