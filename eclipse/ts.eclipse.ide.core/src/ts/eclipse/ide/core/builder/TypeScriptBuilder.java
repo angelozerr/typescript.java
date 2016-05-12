@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -14,6 +15,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
@@ -21,8 +23,8 @@ import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
-import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
+import ts.eclipse.ide.internal.core.TypeScriptCoreMessages;
 
 /**
  * Builder to transpiles TypeScript files into JavaScript files and source map
@@ -75,7 +77,8 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 
 	private void incrementalBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
 		final ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
-		final Map<ITypeScriptRootContainer, List<IFile>> deltaFiles = new HashMap<ITypeScriptRootContainer, List<IFile>>();
+		final Map<ITypeScriptRootContainer, List<IFile>> tsFilesToCompile = new HashMap<ITypeScriptRootContainer, List<IFile>>();
+		final Map<ITypeScriptRootContainer, List<IFile>> tsFilesToDelete = new HashMap<ITypeScriptRootContainer, List<IFile>>();
 		IResourceDelta delta = getDelta(tsProject.getProject());
 		delta.accept(new IResourceDeltaVisitor() {
 
@@ -98,39 +101,80 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 					case IResourceDelta.ADDED:
 					case IResourceDelta.CHANGED:
 						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)) {
-							ITypeScriptRootContainer tsContainer = buildPath.findRootContainer(resource);
-							if (tsContainer != null) {
-								List<IFile> deltas = deltaFiles.get(tsContainer.getContainer());
-								if (deltas == null) {
-									deltas = new ArrayList<IFile>();
-									deltaFiles.put(tsContainer, deltas);
-								}
-								deltas.add((IFile) resource);
-							}
+							addTsFile(buildPath, tsFilesToCompile, resource);
 						}
+						break;
+					case IResourceDelta.REMOVED:
+						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)) {
+							addTsFile(buildPath, tsFilesToDelete, resource);
+						}
+						break;
 					}
 					return false;
 				}
 				return false;
 			}
+
+			private void addTsFile(final ITypeScriptBuildPath buildPath,
+					final Map<ITypeScriptRootContainer, List<IFile>> tsFiles, IResource resource) {
+				ITypeScriptRootContainer tsContainer = buildPath.findRootContainer(resource);
+				if (tsContainer != null) {
+					List<IFile> deltas = tsFiles.get(tsContainer);
+					if (deltas == null) {
+						deltas = new ArrayList<IFile>();
+						tsFiles.put(tsContainer, deltas);
+					}
+					deltas.add((IFile) resource);
+				}
+			}
 		});
 
-		for (Entry<ITypeScriptRootContainer, List<IFile>> entries : deltaFiles.entrySet()) {
+		// Compile ts files *.ts
+		for (Entry<ITypeScriptRootContainer, List<IFile>> entries : tsFilesToCompile.entrySet()) {
 			ITypeScriptRootContainer tsContainer = entries.getKey();
 			try {
 				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
-				if (tsconfig == null || tsconfig.isCompileOnSave()) {
-					List<IFile> deltas = entries.getValue();
-					List<String> filenames = new ArrayList<String>();
-					for (IFile file : deltas) {
-						filenames.add(
-								WorkbenchResourceUtil.getRelativePath(file, tsContainer.getContainer()).toString());
+				if (tsconfig.isBuildOnSave()) {
+					// Compile the whole files for the given tsconfig.json
+					tsProject.getCompiler().compile(tsconfig, null);
+				} else {
+					List<IFile> tsFiles = entries.getValue();
+					if (tsconfig.isCompileOnSave()) {
+						// compileOnSave is activated, compile the list of ts
+						// files.
+						tsProject.getCompiler().compile(tsconfig, tsFiles);
+					} else {
+						// compileOnSave is setted to false in the
+						// tsconfig.json,
+						// add a warning marker inside each ts files that user
+						// which
+						// to compile
+						for (IFile tsFile : tsFiles) {
+							// delete existing marker
+							TypeScriptResourceUtil.deleteTscMarker(tsFile);
+							// add warning marker
+							TypeScriptResourceUtil.addTscMarker(tsFile,
+									NLS.bind(TypeScriptCoreMessages.tsconfig_compileOnSave_disable,
+											tsconfig.getTsconfigFile().getProjectRelativePath().toString()),
+									IMarker.SEVERITY_WARNING, 1);
+							// delete emitted files *.js, *.js.map
+							TypeScriptResourceUtil.deleteEmittedFiles(tsFile, tsconfig);
+						}
 					}
-					tsProject.getCompiler().compile(tsconfig, filenames);
 				}
 			} catch (TypeScriptException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
 			}
+		}
+		// Delete emitted files *.js, *.js.map
+		for (Entry<ITypeScriptRootContainer, List<IFile>> entries : tsFilesToDelete.entrySet()) {
+			ITypeScriptRootContainer tsContainer = entries.getKey();
+			List<IFile> tsFiles = entries.getValue();
+			IDETsconfigJson tsconfig = tsContainer.getTsconfig();
+			for (IFile tsFile : tsFiles) {
+				TypeScriptResourceUtil.deleteEmittedFiles(tsFile, tsconfig);
+			}
+
 		}
 	}
 

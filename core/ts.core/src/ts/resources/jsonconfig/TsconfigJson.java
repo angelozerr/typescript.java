@@ -37,6 +37,8 @@ public class TsconfigJson {
 
 	private boolean compileOnSave;
 
+	private boolean buildOnSave;
+
 	private List<String> files;
 
 	private List<String> exclude;
@@ -45,6 +47,7 @@ public class TsconfigJson {
 
 	public TsconfigJson() {
 		this.compileOnSave = true;
+		this.buildOnSave = false;
 	}
 
 	public void setCompilerOptions(CompilerOptions compilerOptions) {
@@ -61,6 +64,41 @@ public class TsconfigJson {
 
 	public void setCompileOnSave(boolean compileOnSave) {
 		this.compileOnSave = compileOnSave;
+	}
+
+	/**
+	 * Returns true if build must be done on save and false otherwise. This
+	 * property doesn't belong to the standard specification of tsconfig.json,
+	 * it comes from the atom-typescript.
+	 * 
+	 * Build means compile all files. Useful if for some reason you are using
+	 * --out. Default is false. Note that build is a slow process, therefore we
+	 * recommend leaving it off. But in case this is the way you want to go its
+	 * there for your convenience.
+	 * 
+	 * @see https://github.com/TypeStrong/atom-typescript/blob/master/docs/tsconfig.md#buildonsave
+	 * @return true if build must ne done on save and false otherwise.
+	 */
+	public boolean isBuildOnSave() {
+		return buildOnSave;
+	}
+
+	/**
+	 * Set to true if build must be done on save and false otherwise. This
+	 * property doesn't belong to the standard specification of tsconfig.json,
+	 * it comes from the atom-typescript.
+	 * 
+	 * Build means compile all files. Useful if for some reason you are using
+	 * --out. Default is false. Note that build is a slow process, therefore we
+	 * recommend leaving it off. But in case this is the way you want to go its
+	 * there for your convenience.
+	 * 
+	 * @see https://github.com/TypeStrong/atom-typescript/blob/master/docs/tsconfig.md#buildonsave
+	 * 
+	 * @param buildOnSave
+	 */
+	public void setBuildOnSave(boolean buildOnSave) {
+		this.buildOnSave = buildOnSave;
 	}
 
 	public List<String> getFiles() {

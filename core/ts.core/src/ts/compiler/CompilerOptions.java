@@ -16,6 +16,9 @@ public class CompilerOptions {
 	private boolean sourceMap;
 
 	private String outDir;
+	private String out;
+	private String outFile;
+
 	private boolean allowJs;
 	private Boolean watch;
 
@@ -108,6 +111,48 @@ public class CompilerOptions {
 
 	public void setOutDir(String outDir) {
 		this.outDir = outDir;
+	}
+
+	/**
+	 * Concatenate and emit output to single file. The order of concatenation is
+	 * determined by the list of files passed to the compiler on the command
+	 * line along with triple-slash references and imports. See output file
+	 * order documentation for more details.
+	 * 
+	 * @return
+	 */
+	public String getOutFile() {
+		return outFile;
+	}
+
+	/**
+	 * Concatenate and emit output to single file. The order of concatenation is
+	 * determined by the list of files passed to the compiler on the command
+	 * line along with triple-slash references and imports. See output file
+	 * order documentation for more details.
+	 * 
+	 * @param outFile
+	 */
+	public void setOutFile(String outFile) {
+		this.outFile = outFile;
+	}
+
+	/**
+	 * Same thing than outFile but deprectaed.
+	 * 
+	 * @return
+	 */
+	public String getOut() {
+		return out;
+	}
+
+	/**
+	 * Same thing than outFile but deprectaed.
+	 * 
+	 * @param out
+	 */
+	public void setOut(String out) {
+		this.out = out;
 	}
 
 	public boolean isAllowJs() {

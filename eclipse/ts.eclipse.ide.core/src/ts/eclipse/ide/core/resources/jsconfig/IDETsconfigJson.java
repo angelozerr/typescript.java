@@ -31,6 +31,7 @@ public class IDETsconfigJson extends TsconfigJson {
 
 	private IFile tsconfigFile;
 	private IContainer outDir;
+	private IFile outFile;
 
 	/**
 	 * Load tsconfig.json.
@@ -43,6 +44,7 @@ public class IDETsconfigJson extends TsconfigJson {
 		IDETsconfigJson tsconfig = load(tsconfigFile.getContents(), IDETsconfigJson.class);
 		tsconfig.tsconfigFile = tsconfigFile;
 		tsconfig.outDir = computeOutDir(tsconfig);
+		tsconfig.outFile = computeOutFile(tsconfig);
 		return tsconfig;
 	}
 
@@ -113,7 +115,7 @@ public class IDETsconfigJson extends TsconfigJson {
 	 * 
 	 * @return the compilerOptions/outDir as Eclipse folder and null otherwise.
 	 */
-	public IContainer getOutDirContainer() {
+	public IContainer getOutDir() {
 		return outDir;
 	}
 
@@ -133,6 +135,35 @@ public class IDETsconfigJson extends TsconfigJson {
 				return tsconfig.getTsconfigFile().getParent().getFolder(new Path(outDir));
 			} catch (Throwable e) {
 				Trace.trace(Trace.SEVERE, "Error while getting compilerOption/outDir", e);
+			}
+		}
+		return null;
+	}
+
+	public IFile getOutFile() {
+		return outFile;
+	}
+
+	/**
+	 * Compute compilerOptions/outFile as Eclipse file and null otherwise.
+	 * 
+	 * @return compilerOptions/outFile as Eclipse file and null otherwise
+	 */
+	private static IFile computeOutFile(IDETsconfigJson tsconfig) {
+		CompilerOptions options = tsconfig.getCompilerOptions();
+		if (options != null) {
+			String outFile = options.getOutFile();
+			if (StringUtils.isEmpty(outFile)) {
+				// try with "out" which is deprecated.
+				outFile = options.getOut();
+			}
+			if (StringUtils.isEmpty(outFile)) {
+				return null;
+			}
+			try {
+				return tsconfig.getTsconfigFile().getParent().getFile(new Path(outFile));
+			} catch (Throwable e) {
+				Trace.trace(Trace.SEVERE, "Error while getting compilerOption/outFile", e);
 			}
 		}
 		return null;

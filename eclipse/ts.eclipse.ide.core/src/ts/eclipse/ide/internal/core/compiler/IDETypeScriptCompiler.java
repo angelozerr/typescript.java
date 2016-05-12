@@ -41,9 +41,9 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 	}
 
 	@Override
-	public void compile(IContainer container, List<String> filenames) throws TypeScriptException, CoreException {
+	public void compile(IContainer container, List<IFile> tsFiles) throws TypeScriptException, CoreException {
 		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(container);
-		compile(tsconfig, container, filenames);
+		compile(tsconfig, container, tsFiles);
 	}
 
 	@Override
@@ -52,25 +52,24 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 	}
 
 	@Override
-	public void compile(IDETsconfigJson tsconfig, List<String> filenames) throws TypeScriptException, CoreException {
+	public void compile(IDETsconfigJson tsconfig, List<IFile> tsFiles) throws TypeScriptException, CoreException {
 		IContainer container = tsconfig.getTsconfigFile().getParent();
-		compile(tsconfig, container, filenames);
+		compile(tsconfig, container, tsFiles);
 	}
 
-	private void compile(IDETsconfigJson tsconfig, IContainer container, List<String> filenames)
+	private void compile(IDETsconfigJson tsconfig, IContainer container, List<IFile> tsFiles)
 			throws TypeScriptException, CoreException {
-		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container);
+		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container, tsFiles);
 		CompilerOptions options = tsconfig != null && tsconfig.getCompilerOptions() != null
 				? new CompilerOptions(tsconfig.getCompilerOptions()) : new CompilerOptions();
+		if (tsFiles == null && tsconfig != null && tsconfig.getCompilerOptions() != null) {
+			// buildOnSave, copy outFile
+			options.setOutFile(tsconfig.getCompilerOptions().getOutFile());
+
+		}
 		options.setListFiles(true);
 		options.setWatch(false);
-		super.compile(container.getLocation().toFile(), options, filenames, reporter);
-		for (IFile tsFile : reporter.getFilesToRefresh()) {
-			try {
-				TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, true, null);
-			} catch (CoreException e) {
-				Trace.trace(Trace.SEVERE, "Error while tsc compilation when ts file is refreshed", e);
-			}
-		}
+		super.compile(container.getLocation().toFile(), options, reporter.getFileNames(), reporter);
+		reporter.refreshEmittedFiles();
 	}
 }

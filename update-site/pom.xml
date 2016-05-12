@@ -10,6 +10,7 @@
   <modules>
   	<module>ts-feature</module>
 	<module>ts-jsdt-feature</module>
+	<module>ts-json-feature</module>
 	<module>ts-nodejs.embed-feature</module>
 	<module>ts-validation-feature</module>
 	<module>typescript.ide</module> <!-- Update site -->

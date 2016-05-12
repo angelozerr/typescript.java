@@ -11,13 +11,17 @@
 package ts.eclipse.ide.internal.core.compiler;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import ts.compiler.TypeScriptCompilerHelper;
 import ts.eclipse.ide.core.compiler.IDETypeScriptCompilerMessageHandler;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
 
@@ -28,9 +32,21 @@ public class IDETypeScriptCompilerReporter extends IDETypeScriptCompilerMessageH
 		implements INodejsProcessListener {
 
 	private INodejsProcess process;
+	private final List<String> tsFileNames;
 
-	public IDETypeScriptCompilerReporter(IContainer container) throws CoreException {
-		super(container);
+	public IDETypeScriptCompilerReporter(IContainer container, List<IFile> tsFiles) throws CoreException {
+		super(container, tsFiles == null);
+		if (tsFiles != null) {
+			tsFileNames = new ArrayList<String>();
+			for (IFile tsFile : tsFiles) {
+				// delete marker for the given ts files.
+				TypeScriptResourceUtil.deleteTscMarker(tsFile);
+				// add to the list file names
+				tsFileNames.add(WorkbenchResourceUtil.getRelativePath(tsFile, container).toString());
+			}
+		} else {
+			tsFileNames = null;
+		}
 	}
 
 	@Override
@@ -59,6 +75,10 @@ public class IDETypeScriptCompilerReporter extends IDETypeScriptCompilerMessageH
 	@Override
 	public void onCompilationCompleteWatchingForFileChanges() {
 		process.kill();
+	}
+
+	public List<String> getFileNames() {
+		return tsFileNames;
 	}
 
 }

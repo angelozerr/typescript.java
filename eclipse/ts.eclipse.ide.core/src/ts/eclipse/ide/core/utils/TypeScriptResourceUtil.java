@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -42,6 +43,8 @@ import ts.utils.StringUtils;
  *
  */
 public class TypeScriptResourceUtil {
+
+	private static final String TSC_MARKER_TYPE = "ts.eclipse.ide.core.typeScriptProblem";
 
 	public static boolean isTsOrTsxFile(Object element) {
 		return IDEResourcesManager.getInstance().isTsOrTsxFile(element);
@@ -175,6 +178,8 @@ public class TypeScriptResourceUtil {
 		return result;
 	}
 
+	// ------------------ emitted files *.js, *.js.map
+
 	/**
 	 * Returns true if the given *.js file or *.js.map have a corresponding *.ts
 	 * file in the same folder and false otherwise.
@@ -222,7 +227,7 @@ public class TypeScriptResourceUtil {
 		if (tsconfig != null) {
 			// tsconfig.json is found and "outDir" is setted, check if *.js and
 			// *.js.map file in the "outDir" folder.
-			IContainer configOutDir = tsconfig.getOutDirContainer();
+			IContainer configOutDir = tsconfig.getOutDir();
 			if (configOutDir != null && configOutDir.exists()) {
 				outDir = configOutDir;
 			}
@@ -263,6 +268,14 @@ public class TypeScriptResourceUtil {
 		}
 	}
 
+	public static void deleteEmittedFiles(IFile tsFile, IDETsconfigJson tsconfig) throws CoreException {
+		List<IFile> emittedFiles = new ArrayList<IFile>();
+		TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, false, emittedFiles);
+		for (IFile emittedFile : emittedFiles) {
+			emittedFile.delete(true, null);
+		}
+	}
+
 	public static IDETsconfigJson findTsconfig(IResource resource) throws CoreException {
 		return JsonConfigResourcesManager.getInstance().findTsconfig(resource);
 	}
@@ -299,4 +312,16 @@ public class TypeScriptResourceUtil {
 		return new StringBuilder("").append(container.getProjectRelativePath().toString()).toString();
 	}
 
+	public static IMarker addTscMarker(IResource resource, String message, int severity, int lineNumber)
+			throws CoreException {
+		IMarker marker = resource.createMarker(TSC_MARKER_TYPE);
+		marker.setAttribute(IMarker.MESSAGE, message);
+		marker.setAttribute(IMarker.SEVERITY, severity);
+		marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+		return marker;
+	}
+
+	public static void deleteTscMarker(IResource resource) throws CoreException {
+		resource.deleteMarkers(TSC_MARKER_TYPE, true, IResource.DEPTH_INFINITE);
+	}
 }

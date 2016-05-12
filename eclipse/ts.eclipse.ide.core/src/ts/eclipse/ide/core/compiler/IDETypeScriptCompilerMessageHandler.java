@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Path;
 import ts.client.Location;
 import ts.compiler.ITypeScriptCompilerMessageHandler;
 import ts.compiler.TypeScriptCompilerSeverity;
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
@@ -40,18 +41,17 @@ import ts.resources.jsonconfig.TsconfigJson;
  */
 public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerMessageHandler {
 
-	/** Constant for marker type. */
-	private static final String MARKER_TYPE = "ts.eclipse.ide.core.typeScriptProblem";
-
 	private final IContainer container;
 	private final IDETsconfigJson tsconfig;
 	private final List<IFile> filesToRefresh;
 
-	public IDETypeScriptCompilerMessageHandler(IContainer container) throws CoreException {
+	public IDETypeScriptCompilerMessageHandler(IContainer container, boolean deleteMarkers) throws CoreException {
 		this.container = container;
 		this.tsconfig = TypeScriptResourceUtil.findTsconfig(container);
 		this.filesToRefresh = new ArrayList<IFile>();
-		container.deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_INFINITE);
+		if (deleteMarkers) {
+			TypeScriptResourceUtil.deleteTscMarker(container);
+		}
 	}
 
 	@Override
@@ -76,15 +76,27 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 
 	@Override
 	public void onCompilationCompleteWatchingForFileChanges() {
-		refreshFiles();
+		try {
+			refreshEmittedFiles();
+		} catch (CoreException e) {
+			TypeScriptCorePlugin.logError(e);
+		}
 	}
 
-	private void refreshFiles() {
+	public void refreshEmittedFiles() throws CoreException {
+		// refresh *.js, *.js.map files
 		for (IFile tsFile : getFilesToRefresh()) {
 			try {
 				TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, true, null);
 			} catch (CoreException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation when ts file is refreshed", e);
+			}
+		}
+		// refresh outFile if tsconfig.json defines it.
+		if (tsconfig != null) {
+			IFile outFile = tsconfig.getOutFile();
+			if (outFile != null && outFile.exists()) {
+				outFile.refreshLocal(IResource.DEPTH_INFINITE, null);
 			}
 		}
 	}
@@ -99,10 +111,7 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 		IFile file = getFile(filename);
 		if (file != null) {
 			try {
-				IMarker marker = file.createMarker(MARKER_TYPE);
-				marker.setAttribute(IMarker.MESSAGE, message);
-				marker.setAttribute(IMarker.SEVERITY, getSeverity(severity));
-				marker.setAttribute(IMarker.LINE_NUMBER, startLoc.getLine());
+				TypeScriptResourceUtil.addTscMarker(file, message, getSeverity(severity), startLoc.getLine());
 			} catch (CoreException e) {
 
 			}

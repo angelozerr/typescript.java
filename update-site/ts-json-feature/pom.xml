@@ -2,13 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>fr.opensagres.js</groupId>
-    <artifactId>eclipse</artifactId>
+    <artifactId>update-site</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>json</artifactId>
-  <packaging>pom</packaging>
-  <modules>
-  		<module>ts.eclipse.ide.json.core</module>
-		<module>ts.eclipse.ide.json.ui</module>
-  </modules>
+  <artifactId>ts-json-feature</artifactId>
+  <packaging>eclipse-feature</packaging>
 </project>

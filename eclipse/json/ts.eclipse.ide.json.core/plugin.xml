@@ -29,7 +29,7 @@
          			description="JSON schema for the TypeScript compiler's configuration file"
          			fileMatch="tsconfig.json"
          			url="http://json.schemastore.org/tsconfig"
-         			uri="schemastore/tsconfig" />      			
+         			uri="schemastore/tsconfig-neon" />      			
          </schemaCatalogContribution>
 	</extension>
 
