@@ -60,7 +60,8 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 	private void compile(IDETsconfigJson tsconfig, IContainer container, List<String> filenames)
 			throws TypeScriptException, CoreException {
 		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container);
-		CompilerOptions options = new CompilerOptions();
+		CompilerOptions options = tsconfig != null && tsconfig.getCompilerOptions() != null
+				? new CompilerOptions(tsconfig.getCompilerOptions()) : new CompilerOptions();
 		options.setListFiles(true);
 		options.setWatch(false);
 		super.compile(container.getLocation().toFile(), options, filenames, reporter);

@@ -25,11 +25,8 @@ public class CompilerOptions {
 	public CompilerOptions(CompilerOptions options) {
 		this.setCharset(options.getCharset());
 		this.setDeclaration(options.isDeclaration());
-
 		this.setListFiles(options.isListFiles());
-
 		this.setSourceMap(options.isSourceMap());
-
 		this.setOutDir(options.getOutDir());
 	}
 
