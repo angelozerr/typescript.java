@@ -84,7 +84,7 @@ public class TypeScriptCompilerLaunchConfigurationDelegate implements ILaunchCon
 					} catch (InterruptedException localInterruptedException) {
 					}
 				}
-				reporter.refreshFiles();
+				reporter.onCompilationCompleteWatchingForFileChanges();
 			}
 		} catch (TypeScriptException e) {
 			throw new CoreException(new Status(IStatus.ERROR, TypeScriptCorePlugin.PLUGIN_ID, "Error while tsc", e));

@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.compiler;
 
 import java.util.Scanner;
@@ -8,6 +18,10 @@ import ts.client.Location;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
+/**
+ * TypeScript Compiler (tsc) helper.
+ *
+ */
 public class TypeScriptCompilerHelper {
 
 	private static final Pattern TSC_ERROR_PATTERN = Pattern.compile(
@@ -15,10 +29,13 @@ public class TypeScriptCompilerHelper {
 
 	private static final String COMPILATION_COMPLETE_WATCHING_FOR_FILE_CHANGES = "Compilation complete. Watching for file changes.";
 
-	public static void main(String[] args) {
-		processMessage("a.ts(1,5): error TS1005: ';' expected.", null);
-	}
-
+	/**
+	 * Process "tsc" message and call the well
+	 * {@link ITypeScriptCompilerMessageHandler} method.
+	 * 
+	 * @param text
+	 * @param handler
+	 */
 	public static void processMessage(String text, ITypeScriptCompilerMessageHandler handler) {
 		if (StringUtils.isEmpty(text)) {
 			return;
@@ -31,12 +48,15 @@ public class TypeScriptCompilerHelper {
 				String line = scanner.nextLine();
 				line = line.trim(); // remove leading whitespace
 				if (line.endsWith(FileUtils.TS_EXTENSION) || line.endsWith(FileUtils.TSX_EXTENSION)) {
+					// Occurs when tsc is called with --listFiles
 					handler.addFile(line);
 				} else if (line.contains(COMPILATION_COMPLETE_WATCHING_FOR_FILE_CHANGES)) {
-					handler.refreshFiles();
+					// Occurs when tsc is called with --watch when compilation is finished.
+					handler.onCompilationCompleteWatchingForFileChanges();
 				} else {
 					Matcher m = TSC_ERROR_PATTERN.matcher(line);
 					if (m.matches()) {
+						// Error in an ts file.
 						String file = m.group(1);
 						String[] location = m.group(2).split(",");
 						Location startLoc = createLocation(location, true);

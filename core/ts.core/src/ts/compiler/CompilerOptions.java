@@ -17,7 +17,7 @@ public class CompilerOptions {
 
 	private String outDir;
 	private boolean allowJs;
-	private boolean watch;
+	private Boolean watch;
 
 	public CompilerOptions() {
 	}
@@ -121,11 +121,11 @@ public class CompilerOptions {
 		this.allowJs = allowJs;
 	}
 
-	public void setWatch(boolean watch) {
+	public void setWatch(Boolean watch) {
 		this.watch = watch;
 	}
 
-	public boolean isWatch() {
+	public Boolean isWatch() {
 		return watch;
 	}
 

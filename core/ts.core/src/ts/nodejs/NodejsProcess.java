@@ -73,7 +73,7 @@ public class NodejsProcess extends AbstractNodejsProcess {
 					notifyStartProcess(0);
 					BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					String line = null;
-					while ((line = r.readLine()) != null) {
+					while ((line = r.readLine()) != null && process != null) {
 						notifyMessage(line);
 					}
 				} catch (IOException e) {

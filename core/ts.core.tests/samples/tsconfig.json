@@ -4,7 +4,8 @@
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "watch": true
     },
     "files": [
         "sample.ts"

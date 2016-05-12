@@ -60,6 +60,7 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 		process.start();
 		try {
 			process.join();
+			// Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			throw new TypeScriptException(e);
 		}
@@ -85,6 +86,10 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 			}
 			if (options.isSourceMap()) {
 				args.add("--sourceMap");
+			}
+			Boolean watch = options.isWatch();
+			if (watch != null && watch) {
+				args.add("--watch");
 			}
 		}
 	}

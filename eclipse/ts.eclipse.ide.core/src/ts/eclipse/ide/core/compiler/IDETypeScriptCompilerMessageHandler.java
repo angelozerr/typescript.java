@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.core.compiler;
 
 import java.util.ArrayList;
@@ -17,7 +27,17 @@ import ts.compiler.TypeScriptCompilerSeverity;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
+import ts.resources.jsonconfig.TsconfigJson;
 
+/**
+ * Eclipse IDE implementation of {@link ITypeScriptCompilerMessageHandler} used
+ * to track "tsc" message to:
+ * 
+ * <ul>
+ * <li>add error marker to the *.ts files which have error.</li>
+ * <li>refresh emitted files *.js and *.js.map files</li>
+ * </ul>
+ */
 public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerMessageHandler {
 
 	/** Constant for marker type. */
@@ -55,7 +75,11 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 	}
 
 	@Override
-	public void refreshFiles() {
+	public void onCompilationCompleteWatchingForFileChanges() {
+		refreshFiles();
+	}
+
+	private void refreshFiles() {
 		for (IFile tsFile : getFilesToRefresh()) {
 			try {
 				TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, true, null);
@@ -80,8 +104,7 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 				marker.setAttribute(IMarker.SEVERITY, getSeverity(severity));
 				marker.setAttribute(IMarker.LINE_NUMBER, startLoc.getLine());
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
 			}
 		}
 	}
@@ -97,4 +120,9 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 		}
 	}
 
+	public boolean isWatch() {
+		TsconfigJson tsconfig = getTsconfig();
+		return tsconfig != null && tsconfig.getCompilerOptions() != null
+				&& tsconfig.getCompilerOptions().isWatch() != null && tsconfig.getCompilerOptions().isWatch();
+	}
 }
