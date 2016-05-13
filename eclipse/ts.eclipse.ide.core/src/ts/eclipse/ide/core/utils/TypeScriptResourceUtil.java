@@ -223,10 +223,11 @@ public class TypeScriptResourceUtil {
 	public static void refreshAndCollectEmittedFiles(IFile tsFile, IDETsconfigJson tsconfig, boolean refresh,
 			List<IFile> emittedFiles) throws CoreException {
 		IContainer baseDir = tsFile.getParent();
+		// Set outDir with the folder of the ts file.
 		IContainer outDir = tsFile.getParent();
 		if (tsconfig != null) {
-			// tsconfig.json is found and "outDir" is setted, check if *.js and
-			// *.js.map file in the "outDir" folder.
+			// tsconfig.json exists and "outDir" is setted, set "outDir" with
+			// the tsconfig.json/compilerOption/outDir
 			IContainer configOutDir = tsconfig.getOutDir();
 			if (configOutDir != null && configOutDir.exists()) {
 				outDir = configOutDir;
@@ -234,37 +235,50 @@ public class TypeScriptResourceUtil {
 		}
 
 		IPath tsFileNamePath = WorkbenchResourceUtil.getRelativePath(tsFile, baseDir).removeFileExtension();
-		// Check if *js file compiled exists
+		// Refresh *.js file
 		IPath jsFilePath = tsFileNamePath.addFileExtension(FileUtils.JS_EXTENSION);
-		refreshAndCollect(jsFilePath, outDir, refresh, emittedFiles);
-		// Check if *js.map file compiled exists
+		refreshAndCollectEmittedFile(jsFilePath, outDir, refresh, emittedFiles);
+		// Refresh *.js.map file
 		IPath jsMapFilePath = tsFileNamePath.addFileExtension(FileUtils.JS_EXTENSION)
 				.addFileExtension(FileUtils.MAP_EXTENSION);
-		refreshAndCollect(jsMapFilePath, outDir, refresh, emittedFiles);
-
+		refreshAndCollectEmittedFile(jsMapFilePath, outDir, refresh, emittedFiles);
+		// Refresh ts file
 		if (refresh) {
-			tsFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+			refreshFile(tsFile, false);
 		}
 	}
 
-	private static void refreshAndCollect(IPath filePath, IContainer baseDir, boolean refresh, List<IFile> emittedFiles)
-			throws CoreException {
-		IFile file = null;
+	/**
+	 * 
+	 * @param emittedFilePath
+	 * @param baseDir
+	 * @param refresh
+	 * @param emittedFiles
+	 * @throws CoreException
+	 */
+	public static void refreshAndCollectEmittedFile(IPath emittedFilePath, IContainer baseDir, boolean refresh,
+			List<IFile> emittedFiles) throws CoreException {
+		IFile emittedFile = null;
 		if (refresh) {
-			file = baseDir.getFile(filePath);
-			file.refreshLocal(IResource.DEPTH_INFINITE, null);
-			if (file.exists()) {
-				file.setDerived(true, null);
-			}
+			// refresh emitted file *.js, *.js.map
+			emittedFile = baseDir.getFile(emittedFilePath);
+			refreshFile(emittedFile, true);
 		}
 
 		if (emittedFiles != null) {
-			if (file == null && baseDir.exists(filePath)) {
-				file = baseDir.getFile(filePath);
+			if (emittedFile == null && baseDir.exists(emittedFilePath)) {
+				emittedFile = baseDir.getFile(emittedFilePath);
 			}
-			if (file != null) {
-				emittedFiles.add(file);
+			if (emittedFile != null) {
+				emittedFiles.add(emittedFile);
 			}
+		}
+	}
+
+	public static void refreshFile(IFile file, boolean emittedFile) throws CoreException {
+		file.refreshLocal(IResource.DEPTH_INFINITE, null);
+		if (emittedFile && file.exists()) {
+			file.setDerived(true, null);
 		}
 	}
 

@@ -77,8 +77,15 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 			args.addAll(filenames);
 		}
 		if (options != null) {
+			if (options.isAllowJs()) {
+				args.add("--allowJs");
+			}
 			if (options.isListFiles()) {
 				args.add("--listFiles");
+			}
+			if (!StringUtils.isEmpty(options.getMapRoot())) {
+				args.add("--mapRoot");
+				args.add(options.getMapRoot());
 			}
 			if (!StringUtils.isEmpty(options.getOutDir())) {
 				args.add("--outDir");
@@ -86,6 +93,13 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 			}
 			if (options.isSourceMap()) {
 				args.add("--sourceMap");
+			}
+			if (!StringUtils.isEmpty(options.getSourceRoot())) {
+				args.add("--sourceRoot");
+				args.add(options.getSourceRoot());
+			}
+			if (options.isTraceResolution()) {
+				args.add("--traceResolution");
 			}
 			Boolean watch = options.isWatch();
 			if (watch != null && watch) {

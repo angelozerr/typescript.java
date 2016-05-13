@@ -45,9 +45,26 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 			compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFiles, true);
 		} else {
 			if (tsconfig.isCompileOnSave()) {
-				// compileOnSave is activated, compile the list of ts
-				// files.
-				compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFiles, false);
+				// compileOnSave is activated
+				if (tsconfig.hasOutFile()) {
+					// tsconfig.json defines "compilerOptions/outFile" or
+					// "compilerOptions/out", the ts files cannot be compiled
+					// add a warning by suggesting to use "buildOnSave"
+					for (IFile tsFile : tsFiles) {
+						// delete existing marker
+						TypeScriptResourceUtil.deleteTscMarker(tsFile);
+						// add warning marker
+						TypeScriptResourceUtil.addTscMarker(tsFile,
+								NLS.bind(TypeScriptCoreMessages.tsconfig_cannot_use_compileOnSave_with_outFile_error,
+										tsconfig.getTsconfigFile().getProjectRelativePath().toString()),
+								IMarker.SEVERITY_WARNING, 1);
+						// delete emitted files *.js, *.js.map
+						TypeScriptResourceUtil.deleteEmittedFiles(tsFile, tsconfig);
+					}
+				} else {
+					// compile the list of ts files.
+					compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFiles, false);
+				}
 			} else {
 				// compileOnSave is setted to false in the
 				// tsconfig.json,
@@ -74,20 +91,17 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 		IContainer container = tsConfigFile.getParent();
 		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container,
 				!buildOnSave ? tsFiles : null);
-		CompilerOptions options = tsconfigOptions != null ? new CompilerOptions(tsconfigOptions)
-				: new CompilerOptions();
-		if (buildOnSave && tsconfigOptions != null) {
-			// buildOnSave, copy outFile
-			options.setOutFile(tsconfigOptions.getOutFile());
-		}
-		options.setListFiles(true);
-		options.setWatch(false);
+		CompilerOptions options = createOptions(tsconfigOptions, buildOnSave);
+		// compile ts files to *.js, *.js.map files
 		super.compile(container.getLocation().toFile(), options, reporter.getFileNames(), reporter);
+		// refresh *.js, *.js.map which have been generated with tsc.
 		reporter.refreshEmittedFiles();
 		// check the given list of ts files are the same than tsc
 		// --listFiles
 		for (IFile tsFile : tsFiles) {
 			if (!reporter.getFilesToRefresh().contains(tsFile)) {
+				// The ts file to compile is not in the compilation context of
+				// the tsconfig.json
 				// delete existing marker
 				TypeScriptResourceUtil.deleteTscMarker(tsFile);
 				// add warning marker
@@ -98,6 +112,18 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 			}
 		}
 
+	}
+
+	private CompilerOptions createOptions(CompilerOptions tsconfigOptions, boolean buildOnSave) {
+		CompilerOptions options = tsconfigOptions != null ? new CompilerOptions(tsconfigOptions)
+				: new CompilerOptions();
+		if (buildOnSave && tsconfigOptions != null) {
+			// buildOnSave, copy outFile
+			options.setOutFile(tsconfigOptions.getOutFile());
+		}
+		options.setListFiles(true);
+		options.setWatch(false);
+		return options;
 	}
 
 }

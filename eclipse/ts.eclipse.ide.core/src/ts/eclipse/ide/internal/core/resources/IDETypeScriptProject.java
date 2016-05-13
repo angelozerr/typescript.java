@@ -35,6 +35,7 @@ import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.compiler.IDETypeScriptCompiler;
@@ -233,6 +234,11 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public boolean isInScope(IResource resource) {
 		try {
+			// check if the given resource is a file
+			IFile file = resource.getType() == IResource.FILE ? (IFile) resource : null;
+			if (file == null) {
+				return false;
+			}
 			// Use project preferences, which defines include/exclude path
 			ITypeScriptRootContainer tsContainer = getTypeScriptBuildPath().findRootContainer(resource);
 			if (tsContainer == null) {
@@ -242,10 +248,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 					|| IDEResourcesManager.getInstance().isJsxFile(resource);
 			if (isJSFile) {
 				// Can validate js file?
-				return isJsFileIsInScope(resource, tsContainer);
+				return isJsFileIsInScope(file, tsContainer);
 			}
 			// is ts file is included ?
-			return isTsFileIsInScope(resource, tsContainer);
+			return isTsFileIsInScope(file, tsContainer);
 		} catch (CoreException e) {
 			Trace.trace(Trace.SEVERE, "Error while getting tsconfig.json for canValidate", e);
 		}
@@ -256,14 +262,18 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * Returns true if the given js, jsx file can be validated and false
 	 * otherwise.
 	 * 
-	 * @param resource
+	 * @param file
 	 * @return true if the given js, jsx file can be validated and false
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean isJsFileIsInScope(IResource resource, ITypeScriptRootContainer tsContainer) throws CoreException {
+	private boolean isJsFileIsInScope(IFile file, ITypeScriptRootContainer tsContainer) throws CoreException {
+		if (TypeScriptResourceUtil.isEmittedFile(file)) {
+			// the js file is an emitted file
+			return false;
+		}
 		// Search if a jsconfig.json exists?
-		IFile jsconfigFile = JsonConfigResourcesManager.getInstance().findJsconfigFile(resource);
+		IFile jsconfigFile = JsonConfigResourcesManager.getInstance().findJsconfigFile(file);
 		if (jsconfigFile != null) {
 			return true;
 		}
@@ -281,15 +291,15 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * Returns true if the given ts, tsx file can be validated and false
 	 * otherwise.
 	 * 
-	 * @param resource
+	 * @param file
 	 * @return true if the given ts, tsx file can be validated and false
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean isTsFileIsInScope(IResource resource, ITypeScriptRootContainer tsContainer) throws CoreException {
+	private boolean isTsFileIsInScope(IFile file, ITypeScriptRootContainer tsContainer) throws CoreException {
 		IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 		if (tsconfig != null) {
-			return tsconfig.isInScope(resource);
+			return tsconfig.isInScope(file);
 		}
 		// tsconfig.json was not found (ex : MyProject/node_modules),
 		// validation must not be done.

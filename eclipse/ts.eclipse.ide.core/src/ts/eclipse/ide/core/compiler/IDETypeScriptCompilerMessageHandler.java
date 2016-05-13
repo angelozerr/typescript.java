@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -27,8 +26,10 @@ import ts.compiler.TypeScriptCompilerSeverity;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.resources.jsonconfig.TsconfigJson;
+import ts.utils.FileUtils;
 
 /**
  * Eclipse IDE implementation of {@link ITypeScriptCompilerMessageHandler} used
@@ -83,6 +84,11 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 		}
 	}
 
+	/**
+	 * Refresh emitted files *.js , *.js.map
+	 * 
+	 * @throws CoreException
+	 */
 	public void refreshEmittedFiles() throws CoreException {
 		// refresh *.js, *.js.map files
 		for (IFile tsFile : getFilesToRefresh()) {
@@ -94,10 +100,15 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 		}
 		// refresh outFile if tsconfig.json defines it.
 		if (tsconfig != null) {
+			// Refresh *.js outFile
 			IFile outFile = tsconfig.getOutFile();
-			outFile.refreshLocal(IResource.DEPTH_INFINITE, null);
-			if (outFile.exists()) {
-				outFile.setDerived(true, null);
+			if (outFile != null) {
+				TypeScriptResourceUtil.refreshFile(outFile, true);
+				// Refresh *.js.map outFile
+				IContainer outDir = outFile.getParent();
+				IPath mapFileNamePath = WorkbenchResourceUtil.getRelativePath(outFile, outDir)
+						.addFileExtension(FileUtils.MAP_EXTENSION);
+				TypeScriptResourceUtil.refreshAndCollectEmittedFile(mapFileNamePath, outDir, true, null);
 			}
 		}
 	}

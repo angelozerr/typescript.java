@@ -29,9 +29,10 @@ public class TypeScriptCoreMessages extends NLS {
 	public static String SaveProjectPreferencesJob_name;
 	public static String SaveProjectPreferencesJob_taskName;
 
-	// tsconfig.json
+	// tsconfig.json errors while compilation on save
 	public static String tsconfig_compileOnSave_disable_error;
 	public static String tsconfig_compilation_context_error;
+	public static String tsconfig_cannot_use_compileOnSave_with_outFile_error;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

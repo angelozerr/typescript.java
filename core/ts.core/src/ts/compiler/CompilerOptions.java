@@ -4,14 +4,19 @@ package ts.compiler;
  * Instructs the TypeScript compiler how to compile .ts files.
  * 
  * @see http://json.schemastore.org/tsconfig
+ * @se https://www.typescriptlang.org/docs/handbook/compiler-options.html
  *
  */
 public class CompilerOptions {
+
+	private boolean allowJs = true;
 
 	private String charset;
 	private boolean declaration;
 
 	private boolean listFiles;
+
+	private String mapRoot;
 
 	private boolean sourceMap;
 
@@ -19,18 +24,44 @@ public class CompilerOptions {
 	private String out;
 	private String outFile;
 
-	private boolean allowJs;
+	private String sourceRoot;
+
+	private boolean traceResolution;
+
 	private Boolean watch;
 
 	public CompilerOptions() {
 	}
 
 	public CompilerOptions(CompilerOptions options) {
+		this.setAllowJs(options.isAllowJs());
 		this.setCharset(options.getCharset());
 		this.setDeclaration(options.isDeclaration());
 		this.setListFiles(options.isListFiles());
+		this.setMapRoot(options.getMapRoot());
 		this.setSourceMap(options.isSourceMap());
+		this.setSourceRoot(options.getSourceRoot());
 		this.setOutDir(options.getOutDir());
+	}
+
+	/**
+	 * Returns true if allow JavaScript files to be compiled and false
+	 * otherwise.
+	 * 
+	 * @return true if allow JavaScript files to be compiled and false
+	 *         otherwise.
+	 */
+	public boolean isAllowJs() {
+		return allowJs;
+	}
+
+	/**
+	 * Allow JavaScript files to be compiled.
+	 * 
+	 * @param allowJs
+	 */
+	public void setAllowJs(boolean allowJs) {
+		this.allowJs = allowJs;
 	}
 
 	/**
@@ -85,6 +116,18 @@ public class CompilerOptions {
 	 */
 	public void setListFiles(boolean listFiles) {
 		this.listFiles = listFiles;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getMapRoot() {
+		return mapRoot;
+	}
+
+	public void setMapRoot(String mapRoot) {
+		this.mapRoot = mapRoot;
 	}
 
 	/**
@@ -155,12 +198,48 @@ public class CompilerOptions {
 		this.out = out;
 	}
 
-	public boolean isAllowJs() {
-		return allowJs;
+	/**
+	 * Specifies the location where debugger should locate TypeScript files
+	 * instead of source locations. Use this flag if the sources will be located
+	 * at run-time in a different location than that at design-time. The
+	 * location specified will be embedded in the sourceMap to direct the
+	 * debugger where the source files where be located.
+	 * 
+	 * @return
+	 */
+	public String getSourceRoot() {
+		return sourceRoot;
 	}
 
-	public void setAllowJs(boolean allowJs) {
-		this.allowJs = allowJs;
+	/**
+	 * Specifies the location where debugger should locate TypeScript files
+	 * instead of source locations. Use this flag if the sources will be located
+	 * at run-time in a different location than that at design-time. The
+	 * location specified will be embedded in the sourceMap to direct the
+	 * debugger where the source files where be located.
+	 * 
+	 * @param sourceRoot
+	 */
+	public void setSourceRoot(String sourceRoot) {
+		this.sourceRoot = sourceRoot;
+	}
+
+	/**
+	 * Report module resolution log messages.
+	 * 
+	 * @return
+	 */
+	public boolean isTraceResolution() {
+		return traceResolution;
+	}
+
+	/**
+	 * Report module resolution log messages.
+	 * 
+	 * @param traceResolution
+	 */
+	public void setTraceResolution(boolean traceResolution) {
+		this.traceResolution = traceResolution;
 	}
 
 	public void setWatch(Boolean watch) {

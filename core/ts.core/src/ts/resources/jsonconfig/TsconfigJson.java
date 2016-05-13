@@ -127,6 +127,21 @@ public class TsconfigJson {
 	}
 
 	/**
+	 * Returns true if the "compilerOptions" defines "out" or "outFile" and
+	 * false otherwise.
+	 * 
+	 * @return true if the "compilerOptions" defines "out" or "outFile" and
+	 *         false otherwise.
+	 */
+	public boolean hasOutFile() {
+		CompilerOptions options = getCompilerOptions();
+		if (options == null) {
+			return false;
+		}
+		return !StringUtils.isEmpty(options.getOutFile()) || !StringUtils.isEmpty(options.getOut());
+	}
+
+	/**
 	 * Returns the defined "exclude" list from the tsconfig.json other exclude
 	 * by default "node_modules" and "bower_components".
 	 * 

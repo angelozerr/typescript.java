@@ -176,5 +176,4 @@ public class IDETsconfigJson extends TsconfigJson {
 		}
 		return !isExcluded(resource);
 	}
-
 }
