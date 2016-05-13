@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import ts.compiler.CompilerOptions;
 import ts.utils.FileUtils;
@@ -161,7 +162,11 @@ public class TsconfigJson {
 
 	public static <T extends TsconfigJson> T load(Reader json, Class<T> classOfT) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-		return gson.fromJson(json, classOfT);
+		T o = gson.fromJson(json, classOfT);
+		if (o == null) {
+			throw new JsonSyntaxException("JSON Syntax error");
+		}
+		return o;
 	}
 
 	public static <T extends TsconfigJson> T load(InputStream in, Class<T> classOfT) {
