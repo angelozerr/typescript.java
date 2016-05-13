@@ -11,6 +11,7 @@
 package ts.eclipse.ide.internal.core.compiler;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -62,8 +63,16 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 						TypeScriptResourceUtil.deleteEmittedFiles(tsFile, tsconfig);
 					}
 				} else {
+					// check that ts files are in the scope of the tsconfig.json
+					List<IFile> tsFilesToCompile = new ArrayList<IFile>(tsFiles);
+					for (IFile tsFile : tsFiles) {
+						if (!tsconfig.isInScope(tsFile)) {
+							tsFilesToCompile.remove(tsFile);
+							addCompilationContextMarkerError(tsFile, tsconfig.getTsconfigFile());
+						}
+					}
 					// compile the list of ts files.
-					compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFiles, false);
+					compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFilesToCompile, false);
 				}
 			} else {
 				// compileOnSave is setted to false in the
@@ -100,18 +109,20 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 		// --listFiles
 		for (IFile tsFile : tsFiles) {
 			if (!reporter.getFilesToRefresh().contains(tsFile)) {
-				// The ts file to compile is not in the compilation context of
-				// the tsconfig.json
-				// delete existing marker
-				TypeScriptResourceUtil.deleteTscMarker(tsFile);
-				// add warning marker
-				TypeScriptResourceUtil.addTscMarker(tsFile,
-						NLS.bind(TypeScriptCoreMessages.tsconfig_compilation_context_error,
-								tsConfigFile.getProjectRelativePath().toString()),
-						IMarker.SEVERITY_WARNING, 1);
+				addCompilationContextMarkerError(tsFile, tsConfigFile);
 			}
 		}
 
+	}
+
+	private void addCompilationContextMarkerError(IFile tsFile, IFile tsConfigFile) throws CoreException {
+		// The ts file to compile is not in the compilation context of
+		// the tsconfig.json
+		// delete existing marker
+		TypeScriptResourceUtil.deleteTscMarker(tsFile);
+		// add warning marker
+		TypeScriptResourceUtil.addTscMarker(tsFile, NLS.bind(TypeScriptCoreMessages.tsconfig_compilation_context_error,
+				tsConfigFile.getProjectRelativePath().toString()), IMarker.SEVERITY_WARNING, 1);
 	}
 
 	private CompilerOptions createOptions(CompilerOptions tsconfigOptions, boolean buildOnSave) {
