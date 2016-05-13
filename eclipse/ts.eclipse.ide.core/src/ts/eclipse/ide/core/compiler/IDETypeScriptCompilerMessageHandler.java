@@ -95,8 +95,9 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 		// refresh outFile if tsconfig.json defines it.
 		if (tsconfig != null) {
 			IFile outFile = tsconfig.getOutFile();
-			if (outFile != null && outFile.exists()) {
-				outFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+			outFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+			if (outFile.exists()) {
+				outFile.setDerived(true, null);
 			}
 		}
 	}
