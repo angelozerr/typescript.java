@@ -9,7 +9,7 @@ package ts.compiler;
  */
 public class CompilerOptions {
 
-	private boolean allowJs = true;
+	private Boolean allowJs;
 
 	private String charset;
 	private boolean declaration;
@@ -51,7 +51,7 @@ public class CompilerOptions {
 	 * @return true if allow JavaScript files to be compiled and false
 	 *         otherwise.
 	 */
-	public boolean isAllowJs() {
+	public Boolean isAllowJs() {
 		return allowJs;
 	}
 
@@ -60,7 +60,7 @@ public class CompilerOptions {
 	 * 
 	 * @param allowJs
 	 */
-	public void setAllowJs(boolean allowJs) {
+	public void setAllowJs(Boolean allowJs) {
 		this.allowJs = allowJs;
 	}
 

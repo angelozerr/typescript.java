@@ -77,7 +77,7 @@ public class TypeScriptCompiler implements ITypeScriptCompiler {
 			args.addAll(filenames);
 		}
 		if (options != null) {
-			if (options.isAllowJs()) {
+			if (options.isAllowJs() != null && options.isAllowJs()) {
 				args.add("--allowJs");
 			}
 			if (options.isListFiles()) {

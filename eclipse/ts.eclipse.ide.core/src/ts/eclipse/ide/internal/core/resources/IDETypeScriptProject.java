@@ -279,7 +279,8 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		}
 		// Search if tsconfig.json exists and defines alloyJs
 		IDETsconfigJson tsconfig = tsContainer.getTsconfig();
-		if (tsconfig != null && tsconfig.getCompilerOptions() != null && tsconfig.getCompilerOptions().isAllowJs()) {
+		if (tsconfig != null && tsconfig.getCompilerOptions() != null
+				&& tsconfig.getCompilerOptions().isAllowJs() != null && tsconfig.getCompilerOptions().isAllowJs()) {
 			return true;
 		}
 		// jsconfig.json was not found (ex : MyProject/node_modules),
