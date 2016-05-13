@@ -40,7 +40,7 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 	@Override
 	public void compile(IDETsconfigJson tsconfig, List<IFile> tsFiles) throws TypeScriptException, CoreException {
 		IFile tsconfigFile = tsconfig.getTsconfigFile();
-		if (tsconfig.isBuildOnSave() || tsconfig.isCompileOnSave()) {
+		if (tsconfig.isBuildOnSave()) {
 			// Compile the whole files for the given tsconfig.json
 			compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFiles, true);
 		} else {
