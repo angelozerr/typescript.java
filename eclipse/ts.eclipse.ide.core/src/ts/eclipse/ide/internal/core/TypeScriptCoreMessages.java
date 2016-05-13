@@ -30,8 +30,9 @@ public class TypeScriptCoreMessages extends NLS {
 	public static String SaveProjectPreferencesJob_taskName;
 
 	// tsconfig.json
-	public static String tsconfig_compileOnSave_disable;
-
+	public static String tsconfig_compileOnSave_disable_error;
+	public static String tsconfig_compilation_context_error;
+	
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

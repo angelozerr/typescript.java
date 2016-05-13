@@ -15,8 +15,10 @@ import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
 import ts.compiler.CompilerOptions;
@@ -24,7 +26,7 @@ import ts.compiler.TypeScriptCompiler;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
-import ts.eclipse.ide.internal.core.Trace;
+import ts.eclipse.ide.internal.core.TypeScriptCoreMessages;
 
 /**
  * Extends {@link TypeScriptCompiler} to use Eclipse {@link IResource}.
@@ -36,40 +38,66 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 	}
 
 	@Override
-	public void compile(IContainer container) throws TypeScriptException, CoreException {
-		compile(container, null);
-	}
-
-	@Override
-	public void compile(IContainer container, List<IFile> tsFiles) throws TypeScriptException, CoreException {
-		IDETsconfigJson tsconfig = TypeScriptResourceUtil.findTsconfig(container);
-		compile(tsconfig, container, tsFiles);
-	}
-
-	@Override
-	public void compile(IDETsconfigJson tsconfig) throws TypeScriptException, CoreException {
-		compile(tsconfig, null);
-	}
-
-	@Override
 	public void compile(IDETsconfigJson tsconfig, List<IFile> tsFiles) throws TypeScriptException, CoreException {
-		IContainer container = tsconfig.getTsconfigFile().getParent();
-		compile(tsconfig, container, tsFiles);
+		IFile tsconfigFile = tsconfig.getTsconfigFile();
+		if (tsconfig.isBuildOnSave() || tsconfig.isCompileOnSave()) {
+			// Compile the whole files for the given tsconfig.json
+			compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFiles, true);
+		} else {
+			if (tsconfig.isCompileOnSave()) {
+				// compileOnSave is activated, compile the list of ts
+				// files.
+				compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFiles, false);
+			} else {
+				// compileOnSave is setted to false in the
+				// tsconfig.json,
+				// add a warning marker inside each ts files that user
+				// whish
+				// to compile
+				for (IFile tsFile : tsFiles) {
+					// delete existing marker
+					TypeScriptResourceUtil.deleteTscMarker(tsFile);
+					// add warning marker
+					TypeScriptResourceUtil.addTscMarker(tsFile,
+							NLS.bind(TypeScriptCoreMessages.tsconfig_compileOnSave_disable_error,
+									tsconfig.getTsconfigFile().getProjectRelativePath().toString()),
+							IMarker.SEVERITY_WARNING, 1);
+					// delete emitted files *.js, *.js.map
+					TypeScriptResourceUtil.deleteEmittedFiles(tsFile, tsconfig);
+				}
+			}
+		}
 	}
 
-	private void compile(IDETsconfigJson tsconfig, IContainer container, List<IFile> tsFiles)
+	private void compile(IFile tsConfigFile, CompilerOptions tsconfigOptions, List<IFile> tsFiles, boolean buildOnSave)
 			throws TypeScriptException, CoreException {
-		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container, tsFiles);
-		CompilerOptions options = tsconfig != null && tsconfig.getCompilerOptions() != null
-				? new CompilerOptions(tsconfig.getCompilerOptions()) : new CompilerOptions();
-		if (tsFiles == null && tsconfig != null && tsconfig.getCompilerOptions() != null) {
+		IContainer container = tsConfigFile.getParent();
+		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container,
+				!buildOnSave ? tsFiles : null);
+		CompilerOptions options = tsconfigOptions != null ? new CompilerOptions(tsconfigOptions)
+				: new CompilerOptions();
+		if (buildOnSave) {
 			// buildOnSave, copy outFile
-			options.setOutFile(tsconfig.getCompilerOptions().getOutFile());
-
+			options.setOutFile(tsconfigOptions.getOutFile());
 		}
 		options.setListFiles(true);
 		options.setWatch(false);
 		super.compile(container.getLocation().toFile(), options, reporter.getFileNames(), reporter);
 		reporter.refreshEmittedFiles();
+		// check the given list of ts files are the same than tsc
+		// --listFiles
+		for (IFile tsFile : tsFiles) {
+			if (!reporter.getFilesToRefresh().contains(tsFile)) {
+				// delete existing marker
+				TypeScriptResourceUtil.deleteTscMarker(tsFile);
+				// add warning marker
+				TypeScriptResourceUtil.addTscMarker(tsFile,
+						NLS.bind(TypeScriptCoreMessages.tsconfig_compilation_context_error,
+								tsConfigFile.getProjectRelativePath().toString()),
+						IMarker.SEVERITY_WARNING, 1);
+			}
+		}
+
 	}
+
 }

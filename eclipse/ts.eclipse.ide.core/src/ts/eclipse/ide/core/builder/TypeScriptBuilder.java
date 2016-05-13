@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -15,7 +14,6 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
@@ -24,7 +22,6 @@ import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
-import ts.eclipse.ide.internal.core.TypeScriptCoreMessages;
 
 /**
  * Builder to transpiles TypeScript files into JavaScript files and source map
@@ -67,7 +64,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			try {
 				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 				if (tsconfig == null || tsconfig.isCompileOnSave()) {
-					tsProject.getCompiler().compile(tsconfig);
+					tsProject.getCompiler().compile(tsconfig, null);
 				}
 			} catch (TypeScriptException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
@@ -132,36 +129,10 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		// Compile ts files *.ts
 		for (Entry<ITypeScriptRootContainer, List<IFile>> entries : tsFilesToCompile.entrySet()) {
 			ITypeScriptRootContainer tsContainer = entries.getKey();
+			List<IFile> tsFiles = entries.getValue();
 			try {
 				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
-				if (tsconfig.isBuildOnSave()) {
-					// Compile the whole files for the given tsconfig.json
-					tsProject.getCompiler().compile(tsconfig, null);
-				} else {
-					List<IFile> tsFiles = entries.getValue();
-					if (tsconfig.isCompileOnSave()) {
-						// compileOnSave is activated, compile the list of ts
-						// files.
-						tsProject.getCompiler().compile(tsconfig, tsFiles);
-					} else {
-						// compileOnSave is setted to false in the
-						// tsconfig.json,
-						// add a warning marker inside each ts files that user
-						// which
-						// to compile
-						for (IFile tsFile : tsFiles) {
-							// delete existing marker
-							TypeScriptResourceUtil.deleteTscMarker(tsFile);
-							// add warning marker
-							TypeScriptResourceUtil.addTscMarker(tsFile,
-									NLS.bind(TypeScriptCoreMessages.tsconfig_compileOnSave_disable,
-											tsconfig.getTsconfigFile().getProjectRelativePath().toString()),
-									IMarker.SEVERITY_WARNING, 1);
-							// delete emitted files *.js, *.js.map
-							TypeScriptResourceUtil.deleteEmittedFiles(tsFile, tsconfig);
-						}
-					}
-				}
+				tsProject.getCompiler().compile(tsconfig, tsFiles);
 			} catch (TypeScriptException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
 			}
