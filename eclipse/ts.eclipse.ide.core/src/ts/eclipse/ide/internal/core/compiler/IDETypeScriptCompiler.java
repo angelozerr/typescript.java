@@ -76,7 +76,7 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 				!buildOnSave ? tsFiles : null);
 		CompilerOptions options = tsconfigOptions != null ? new CompilerOptions(tsconfigOptions)
 				: new CompilerOptions();
-		if (buildOnSave) {
+		if (buildOnSave && tsconfigOptions != null) {
 			// buildOnSave, copy outFile
 			options.setOutFile(tsconfigOptions.getOutFile());
 		}
