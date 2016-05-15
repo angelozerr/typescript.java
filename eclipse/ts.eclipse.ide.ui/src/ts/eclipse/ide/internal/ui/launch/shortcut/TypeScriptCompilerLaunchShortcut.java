@@ -1,6 +1,7 @@
 package ts.eclipse.ide.internal.ui.launch.shortcut;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -17,6 +18,7 @@ import org.eclipse.ui.IEditorPart;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.launch.TypeScriptCompilerLaunchConstants;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 
 public class TypeScriptCompilerLaunchShortcut implements ILaunchShortcut {
 
@@ -85,6 +87,8 @@ public class TypeScriptCompilerLaunchShortcut implements ILaunchShortcut {
 			return (IContainer) element;
 		} else if (element instanceof ITypeScriptRootContainer) {
 			return ((ITypeScriptRootContainer) element).getContainer();
+		} else if (element instanceof IFile && TypeScriptResourceUtil.isTsConfigFile((IFile) element)) {
+			return ((IFile) element).getParent();
 		}
 		return null;
 	}
