@@ -536,14 +536,17 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	class OccurrencesCollector
 			implements ITypeScriptOccurrencesCollector, ITypeScriptAsynchCollector, ICancellationToken {
 
-		private final IDocument document;
+		private IDocument document;
 		private List<Position> positions;
 		private ITextSelection selection;
 		private boolean canceled;
 
-		public OccurrencesCollector(IDocument document) {
-			this.document = document;
+		public OccurrencesCollector() {			
 			this.positions = new ArrayList<Position>();
+		}
+		
+		public void setDocument(IDocument document) {
+			this.document = document;
 		}
 
 		@Override
@@ -610,8 +613,9 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 			return;
 
 		if (occurrencesCollector == null) {
-			occurrencesCollector = new OccurrencesCollector(document);
+			occurrencesCollector = new OccurrencesCollector();
 		}
+		occurrencesCollector.setDocument(document);
 		try {
 			ITypeScriptFile tsFile = getTypeScriptFile(document);
 			occurrencesCollector.setSelection(selection);
