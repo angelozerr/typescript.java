@@ -45,7 +45,7 @@ public class TypeScriptCompletionProposalComputer
 			resource = tsContext.getResource();
 		} else if (context instanceof JavaContentAssistInvocationContext) {
 			JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-			resource = javaContext.getCompilationUnit().getResource();
+			resource = javaContext.getCompilationUnit() != null ? javaContext.getCompilationUnit().getResource() : null;
 		}
 		if (resource != null) {
 			try {

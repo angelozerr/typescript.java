@@ -183,11 +183,6 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 		} else {
 			int newOffset = baseOffset + replacement.length();
-			/*
-			 * if (isObjectKey() && TernTypeHelper.isStringType(getType())) { //
-			 * select cursor inside quote of property value (ex : config: // "")
-			 * newOffset--; }
-			 */
 			fSelectedRegion = new Region(newOffset, 0);
 		}
 	}
@@ -196,7 +191,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 		try {
 			ICompletionEntryDetails details = super.getEntryDetails();
-			TypeScriptKind tsKind = TypeScriptKind.getKind(details.getKind());
+			TypeScriptKind tsKind = details != null ? TypeScriptKind.getKind(details.getKind()) : null;
 			if (tsKind != null && (TypeScriptKind.CONSTRUCTOR == tsKind || TypeScriptKind.FUNCTION == tsKind
 					|| TypeScriptKind.METHOD == tsKind)) {
 				// It's a function
@@ -248,63 +243,14 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 				replacement.append(SPACE);
 			}
 
-			/*
-			 * if (parameter.isFunction() && isGenerateAnonymousFunction() &&
-			 * initialFunction) { FunctionInfo info = parameter.getInfo();
-			 * List<Parameter> parametersOfParam = info.getParameters();
-			 * replacement.append("function("); if (parametersOfParam != null) {
-			 * computeReplacementString(parametersOfParam, replacement,
-			 * arguments, indentation, nbIndentations + 1, false); } else { //
-			 * to select focus inside the () of generated inline // function
-			 * arguments.addArg(replacement.length(), 0); }
-			 * replacement.append(") {"); replacement.append("\n");
-			 * indent(replacement, indentation, nbIndentations);
-			 * indent(replacement); if
-			 * (!StringUtils.isEmpty(info.getReturnType())) { if
-			 * (TernTypeHelper.isStringType(info.getReturnType())) {
-			 * replacement.append("return \"\";"); } else if
-			 * (TernTypeHelper.isBoolType(info.getReturnType())) {
-			 * replacement.append("return true;"); } else if
-			 * ("{}".equals(info.getReturnType())) {
-			 * replacement.append("return {"); replacement.append("\n");
-			 * indent(replacement, indentation, nbIndentations);
-			 * indent(replacement); indent(replacement); // to select focus
-			 * inside the {} of generated return // statement of the function.
-			 * arguments.addArg(replacement.length(), 0);
-			 * replacement.append("\n"); indent(replacement, indentation,
-			 * nbIndentations); indent(replacement); replacement.append("}"); }
-			 * } else { // to select focus inside the {} of generated inline //
-			 * function arguments.addArg(replacement.length(), 0); }
-			 * replacement.append("\n"); indent(replacement, indentation,
-			 * nbIndentations); replacement.append("}"); } else {
-			 */
-			/*
-			 * if ("{}".equals(parameter.getType()) && isGenerateObjectValue()
-			 * && initialFunction) { replacement.append("{");
-			 * replacement.append("\n"); indent(replacement, indentation,
-			 * nbIndentations); replacement.append("}"); } else {
-			 */
 			int offset = replacement.length();
 			paramName = parameter.getText();
 			// to select focus for parameter
 			replacement.append(paramName);
-			// if (initialFunction) {
-			// arguments.addParameter(offset, paramName.length(),
-			// paramName, i);
-			// } else {
 			arguments.addArg(offset, paramName.length());
 			hasParam = true;
-			// }
-
-			// }
-			// }
 		}
-
 	}
-
-	// protected void indent(StringBuilder replacement) {
-	// replacement.append(indentChars);
-	// }
 
 	/**
 	 * Returns the indentation characters from the given line.
