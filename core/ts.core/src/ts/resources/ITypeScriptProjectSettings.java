@@ -13,6 +13,7 @@ package ts.resources;
 import java.io.File;
 
 import ts.TypeScriptException;
+import ts.client.completions.ICompletionEntryMatcher;
 
 /**
  * TypeScript project settings API.
@@ -48,6 +49,12 @@ public interface ITypeScriptProjectSettings {
 	 * @throws TypeScriptException
 	 */
 	File getTsserverFile() throws TypeScriptException;
+
+	/**
+	 * Returns the completion entry matcher to use to filter TypeScript
+	 * completion entries.
+	 */
+	ICompletionEntryMatcher getCompletionEntryMatcher();
 
 	/**
 	 * Dispose the settings.

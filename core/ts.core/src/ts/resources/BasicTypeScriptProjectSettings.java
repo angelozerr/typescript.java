@@ -12,6 +12,7 @@ package ts.resources;
 
 import java.io.File;
 
+import ts.client.completions.ICompletionEntryMatcher;
 import ts.internal.repository.TypeScriptRepository;
 import ts.repository.ITypeScriptRepository;
 import ts.repository.TypeScriptRepositoryException;
@@ -25,6 +26,7 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	private final File nodejsInstallPath;
 	private final SynchStrategy synchStrategy;
 	private final ITypeScriptRepository repository;
+	private ICompletionEntryMatcher completionEntryMatcher;
 
 	public BasicTypeScriptProjectSettings(File nodejsInstallPath, File typeScriptDir)
 			throws TypeScriptRepositoryException {
@@ -56,6 +58,15 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	@Override
 	public File getTsserverFile() {
 		return repository.getTsserverFile();
+	}
+
+	@Override
+	public ICompletionEntryMatcher getCompletionEntryMatcher() {
+		return completionEntryMatcher;
+	}
+
+	public void setCompletionEntryMatcher(ICompletionEntryMatcher completionEntryMatcher) {
+		this.completionEntryMatcher = completionEntryMatcher;
 	}
 
 	@Override

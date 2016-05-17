@@ -14,15 +14,19 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 
 import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.CompletionEntry;
+import ts.client.completions.ICompletionEntryMatcher;
 
+/**
+ * {@link IContentProposal} implementation with TypeScript completion entry.
+ */
 public class TypeScriptContentProposal extends CompletionEntry implements IContentProposal {
 
 	private final String content;
 	private final String description;
 
 	public TypeScriptContentProposal(String name, String kind, String kindModifiers, String sortText, String prefix,
-			String fileName, int line, int offset, ITypeScriptServiceClient client) {
-		super(name, kind, kindModifiers, sortText, fileName, line, offset, client);
+			String fileName, int line, int offset, ITypeScriptServiceClient client, ICompletionEntryMatcher matcher) {
+		super(name, kind, kindModifiers, sortText, fileName, line, offset, client, matcher);
 		this.content = name.substring(prefix.length(), name.length());
 		this.description = null;
 	}

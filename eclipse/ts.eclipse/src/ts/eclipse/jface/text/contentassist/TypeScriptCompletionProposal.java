@@ -1,3 +1,14 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
+
 package ts.eclipse.jface.text.contentassist;
 
 import java.util.List;
@@ -7,13 +18,17 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension7;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -22,13 +37,18 @@ import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.ICompletionEntryDetails;
+import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.SymbolDisplayPart;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 import ts.utils.StringUtils;
 import ts.utils.TypeScriptHelper;
 
-public class TypeScriptCompletionProposal extends CompletionEntry implements ICompletionProposal,
-		ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3 {
+/**
+ * {@link ICompletionProposal} implementation with TypeScript completion entry.
+ */
+public class TypeScriptCompletionProposal extends CompletionEntry
+		implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2,
+		ICompletionProposalExtension3, ICompletionProposalExtension6, ICompletionProposalExtension7 {
 
 	private int cursorPosition;
 	private int replacementOffset;
@@ -36,14 +56,17 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 	private boolean contextInformationComputed;
 	private IContextInformation contextInformation;
 	private boolean fToggleEating;
+	private StyledString fDisplayString;
 
 	public TypeScriptCompletionProposal(String name, String kind, String kindModifiers, String sortText, int position,
-			String prefix, String fileName, int line, int offset, ITypeScriptServiceClient client) {
-		super(name, kind, kindModifiers, sortText, fileName, line, offset, client);
+			String prefix, String fileName, int line, int offset, ITypeScriptServiceClient client,
+			ICompletionEntryMatcher matcher) {
+		super(name, kind, kindModifiers, sortText, fileName, line, offset, client, matcher);
 		this.cursorPosition = name.length();
 		this.replacementOffset = position - prefix.length();
 		setReplacementLength(prefix.length());
 		this.contextInformationComputed = false;
+		this.fDisplayString = new StyledString(getName());
 	}
 
 	public void setReplacementLength(int replacementlength) {
@@ -158,7 +181,10 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 
 	@Override
 	public String getDisplayString() {
-		return getName();
+		if (fDisplayString != null) {
+			return fDisplayString.getString();
+		}
+		return ""; //$NON-NLS-1$
 	}
 
 	@Override
@@ -210,7 +236,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 	public boolean validate(IDocument document, int offset, DocumentEvent event) {
 		if (offset < replacementOffset)
 			return false;
-		boolean validated = startsWith(document, offset, getReplacementString());
+		boolean validated = isMatchWord(document, offset, getReplacementString());
 		// if (fUpdateLengthOnValidate && event != null) {
 		// replacementLength += event.fText.length() - event.fLength; // adjust
 		// the
@@ -225,8 +251,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 		return validated;
 	}
 
-	// code is borrowed from JavaCompletionProposal
-	protected boolean startsWith(IDocument document, int offset, String word) {
+	protected boolean isMatchWord(IDocument document, int offset, String word) {
 
 		int replacementOffset = getReplacementOffset();
 		int wordLength = word == null ? 0 : word.length();
@@ -236,13 +261,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 		try {
 			int length = offset - replacementOffset;
 			String start = document.get(replacementOffset, length);
-
-			return (word != null && word.substring(0, length).equalsIgnoreCase(start));
-			/*
-			 * || (fAlternateMatch != null && length <= fAlternateMatch.length()
-			 * && fAlternateMatch.substring(0, length).equalsIgnoreCase(start)
-			 */
-			// );
+			return word != null && getMatcher().match(word, start);
 		} catch (BadLocationException x) {
 		}
 
@@ -253,4 +272,53 @@ public class TypeScriptCompletionProposal extends CompletionEntry implements ICo
 	public boolean isValidFor(IDocument document, int offset) {
 		return validate(document, offset, null);
 	}
+
+	@Override
+	public StyledString getStyledDisplayString() {
+		return fDisplayString;
+	}
+
+	@Override
+	public StyledString getStyledDisplayString(IDocument document, int offset, BoldStylerProvider boldStylerProvider) {
+		StyledString styledDisplayString = new StyledString();
+		styledDisplayString.append(getStyledDisplayString());
+
+		String pattern = getPatternToEmphasizeMatch(document, offset);
+		if (pattern != null && pattern.length() > 0) {
+			String displayString = styledDisplayString.getString();
+			int[] bestSequence = getMatcher().bestSubsequence(displayString, pattern);
+			int highlightAdjustment = 0;
+			for (int index : bestSequence) {
+				styledDisplayString.setStyle(index + highlightAdjustment, 1, boldStylerProvider.getBoldStyler());
+			}
+		}
+		return styledDisplayString;
+	}
+
+	/**
+	 * Computes the token at the given <code>offset</code> in
+	 * <code>document</code> to emphasize the ranges matching this token in
+	 * proposal's display string.
+	 * 
+	 * @param document
+	 *            the document where content assist is invoked
+	 * @param offset
+	 *            the offset in the document at current caret location
+	 * @return the token at the given <code>offset</code> in
+	 *         <code>document</code> to be used for emphasizing matching ranges
+	 *         in proposal's display string
+	 * @since 3.12
+	 */
+	protected String getPatternToEmphasizeMatch(IDocument document, int offset) {
+		int start = getPrefixCompletionStart(document, offset);
+		int patternLength = offset - start;
+		String pattern = null;
+		try {
+			pattern = document.get(start, patternLength);
+		} catch (BadLocationException e) {
+			// return null
+		}
+		return pattern;
+	}
+
 }

@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
+import ts.client.completions.ICompletionEntryMatcher;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
@@ -195,5 +196,11 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		String buildPaths = getStringPreferencesValue(TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH,
 				TypeScriptCorePreferenceConstants.DEFAULT_TYPESCRIPT_BUILD_PATH);
 		return TypeScriptBuildPath.load(getTypeScriptProject().getProject(), buildPaths);
+	}
+
+	@Override
+	public ICompletionEntryMatcher getCompletionEntryMatcher() {
+		// TODO: support entry matcher with preferences.
+		return ICompletionEntryMatcher.LCS;
 	}
 }

@@ -61,7 +61,8 @@ public class TypeScriptCompletionProposalComputer
 						CharSequence prefix = context.computeIdentifierPrefix();
 
 						CompletionProposalCollector collector = new CompletionProposalCollector(position,
-								prefix != null ? prefix.toString() : null);
+								prefix != null ? prefix.toString() : null,
+								tsProject.getProjectSettings().getCompletionEntryMatcher());
 						tsFile.completions(position, collector);
 						return collector.getProposals();
 					}

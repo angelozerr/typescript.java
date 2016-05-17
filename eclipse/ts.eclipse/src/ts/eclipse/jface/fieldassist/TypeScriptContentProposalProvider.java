@@ -1,3 +1,14 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
+
 package ts.eclipse.jface.fieldassist;
 
 import java.io.BufferedReader;
@@ -14,21 +25,26 @@ import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.utils.TypeScriptHelper;
 
+/**
+ * {@link IContentProposalProvider} implementation to collect TypeScript
+ * completion entries.
+ */
 public class TypeScriptContentProposalProvider implements IContentProposalProvider {
 
 	private final String fileName;
-	private final ITypeScriptProject project;
+	private final ITypeScriptProject tsProject;
 
 	public TypeScriptContentProposalProvider(String fileName, ITypeScriptProject project) {
 		this.fileName = fileName;
-		this.project = project;
+		this.tsProject = project;
 	}
 
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
-		ITypeScriptFile tsFile = project.getOpenedFile(fileName);
+		ITypeScriptFile tsFile = tsProject.getOpenedFile(fileName);
 		String prefix = TypeScriptHelper.getPrefix(contents, position);
-		ContentProposalCollector collector = new ContentProposalCollector(prefix);
+		ContentProposalCollector collector = new ContentProposalCollector(prefix,
+				tsProject.getProjectSettings().getCompletionEntryMatcher());
 		try {
 			tsFile.completions(position, collector);
 		} catch (TypeScriptException e) {
