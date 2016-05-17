@@ -29,10 +29,14 @@ public class CompletionInfo extends AbstractCompletionCollector implements IComp
 	}
 
 	@Override
-	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText,
+	protected ICompletionEntry createEntry(String name, String kind, String kindModifiers, String sortText,
 			String fileName, int line, int offset, ITypeScriptServiceClient client) {
-		entries.add(
-				new CompletionEntry(name, kind, kindModifiers, sortText, fileName, line, offset, client, getMatcher()));
+		return new CompletionEntry(name, kind, kindModifiers, sortText, fileName, line, offset, getMatcher(), client);
+	}
+
+	@Override
+	protected void addCompletionEntry(ICompletionEntry entry) {
+		entries.add(entry);
 	}
 
 	@Override

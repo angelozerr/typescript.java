@@ -8,8 +8,9 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.jsdt.internal.core;
+package ts.eclipse.ide.jsdt.core;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
@@ -23,6 +24,8 @@ public class JSDTTypeScriptCorePlugin extends Plugin {
 
 	// The shared instance
 	private static JSDTTypeScriptCorePlugin plugin;
+
+	private boolean isJSDT2;
 
 	/**
 	 * The constructor
@@ -39,6 +42,8 @@ public class JSDTTypeScriptCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		//Platform.getPlugin("org.eclipse.wst.jsdt.core")
+		isJSDT2 = Platform.getBundle("org.eclipse.wst.jsdt.core").getVersion().toString().startsWith("2.0.0");
 	}
 
 	/*
@@ -59,6 +64,10 @@ public class JSDTTypeScriptCorePlugin extends Plugin {
 	 */
 	public static JSDTTypeScriptCorePlugin getDefault() {
 		return plugin;
+	}
+
+	public boolean isJSDT2() {		
+		return isJSDT2;
 	}
 
 }

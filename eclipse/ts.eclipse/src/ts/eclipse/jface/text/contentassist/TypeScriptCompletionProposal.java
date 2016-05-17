@@ -14,11 +14,16 @@ package ts.eclipse.jface.text.contentassist;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.IPositionUpdater;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.BoldStylerProvider;
+//import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -28,12 +33,24 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension7;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.text.link.ILinkedModeListener;
+import org.eclipse.jface.text.link.InclusivePositionUpdater;
+import org.eclipse.jface.text.link.LinkedModeModel;
+import org.eclipse.jface.text.link.LinkedModeUI;
+import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
+import org.eclipse.jface.text.link.LinkedModeUI.IExitPolicy;
+import org.eclipse.jface.text.link.LinkedPosition;
+import org.eclipse.jface.text.link.LinkedPositionGroup;
+import org.eclipse.jface.text.link.ProposalPosition;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import ts.TypeScriptException;
+import ts.TypeScriptKind;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.ICompletionEntryDetails;
@@ -50,6 +67,13 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2,
 		ICompletionProposalExtension3, ICompletionProposalExtension6, ICompletionProposalExtension7 {
 
+	public static final String TAB = "\t";
+	public static final String SPACE = " ";
+
+	private static final String RPAREN = ")";
+	private static final String LPAREN = "(";
+	private static final String COMMA = ",";
+
 	private int cursorPosition;
 	private int replacementOffset;
 	private int replacementlength;
@@ -58,10 +82,19 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	private boolean fToggleEating;
 	private StyledString fDisplayString;
 
+	private IRegion fSelectedRegion; // initialized by apply()
+	private IPositionUpdater fUpdater;
+
+	private String fReplacementString;
+
+	private Arguments arguments;
+	private ITextViewer fTextViewer;
+
 	public TypeScriptCompletionProposal(String name, String kind, String kindModifiers, String sortText, int position,
-			String prefix, String fileName, int line, int offset, ITypeScriptServiceClient client,
-			ICompletionEntryMatcher matcher) {
-		super(name, kind, kindModifiers, sortText, fileName, line, offset, client, matcher);
+			String prefix, String fileName, int line, int offset, ICompletionEntryMatcher matcher,
+			ITypeScriptServiceClient client) {
+		super(name, kind, kindModifiers, sortText, fileName, line, offset, matcher, client);
+		fReplacementString = name;
 		this.cursorPosition = name.length();
 		this.replacementOffset = position - prefix.length();
 		setReplacementLength(prefix.length());
@@ -83,6 +116,13 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public void apply(IDocument document, char trigger, int offset) {
+		// compute replacement string
+		String replacement = computeReplacementString(document, offset);
+		setReplacementString(replacement);
+
+		updateReplacementLengthForString(document, offset, replacement);
+
+		// apply the replacement.
 		CompletionProposal proposal = new CompletionProposal(getReplacementString(), getReplacementOffset(),
 				getReplacementLength(), getCursorPosition(), getImage(), getDisplayString(), getContextInformation(),
 				getAdditionalProposalInfo());
@@ -90,11 +130,251 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		// selected the proposal, and where the cursor offset is
 		// but we might in the future...
 		proposal.apply(document);
-		// we want to ContextInformationPresenter.updatePresentation() here
+		int baseOffset = getReplacementOffset();
+
+		if (arguments != null && !arguments.isEmpty() && getTextViewer() != null) {
+			try {// adjust offset of the whole arguments
+				arguments.setBaseOffset(baseOffset);
+				// guess parameters if "guess-types" tern plugin is checked.
+				// guessParameters(offset);
+				// Create group.
+				Arg arg = null;
+				LinkedModeModel model = new LinkedModeModel();
+				for (int i = 0; i != arguments.size(); i++) {
+					arg = arguments.get(i);
+					LinkedPositionGroup group = new LinkedPositionGroup();
+					if (arg.getProposals() == null) {
+						group.addPosition(new LinkedPosition(document, arg.getOffset(), arg.getLength(),
+								LinkedPositionGroup.NO_STOP));
+					} else {
+						ensurePositionCategoryInstalled(document, model);
+						document.addPosition(getCategory(), arg);
+						group.addPosition(new ProposalPosition(document, arg.getOffset(), arg.getLength(),
+								LinkedPositionGroup.NO_STOP, arg.getProposals()));
+					}
+					model.addGroup(group);
+				}
+
+				model.forceInstall();
+				/*
+				 * JavaEditor editor = getJavaEditor(); if (editor != null) {
+				 * model.addLinkingListener(new EditorHighlightingSynchronizer(
+				 * editor)); }
+				 */
+
+				LinkedModeUI ui = new EditorLinkedModeUI(model, getTextViewer());
+				ui.setExitPosition(getTextViewer(), baseOffset + replacement.length(), 0, Integer.MAX_VALUE);
+				ui.setExitPolicy(new ExitPolicy(')', document));
+				ui.setDoContextInfo(true);
+				ui.setCyclingMode(LinkedModeUI.CYCLE_WHEN_NO_PARENT);
+				ui.enter();
+
+				fSelectedRegion = ui.getSelectedRegion();
+
+			} catch (BadLocationException e) {
+				ensurePositionCategoryRemoved(document);
+				// JavaScriptPlugin.log(e);
+				// openErrorDialog(e);
+			} catch (BadPositionCategoryException e) {
+				ensurePositionCategoryRemoved(document);
+				// JavaScriptPlugin.log(e);
+				// openErrorDialog(e);
+			}
+
+		} else {
+			int newOffset = baseOffset + replacement.length();
+			/*
+			 * if (isObjectKey() && TernTypeHelper.isStringType(getType())) { //
+			 * select cursor inside quote of property value (ex : config: // "")
+			 * newOffset--; }
+			 */
+			fSelectedRegion = new Region(newOffset, 0);
+		}
+	}
+
+	private String computeReplacementString(IDocument document, int offset) {
+
+		try {
+			ICompletionEntryDetails details = super.getEntryDetails();
+			TypeScriptKind tsKind = TypeScriptKind.getKind(details.getKind());
+			if (tsKind != null && (TypeScriptKind.CONSTRUCTOR == tsKind || TypeScriptKind.FUNCTION == tsKind
+					|| TypeScriptKind.METHOD == tsKind)) {
+				// It's a function
+				// compute replacement string
+				// setReplacementString(replacement);
+
+				String indentation = getIndentation(document, offset);
+				arguments = new Arguments();
+
+				StringBuilder replacement = new StringBuilder(super.getName());
+				replacement.append(LPAREN);
+				setCursorPosition(replacement.length());
+				computeReplacementString(details.getDisplayParts(), replacement, arguments, indentation, 1, true);
+				replacement.append(RPAREN);
+				return replacement.toString();
+			}
+
+		} catch (TypeScriptException e) {
+		}
+		return getReplacementString();
+	}
+
+	/**
+	 * Compute replacement string for the given function.
+	 * 
+	 * @param parameters
+	 * @param replacement
+	 * @param arguments
+	 * @param indentation
+	 * @param nbIndentations
+	 * @param initialFunction
+	 */
+	private void computeReplacementString(List<SymbolDisplayPart> parameters, StringBuilder replacement,
+			Arguments arguments, String indentation, int nbIndentations, boolean initialFunction) {
+		int count = parameters.size();
+		SymbolDisplayPart parameter = null;
+		String paramName = null;
+		boolean hasParam = false;
+		for (int i = 0; i != count; i++) {
+			parameter = parameters.get(i);
+			if (!parameter.getKind().equals("parameterName")) {
+				continue;
+			}
+			if (hasParam) {
+				// if (prefs.beforeComma)
+				// buffer.append(SPACE);
+				replacement.append(COMMA);
+				// if (prefs.afterComma)
+				replacement.append(SPACE);
+			}
+
+			/*
+			 * if (parameter.isFunction() && isGenerateAnonymousFunction() &&
+			 * initialFunction) { FunctionInfo info = parameter.getInfo();
+			 * List<Parameter> parametersOfParam = info.getParameters();
+			 * replacement.append("function("); if (parametersOfParam != null) {
+			 * computeReplacementString(parametersOfParam, replacement,
+			 * arguments, indentation, nbIndentations + 1, false); } else { //
+			 * to select focus inside the () of generated inline // function
+			 * arguments.addArg(replacement.length(), 0); }
+			 * replacement.append(") {"); replacement.append("\n");
+			 * indent(replacement, indentation, nbIndentations);
+			 * indent(replacement); if
+			 * (!StringUtils.isEmpty(info.getReturnType())) { if
+			 * (TernTypeHelper.isStringType(info.getReturnType())) {
+			 * replacement.append("return \"\";"); } else if
+			 * (TernTypeHelper.isBoolType(info.getReturnType())) {
+			 * replacement.append("return true;"); } else if
+			 * ("{}".equals(info.getReturnType())) {
+			 * replacement.append("return {"); replacement.append("\n");
+			 * indent(replacement, indentation, nbIndentations);
+			 * indent(replacement); indent(replacement); // to select focus
+			 * inside the {} of generated return // statement of the function.
+			 * arguments.addArg(replacement.length(), 0);
+			 * replacement.append("\n"); indent(replacement, indentation,
+			 * nbIndentations); indent(replacement); replacement.append("}"); }
+			 * } else { // to select focus inside the {} of generated inline //
+			 * function arguments.addArg(replacement.length(), 0); }
+			 * replacement.append("\n"); indent(replacement, indentation,
+			 * nbIndentations); replacement.append("}"); } else {
+			 */
+			/*
+			 * if ("{}".equals(parameter.getType()) && isGenerateObjectValue()
+			 * && initialFunction) { replacement.append("{");
+			 * replacement.append("\n"); indent(replacement, indentation,
+			 * nbIndentations); replacement.append("}"); } else {
+			 */
+			int offset = replacement.length();
+			paramName = parameter.getText();
+			// to select focus for parameter
+			replacement.append(paramName);
+			// if (initialFunction) {
+			// arguments.addParameter(offset, paramName.length(),
+			// paramName, i);
+			// } else {
+			arguments.addArg(offset, paramName.length());
+			hasParam = true;
+			// }
+
+			// }
+			// }
+		}
+
+	}
+
+	// protected void indent(StringBuilder replacement) {
+	// replacement.append(indentChars);
+	// }
+
+	/**
+	 * Returns the indentation characters from the given line.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return the indentation characters from the given line.
+	 */
+	private String getIndentation(IDocument document, int offset) {
+		try {
+			IRegion lineRegion = document.getLineInformationOfOffset(offset);
+			String lineText = document.get(lineRegion.getOffset(), lineRegion.getLength());
+			StringBuilder indentation = new StringBuilder();
+			char[] chars = lineText.toCharArray();
+			char c;
+			for (int i = 0; i < chars.length; i++) {
+				c = chars[i];
+				if (c == ' ' || c == '\t') {
+					indentation.append(c);
+				} else {
+					break;
+				}
+			}
+			return indentation.toString();
+
+		} catch (BadLocationException e1) {
+		}
+		return "";
+	}
+
+	/**
+	 * Compute new replacement length for string replacement.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @param replacement
+	 */
+	protected void updateReplacementLengthForString(IDocument document, int offset, String replacement) {
+		boolean isString = replacement.startsWith("\"") || replacement.startsWith("'");
+		if (isString) {
+			int length = document.getLength();
+			int pos = offset;
+			char c;
+			while (pos < length) {
+				try {
+					c = document.getChar(pos);
+					switch (c) {
+					case '\r':
+					case '\n':
+					case '\t':
+					case ' ':
+						return;
+					case '"':
+					case '\'':
+						setReplacementLength(getReplacementLength() + pos - offset + 1);
+						return;
+					}
+					++pos;
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
 		IDocument document = viewer.getDocument();
+		if (fTextViewer == null) {
+			fTextViewer = viewer;
+		}
 		// don't eat if not in preferences, XOR with modifier key 1 (Ctrl)
 		// but: if there is a selection, replace it!
 		Point selection = viewer.getSelectedRange();
@@ -112,7 +392,15 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	}
 
 	protected String getReplacementString() {
-		return getName();
+		return fReplacementString;
+	}
+
+	/**
+	 * @param replacementString
+	 *            The fReplacementString to set.
+	 */
+	public void setReplacementString(String replacementString) {
+		fReplacementString = replacementString;
 	}
 
 	protected int getReplacementLength() {
@@ -125,6 +413,10 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	protected int getCursorPosition() {
 		return cursorPosition;
+	}
+
+	public void setCursorPosition(int cursorPosition) {
+		this.cursorPosition = cursorPosition;
 	}
 
 	@Override
@@ -194,15 +486,24 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public Point getSelection(IDocument document) {
-		CompletionProposal proposal = new CompletionProposal(getReplacementString(), getReplacementOffset(),
-				getReplacementLength(), getCursorPosition(), getImage(), getDisplayString(), getContextInformation(),
-				getAdditionalProposalInfo());
-		return proposal.getSelection(document);
+		// CompletionProposal proposal = new
+		// CompletionProposal(getReplacementString(), getReplacementOffset(),
+		// getReplacementLength(), getCursorPosition(), getImage(),
+		// getDisplayString(), getContextInformation(),
+		// getAdditionalProposalInfo());
+		// return proposal.getSelection(document);
+		if (fSelectedRegion == null) {
+			return new Point(getReplacementOffset(), 0);
+		}
+		return new Point(fSelectedRegion.getOffset(), fSelectedRegion.getLength());
+	}
+
+	public ITextViewer getTextViewer() {
+		return fTextViewer;
 	}
 
 	@Override
 	public char[] getTriggerCharacters() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -234,25 +535,56 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public boolean validate(IDocument document, int offset, DocumentEvent event) {
-		if (offset < replacementOffset)
+		if (offset < replacementOffset) {
 			return false;
-		boolean validated = isMatchWord(document, offset, getReplacementString());
-		// if (fUpdateLengthOnValidate && event != null) {
-		// replacementLength += event.fText.length() - event.fLength; // adjust
-		// the
-		// replacement
-		// length
-		// by
-		// the
-		// event's
-		// text
-		// replacement
-		// }
-		return validated;
+		}
+
+		int replacementOffset = getReplacementOffset();
+		String word = getReplacementString();
+		int wordLength = word == null ? 0 : word.length();
+		if (offset > replacementOffset + wordLength) {
+			return false;
+		}
+
+		try {
+			int length = offset - replacementOffset;
+			String start = document.get(replacementOffset, length);
+			return super.updatePrefix(start);
+			// if (word == null) {
+			// return false;
+			// }
+			// int[] bestSequence = getMatcher().bestSubsequence(word, start);
+			// if (bestSequence != null && bestSequence.length > 0) {
+			// super.updatePrefix(start);
+			// return true;
+			// }
+		} catch (BadLocationException x) {
+		}
+
+		return false;
+
+		/*
+		 * 
+		 * 
+		 * boolean validated = isMatchWord(document, offset,
+		 * getReplacementString()); if (validated) { StyledString
+		 * styledDisplayString = new StyledString();
+		 * styledDisplayString.append(getName()); String pattern = if (pattern
+		 * != null && pattern.length() > 0) { String displayString =
+		 * styledDisplayString.getString(); int[] bestSequence =
+		 * getMatcher().bestSubsequence(displayString, pattern); int
+		 * highlightAdjustment = 0; for (int index : bestSequence) {
+		 * styledDisplayString.setStyle(index + highlightAdjustment, 1, null); }
+		 * } }
+		 * 
+		 * // if (fUpdateLengthOnValidate && event != null) { //
+		 * replacementLength += event.fText.length() - event.fLength; // adjust
+		 * // the // replacement // length // by // the // event's // text //
+		 * replacement // } return validated;
+		 */
 	}
 
 	protected boolean isMatchWord(IDocument document, int offset, String word) {
-
 		int replacementOffset = getReplacementOffset();
 		int wordLength = word == null ? 0 : word.length();
 		if (offset > replacementOffset + wordLength)
@@ -261,7 +593,11 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		try {
 			int length = offset - replacementOffset;
 			String start = document.get(replacementOffset, length);
-			return word != null && getMatcher().match(word, start);
+			if (word == null) {
+				return false;
+			}
+			int[] bestSequence = getMatcher().bestSubsequence(word, start);
+			return bestSequence != null && bestSequence.length > 0;
 		} catch (BadLocationException x) {
 		}
 
@@ -270,7 +606,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public boolean isValidFor(IDocument document, int offset) {
-		return validate(document, offset, null);
+		return false; // validate(document, offset, null);
 	}
 
 	@Override
@@ -321,4 +657,85 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		return pattern;
 	}
 
+	private void ensurePositionCategoryInstalled(final IDocument document, LinkedModeModel model) {
+		if (!document.containsPositionCategory(getCategory())) {
+			document.addPositionCategory(getCategory());
+			fUpdater = new InclusivePositionUpdater(getCategory());
+			document.addPositionUpdater(fUpdater);
+
+			model.addLinkingListener(new ILinkedModeListener() {
+
+				/*
+				 * @see
+				 * org.eclipse.jface.text.link.ILinkedModeListener#left(org.
+				 * eclipse.jface.text.link.LinkedModeModel, int)
+				 */
+				public void left(LinkedModeModel environment, int flags) {
+					ensurePositionCategoryRemoved(document);
+				}
+
+				public void suspend(LinkedModeModel environment) {
+				}
+
+				public void resume(LinkedModeModel environment, int flags) {
+				}
+			});
+		}
+	}
+
+	private void ensurePositionCategoryRemoved(IDocument document) {
+		if (document.containsPositionCategory(getCategory())) {
+			try {
+				document.removePositionCategory(getCategory());
+			} catch (BadPositionCategoryException e) {
+				// ignore
+			}
+			document.removePositionUpdater(fUpdater);
+		}
+	}
+
+	protected static final class ExitPolicy implements IExitPolicy {
+
+		final char fExitCharacter;
+		private final IDocument fDocument;
+
+		public ExitPolicy(char exitCharacter, IDocument document) {
+			fExitCharacter = exitCharacter;
+			fDocument = document;
+		}
+
+		public ExitFlags doExit(LinkedModeModel environment, VerifyEvent event, int offset, int length) {
+
+			if (event.character == fExitCharacter) {
+				if (environment.anyPositionContains(offset))
+					return new ExitFlags(ILinkedModeListener.UPDATE_CARET, false);
+				else
+					return new ExitFlags(ILinkedModeListener.UPDATE_CARET, true);
+			}
+
+			switch (event.character) {
+			case ';':
+				return new ExitFlags(ILinkedModeListener.NONE, true);
+			case SWT.CR:
+				// when entering an anonymous class as a parameter, we don't
+				// want
+				// to jump after the parenthesis when return is pressed
+				if (offset > 0) {
+					try {
+						if (fDocument.getChar(offset - 1) == '{')
+							return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
+					} catch (BadLocationException e) {
+					}
+				}
+				return null;
+			default:
+				return null;
+			}
+		}
+
+	}
+
+	private String getCategory() {
+		return "TypeScriptCompletionProposal_" + toString(); //$NON-NLS-1$
+	}
 }

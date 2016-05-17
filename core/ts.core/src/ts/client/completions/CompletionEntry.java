@@ -12,8 +12,16 @@ package ts.client.completions;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
+import ts.internal.matcher.LCSS;
+import ts.utils.StringUtils;
 
 public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionEntryDetailsCollector {
+
+	// Negative value ensures subsequence matches have a lower relevance than
+	// standard JDT or template proposals
+	private static final int SUBWORDS_RANGE_START = -9000;
+
+	private static final int minPrefixLengthForTypes = 1;
 
 	private final String name;
 	private final String kind;
@@ -23,12 +31,13 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 	private final String fileName;
 	private final int line;
 	private final int offset;
-	private final ITypeScriptServiceClient client;
 	private CompletionEntryDetails entryDetails;
-	private ICompletionEntryMatcher matcher;
+	private final ICompletionEntryMatcher matcher;
+	private int relevance;
+	private final ITypeScriptServiceClient client;
 
 	public CompletionEntry(String name, String kind, String kindModifiers, String sortText, String fileName, int line,
-			int offset, ITypeScriptServiceClient client, ICompletionEntryMatcher matcher) {
+			int offset, ICompletionEntryMatcher matcher, ITypeScriptServiceClient client) {
 		this.name = name;
 		this.kind = kind;
 		this.kindModifiers = kindModifiers;
@@ -36,8 +45,8 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 		this.fileName = fileName;
 		this.line = line;
 		this.offset = offset;
-		this.client = client;
 		this.matcher = matcher;
+		this.client = client;
 	}
 
 	@Override
@@ -85,5 +94,48 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 
 	public ICompletionEntryMatcher getMatcher() {
 		return matcher;
+	}
+
+	@Override
+	public int getRelevance() {
+		return relevance;
+	}
+
+	@Override
+	public boolean updatePrefix(String prefix) {
+		Integer relevanceBoost = null;
+		int[] bestSequence = null;
+		if (StringUtils.isEmpty(prefix)) {
+			relevanceBoost = 0;
+		} else {
+			bestSequence = matcher.bestSubsequence(name, prefix);
+			if ((bestSequence != null && bestSequence.length > 0)) {
+				relevanceBoost = 0;
+				if (name.equals(prefix)) {
+					if (minPrefixLengthForTypes < prefix.length()) {
+						relevanceBoost = 16 * (RelevanceConstants.R_EXACT_NAME + RelevanceConstants.R_CASE);
+					}
+				} else if (name.equalsIgnoreCase(prefix)) {
+					if (minPrefixLengthForTypes < prefix.length()) {
+						relevanceBoost = 16 * RelevanceConstants.R_EXACT_NAME;
+					}
+				} else if (startsWithIgnoreCase(prefix, name)) {
+					// Don't adjust score
+				} else {
+					int score = LCSS.scoreSubsequence(bestSequence);
+					relevanceBoost = SUBWORDS_RANGE_START + score;
+				}
+
+			}
+		}
+		if (relevanceBoost != null) {
+			relevance = relevanceBoost;
+			return true;
+		}
+		return false;
+	}
+
+	private boolean startsWithIgnoreCase(String prefix, String name) {
+		return prefix.toUpperCase().startsWith(name.toUpperCase());
 	}
 }

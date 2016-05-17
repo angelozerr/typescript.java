@@ -12,6 +12,8 @@ package ts.client.completions;
 
 import ts.client.AbstractTypeScriptCollector;
 import ts.client.ITypeScriptServiceClient;
+import ts.internal.matcher.LCSS;
+import ts.utils.StringUtils;
 
 public abstract class AbstractCompletionCollector extends AbstractTypeScriptCollector
 		implements ITypeScriptCompletionCollector {
@@ -27,10 +29,17 @@ public abstract class AbstractCompletionCollector extends AbstractTypeScriptColl
 	@Override
 	public void addCompletionEntry(String name, String kind, String kindModifiers, String sortText, String fileName,
 			int line, int offset, ITypeScriptServiceClient client) {
-		if (matcher.match(name, prefix)) {
-			doAddCompletionEntry(name, kind, kindModifiers, sortText, fileName, line, offset, client);
-		}
+		String prefix = getPrefix();
+		ICompletionEntry entry = createEntry(name, kind, kindModifiers, sortText, fileName, line, offset, client);
+		if (entry.updatePrefix(prefix)) {
+			addCompletionEntry(entry);
+		}		
 	}
+
+	protected abstract ICompletionEntry createEntry(String name, String kind, String kindModifiers, String sortText,
+			String fileName, int line, int offset, ITypeScriptServiceClient client);
+
+	protected abstract void addCompletionEntry(ICompletionEntry entry);
 
 	public String getPrefix() {
 		return prefix;
@@ -40,6 +49,7 @@ public abstract class AbstractCompletionCollector extends AbstractTypeScriptColl
 		return matcher;
 	}
 
-	protected abstract void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText,
-			String fileName, int line, int offset, ITypeScriptServiceClient client);
+//	protected abstract void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText,
+//			String fileName, int line, int offset, int[] bestSubsequence, int relevance,
+//			ITypeScriptServiceClient client);
 }

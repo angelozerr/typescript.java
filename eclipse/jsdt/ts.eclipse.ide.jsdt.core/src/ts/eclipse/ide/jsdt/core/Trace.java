@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.jsdt.internal.core;
+package ts.eclipse.ide.jsdt.core;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -8,18 +8,23 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.client.completions;
+package ts.eclipse.ide.core.resources;
 
-import java.util.List;
+import org.eclipse.core.filesystem.IFileStore;
 
-import ts.client.IKindProvider;
+import ts.resources.ITypeScriptFile;
 
-public interface ICompletionEntryDetails extends IKindProvider {
+/**
+ * IDE TypeScript file.
+ *
+ */
+public interface IIDETypeScriptFileStore extends ITypeScriptFile {
 
-	String getName();
-
-	List<SymbolDisplayPart> getDisplayParts();
-
-	List<SymbolDisplayPart> getDocumentation();
+	/**
+	 * Returns the wrapped Eclipse resource.
+	 * 
+	 * @return
+	 */
+	IFileStore getResource();
 
 }

@@ -47,6 +47,7 @@ import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.INavbarListener;
+import ts.resources.ITypeScriptFile;
 
 public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInformationControl,
 		IInformationControlExtension, IInformationControlExtension2, DisposeListener, INavbarListener {
@@ -84,7 +85,7 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInform
 	 */
 	private ILabelProvider treeLabelProvider;
 
-	private IIDETypeScriptFile tsFile;
+	private ITypeScriptFile tsFile;
 
 	/**
 	 * Constructor
@@ -96,7 +97,7 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInform
 	 * @param editor
 	 *            Current ts editor
 	 */
-	public TypeScriptQuickOutlineDialog(Shell parent, int shellStyle, IIDETypeScriptFile tsFile) {
+	public TypeScriptQuickOutlineDialog(Shell parent, int shellStyle, ITypeScriptFile tsFile) {
 		super(parent, shellStyle, true, true, false, true, true, null, null);
 		this.tsFile = tsFile;
 		this.tsFile.addNavbarListener(this);
@@ -290,7 +291,10 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInform
 		}
 		dispose();
 		if (selectedElement instanceof NavigationBarItem) {
-			EditorUtils.openInEditor((IFile) tsFile.getResource(), (NavigationBarItem) selectedElement);
+			if (tsFile instanceof IIDETypeScriptFile) {
+				EditorUtils.openInEditor(((IFile) ((IIDETypeScriptFile) tsFile).getResource()),
+						(NavigationBarItem) selectedElement);
+			}
 		}
 	}
 

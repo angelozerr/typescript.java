@@ -12,7 +12,6 @@ package ts.eclipse.ide.core.resources;
 
 import org.eclipse.core.resources.IResource;
 
-import ts.client.Location;
 import ts.resources.ITypeScriptFile;
 
 /**

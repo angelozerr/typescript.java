@@ -21,38 +21,21 @@ public interface ICompletionEntryMatcher {
 	public static ICompletionEntryMatcher LCS = new ICompletionEntryMatcher() {
 
 		@Override
-		public boolean match(String completion, String token) {
-			return LCSS.containsSubsequence(completion, token);
-		}
-
-		@Override
 		public int[] bestSubsequence(String completion, String token) {
 			return LCSS.bestSubsequence(completion, token);
 		}
+
 	};
 	public static ICompletionEntryMatcher START_WITH_MATCHER = new ICompletionEntryMatcher() {
 
 		@Override
-		public boolean match(String completion, String token) {
-			return completion.startsWith(token);
-		}
-
-		@Override
 		public int[] bestSubsequence(String completion, String token) {
+			if (!completion.startsWith(token)) {
+				return null;
+			}
 			return new int[] { 0, token.length() - 1 };
 		}
 	};
-
-	/**
-	 * Returns true if the given completion entry name match the given token and
-	 * false otherwise.
-	 * 
-	 * @param completion
-	 * @param token
-	 * @return true if the given completion entry name match the given token and
-	 *         false otherwise.
-	 */
-	boolean match(String completion, String token);
 
 	int[] bestSubsequence(String completion, String token);
 

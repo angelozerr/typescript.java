@@ -20,4 +20,5 @@ Export-Package: ts.eclipse.jface.fieldassist,
  ts.eclipse.swt
 Require-Bundle: org.eclipse.jface,
  ts.core;bundle-version="1.0.0",
- org.eclipse.jface.text;resolution:=optional
+ org.eclipse.jface.text;resolution:=optional,
+ org.eclipse.ui.workbench.texteditor;resolution:=optional

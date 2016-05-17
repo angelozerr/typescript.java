@@ -16,16 +16,16 @@ import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import ts.client.navbar.NavigationBarItem;
-import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.resources.INavbarListener;
+import ts.resources.ITypeScriptFile;
 
 public class TypeScriptContentOutlinePage extends Page implements IContentOutlinePage, INavbarListener {
 
 	private static final String OUTLINE_COMMON_NAVIGATOR_ID = TypeScriptUIPlugin.PLUGIN_ID + ".outline"; //$NON-NLS-1$
 
 	private CommonViewer fOutlineViewer;
-	private IIDETypeScriptFile tsFile;
+	private ITypeScriptFile tsFile;
 
 	private ListenerList fSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
 	private ListenerList fPostSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
@@ -58,7 +58,7 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 
 	}
 
-	public void setInput(IIDETypeScriptFile tsFile) {
+	public void setInput(ITypeScriptFile tsFile) {
 		if (this.tsFile != null) {
 			this.tsFile.removeNavbarListener(this);
 		}

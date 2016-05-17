@@ -60,7 +60,7 @@ public class TypeScriptCompletionProposalComputer
 						ITypeScriptFile tsFile = tsProject.openFile(resource, document);
 						CharSequence prefix = context.computeIdentifierPrefix();
 
-						CompletionProposalCollector collector = new CompletionProposalCollector(position,
+						CompletionProposalCollector collector = new JSDTCompletionProposalCollector(position,
 								prefix != null ? prefix.toString() : null,
 								tsProject.getProjectSettings().getCompletionEntryMatcher());
 						tsFile.completions(position, collector);

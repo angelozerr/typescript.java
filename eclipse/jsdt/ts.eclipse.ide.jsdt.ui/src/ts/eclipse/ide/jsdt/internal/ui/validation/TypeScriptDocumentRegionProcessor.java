@@ -17,7 +17,9 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.wst.sse.ui.internal.reconcile.DocumentRegionProcessor;
+import org.eclipse.wst.sse.ui.internal.reconcile.validator.ValidatorStrategy;
 
+import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
 import ts.eclipse.ide.ui.folding.IndentFoldingStrategy;
 import ts.utils.FileUtils;
 
@@ -35,6 +37,17 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 
 	public TypeScriptDocumentRegionProcessor(IResource resource) {
 		this.contentType = getContentType(resource);
+	}
+
+	@Override
+	protected ValidatorStrategy getValidatorStrategy() {
+		if (JSDTTypeScriptCorePlugin.getDefault().isJSDT2()) {
+			// JSDT 2.0.0 provides the capability to define WTP Validator,
+			// return null
+			// to avoid validate twice
+			return null;
+		}
+		return super.getValidatorStrategy();
 	}
 
 	private String getContentType(IResource resource) {
@@ -90,7 +103,6 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 	protected void process(DirtyRegion dirtyRegion) {
 		if (!isInstalled() /* || isInRewriteSession() */ || dirtyRegion == null || getDocument() == null)
 			return;
-
 		/*
 		 * if there is a folding strategy then reconcile it for the entire dirty
 		 * region. NOTE: the folding strategy does not care about the sub

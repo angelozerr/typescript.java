@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -68,7 +69,6 @@ import ts.client.ITypeScriptAsynchCollector;
 import ts.client.Location;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
-import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
@@ -541,10 +541,10 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		private ITextSelection selection;
 		private boolean canceled;
 
-		public OccurrencesCollector() {			
+		public OccurrencesCollector() {
 			this.positions = new ArrayList<Position>();
 		}
-		
+
 		public void setDocument(IDocument document) {
 			this.document = document;
 		}
@@ -626,13 +626,20 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 
 	}
 
-	private IIDETypeScriptFile getTypeScriptFile(IDocument document) throws CoreException, TypeScriptException {
+	private ITypeScriptFile getTypeScriptFile(IDocument document) throws CoreException, TypeScriptException {
 		IResource file = EditorUtils.getResource(this);
-		IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
-		return tsProject.openFile(file, document);
+		if (file != null) {
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
+			return tsProject.openFile(file, document);
+		} 
+		IFileStore fs = EditorUtils.getFileStore(this);
+		if(fs != null) {
+			// TODO
+		}
+		return null;
 	}
 
-	public IIDETypeScriptFile getTypeScriptFile() throws CoreException, TypeScriptException {
+	public ITypeScriptFile getTypeScriptFile() throws CoreException, TypeScriptException {
 		final IDocument document = getSourceViewer().getDocument();
 		if (document == null) {
 			return null;
@@ -774,7 +781,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		return contentOutlinePage;
 	}
 
-	private void setOutlinePageInput(IIDETypeScriptFile tsFile) {
+	private void setOutlinePageInput(ITypeScriptFile tsFile) {
 		// try {
 		contentOutlinePage.setInput(tsFile);
 		// } catch (TypeScriptException e) {
@@ -854,7 +861,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 			if (start == null || end == null)
 				return;
 
-			IIDETypeScriptFile tsFile = getTypeScriptFile();
+			ITypeScriptFile tsFile = getTypeScriptFile();
 
 			int offset = tsFile.getPosition(start);
 			int length = tsFile.getPosition(end) - offset;

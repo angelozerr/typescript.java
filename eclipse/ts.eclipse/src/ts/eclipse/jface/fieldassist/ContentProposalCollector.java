@@ -17,6 +17,7 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 
 import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.AbstractCompletionCollector;
+import ts.client.completions.ICompletionEntry;
 import ts.client.completions.ICompletionEntryMatcher;
 
 /**
@@ -33,11 +34,15 @@ public class ContentProposalCollector extends AbstractCompletionCollector {
 	}
 
 	@Override
-	protected void doAddCompletionEntry(String name, String kind, String kindModifiers, String sortText,
+	protected ICompletionEntry createEntry(String name, String kind, String kindModifiers, String sortText,
 			String fileName, int line, int offset, ITypeScriptServiceClient client) {
-		IContentProposal proposal = new TypeScriptContentProposal(name, kind, kindModifiers, sortText, getPrefix(),
-				fileName, line, offset, client, getMatcher());
-		proposals.add(proposal);
+		return new TypeScriptContentProposal(name, kind, kindModifiers, sortText, getPrefix(), fileName, line, offset,
+				getMatcher(), client);
+	}
+
+	@Override
+	protected void addCompletionEntry(ICompletionEntry entry) {
+		proposals.add((IContentProposal) entry);
 	}
 
 	public List<IContentProposal> getProposals() {

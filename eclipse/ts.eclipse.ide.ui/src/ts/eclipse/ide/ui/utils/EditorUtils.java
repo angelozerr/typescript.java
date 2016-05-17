@@ -120,6 +120,16 @@ public class EditorUtils {
 		return (IResource) editor.getEditorInput().getAdapter(IResource.class);
 	}
 
+	/**
+	 * Returns the resource of the given editor and null otherwise.
+	 * 
+	 * @param editor
+	 * @return the resource of the given editor and null otherwise.
+	 */
+	public static IFileStore getFileStore(IEditorPart editor) {
+		return (IFileStore) editor.getEditorInput().getAdapter(IFileStore.class);
+	}
+
 	public static ITextEditor getEditor(IWorkbenchPartReference ref) {
 		IWorkbenchPart part = ref.getPart(true);// ref.getPage().getActivePart();
 		if (part != null && part instanceof ITextEditor) {
