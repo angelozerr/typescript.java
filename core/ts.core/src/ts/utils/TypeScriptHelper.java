@@ -33,15 +33,15 @@ public class TypeScriptHelper {
 		return prefix != null ? prefix.toString() : null;
 	}
 
-	public static String html(List<SymbolDisplayPart> parts) {
+	public static String text(List<SymbolDisplayPart> parts) {
 		if (parts == null || parts.size() < 1) {
 			return null;
 		}
-		StringBuilder html = new StringBuilder("<pre>");
+		StringBuilder html = new StringBuilder("");
 		for (SymbolDisplayPart part : parts) {
 			html.append(part.getText());
 		}
-		html.append("</pre>");
+		html.append("");
 		return html.toString();
 	}
 }

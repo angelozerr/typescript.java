@@ -13,6 +13,7 @@ package ts.eclipse.jface.text.contentassist;
 
 import java.util.List;
 
+import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -47,6 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import ts.TypeScriptException;
@@ -57,6 +59,8 @@ import ts.client.completions.ICompletionEntryDetails;
 import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.SymbolDisplayPart;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
+import ts.eclipse.jface.text.HoverControlCreator;
+import ts.eclipse.jface.text.PresenterControlCreator;
 import ts.utils.StringUtils;
 import ts.utils.TypeScriptHelper;
 
@@ -89,6 +93,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	private Arguments arguments;
 	private ITextViewer fTextViewer;
+	private HoverControlCreator tsControlCreator;
 
 	public TypeScriptCompletionProposal(String name, String kind, String kindModifiers, String sortText, int position,
 			String prefix, String fileName, int line, int offset, ICompletionEntryMatcher matcher,
@@ -372,9 +377,9 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 			if (details == null) {
 				return null;
 			}
-			String html = TypeScriptHelper.html(details.getDocumentation());
+			String html = TypeScriptHelper.text(details.getDocumentation());
 			if (StringUtils.isEmpty(html)) {
-				html = TypeScriptHelper.html(details.getDisplayParts());
+				html = TypeScriptHelper.text(details.getDisplayParts());
 			}
 			return html;
 		} catch (TypeScriptException e) {
@@ -399,7 +404,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 			if (details != null) {
 				List<SymbolDisplayPart> parts = details.getDisplayParts();
 				if (parts != null && parts.size() > 0) {
-					return new ContextInformation("", TypeScriptHelper.html(parts));
+					return new ContextInformation("", TypeScriptHelper.text(parts));
 				}
 			}
 		} catch (TypeScriptException e) {
@@ -455,7 +460,19 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public IInformationControlCreator getInformationControlCreator() {
-		// TODO Auto-generated method stub
+//		Shell shell = getActiveWorkbenchShell();
+//		if (shell == null || !BrowserInformationControl.isAvailable(shell))
+//			return null;
+//
+//		if (tsControlCreator == null) {
+//			PresenterControlCreator presenterControlCreator = new PresenterControlCreator();
+//			tsControlCreator = new HoverControlCreator(presenterControlCreator, true);
+//		}
+//		return tsControlCreator;
+		return null;
+	}
+
+	protected Shell getActiveWorkbenchShell() {
 		return null;
 	}
 

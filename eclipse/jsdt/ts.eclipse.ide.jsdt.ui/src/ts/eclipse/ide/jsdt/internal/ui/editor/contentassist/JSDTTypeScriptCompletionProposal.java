@@ -1,9 +1,11 @@
 package ts.eclipse.ide.jsdt.internal.ui.editor.contentassist;
 
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposal;
 
 import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.ICompletionEntryMatcher;
+import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.jface.text.contentassist.TypeScriptCompletionProposal;
 
 public class JSDTTypeScriptCompletionProposal extends TypeScriptCompletionProposal implements IJavaCompletionProposal {
@@ -12,6 +14,11 @@ public class JSDTTypeScriptCompletionProposal extends TypeScriptCompletionPropos
 			int position, String prefix, String fileName, int line, int offset, ICompletionEntryMatcher matcher,
 			ITypeScriptServiceClient client) {
 		super(name, kind, kindModifiers, sortText, position, prefix, fileName, line, offset, matcher, client);
+	}
+
+	@Override
+	protected Shell getActiveWorkbenchShell() {
+		return JSDTTypeScriptUIPlugin.getActiveWorkbenchShell();
 	}
 
 }

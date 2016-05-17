@@ -11,6 +11,8 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui;
 
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
@@ -29,7 +31,7 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 	private static JSDTTypeScriptUIPlugin plugin;
 
 	private TypeScriptDocumentProvider documentProvider;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -39,9 +41,8 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
+	 * BundleContext )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -51,9 +52,8 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.
+	 * BundleContext )
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
@@ -68,11 +68,23 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 	public static JSDTTypeScriptUIPlugin getDefault() {
 		return plugin;
 	}
-	
+
 	public synchronized IDocumentProvider getTypeScriptDocumentProvider() {
 		if (documentProvider == null) {
 			documentProvider = new TypeScriptDocumentProvider();
 		}
 		return documentProvider;
+	}
+
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+	}
+
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null) {
+			return window.getShell();
+		}
+		return null;
 	}
 }
