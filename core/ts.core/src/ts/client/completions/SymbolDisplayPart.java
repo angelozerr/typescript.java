@@ -16,6 +16,7 @@ package ts.client.completions;
  */
 public class SymbolDisplayPart {
 
+	private static final String PARAMETER_NAME_KIND = "parameterName";
 	private final String text;
 	private final String kind;
 
@@ -30,6 +31,10 @@ public class SymbolDisplayPart {
 
 	public String getKind() {
 		return kind;
+	}
+	
+	public boolean isParameterName() {
+		return PARAMETER_NAME_KIND.equals(kind);
 	}
 
 }

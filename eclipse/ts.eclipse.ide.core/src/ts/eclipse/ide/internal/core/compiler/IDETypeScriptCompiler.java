@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
-import ts.compiler.CompilerOptions;
-import ts.compiler.TypeScriptCompiler;
+import ts.cmd.tsc.CompilerOptions;
+import ts.cmd.tsc.TypeScriptCompiler;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -102,7 +102,7 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 				!buildOnSave ? tsFiles : null);
 		CompilerOptions options = createOptions(tsconfigOptions, buildOnSave);
 		// compile ts files to *.js, *.js.map files
-		super.compile(container.getLocation().toFile(), options, reporter.getFileNames(), reporter);
+		super.execute(container.getLocation().toFile(), options, reporter.getFileNames(), reporter);
 		// refresh *.js, *.js.map which have been generated with tsc.
 		reporter.refreshEmittedFiles();
 		// check the given list of ts files are the same than tsc

@@ -64,6 +64,7 @@ import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
 import ts.TypeScriptException;
+import ts.TypeScriptNoContentAvailableException;
 import ts.client.ICancellationToken;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.Location;
@@ -585,7 +586,12 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 
 		@Override
 		public void onError(TypeScriptException e) {
-			Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
+//			if (e instanceof TypeScriptNoContentAvailableException) {
+//				// tsserver throws this error when the tsserver returns nothing
+//				// Ignore this error
+//			} else {
+				Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
+			//}
 		}
 	}
 
@@ -631,9 +637,9 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		if (file != null) {
 			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 			return tsProject.openFile(file, document);
-		} 
+		}
 		IFileStore fs = EditorUtils.getFileStore(this);
-		if(fs != null) {
+		if (fs != null) {
 			// TODO
 		}
 		return null;

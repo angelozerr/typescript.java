@@ -11,6 +11,7 @@
 package ts.client.completions;
 
 import ts.TypeScriptException;
+import ts.TypeScriptKind;
 import ts.client.ITypeScriptServiceClient;
 import ts.internal.matcher.LCSS;
 import ts.utils.StringUtils;
@@ -35,6 +36,8 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 	private final ICompletionEntryMatcher matcher;
 	private int relevance;
 	private final ITypeScriptServiceClient client;
+
+	private Boolean isFunction;
 
 	public CompletionEntry(String name, String kind, String kindModifiers, String sortText, String fileName, int line,
 			int offset, ICompletionEntryMatcher matcher, ITypeScriptServiceClient client) {
@@ -99,6 +102,15 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 	@Override
 	public int getRelevance() {
 		return relevance;
+	}
+
+	public boolean isFunction() {
+		if (isFunction == null) {
+			TypeScriptKind tsKind = TypeScriptKind.getKind(getKind());
+			isFunction = (tsKind != null && (TypeScriptKind.CONSTRUCTOR == tsKind || TypeScriptKind.FUNCTION == tsKind
+					|| TypeScriptKind.METHOD == tsKind));
+		}
+		return isFunction;
 	}
 
 	@Override

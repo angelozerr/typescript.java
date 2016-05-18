@@ -24,8 +24,8 @@ import ts.client.TypeScriptServiceClient;
 import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
-import ts.compiler.ITypeScriptCompiler;
-import ts.compiler.TypeScriptCompiler;
+import ts.cmd.tsc.ITypeScriptCompiler;
+import ts.cmd.tsc.TypeScriptCompiler;
 
 /**
  * TypeScript project implementation.

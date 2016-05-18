@@ -3,8 +3,8 @@ package ts.core.tests;
 import java.io.File;
 
 import ts.TypeScriptException;
-import ts.compiler.CompilerOptions;
-import ts.compiler.TypeScriptCompiler;
+import ts.cmd.tsc.CompilerOptions;
+import ts.cmd.tsc.TypeScriptCompiler;
 import ts.nodejs.INodejsProcess;
 import ts.nodejs.NodejsProcessAdapter;
 
@@ -17,7 +17,7 @@ public class CompilerTest {
 		File projectDir = new File("./samples");
 		CompilerOptions options = new CompilerOptions();
 		options.setListFiles(true);
-		compiler.compile(projectDir, options, null, new NodejsProcessAdapter() {
+		compiler.execute(projectDir, options, null, new NodejsProcessAdapter() {
 			@Override
 			public void onMessage(INodejsProcess process, String response) {
 				System.err.println(response);

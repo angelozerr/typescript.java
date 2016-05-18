@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-import ts.compiler.CompilerOptions;
+import ts.cmd.tsc.CompilerOptions;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 

@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 
-import ts.compiler.TypeScriptCompilerHelper;
+import ts.cmd.tsc.TypeScriptCompilerHelper;
 import ts.eclipse.ide.core.compiler.IDETypeScriptCompilerMessageHandler;
 
 /**

@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import ts.TypeScriptException;
-import ts.compiler.ITypeScriptCompiler;
+import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 
 /**

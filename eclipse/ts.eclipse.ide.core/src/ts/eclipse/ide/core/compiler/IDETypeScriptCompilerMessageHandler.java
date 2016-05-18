@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import ts.client.Location;
-import ts.compiler.ITypeScriptCompilerMessageHandler;
-import ts.compiler.TypeScriptCompilerSeverity;
+import ts.cmd.tsc.ITypeScriptCompilerMessageHandler;
+import ts.cmd.tsc.TypeScriptCompilerSeverity;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;

@@ -37,11 +37,35 @@ public class TypeScriptHelper {
 		if (parts == null || parts.size() < 1) {
 			return null;
 		}
-		StringBuilder html = new StringBuilder("");
+		StringBuilder html = new StringBuilder("<pre>");
 		for (SymbolDisplayPart part : parts) {
 			html.append(part.getText());
 		}
-		html.append("");
+		html.append("</pre>");
 		return html.toString();
+	}
+
+	public static String extractFunctionParameters(List<SymbolDisplayPart> parts) {
+		if (parts == null || parts.size() < 1) {
+			return null;
+		}
+		StringBuilder information = new StringBuilder("");
+		boolean hasParam = false;
+		for (SymbolDisplayPart part : parts) {
+			if (part.isParameterName()) {
+				information.append(part.getText());
+				hasParam = true;
+			} else if (hasParam) {
+				if (")".equals(part.getText()))
+				{
+					// end of parameters declaration
+					break;
+				} else {
+					information.append(part.getText());
+				}
+			}
+		}
+		information.append("");
+		return information.toString();
 	}
 }

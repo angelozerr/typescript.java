@@ -27,7 +27,7 @@ import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
 
 import ts.TypeScriptException;
-import ts.compiler.CompilerOptions;
+import ts.cmd.tsc.CompilerOptions;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.launch.TypeScriptCompilerLaunchConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;

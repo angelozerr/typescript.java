@@ -23,7 +23,7 @@ import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
-import ts.compiler.ITypeScriptCompiler;
+import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;

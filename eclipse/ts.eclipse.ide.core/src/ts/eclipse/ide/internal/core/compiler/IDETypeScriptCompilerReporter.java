@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
-import ts.compiler.TypeScriptCompilerHelper;
+import ts.cmd.tsc.TypeScriptCompilerHelper;
 import ts.eclipse.ide.core.compiler.IDETypeScriptCompilerMessageHandler;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;

@@ -62,9 +62,10 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 		if (this.tsFile != null) {
 			this.tsFile.removeNavbarListener(this);
 		}
-
-		this.tsFile = tsFile;
-		this.tsFile.addNavbarListener(this);
+		if (tsFile != null) {
+			this.tsFile = tsFile;
+			this.tsFile.addNavbarListener(this);
+		}
 	}
 
 	public Control getControl() {

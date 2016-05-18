@@ -13,7 +13,6 @@ package ts.eclipse.jface.text.contentassist;
 
 import java.util.List;
 
-import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -23,7 +22,6 @@ import org.eclipse.jface.text.IPositionUpdater;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 //import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ContextInformation;
@@ -32,7 +30,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension7;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.InclusivePositionUpdater;
@@ -52,7 +49,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import ts.TypeScriptException;
-import ts.TypeScriptKind;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.ICompletionEntryDetails;
@@ -60,7 +56,6 @@ import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.SymbolDisplayPart;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 import ts.eclipse.jface.text.HoverControlCreator;
-import ts.eclipse.jface.text.PresenterControlCreator;
 import ts.utils.StringUtils;
 import ts.utils.TypeScriptHelper;
 
@@ -69,7 +64,7 @@ import ts.utils.TypeScriptHelper;
  */
 public class TypeScriptCompletionProposal extends CompletionEntry
 		implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2,
-		ICompletionProposalExtension3, ICompletionProposalExtension6, ICompletionProposalExtension7 {
+		ICompletionProposalExtension3, ICompletionProposalExtension6 {
 
 	public static final String TAB = "\t";
 	public static final String SPACE = " ";
@@ -195,23 +190,23 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	private String computeReplacementString(IDocument document, int offset) {
 
 		try {
-			ICompletionEntryDetails details = super.getEntryDetails();
-			TypeScriptKind tsKind = details != null ? TypeScriptKind.getKind(details.getKind()) : null;
-			if (tsKind != null && (TypeScriptKind.CONSTRUCTOR == tsKind || TypeScriptKind.FUNCTION == tsKind
-					|| TypeScriptKind.METHOD == tsKind)) {
-				// It's a function
-				// compute replacement string
-				// setReplacementString(replacement);
+			if (super.isFunction()) {
+				ICompletionEntryDetails entryDetails = super.getEntryDetails();
+				if (entryDetails != null) {
+					// It's a function
+					// compute replacement string
 
-				String indentation = getIndentation(document, offset);
-				arguments = new Arguments();
+					String indentation = getIndentation(document, offset);
+					arguments = new Arguments();
 
-				StringBuilder replacement = new StringBuilder(super.getName());
-				replacement.append(LPAREN);
-				setCursorPosition(replacement.length());
-				computeReplacementString(details.getDisplayParts(), replacement, arguments, indentation, 1, true);
-				replacement.append(RPAREN);
-				return replacement.toString();
+					StringBuilder replacement = new StringBuilder(super.getName());
+					replacement.append(LPAREN);
+					setCursorPosition(replacement.length());
+					computeReplacementString(entryDetails.getDisplayParts(), replacement, arguments, indentation, 1,
+							true);
+					replacement.append(RPAREN);
+					return replacement.toString();
+				}
 			}
 
 		} catch (TypeScriptException e) {
@@ -232,12 +227,12 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	private void computeReplacementString(List<SymbolDisplayPart> parameters, StringBuilder replacement,
 			Arguments arguments, String indentation, int nbIndentations, boolean initialFunction) {
 		int count = parameters.size();
-		SymbolDisplayPart parameter = null;
+		SymbolDisplayPart part = null;
 		String paramName = null;
 		boolean hasParam = false;
 		for (int i = 0; i != count; i++) {
-			parameter = parameters.get(i);
-			if (!parameter.getKind().equals("parameterName")) {
+			part = parameters.get(i);
+			if (!part.isParameterName()) {
 				continue;
 			}
 			if (hasParam) {
@@ -249,7 +244,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 			}
 
 			int offset = replacement.length();
-			paramName = parameter.getText();
+			paramName = part.getText();
 			// to select focus for parameter
 			replacement.append(paramName);
 			arguments.addArg(offset, paramName.length());
@@ -400,15 +395,16 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	private IContextInformation createContextInformation() {
 		try {
-			ICompletionEntryDetails details = getEntryDetails();
-			if (details != null) {
-				List<SymbolDisplayPart> parts = details.getDisplayParts();
-				if (parts != null && parts.size() > 0) {
-					return new ContextInformation("", TypeScriptHelper.text(parts));
-				}
+			String information = null;
+			ICompletionEntryDetails entryDetails = super.getEntryDetails();
+			if (entryDetails == null) {
+				return null;
 			}
+			if (isFunction()) {
+				information = TypeScriptHelper.extractFunctionParameters(entryDetails.getDisplayParts());
+			}
+			return information != null ? new ContextInformation("", information) : null;
 		} catch (TypeScriptException e) {
-			e.printStackTrace();
 		}
 		return null;
 	}
@@ -460,15 +456,17 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public IInformationControlCreator getInformationControlCreator() {
-//		Shell shell = getActiveWorkbenchShell();
-//		if (shell == null || !BrowserInformationControl.isAvailable(shell))
-//			return null;
-//
-//		if (tsControlCreator == null) {
-//			PresenterControlCreator presenterControlCreator = new PresenterControlCreator();
-//			tsControlCreator = new HoverControlCreator(presenterControlCreator, true);
-//		}
-//		return tsControlCreator;
+		// Shell shell = getActiveWorkbenchShell();
+		// if (shell == null || !BrowserInformationControl.isAvailable(shell))
+		// return null;
+		//
+		// if (tsControlCreator == null) {
+		// PresenterControlCreator presenterControlCreator = new
+		// PresenterControlCreator();
+		// tsControlCreator = new HoverControlCreator(presenterControlCreator,
+		// true);
+		// }
+		// return tsControlCreator;
 		return null;
 	}
 
@@ -575,23 +573,6 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	@Override
 	public StyledString getStyledDisplayString() {
 		return fDisplayString;
-	}
-
-	@Override
-	public StyledString getStyledDisplayString(IDocument document, int offset, BoldStylerProvider boldStylerProvider) {
-		StyledString styledDisplayString = new StyledString();
-		styledDisplayString.append(getStyledDisplayString());
-
-		String pattern = getPatternToEmphasizeMatch(document, offset);
-		if (pattern != null && pattern.length() > 0) {
-			String displayString = styledDisplayString.getString();
-			int[] bestSequence = getMatcher().bestSubsequence(displayString, pattern);
-			int highlightAdjustment = 0;
-			for (int index : bestSequence) {
-				styledDisplayString.setStyle(index + highlightAdjustment, 1, boldStylerProvider.getBoldStyler());
-			}
-		}
-		return styledDisplayString;
 	}
 
 	/**

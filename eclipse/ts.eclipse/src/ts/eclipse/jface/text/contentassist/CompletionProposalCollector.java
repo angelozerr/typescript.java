@@ -8,7 +8,6 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-
 package ts.eclipse.jface.text.contentassist;
 
 import java.util.ArrayList;

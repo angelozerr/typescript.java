@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import ts.compiler.CompilerOptions;
+import ts.cmd.tsc.CompilerOptions;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.resources.jsonconfig.TsconfigJson;
