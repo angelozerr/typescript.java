@@ -37,13 +37,24 @@ public class TypeScriptCorePreferenceConstants {
 	public static final String TSSERVER_TRACE_ON_CONSOLE = "tsserverTraceOnConsole"; //$NON-NLS-1$
 
 	// tsc
-
+	
 	public static final String TSC_USE_EMBEDDED_TYPESCRIPT = "tscUseEmbeddedTypeScript"; //$NON-NLS-1$
 
 	public static final String TSC_EMBEDDED_TYPESCRIPT_ID = "tscEmbeddedTypeScriptId"; //$NON-NLS-1$
 
 	public static final String TSC_INSTALLED_TYPESCRIPT_PATH = "tscInstalledTypeScriptPath"; //$NON-NLS-1$
 
+	// tslint
+
+	public static final String TSLINT_STRATEGY = "tslintStrategy"; //$NON-NLS-1$
+	
+	public static final String TSLINT_USE_CUSTOM_TSLINTJSON_FILE = "tslintUseCustomTslingJsonFile"; //$NON-NLS-1$
+	
+	public static final String TSLINT_USE_EMBEDDED_TYPESCRIPT = "tslintUseEmbeddedTypeScript"; //$NON-NLS-1$
+
+	public static final String TSLINT_EMBEDDED_TYPESCRIPT_ID = "tslintEmbeddedTypeScriptId"; //$NON-NLS-1$
+
+	public static final String TSLINT_INSTALLED_TYPESCRIPT_PATH = "tslintInstalledTypeScriptPath"; //$NON-NLS-1$
 	// Salsa
 
 	public static final String USE_SALSA_AS_JS_INFERENCE = "useSalsaAsJSInference"; //$NON-NLS-1$

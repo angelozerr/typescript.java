@@ -17,13 +17,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
-import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
 import ts.eclipse.ide.core.resources.UseSalsa;
+import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.repository.ITypeScriptRepository;
 
@@ -35,7 +36,8 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
+		IEclipsePreferences node = WorkspaceTypeScriptSettingsHelper
+				.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
 
 		// initialize properties for direct access of node.js server (start an
 		// internal process)
@@ -50,6 +52,8 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 			initializeTscPreferences(node, defaultRepository);
 			// Initialize tsserver preferences
 			initializeTsserverPreferences(node, defaultRepository);
+			// Initialize tslint preferences
+			initializeTslintPreferences(node, defaultRepository);
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while getting the default TypeScript repository", e);
 		}
@@ -117,5 +121,13 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		node.put(TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH,
 				TypeScriptCorePreferenceConstants.DEFAULT_TYPESCRIPT_BUILD_PATH);
 
+	}
+
+	private void initializeTslintPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
+		node.put(TypeScriptCorePreferenceConstants.TSLINT_STRATEGY, TslintSettingsStrategy.DisableTslint.name());
+		node.put(TypeScriptCorePreferenceConstants.TSLINT_USE_CUSTOM_TSLINTJSON_FILE, "");
+		node.put(TypeScriptCorePreferenceConstants.TSLINT_EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
+		node.putBoolean(TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT, true);
+		node.put(TypeScriptCorePreferenceConstants.TSLINT_INSTALLED_TYPESCRIPT_PATH, "");
 	}
 }

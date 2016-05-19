@@ -18,6 +18,7 @@ public class Location {
 
 	private int line;
 	private int offset;
+	private int position = -1;
 
 	public Location() {
 
@@ -44,5 +45,13 @@ public class Location {
 	 */
 	public int getOffset() {
 		return offset;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
 	}
 }

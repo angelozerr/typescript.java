@@ -10,6 +10,8 @@
  */
 package ts.eclipse.ide.core.resources;
 
+import java.io.File;
+
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.resources.ITypeScriptProjectSettings;
 

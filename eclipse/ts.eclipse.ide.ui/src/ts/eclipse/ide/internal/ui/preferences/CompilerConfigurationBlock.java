@@ -23,6 +23,8 @@ import ts.eclipse.ide.internal.ui.dialogs.IStatusChangeListener;
  */
 public class CompilerConfigurationBlock extends AbstractTypeScriptRepositoryConfigurationBlock {
 
+	private static final String[] DEFAULT_PATHS = new String[] { "${project_loc:node_modules/typescript}" };
+	
 	private static final Key PREF_TSC_USE_EMBEDDED_TYPESCRIPT = getTypeScriptCoreKey(
 			TypeScriptCorePreferenceConstants.TSC_USE_EMBEDDED_TYPESCRIPT);
 	private static final Key PREF_TSC_TYPESCRIPT_EMBEDDED = getTypeScriptCoreKey(
@@ -69,4 +71,8 @@ public class CompilerConfigurationBlock extends AbstractTypeScriptRepositoryConf
 		return PREF_TSC_TYPESCRIPT_PATH;
 	}
 
+	@Override
+	protected String[] getDefaultPaths() {
+		return DEFAULT_PATHS;
+	}
 }

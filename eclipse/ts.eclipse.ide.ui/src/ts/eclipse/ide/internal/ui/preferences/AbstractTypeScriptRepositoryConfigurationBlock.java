@@ -43,16 +43,13 @@ import ts.utils.StringUtils;
  */
 public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends OptionsConfigurationBlock {
 
-	private static final String[] DEFAULT_PATHS = new String[] { "${project_loc:node_modules/typescript}" };
-
 	private Composite controlsComposite;
 	private ControlEnableState blockEnableState;
 	private Combo embeddedComboBox;
 	private Combo installedComboBox;
 	private Button useEmbedded;
 
-	private Button browseFileSystemButton;
-	private Button browseWorkspaceButton;
+	private BrowseButtonsComposite browseButtons;
 
 	public AbstractTypeScriptRepositoryConfigurationBlock(IStatusChangeListener context, IProject project,
 			Key[] allKeys, IWorkbenchPreferenceContainer container) {
@@ -93,9 +90,9 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 		int nColumns = 2;
 		GridLayout layout = new GridLayout();
 		layout.numColumns = nColumns;
-		
+
 		Group group = new Group(parent, SWT.NONE);
-		group.setFont(controlsComposite.getFont());
+		group.setFont(parent.getFont());
 		group.setText(getTypeScriptGroupLabel());
 		group.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 		group.setLayout(layout);
@@ -121,13 +118,19 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 		// Create combo of embedded node.js
 		ITypeScriptRepository[] respositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
 		String[] values = new String[respositories.length];
+		String[] labels = new String[respositories.length];
 		int i = 0;
 		for (ITypeScriptRepository repository : respositories) {
 			values[i] = repository.getName();
+			labels[i] = getRepositoryLabel(repository);
 			i++;
 		}
-		embeddedComboBox = newComboControl(parent, getEmbeddedTypescriptKey(), values, values);
+		embeddedComboBox = newComboControl(parent, getEmbeddedTypescriptKey(), values, labels);
 		embeddedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+	}
+
+	protected String getRepositoryLabel(ITypeScriptRepository repository) {
+		return repository.getName();
 	}
 
 	private void createInstalledTypeScriptField(Composite parent) {
@@ -141,64 +144,21 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 			}
 		});
 
-		installedComboBox = newComboControl(parent, getInstalledTypescriptPathKey(), DEFAULT_PATHS, DEFAULT_PATHS,
+		installedComboBox = newComboControl(parent, getInstalledTypescriptPathKey(), getDefaultPaths(), getDefaultPaths(),
 				false);
 		installedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Create Browse buttons.
-		createBrowseButtons(parent, installedComboBox);
+		browseButtons = new BrowseButtonsComposite(parent, installedComboBox, getProject(), SWT.NONE);
 	}
 
-	protected void createBrowseButtons(final Composite parent, final Combo filePathCombo) {
-		Composite buttons = new Composite(parent, SWT.NONE);
-		buttons.setLayout(new GridLayout(2, false));
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		gd.horizontalAlignment = SWT.RIGHT;
-		buttons.setLayoutData(gd);
-
-		browseFileSystemButton = new Button(buttons, SWT.NONE);
-		browseFileSystemButton.setText(TypeScriptUIMessages.Browse_FileSystem_button);
-		browseFileSystemButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dialog = new DirectoryDialog(parent.getShell());
-				dialog.setFilterPath(filePathCombo.getText());
-				String result = dialog.open();
-				if (!StringUtils.isEmpty(result)) {
-					installedComboBox.setText(result);
-				}
-
-			}
-		});
-
-		browseWorkspaceButton = new Button(buttons, SWT.NONE);
-		browseWorkspaceButton.setText(TypeScriptUIMessages.Browse_Workspace_button);
-		browseWorkspaceButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				WorkspaceResourceSelectionDialog dialog = new WorkspaceResourceSelectionDialog(parent.getShell(),
-						Mode.FILE_FOLDER);
-				IResource initialResource = TypeScriptCorePlugin.getTypeScriptRepositoryManager()
-						.getResource(filePathCombo.getText(), getProject());
-				if (initialResource != null) {
-					dialog.setInitialSelection(initialResource);
-				}
-				if (dialog.open() == Window.OK) {
-					IResource resource = (IResource) dialog.getFirstResult();
-					filePathCombo.setText(TypeScriptCorePlugin.getTypeScriptRepositoryManager()
-							.generateFileName(resource, getProject()));
-				}
-			}
-		});
-	}
+	protected abstract String[] getDefaultPaths();
 
 	private void updateComboBoxes() {
 		boolean embedded = useEmbedded.getSelection();
 		embeddedComboBox.setEnabled(embedded);
 		installedComboBox.setEnabled(!embedded);
-		browseFileSystemButton.setEnabled(!embedded);
-		browseWorkspaceButton.setEnabled(!embedded);
+		browseButtons.setEnabled(!embedded);
 	}
 
 	@Override

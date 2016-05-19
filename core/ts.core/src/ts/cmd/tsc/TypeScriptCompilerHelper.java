@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ts.client.Location;
+import ts.cmd.Severity;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
@@ -65,7 +66,7 @@ public class TypeScriptCompilerHelper {
 						String code = m.group(4);
 						String message = m.group(5);
 						handler.addError(file, startLoc, endLoc, StringUtils.isEmpty(severity)
-								? TypeScriptCompilerSeverity.info : TypeScriptCompilerSeverity.valueOf(severity), code,
+								? Severity.info : Severity.valueOf(severity), code,
 								message);
 					}
 				}

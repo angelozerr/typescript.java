@@ -12,7 +12,9 @@ package ts.resources;
 
 import java.io.File;
 
+import ts.TypeScriptException;
 import ts.client.completions.ICompletionEntryMatcher;
+import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.internal.repository.TypeScriptRepository;
 import ts.repository.ITypeScriptRepository;
 import ts.repository.TypeScriptRepositoryException;
@@ -27,6 +29,7 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	private final SynchStrategy synchStrategy;
 	private final ITypeScriptRepository repository;
 	private ICompletionEntryMatcher completionEntryMatcher;
+	private TslintSettingsStrategy tslintStrategy;
 
 	public BasicTypeScriptProjectSettings(File nodejsInstallPath, File typeScriptDir)
 			throws TypeScriptRepositoryException {
@@ -61,12 +64,37 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	}
 
 	@Override
+	public File getTslintFile() throws TypeScriptException {
+		return repository.getTslintFile();
+	}
+
+	@Override
 	public ICompletionEntryMatcher getCompletionEntryMatcher() {
 		return completionEntryMatcher;
 	}
 
 	public void setCompletionEntryMatcher(ICompletionEntryMatcher completionEntryMatcher) {
 		this.completionEntryMatcher = completionEntryMatcher;
+	}
+
+	@Override
+	public File getTslintJsonFile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TslintSettingsStrategy getTslintStrategy() {
+		return tslintStrategy;
+	}
+
+	public void setTslintStrategy(TslintSettingsStrategy tslintStrategy) {
+		this.tslintStrategy = tslintStrategy;
+	}
+
+	@Override
+	public boolean isUseCodeSnippetsOnMethodSuggest() {
+		return false;
 	}
 
 	@Override

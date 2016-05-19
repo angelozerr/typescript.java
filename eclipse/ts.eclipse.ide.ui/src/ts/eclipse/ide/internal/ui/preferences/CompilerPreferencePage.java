@@ -11,21 +11,10 @@
 package ts.eclipse.ide.internal.ui.preferences;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
-import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
-import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.preferences.PropertyAndPreferencePage;
 
 /**
@@ -47,45 +36,6 @@ public class CompilerPreferencePage extends PropertyAndPreferencePage {
 		IWorkbenchPreferenceContainer container = (IWorkbenchPreferenceContainer) getContainer();
 		configurationBlock = new CompilerConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
 		super.createControl(parent);
-	}
-
-	@Override
-	protected Control createPreferenceHeaderContent(Composite parent) {
-		final IProject project = getProject();
-		if (project != null) {
-			GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-			gd.horizontalSpan = 3;
-
-			final Button enableBuilderCheckbox = new Button(parent, SWT.CHECK);
-			enableBuilderCheckbox.setFont(JFaceResources.getDialogFont());
-			enableBuilderCheckbox
-					.setText(TypeScriptUIMessages.CompilerConfigurationBlock_enable_builder_checkbox_label);
-			enableBuilderCheckbox.setLayoutData(gd);
-			enableBuilderCheckbox.setSelection(TypeScriptResourceUtil.hasTypeScriptBuilder(project));
-			enableBuilderCheckbox.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent event) {
-					if (TypeScriptResourceUtil.hasTypeScriptBuilder(project)) {
-						try {
-							TypeScriptResourceUtil.removeTypeScriptBuilder(project);
-						} catch (CoreException e) {
-							ErrorDialog.openError(getShell(), TypeScriptUIMessages.TypeScriptBuilder_Error_title,
-									TypeScriptUIMessages.TypeScriptBuilder_disable_Error_message, e.getStatus());
-						}
-					} else {
-						try {
-							TypeScriptResourceUtil.addTypeScriptBuilder(project);
-						} catch (CoreException e) {
-							ErrorDialog.openError(getShell(), TypeScriptUIMessages.TypeScriptBuilder_Error_title,
-									TypeScriptUIMessages.TypeScriptBuilder_enable_Error_message, e.getStatus());
-						}
-					}
-				}
-			});
-
-			new Label(parent, SWT.NONE).setLayoutData(new GridData());
-		}
-		return null;
 	}
 
 	@Override

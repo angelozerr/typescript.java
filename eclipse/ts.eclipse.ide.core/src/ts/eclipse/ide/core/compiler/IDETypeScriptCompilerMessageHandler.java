@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import ts.client.Location;
+import ts.cmd.Severity;
 import ts.cmd.tsc.ITypeScriptCompilerMessageHandler;
-import ts.cmd.tsc.TypeScriptCompilerSeverity;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -118,19 +118,20 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 	}
 
 	@Override
-	public void addError(String filename, Location startLoc, Location endLoc, TypeScriptCompilerSeverity severity,
+	public void addError(String filename, Location startLoc, Location endLoc, Severity severity,
 			String code, String message) {
 		IFile file = getFile(filename);
 		if (file != null) {
 			try {
-				TypeScriptResourceUtil.addTscMarker(file, message, getSeverity(severity), startLoc.getLine());
+				String error = TypeScriptResourceUtil.formatTscError(code, message);
+				TypeScriptResourceUtil.addTscMarker(file, error, getSeverity(severity), startLoc.getLine());
 			} catch (CoreException e) {
 
 			}
 		}
 	}
 
-	private int getSeverity(TypeScriptCompilerSeverity severity) {
+	private int getSeverity(Severity severity) {
 		switch (severity) {
 		case error:
 			return IMarker.SEVERITY_ERROR;

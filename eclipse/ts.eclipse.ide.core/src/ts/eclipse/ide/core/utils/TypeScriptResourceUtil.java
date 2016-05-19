@@ -44,6 +44,8 @@ import ts.utils.StringUtils;
  */
 public class TypeScriptResourceUtil {
 
+	private static final String TSC_TYPE = "tsc";
+	private static final String TSLINT_TYPE = "tslint";
 	private static final String TSC_MARKER_TYPE = "ts.eclipse.ide.core.typeScriptProblem";
 
 	public static boolean isTsOrTsxFile(Object element) {
@@ -335,7 +337,33 @@ public class TypeScriptResourceUtil {
 		return marker;
 	}
 
+	public static IMarker addTscMarker(IResource resource, String message, int severity, int lineNumber, int charStart,
+			int charEnd) throws CoreException {
+		IMarker marker = addTscMarker(resource, message, severity, lineNumber);
+		marker.setAttribute(IMarker.CHAR_START, charStart);
+		marker.setAttribute(IMarker.CHAR_END, charEnd);
+		return marker;
+	}
+
 	public static void deleteTscMarker(IResource resource) throws CoreException {
 		resource.deleteMarkers(TSC_MARKER_TYPE, true, IResource.DEPTH_INFINITE);
+	}
+
+	public static String formatError(String cmd, String code, String message) {
+		StringBuilder error = new StringBuilder(cmd);
+		error.append(" (");
+		error.append(code);
+		error.append("): '");
+		error.append(message);
+		error.append("'");
+		return error.toString();
+	}
+
+	public static String formatTslintError(String code, String message) {
+		return formatError(TSLINT_TYPE, code, message);
+	}
+
+	public static String formatTscError(String code, String message) {
+		return formatError(TSC_TYPE, code, message);
 	}
 }

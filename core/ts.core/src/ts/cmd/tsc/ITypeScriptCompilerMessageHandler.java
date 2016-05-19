@@ -1,13 +1,11 @@
 package ts.cmd.tsc;
 
-import ts.client.Location;
+import ts.cmd.ITypeScriptLinterHandler;
 
-public interface ITypeScriptCompilerMessageHandler {
+public interface ITypeScriptCompilerMessageHandler extends ITypeScriptLinterHandler {
 
 	void addFile(String file);
 
 	void onCompilationCompleteWatchingForFileChanges();
 
-	void addError(String file, Location startLoc, Location endLoc,
-			TypeScriptCompilerSeverity typeScriptCompilerSeverity, String code, String message);
 }

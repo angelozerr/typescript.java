@@ -48,7 +48,6 @@ public class AbstractCmd<T extends IOptions> {
 		process.start();
 		try {
 			process.join();
-			;
 		} catch (InterruptedException e) {
 			throw new TypeScriptException(e);
 		}

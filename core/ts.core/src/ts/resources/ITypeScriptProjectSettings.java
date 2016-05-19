@@ -14,6 +14,7 @@ import java.io.File;
 
 import ts.TypeScriptException;
 import ts.client.completions.ICompletionEntryMatcher;
+import ts.cmd.tslint.TslintSettingsStrategy;
 
 /**
  * TypeScript project settings API.
@@ -51,10 +52,25 @@ public interface ITypeScriptProjectSettings {
 	File getTsserverFile() throws TypeScriptException;
 
 	/**
+	 * Returns the tslint/bin/tslint file to execute.
+	 * 
+	 * @return the tslint/bin/tslint file to execute.
+	 */
+	File getTslintFile() throws TypeScriptException;
+
+	/**
 	 * Returns the completion entry matcher to use to filter TypeScript
 	 * completion entries.
 	 */
 	ICompletionEntryMatcher getCompletionEntryMatcher();
+
+	boolean isUseCodeSnippetsOnMethodSuggest();
+	
+	// ------------- tslint settings
+	
+	TslintSettingsStrategy getTslintStrategy();
+
+	File getTslintJsonFile();
 
 	/**
 	 * Dispose the settings.

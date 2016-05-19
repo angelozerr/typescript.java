@@ -24,6 +24,8 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	private File typesScriptDir;
 	private File tscFile;
 	private File tsserverFile;
+	private File tslintFile;
+	private String tslintName;
 
 	public TypeScriptRepository(File baseDir) throws TypeScriptRepositoryException {
 		this(baseDir, null);
@@ -38,6 +40,7 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 
 	private void updateBaseDir(File baseDir) throws TypeScriptRepositoryException {
 		this.typesScriptDir = baseDir;
+		// tsserver file
 		this.tsserverFile = TypeScriptRepositoryManager.getTsserverFile(typesScriptDir);
 		if (!tsserverFile.exists()) {
 			this.typesScriptDir = new File(baseDir, "node_modules/typescript");
@@ -47,23 +50,36 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 			throw new TypeScriptRepositoryException(FileUtils.getPath(typesScriptDir)
 					+ " is not a valid TypeScript repository. Check the directory contains node_modules/typescript/bin/tsserver or bin/tsserver.");
 		}
+		// tsc file
 		this.tscFile = TypeScriptRepositoryManager.getTscFile(typesScriptDir);
-		this.setName(generateName());
+		this.setName(generateName("TypeScript", typesScriptDir));
+		// tslint file
+		File tslintBaseDir = new File(baseDir, "node_modules/tslint");
+		if (tslintBaseDir.exists()) {
+			this.tslintFile = TypeScriptRepositoryManager.getTslintFile(tslintBaseDir);
+			this.tslintName = generateName("tslint", tslintBaseDir);
+		}
 	}
 
-	private String generateName() {
-		StringBuilder name = new StringBuilder("TypeScript (");
-		File packageJsonFile = new File(typesScriptDir, "package.json");
-		try {
-			JsonObject json = Json.parse(IOUtils.toString(new FileInputStream(packageJsonFile))).asObject();
-			String version = json.getString("version", null);
-			if (version != null) {
-				name.append(version);
-			}
-		} catch (Exception e) {
+	private String generateName(String prefix, File baseDir) {
+		StringBuilder name = new StringBuilder(prefix);
+		name.append(" (");
+		String version = getPackageJsonVersion(baseDir);
+		if (version != null) {
+			name.append(version);
 		}
 		name.append(")");
 		return name.toString();
+	}
+
+	private String getPackageJsonVersion(File baseDir) {
+		File packageJsonFile = new File(baseDir, "package.json");
+		try {
+			JsonObject json = Json.parse(IOUtils.toString(new FileInputStream(packageJsonFile))).asObject();
+			return json.getString("version", null);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -98,5 +114,15 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	@Override
 	public File getTsserverFile() {
 		return tsserverFile;
+	}
+
+	@Override
+	public File getTslintFile() {
+		return tslintFile;
+	}
+
+	@Override
+	public String getTslintName() {
+		return tslintName;
 	}
 }

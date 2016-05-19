@@ -24,6 +24,7 @@ import org.eclipse.jface.text.IDocument;
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
 import ts.cmd.tsc.ITypeScriptCompiler;
+import ts.cmd.tslint.ITypeScriptLint;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
@@ -35,12 +36,14 @@ import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
+import ts.eclipse.ide.core.tslint.IIDETypeScriptLint;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.eclipse.ide.internal.core.compiler.IDETypeScriptCompiler;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
+import ts.eclipse.ide.internal.core.tslint.IDETypeScriptLint;
 import ts.resources.TypeScriptProject;
 import ts.utils.FileUtils;
 
@@ -335,4 +338,15 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	protected ITypeScriptCompiler createCompiler(File tscFile, File nodejsFile) {
 		return new IDETypeScriptCompiler(tscFile, nodejsFile);
 	}
+
+	@Override
+	public IIDETypeScriptLint getTslint() throws TypeScriptException {
+		return (IIDETypeScriptLint) super.getTslint();
+	}
+
+	@Override
+	protected ITypeScriptLint createTslint(File tslintFile, File tslintJsonFile, File nodejsFile) {
+		return new IDETypeScriptLint(tslintFile, tslintJsonFile, nodejsFile);
+	}
+
 }

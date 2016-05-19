@@ -7,12 +7,19 @@ import org.eclipse.wst.validation.internal.provisional.core.IReporter;
 import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
 import ts.TypeScriptException;
+import ts.client.Location;
 import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.cmd.ITypeScriptLinterHandler;
+import ts.cmd.Severity;
+import ts.cmd.tslint.TslintHelper;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.validator.internal.core.Trace;
-import ts.resources.ITypeScriptFile;
+import ts.nodejs.INodejsProcess;
+import ts.nodejs.INodejsProcessListener;
+import ts.nodejs.NodejsProcessAdapter;
 
-public class TypeScriptReporterCollector implements ITypeScriptGeterrCollector {
+public class TypeScriptReporterCollector extends NodejsProcessAdapter
+		implements ITypeScriptGeterrCollector, ITypeScriptLinterHandler, INodejsProcessListener {
 
 	private static final String CHAR_END = "charEnd";
 	private static final String CHAR_START = "charStart";
@@ -40,7 +47,7 @@ public class TypeScriptReporterCollector implements ITypeScriptGeterrCollector {
 				if (start == 0) {
 					end = 1;
 				} else {
-					start = start -1;
+					start = start - 1;
 				}
 			}
 			// TODO: severity
@@ -59,6 +66,41 @@ public class TypeScriptReporterCollector implements ITypeScriptGeterrCollector {
 
 	private int getSeverity(String severity) {
 		return WARNING_SEVERITY.equals(severity) ? IMessage.NORMAL_SEVERITY : IMessage.HIGH_SEVERITY;
+	}
+
+	@Override
+	public void onMessage(INodejsProcess process, String response) {
+		TslintHelper.processJsonMessage(response, this);
+	}
+
+	@Override
+	public void addError(String file, Location startLoc, Location endLoc, Severity severity, String code,
+			String failure) {
+		IResource resource = tsFile.getResource();
+		int start = startLoc.getPosition();
+		int end = endLoc.getPosition();
+		if (start == end) {
+			if (start == 0) {
+				end = 1;
+			} else {
+				start = start - 1;
+			}
+		}
+		// TODO: severity
+		// String severity = null;
+		LocalizedMessage message = new LocalizedMessage(getSeverity(severity), failure, resource);
+		message.setOffset(start);
+		message.setLength(end - start);
+		message.setAttribute(CHAR_START, start);
+		message.setAttribute(CHAR_END, end);
+		message.setLineNo(startLoc.getLine());
+		reporter.addMessage(validator, message);
+
+	}
+
+	private int getSeverity(Severity severity) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

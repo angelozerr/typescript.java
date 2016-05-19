@@ -17,6 +17,7 @@ import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.cmd.tsc.ITypeScriptCompiler;
+import ts.cmd.tslint.ITypeScriptLint;
 
 /**
  * TypeScript project API.
@@ -70,6 +71,16 @@ public interface ITypeScriptProject {
 
 	boolean isServerDisposed();
 
+	/**
+	 * Returns the tslint linter.
+	 * 
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	ITypeScriptLint getTslint() throws TypeScriptException;
+
 	ITypeScriptProjectSettings getProjectSettings();
+
+	void disposeTslint();
 
 }

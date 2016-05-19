@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 import ts.client.completions.ICompletionEntryMatcher;
+import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
@@ -39,6 +40,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	private final IDETypeScriptProject tsProject;
 	private SaveProjectPreferencesJob savePreferencesJob;
 	private boolean updatingBuildPath;
+	private TslintSettingsStrategy tslintStrategy;
 
 	public IDETypeScriptProjectSettings(IDETypeScriptProject tsProject) {
 		super(tsProject.getProject(), TypeScriptCorePlugin.PLUGIN_ID);
@@ -142,6 +144,9 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 			getTypeScriptProject().disposeCompiler();
 		} else if (isTypeScriptBuildPathPreferencesChanged(event) && !updatingBuildPath) {
 			getTypeScriptProject().disposeBuildPath();
+		} else if (isTslintPreferencesChanged(event)) {
+			this.tslintStrategy = null;
+			getTypeScriptProject().disposeTslint();
 		}
 	}
 
@@ -162,6 +167,14 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return TypeScriptCorePreferenceConstants.TSC_USE_EMBEDDED_TYPESCRIPT.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSC_EMBEDDED_TYPESCRIPT_ID.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSC_INSTALLED_TYPESCRIPT_PATH.equals(event.getKey());
+	}
+
+	private boolean isTslintPreferencesChanged(PreferenceChangeEvent event) {
+		return TypeScriptCorePreferenceConstants.TSLINT_STRATEGY.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.TSLINT_USE_CUSTOM_TSLINTJSON_FILE.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.TSLINT_EMBEDDED_TYPESCRIPT_ID.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.TSLINT_INSTALLED_TYPESCRIPT_PATH.equals(event.getKey());
 	}
 
 	private boolean isTypeScriptBuildPathPreferencesChanged(PreferenceChangeEvent event) {
@@ -202,5 +215,48 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	public ICompletionEntryMatcher getCompletionEntryMatcher() {
 		// TODO: support entry matcher with preferences.
 		return ICompletionEntryMatcher.LCS;
+	}
+	
+	public boolean isUseCodeSnippetsOnMethodSuggest() {
+		return true;
+	}
+
+	// -------------tslint
+
+	@Override
+	public File getTslintFile() {
+		if (super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT, false)) {
+			// Use TypeScript Repository.
+			ITypeScriptRepository repository = getRepository(
+					TypeScriptCorePreferenceConstants.TSLINT_EMBEDDED_TYPESCRIPT_ID);
+			return (repository != null) ? repository.getTslintFile() : null;
+		}
+
+		// Use Installed tslint
+		String path = super.getStringPreferencesValue(
+				TypeScriptCorePreferenceConstants.TSLINT_INSTALLED_TYPESCRIPT_PATH, null);
+		File resolvedPath = resolvePath(path);
+		return resolvedPath != null ? IDETypeScriptRepositoryManager.getTslintFile(resolvedPath) : null;
+	}
+
+	@Override
+	public TslintSettingsStrategy getTslintStrategy() {
+		if (tslintStrategy == null) {
+			String strategy = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.TSLINT_STRATEGY,
+					TslintSettingsStrategy.DisableTslint.name());
+			try {
+				tslintStrategy = TslintSettingsStrategy.valueOf(strategy);
+			} catch (Throwable e) {
+				tslintStrategy = TslintSettingsStrategy.DisableTslint;
+			}
+		}
+		return tslintStrategy;
+	}
+
+	@Override
+	public File getTslintJsonFile() {
+		String path = super.getStringPreferencesValue(
+				TypeScriptCorePreferenceConstants.TSLINT_USE_CUSTOM_TSLINTJSON_FILE, null);
+		return resolvePath(path);
 	}
 }

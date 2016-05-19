@@ -17,6 +17,7 @@ import org.eclipse.jface.text.IDocument;
 import ts.TypeScriptException;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.core.tslint.IIDETypeScriptLint;
 import ts.resources.ITypeScriptProject;
 
 /**
@@ -95,4 +96,6 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	ITypeScriptBuildPath getTypeScriptBuildPath();
 
 	IIDETypeScriptCompiler getCompiler() throws TypeScriptException;
+
+	IIDETypeScriptLint getTslint() throws TypeScriptException;
 }

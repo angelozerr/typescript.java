@@ -66,4 +66,7 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 		return new File(typesScriptDir, "bin/tsc");
 	}
 
+	public static File getTslintFile(File tslintScriptDir) {
+		return new File(tslintScriptDir, "bin/tslint");
+	}
 }

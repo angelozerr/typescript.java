@@ -48,4 +48,19 @@ public interface ITypeScriptRepository {
 	 * @return the tsserver file.
 	 */
 	File getTsserverFile();
+
+	/**
+	 * Returns the tslint file.
+	 * 
+	 * @return the tslint file.
+	 */
+	File getTslintFile();
+
+	/**
+	 * Returns the tslint repository name.
+	 * 
+	 * @return the tslint repository name.
+	 */
+	String getTslintName();
+
 }

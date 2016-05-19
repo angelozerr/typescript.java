@@ -62,13 +62,24 @@ public class TypeScriptUIMessages extends NLS {
 	public static String ServerConfigurationBlock_installed_checkbox_label;
 	public static String ServerConfigurationBlock_traceOnConsole_label;
 
-	public static String CompilerConfigurationBlock_enable_builder_checkbox_label;
+	public static String TypeScriptMainPropertyPage_enable_builder_checkbox_label;
+	public static String TypeScriptMainPropertyPage_enable_builder_checkbox_description;
 	public static String TypeScriptBuilder_Error_title;
 	public static String TypeScriptBuilder_enable_Error_message;
 	public static String TypeScriptBuilder_disable_Error_message;
 	public static String CompilerConfigurationBlock_typescript_group_label;
 	public static String CompilerConfigurationBlock_embedded_checkbox_label;
 	public static String CompilerConfigurationBlock_installed_checkbox_label;
+
+	public static String ValidationConfigurationBlock_tslintjson_group_label;
+	public static String ValidationConfigurationBlock_tslintjson_strategy_DisableTslint;
+	public static String ValidationConfigurationBlock_tslintjson_strategy_UseDefaultTslintJson;
+	public static String ValidationConfigurationBlock_tslintjson_strategy_UseCustomTslintJson;
+	public static String ValidationConfigurationBlock_tslintjson_strategy_SearchForTslintJson;
+
+	public static String ValidationConfigurationBlock_tslint_group_label;
+	public static String ValidationConfigurationBlock_embedded_checkbox_label;
+	public static String ValidationConfigurationBlock_installed_checkbox_label;
 
 	// Search
 	public static String TypeScriptSearchQuery_label;

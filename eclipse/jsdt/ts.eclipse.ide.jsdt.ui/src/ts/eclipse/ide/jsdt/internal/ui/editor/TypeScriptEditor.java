@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -64,7 +65,6 @@ import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
 import ts.TypeScriptException;
-import ts.TypeScriptNoContentAvailableException;
 import ts.client.ICancellationToken;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.Location;
@@ -76,6 +76,7 @@ import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.ide.jsdt.internal.ui.actions.CompositeActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.JavaSearchActionGroup;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
@@ -586,12 +587,12 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 
 		@Override
 		public void onError(TypeScriptException e) {
-//			if (e instanceof TypeScriptNoContentAvailableException) {
-//				// tsserver throws this error when the tsserver returns nothing
-//				// Ignore this error
-//			} else {
-				Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
-			//}
+			// if (e instanceof TypeScriptNoContentAvailableException) {
+			// // tsserver throws this error when the tsserver returns nothing
+			// // Ignore this error
+			// } else {
+			Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
+			// }
 		}
 	}
 

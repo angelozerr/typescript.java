@@ -2,8 +2,7 @@ package ts.cmd.tsc;
 
 import java.util.List;
 
-import ts.cmd.IOptions;
-import ts.utils.StringUtils;
+import ts.cmd.AbstractOptions;
 
 /**
  * Instructs the TypeScript compiler how to compile .ts files.
@@ -12,7 +11,7 @@ import ts.utils.StringUtils;
  * @se https://www.typescriptlang.org/docs/handbook/compiler-html
  *
  */
-public class CompilerOptions implements IOptions {
+public class CompilerOptions extends AbstractOptions {
 
 	private Boolean allowJs;
 	private boolean allowSyntheticDefaultImports;
@@ -1197,19 +1196,6 @@ public class CompilerOptions implements IOptions {
 		fillOption("--traceResolution", isTraceResolution(), args);
 		fillOption("--version", isVersion(), args);
 		fillOption("--watch", isWatch(), args);
-	}
-
-	private void fillOption(String name, Boolean value, List<String> args) {
-		if (value != null && value) {
-			args.add(name);
-		}
-	}
-
-	private void fillOption(String name, String value, List<String> args) {
-		if (!StringUtils.isEmpty(value)) {
-			args.add(name);
-			args.add(value);
-		}
 	}
 
 }

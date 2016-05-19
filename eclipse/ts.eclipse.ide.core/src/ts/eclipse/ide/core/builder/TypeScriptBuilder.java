@@ -73,6 +73,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 	}
 
 	private void incrementalBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
+
 		final ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
 		final Map<ITypeScriptRootContainer, List<IFile>> tsFilesToCompile = new HashMap<ITypeScriptRootContainer, List<IFile>>();
 		final Map<ITypeScriptRootContainer, List<IFile>> tsFilesToDelete = new HashMap<ITypeScriptRootContainer, List<IFile>>();
@@ -132,7 +133,10 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			List<IFile> tsFiles = entries.getValue();
 			try {
 				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
+				// compile ts files
 				tsProject.getCompiler().compile(tsconfig, tsFiles);
+				// validate ts files with tslint
+				tsProject.getTslint().lint(tsconfig, tsFiles, tsProject.getProjectSettings());
 			} catch (TypeScriptException e) {
 				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
 			}

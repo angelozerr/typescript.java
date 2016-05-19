@@ -8,8 +8,15 @@ public class TypeScriptLint extends AbstractCmd<TSLintOptions> implements ITypeS
 
 	private static final String TSLINT_FILE_TYPE = "tslint";
 
-	public TypeScriptLint(File tslintFile, File nodejsFile) {
+	private final File tslintJsonFile;
+
+	public TypeScriptLint(File tslintFile, File tslintJsonFile, File nodejsFile) {
 		super(tslintFile, nodejsFile, TSLINT_FILE_TYPE);
+		this.tslintJsonFile = tslintJsonFile;
+	}
+
+	public File getTslintJsonFile() {
+		return tslintJsonFile;
 	}
 
 }

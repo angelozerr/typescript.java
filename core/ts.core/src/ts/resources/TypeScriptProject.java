@@ -26,6 +26,8 @@ import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tsc.TypeScriptCompiler;
+import ts.cmd.tslint.ITypeScriptLint;
+import ts.cmd.tslint.TypeScriptLint;
 
 /**
  * TypeScript project implementation.
@@ -46,6 +48,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 	private final Map<String, Object> data;
 	private final List<ITypeScriptClientListener> listeners;
 	protected final Object serverLock = new Object();
+	private ITypeScriptLint tslint;
 
 	public TypeScriptProject(File projectDir, ITypeScriptProjectSettings projectSettings) {
 		this.projectDir = projectDir;
@@ -295,6 +298,33 @@ public class TypeScriptProject implements ITypeScriptProject {
 			compiler = createCompiler();
 		}
 		return compiler;
+	}
+
+	@Override
+	public ITypeScriptLint getTslint() throws TypeScriptException {
+		if (tslint == null) {
+			tslint = createTslint();
+		}
+		return tslint;
+	}
+
+	@Override
+	public void disposeTslint() {
+		if (tslint != null) {
+			// tslint.dispose();
+			tslint = null;
+		}
+	}
+
+	protected ITypeScriptLint createTslint() throws TypeScriptException {
+		File nodeFile = getProjectSettings().getNodejsInstallPath();
+		File tslintFile = getProjectSettings().getTslintFile();
+		File tslintJsonFile = getProjectSettings().getTslintJsonFile();
+		return createTslint(tslintFile, tslintJsonFile, nodeFile);
+	}
+
+	protected ITypeScriptLint createTslint(File tslintFile, File tslintJsonFile, File nodejsFile) {
+		return new TypeScriptLint(tslintFile, tslintJsonFile, nodejsFile);
 	}
 
 	@Override
