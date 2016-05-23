@@ -88,6 +88,39 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 		}
 	}
 
+	public Integer getIntegerPreferencesValue(String key, Integer def) {
+		Integer value = getProjectPreferencesValue(key, (Integer) null);
+		if (value != null) {
+			return value;
+		}
+		return getIntegerWorkspacePreferencesValue(key, def);
+	}
+
+	public Integer getProjectPreferencesValue(String key, Integer def) {
+		IEclipsePreferences node = getProjectPreferences();
+		return getInteger(node, key, def);
+	}
+
+	public Integer getIntegerWorkspacePreferencesValue(String key, Integer def) {
+		IEclipsePreferences node = getWorkspacePreferences();
+		return getInteger(node, key, def);
+	}
+
+	private Integer getInteger(IEclipsePreferences preferences, String key, Integer def) {
+		if (preferences == null) {
+			return def;
+		}
+		String result = preferences.get(key, null);
+		if (result == null) {
+			return def;
+		}
+		try {
+			return Integer.parseInt(result);
+		} catch (Throwable e) {
+			return def;
+		}
+	}
+
 	protected IEclipsePreferences getProjectPreferences() {
 		return projectScope.getNode(pluginId);
 	}

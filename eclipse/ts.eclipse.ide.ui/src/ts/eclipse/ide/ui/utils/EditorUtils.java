@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -117,7 +118,11 @@ public class EditorUtils {
 	 * @return the resource of the given editor and null otherwise.
 	 */
 	public static IResource getResource(IEditorPart editor) {
-		return (IResource) editor.getEditorInput().getAdapter(IResource.class);
+		return getResource(editor.getEditorInput());
+	}
+
+	public static IResource getResource(IEditorInput input) {
+		return (IResource) input.getAdapter(IResource.class);
 	}
 
 	/**

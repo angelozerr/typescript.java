@@ -37,7 +37,7 @@ public class TypeScriptCorePreferenceConstants {
 	public static final String TSSERVER_TRACE_ON_CONSOLE = "tsserverTraceOnConsole"; //$NON-NLS-1$
 
 	// tsc
-	
+
 	public static final String TSC_USE_EMBEDDED_TYPESCRIPT = "tscUseEmbeddedTypeScript"; //$NON-NLS-1$
 
 	public static final String TSC_EMBEDDED_TYPESCRIPT_ID = "tscEmbeddedTypeScriptId"; //$NON-NLS-1$
@@ -47,35 +47,94 @@ public class TypeScriptCorePreferenceConstants {
 	// tslint
 
 	public static final String TSLINT_STRATEGY = "tslintStrategy"; //$NON-NLS-1$
-	
+
 	public static final String TSLINT_USE_CUSTOM_TSLINTJSON_FILE = "tslintUseCustomTslingJsonFile"; //$NON-NLS-1$
-	
+
 	public static final String TSLINT_USE_EMBEDDED_TYPESCRIPT = "tslintUseEmbeddedTypeScript"; //$NON-NLS-1$
 
 	public static final String TSLINT_EMBEDDED_TYPESCRIPT_ID = "tslintEmbeddedTypeScriptId"; //$NON-NLS-1$
 
 	public static final String TSLINT_INSTALLED_TYPESCRIPT_PATH = "tslintInstalledTypeScriptPath"; //$NON-NLS-1$
+
 	// Salsa
 
 	public static final String USE_SALSA_AS_JS_INFERENCE = "useSalsaAsJSInference"; //$NON-NLS-1$
 
-	// TypeScript/Salsa nature paths
-
-	// public static final String NATURE_TYPESCRIPT_PATHS =
-	// "natureTypescriptPaths"; //$NON-NLS-1$
-	//
-	// public static final String DEFAULT_NATURE_TYPESCRIPT_PATHS =
-	// TSCONFIG_JSON + ",src/" + TSCONFIG_JSON; //$NON-NLS-1$
-	//
-	// public static final String NATURE_SALSA_PATHS = "natureSalsaPaths";
-	// //$NON-NLS-1$
-	//
-	// public static final String DEFAULT_NATURE_SALSA_PATHS = JSCONFIG_JSON +
-	// ",src/" + JSCONFIG_JSON; //$NON-NLS-1$
+	// TypeScript build path
 
 	public static final String TYPESCRIPT_BUILD_PATH = "typeScriptBuildPath"; //$NON-NLS-1$
 
 	public static final String DEFAULT_TYPESCRIPT_BUILD_PATH = new DefaultTypeScriptBuildPath().toString(); // $NON-NLS-1$
+
+	// Editor Options
+
+	public static final String EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES = "editorOptionsConvertTabsToSpaces"; // $NON-NLS-1$
+
+	public static final boolean EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES_DEFAULT = true; // $NON-NLS-1$
+
+	public static final String EDITOR_OPTIONS_INDENT_SIZE = "editorOptionsIndentSize"; // $NON-NLS-1$
+
+	public static final int EDITOR_OPTIONS_INDENT_SIZE_DEFAULT = 4; // $NON-NLS-1$
+
+	public static final String EDITOR_OPTIONS_TAB_SIZE = "editorOptionsTabSize"; // $NON-NLS-1$
+
+	public static final int EDITOR_OPTIONS_TAB_SIZE_DEFAULT = 4; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER = "insertSpaceAfterCommaDelimiter"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS = "insertSpaceAfterSemicolonInForStatements"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS = "insertSpaceBeforeAndAfterBinaryOperators"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS = "insertSpaceAfterKeywordsInControlFlowStatements"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS = "insertSpaceAfterFunctionKeywordForAnonymousFunctions"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS = "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS = "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS = "placeOpenBraceOnNewLineForFunctions"; // $NON-NLS-1$
+
+	public static final String FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS = "placeOpenBraceOnNewLineForControlBlocks"; // $NON-NLS-1$
+
+	// Format Options
+
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_indentSize = "indentSize"; //
+	// $NON-NLS-1$
+	// public static final String FORMAT_convertTabsToSpaces =
+	// "convertTabsToSpaces"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
+	// "format.insertSpaceAfterCommaDelimiter": "Defines space handling after a
+	// comma delimiter",
+	// "format.insertSpaceAfterSemicolonInForStatements": " Defines space
+	// handling after a semicolon in a for statement",
+	// "format.insertSpaceBeforeAndAfterBinaryOperators": "Defines space
+	// handling after a binary operator",
+	// "format.insertSpaceAfterKeywordsInControlFlowStatements": "Defines space
+	// handling after keywords in control flow statement",
+	// "format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": "Defines
+	// space handling after function keyword for anonymous functions",
+	// "format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis":
+	// "Defines space handling after opening and before closing non empty
+	// parenthesis",
+	// "format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets":
+	// "Defines space handling after opening and before closing non empty
+	// brackets",
+	// "format.placeOpenBraceOnNewLineForFunctions": "Defines whether an open
+	// brace is put onto a new line for functions or not",
+	// "format.placeOpenBraceOnNewLineForControlBlocks": "Defines whether an
+	// open brace is put onto a new line for control blocks or not",
 
 	private TypeScriptCorePreferenceConstants() {
 	}

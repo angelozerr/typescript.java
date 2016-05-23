@@ -45,17 +45,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.wst.jsdt.core.JavaScriptCore;
-import org.eclipse.wst.jsdt.internal.ui.IJavaHelpContextIds;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
-import org.eclipse.wst.jsdt.internal.ui.actions.AddBlockCommentAction;
-import org.eclipse.wst.jsdt.internal.ui.actions.RemoveBlockCommentAction;
+import org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaSourceViewer;
 import org.eclipse.wst.jsdt.internal.ui.text.JavaPairMatcher;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
@@ -260,12 +257,14 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		// stores.add(new EclipsePreferencesAdapter(new
 		// ProjectScope(project.getProject()), JavaScriptCore.PLUGIN_ID));
 		// }
+		addPreferenceStores(stores, input);
+		return new ChainedPreferenceStore((IPreferenceStore[]) stores.toArray(new IPreferenceStore[stores.size()]));
+	}
 
+	protected void addPreferenceStores(List stores, IEditorInput input) {
 		stores.add(JavaScriptPlugin.getDefault().getPreferenceStore());
 		stores.add(new PreferencesAdapter(JavaScriptCore.getPlugin().getPluginPreferences()));
 		stores.add(EditorsUI.getPreferenceStore());
-
-		return new ChainedPreferenceStore((IPreferenceStore[]) stores.toArray(new IPreferenceStore[stores.size()]));
 	}
 
 	@Override
@@ -275,21 +274,30 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		Action action = new GotoMatchingBracketAction(this);
 		action.setActionDefinitionId(IJavaEditorActionDefinitionIds.GOTO_MATCHING_BRACKET);
 		setAction(GotoMatchingBracketAction.GOTO_MATCHING_BRACKET, action);
-		
-		/*action= new AddBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "AddBlockComment.", this);  //$NON-NLS-1$
-		action.setActionDefinitionId(IJavaEditorActionDefinitionIds.ADD_BLOCK_COMMENT);
-		setAction("AddBlockComment", action); //$NON-NLS-1$
-		markAsStateDependentAction("AddBlockComment", true); //$NON-NLS-1$
-		markAsSelectionDependentAction("AddBlockComment", true); //$NON-NLS-1$
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.ADD_BLOCK_COMMENT_ACTION);
 
-		action= new RemoveBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "RemoveBlockComment.", this);  //$NON-NLS-1$
-		action.setActionDefinitionId(IJavaEditorActionDefinitionIds.REMOVE_BLOCK_COMMENT);
-		setAction("RemoveBlockComment", action); //$NON-NLS-1$
-		markAsStateDependentAction("RemoveBlockComment", true); //$NON-NLS-1$
-		markAsSelectionDependentAction("RemoveBlockComment", true); //$NON-NLS-1$
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.REMOVE_BLOCK_COMMENT_ACTION);
-		*/
+		/*
+		 * action= new
+		 * AddBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(),
+		 * "AddBlockComment.", this); //$NON-NLS-1$
+		 * action.setActionDefinitionId(IJavaEditorActionDefinitionIds.
+		 * ADD_BLOCK_COMMENT); setAction("AddBlockComment", action);
+		 * //$NON-NLS-1$ markAsStateDependentAction("AddBlockComment", true);
+		 * //$NON-NLS-1$ markAsSelectionDependentAction("AddBlockComment",
+		 * true); //$NON-NLS-1$
+		 * PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
+		 * IJavaHelpContextIds.ADD_BLOCK_COMMENT_ACTION);
+		 * 
+		 * action= new
+		 * RemoveBlockCommentAction(TypeScriptEditorMessages.getResourceBundle()
+		 * , "RemoveBlockComment.", this); //$NON-NLS-1$
+		 * action.setActionDefinitionId(IJavaEditorActionDefinitionIds.
+		 * REMOVE_BLOCK_COMMENT); setAction("RemoveBlockComment", action);
+		 * //$NON-NLS-1$ markAsStateDependentAction("RemoveBlockComment", true);
+		 * //$NON-NLS-1$ markAsSelectionDependentAction("RemoveBlockComment",
+		 * true); //$NON-NLS-1$
+		 * PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
+		 * IJavaHelpContextIds.REMOVE_BLOCK_COMMENT_ACTION);
+		 */
 
 	}
 
@@ -584,4 +592,13 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		return store != null && store.getBoolean(PreferenceConstants.EDITOR_MARK_OCCURRENCES);
 	}
 
+	protected void setPreferenceStore(IPreferenceStore store) {
+		super.setPreferenceStore(store);
+		if (getSourceViewerConfiguration() instanceof JavaScriptSourceViewerConfiguration) {
+			JavaScriptTextTools textTools= JavaScriptPlugin.getDefault().getJavaTextTools();
+			setSourceViewerConfiguration(new JavaScriptSourceViewerConfiguration(textTools.getColorManager(), store, this, IJavaScriptPartitions.JAVA_PARTITIONING));
+		}
+		if (getSourceViewer() instanceof JavaSourceViewer)
+			((JavaSourceViewer)getSourceViewer()).setPreferenceStore(store);
+	}
 }

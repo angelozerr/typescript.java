@@ -44,6 +44,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptHover_openDeclaration;
 
 	// Preferences
+
+	// Main
+	public static String TypeScriptMainPropertyPage_enable_builder_checkbox_label;
+	public static String TypeScriptMainPropertyPage_enable_builder_checkbox_description;
 	public static String TypeScriptMainPreferencePage_useSalsa;
 	public static String TypeScriptMainPreferencePage_useSalsa_Never;
 	public static String TypeScriptMainPreferencePage_useSalsa_EveryTime;
@@ -53,20 +57,35 @@ public class TypeScriptUIMessages extends NLS {
 	public static String PropertyAndPreferencePage_useworkspacesettings_change;
 	public static String PropertyAndPreferencePage_showprojectspecificsettings_label;
 
+	// nodejs
 	public static String NodejsConfigurationBlock_nodejs_group_label;
 	public static String NodejsConfigurationBlock_embedded_checkbox_label;
 	public static String NodejsConfigurationBlock_installed_checkbox_label;
 
+	// tsserver
 	public static String ServerConfigurationBlock_typescript_group_label;
 	public static String ServerConfigurationBlock_embedded_checkbox_label;
 	public static String ServerConfigurationBlock_installed_checkbox_label;
 	public static String ServerConfigurationBlock_traceOnConsole_label;
 
-	public static String TypeScriptMainPropertyPage_enable_builder_checkbox_label;
-	public static String TypeScriptMainPropertyPage_enable_builder_checkbox_description;
-	public static String TypeScriptBuilder_Error_title;
-	public static String TypeScriptBuilder_enable_Error_message;
-	public static String TypeScriptBuilder_disable_Error_message;
+	// Formatter
+	public static String FormatterConfigurationBlock_editorOptions_group_label;
+	public static String FormatterPreferencePage_editorOptions_tabSize;
+	public static String FormatterPreferencePage_editorOptions_indentSize;
+	public static String FormatterPreferencePage_editorOptions_newLineCharacter;
+	public static String FormatterPreferencePage_editorOptions_convertTabsToSpaces;
+	public static String FormatterConfigurationBlock_formatOptions_group_label;
+	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterCommaDelimiter;
+	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterSemicolonInForStatements;
+	public static String FormatterConfigurationBlock_formatOptions_insertSpaceBeforeAndAfterBinaryOperators;
+	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterKeywordsInControlFlowStatements;
+	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterFunctionKeywordForAnonymousFunctions;
+	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis;
+	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets;
+	public static String FormatterConfigurationBlock_formatOptions_placeOpenBraceOnNewLineForFunctions;
+	public static String FormatterConfigurationBlock_formatOptions_placeOpenBraceOnNewLineForControlBlocks;
+
+	// tsc
 	public static String CompilerConfigurationBlock_typescript_group_label;
 	public static String CompilerConfigurationBlock_embedded_checkbox_label;
 	public static String CompilerConfigurationBlock_installed_checkbox_label;
@@ -90,6 +109,11 @@ public class TypeScriptUIMessages extends NLS {
 	public static String DiscoverBuildPathDialog_title;
 	public static String DiscoverBuildPathDialog_message;
 	public static String DiscoverBuildPathDialog_SearchBuildPathJob_name;
+
+	// TypeScript builder
+	public static String TypeScriptBuilder_Error_title;
+	public static String TypeScriptBuilder_enable_Error_message;
+	public static String TypeScriptBuilder_disable_Error_message;
 
 	public static ResourceBundle getResourceBundle() {
 		try {

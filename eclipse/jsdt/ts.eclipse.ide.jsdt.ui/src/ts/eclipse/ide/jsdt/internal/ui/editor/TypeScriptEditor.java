@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,9 +28,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.DefaultLineTracker;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -38,12 +39,15 @@ import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextInputListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITextViewerExtension7;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.TabsToSpacesConverter;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -57,10 +61,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionContext;
 import org.eclipse.ui.actions.ActionGroup;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.wst.jsdt.core.JavaScriptCore;
+import org.eclipse.wst.jsdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider;
+import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
@@ -70,6 +76,8 @@ import ts.client.ITypeScriptAsynchCollector;
 import ts.client.Location;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
@@ -264,21 +272,36 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 
 		String property = event.getProperty();
 
-		if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH.equals(property)) {
-			/*
-			 * Ignore tab setting since we rely on the formatter preferences. We
-			 * do this outside the try-finally block to avoid that
-			 * EDITOR_TAB_WIDTH is handled by the sub-class
-			 * (AbstractDecoratedTextEditor).
-			 */
-			return;
-		}
-
 		try {
 
 			ISourceViewer sourceViewer = getSourceViewer();
 			if (sourceViewer == null)
 				return;
+
+			/*
+			 * if (AbstractDecoratedTextEditorPreferenceConstants.
+			 * EDITOR_SPACES_FOR_TABS.equals(property) ||
+			 * TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE.
+			 * equals(property) ||
+			 * AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH.
+			 * equals(property)) {
+			 */
+			if (TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES.equals(property)) {
+
+				// if (SPACES_FOR_TABS.equals(p)) {
+				if (isTabsToSpacesConversionEnabled())
+					installTabsToSpacesConverter();
+				else
+					uninstallTabsToSpacesConverter();
+				// return;
+				// }
+
+				StyledText textWidget = sourceViewer.getTextWidget();
+				int tabWidth = getSourceViewerConfiguration().getTabWidth(sourceViewer);
+				if (textWidget.getTabs() != tabWidth)
+					textWidget.setTabs(tabWidth);
+				return;
+			}
 
 			boolean newBooleanValue = false;
 			Object newValue = event.getNewValue();
@@ -298,6 +321,20 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		} finally {
 			super.handlePreferenceStoreChanged(event);
 		}
+	}
+
+	@Override
+	protected void addPreferenceStores(List stores, IEditorInput input) {
+		IResource file = input != null ? EditorUtils.getResource(input) : null;
+		if (file != null) {
+			stores.add(
+					new EclipsePreferencesAdapter(new ProjectScope(file.getProject()), TypeScriptCorePlugin.PLUGIN_ID));
+			stores.add(
+					new EclipsePreferencesAdapter(new ProjectScope(file.getProject()), TypeScriptUIPlugin.PLUGIN_ID));
+		}
+		stores.add(TypeScriptUIPlugin.getDefault().getPreferenceStore());
+		stores.add(new PreferencesAdapter(TypeScriptCorePlugin.getDefault().getPluginPreferences()));
+		super.addPreferenceStores(stores, input);
 	}
 
 	// ---------------------- Occurrences
@@ -916,4 +953,34 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		}
 	}
 
+	@Override
+	protected void installTabsToSpacesConverter() {
+		ISourceViewer sourceViewer = getSourceViewer();
+		SourceViewerConfiguration config = getSourceViewerConfiguration();
+		if (config != null && sourceViewer instanceof ITextViewerExtension7) {
+			int tabWidth = config.getTabWidth(sourceViewer);
+			TabsToSpacesConverter tabToSpacesConverter = new TabsToSpacesConverter();
+			tabToSpacesConverter.setNumberOfSpacesPerTab(tabWidth);
+			IDocumentProvider provider = getDocumentProvider();
+			if (provider instanceof ICompilationUnitDocumentProvider) {
+				ICompilationUnitDocumentProvider cup = (ICompilationUnitDocumentProvider) provider;
+				tabToSpacesConverter.setLineTracker(cup.createLineTracker(getEditorInput()));
+			} else
+				tabToSpacesConverter.setLineTracker(new DefaultLineTracker());
+			((ITextViewerExtension7) sourceViewer).setTabsToSpacesConverter(tabToSpacesConverter);
+			updateIndentPrefixes();
+		}
+	}
+
+	protected boolean isTabsToSpacesConversionEnabled() {
+		IResource file = EditorUtils.getResource(this);
+		if (file != null) {
+			try {
+				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
+				return tsProject.getProjectSettings().isEditorOptionsConvertTabsToSpaces();
+			} catch (CoreException e) {
+			}
+		}
+		return false;
+	}
 }

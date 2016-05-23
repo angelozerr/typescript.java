@@ -10,6 +10,11 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui.editor;
 
+import java.util.Arrays;
+
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.AbstractInformationControlManager;
@@ -30,11 +35,12 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 import org.eclipse.wst.jsdt.internal.ui.text.ContentAssistPreference;
 import org.eclipse.wst.jsdt.internal.ui.text.java.ContentAssistProcessor;
-import org.eclipse.wst.jsdt.internal.ui.text.javadoc.JavadocCompletionProcessor;
 import org.eclipse.wst.jsdt.ui.text.IColorManager;
 import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptJavadocCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.format.TypeScriptContentFormatter;
@@ -179,5 +185,99 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 				}
 			}
 		};
+	}
+
+	@Override
+	public int getTabWidth(ISourceViewer sourceViewer) {
+		IResource file = EditorUtils.getResource(getEditor());
+		if (file == null) {
+			return super.getTabWidth(sourceViewer);
+		}
+		try {
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
+			if (tsProject != null) {
+				boolean convertTabsToSpaces = tsProject.getProjectSettings().isEditorOptionsConvertTabsToSpaces();
+				if (convertTabsToSpaces) {
+					// indentSize
+					return tsProject.getProjectSettings().getEditorOptionsIndentSize();
+				}
+				// tabSize
+				return tsProject.getProjectSettings().getEditorOptionsTabSize();
+			}
+		} catch (CoreException e) {
+		}
+		return super.getTabWidth(sourceViewer);
+	}
+
+	@Override
+	public String[] getIndentPrefixes(final ISourceViewer sourceViewer, final String contentType) {
+		IResource file = EditorUtils.getResource(getEditor());
+		if (file != null) {
+			try {
+				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
+				final int tabWidth = tsProject.getProjectSettings().getEditorOptionsTabSize();
+				final int indentWidth = tsProject.getProjectSettings().getEditorOptionsIndentSize();
+				boolean allowTabs = tabWidth <= indentWidth;
+
+				boolean useSpaces = !tsProject.getProjectSettings().isEditorOptionsConvertTabsToSpaces();
+
+				Assert.isLegal(allowTabs || useSpaces);
+
+				if (!allowTabs) {
+					char[] spaces = new char[indentWidth];
+					Arrays.fill(spaces, ' ');
+					return new String[] { new String(spaces), "" }; //$NON-NLS-1$
+				} else if (!useSpaces)
+					return getIndentPrefixesForTab(tabWidth);
+				else
+					return getIndentPrefixesForSpaces(tabWidth);
+
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return super.getIndentPrefixes(sourceViewer, contentType);
+	}
+
+	/**
+	 * Computes and returns the indent prefixes for space indentation and the
+	 * given <code>tabWidth</code>.
+	 *
+	 * @param tabWidth
+	 *            the display tab width
+	 * @return the indent prefixes
+	 * @see #getIndentPrefixes(ISourceViewer, String)
+	 *
+	 */
+	private String[] getIndentPrefixesForSpaces(final int tabWidth) {
+		String[] indentPrefixes = new String[tabWidth + 2];
+		indentPrefixes[0] = getStringWithSpaces(tabWidth);
+
+		for (int i = 0; i < tabWidth; i++) {
+			String spaces = getStringWithSpaces(i);
+			if (i < tabWidth)
+				indentPrefixes[i + 1] = spaces + '\t';
+			else
+				indentPrefixes[i + 1] = new String(spaces);
+		}
+
+		indentPrefixes[tabWidth + 1] = ""; //$NON-NLS-1$
+
+		return indentPrefixes;
+	}
+
+	/**
+	 * Creates and returns a String with <code>count</code> spaces.
+	 *
+	 * @param count
+	 *            the space count
+	 * @return the string with the spaces
+	 *
+	 */
+	private String getStringWithSpaces(final int count) {
+		char[] spaceChars = new char[count];
+		Arrays.fill(spaceChars, ' ');
+		return new String(spaceChars);
 	}
 }

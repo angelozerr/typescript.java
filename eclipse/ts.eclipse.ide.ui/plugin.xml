@@ -208,7 +208,7 @@
             class="ts.eclipse.ide.internal.ui.preferences.CompilerPreferencePage"
             id="ts.eclipse.ide.ui.preference.CompilerPreferencePage"
             category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
-      </page>
+      </page>      
 	  <page
             name="%ServerPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.ServerPreferencePage"
@@ -221,6 +221,18 @@
             id="ts.eclipse.ide.ui.preference.ValidationPreferencePage"
             category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
       </page>
+	  <page
+            name="%EditorPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.EditorPreferencePage"
+            id="ts.eclipse.ide.ui.preference.EditorPreferencePage"
+            category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
+      </page>
+	  <page
+            name="%FormatterPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.FormatterPreferencePage"
+            id="ts.eclipse.ide.ui.preference.FormatterPreferencePage"
+            category="ts.eclipse.ide.ui.preference.EditorPreferencePage">
+      </page>            
    </extension>
          		
   <!-- Property Pages -->          		
@@ -279,7 +291,29 @@
 		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
 		     </adapt>         
          </enabledWhen>
-      </page>                  
+      </page>
+      <page
+            name="%EditorPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.EditorPreferencePage"
+            id="ts.eclipse.ide.ui.property.EditorPreferencePage"
+            category="ts.eclipse.ide.ui.property.TypeScriptMainPropertyPage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
+		     </adapt>         
+         </enabledWhen>
+      </page>
+	  <page
+            name="%FormatterPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.FormatterPreferencePage"
+            id="ts.eclipse.ide.ui.property.FormatterPreferencePage"
+            category="ts.eclipse.ide.ui.property.EditorPreferencePage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
+		     </adapt>         
+         </enabledWhen>
+      </page>                              
    </extension>
 	            
 	<!-- Search -->

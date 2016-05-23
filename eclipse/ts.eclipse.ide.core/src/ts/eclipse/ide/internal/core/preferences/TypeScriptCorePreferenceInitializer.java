@@ -66,10 +66,8 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		// searched for compilation and validation must be done
 		initializeTypeScriptBuildPath(node);
 
-		// node.put(TypeScriptCorePreferenceConstants.NATURE_TYPESCRIPT_PATHS,
-		// TypeScriptCorePreferenceConstants.DEFAULT_NATURE_TYPESCRIPT_PATHS);
-		// node.put(TypeScriptCorePreferenceConstants.NATURE_SALSA_PATHS,
-		// TypeScriptCorePreferenceConstants.DEFAULT_NATURE_SALSA_PATHS);
+		// initialize editor+formation options
+		initializeEditorFormatOptions(node);
 	}
 
 	/**
@@ -120,7 +118,6 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 	private void initializeTypeScriptBuildPath(IEclipsePreferences node) {
 		node.put(TypeScriptCorePreferenceConstants.TYPESCRIPT_BUILD_PATH,
 				TypeScriptCorePreferenceConstants.DEFAULT_TYPESCRIPT_BUILD_PATH);
-
 	}
 
 	private void initializeTslintPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
@@ -129,5 +126,27 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		node.put(TypeScriptCorePreferenceConstants.TSLINT_EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
 		node.putBoolean(TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT, true);
 		node.put(TypeScriptCorePreferenceConstants.TSLINT_INSTALLED_TYPESCRIPT_PATH, "");
+	}
+
+	private void initializeEditorFormatOptions(IEclipsePreferences node) {
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER, true);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS,
+				true);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS,
+				true);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS,
+				true);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS,
+				false);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS,
+				true);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS,
+				false);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS,
+				false);
+		node.putBoolean(TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS,
+				false);
+
+
 	}
 }

@@ -216,7 +216,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		// TODO: support entry matcher with preferences.
 		return ICompletionEntryMatcher.LCS;
 	}
-	
+
 	public boolean isUseCodeSnippetsOnMethodSuggest() {
 		return true;
 	}
@@ -259,4 +259,24 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 				TypeScriptCorePreferenceConstants.TSLINT_USE_CUSTOM_TSLINTJSON_FILE, null);
 		return resolvePath(path);
 	}
+
+	@Override
+	public boolean isEditorOptionsConvertTabsToSpaces() {
+		return super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES,
+				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES_DEFAULT);
+	}
+
+	@Override
+	public int getEditorOptionsIndentSize() {
+		return super.getIntegerPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE,
+				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE_DEFAULT);
+	}
+
+	@Override
+	public int getEditorOptionsTabSize() {
+		return super.getIntegerPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE,
+				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE_DEFAULT);
+
+	}
+
 }
