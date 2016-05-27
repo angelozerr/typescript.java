@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.commands,
  org.eclipse.core.expressions,
  org.eclipse.debug.core,
- org.eclipse.core.filesystem
+ org.eclipse.core.filesystem,
+ org.eclipse.jface
 Export-Package: ts.eclipse.ide.core,
  ts.eclipse.ide.core.builder,
  ts.eclipse.ide.core.compiler,

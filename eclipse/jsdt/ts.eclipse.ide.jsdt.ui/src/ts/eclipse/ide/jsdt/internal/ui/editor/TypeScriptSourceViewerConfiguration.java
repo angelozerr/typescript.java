@@ -233,8 +233,7 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 					return getIndentPrefixesForSpaces(tabWidth);
 
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
 			}
 		}
 		return super.getIndentPrefixes(sourceViewer, contentType);

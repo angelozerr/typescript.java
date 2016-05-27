@@ -319,7 +319,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 	protected ITypeScriptLint createTslint() throws TypeScriptException {
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File tslintFile = getProjectSettings().getTslintFile();
-		File tslintJsonFile = getProjectSettings().getTslintJsonFile();
+		File tslintJsonFile = getProjectSettings().getCustomTslintJsonFile();
 		return createTslint(tslintFile, tslintJsonFile, nodeFile);
 	}
 

@@ -596,7 +596,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		super.setPreferenceStore(store);
 		if (getSourceViewerConfiguration() instanceof JavaScriptSourceViewerConfiguration) {
 			JavaScriptTextTools textTools= JavaScriptPlugin.getDefault().getJavaTextTools();
-			setSourceViewerConfiguration(new JavaScriptSourceViewerConfiguration(textTools.getColorManager(), store, this, IJavaScriptPartitions.JAVA_PARTITIONING));
+			setSourceViewerConfiguration(new TypeScriptSourceViewerConfiguration(textTools.getColorManager(), store, this, IJavaScriptPartitions.JAVA_PARTITIONING));
 		}
 		if (getSourceViewer() instanceof JavaSourceViewer)
 			((JavaSourceViewer)getSourceViewer()).setPreferenceStore(store);

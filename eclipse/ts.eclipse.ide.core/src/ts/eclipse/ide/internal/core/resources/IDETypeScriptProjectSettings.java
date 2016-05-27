@@ -13,6 +13,7 @@ package ts.eclipse.ide.internal.core.resources;
 import java.io.File;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -254,7 +255,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
-	public File getTslintJsonFile() {
+	public File getCustomTslintJsonFile() {
 		String path = super.getStringPreferencesValue(
 				TypeScriptCorePreferenceConstants.TSLINT_USE_CUSTOM_TSLINTJSON_FILE, null);
 		return resolvePath(path);

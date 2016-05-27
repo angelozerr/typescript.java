@@ -70,7 +70,7 @@ public interface ITypeScriptProjectSettings {
 	
 	TslintSettingsStrategy getTslintStrategy();
 
-	File getTslintJsonFile();
+	File getCustomTslintJsonFile();
 
 	/**
 	 * Dispose the settings.

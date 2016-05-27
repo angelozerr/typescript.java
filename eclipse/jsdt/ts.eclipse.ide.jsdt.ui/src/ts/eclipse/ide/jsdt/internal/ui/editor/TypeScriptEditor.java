@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
@@ -25,6 +26,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -64,7 +67,6 @@ import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.eclipse.wst.jsdt.core.JavaScriptCore;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
@@ -123,6 +125,8 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	 * 
 	 */
 	private ActivationListener fActivationListener = new ActivationListener();
+
+	private IEclipsePreferences editorPreferences;
 
 	/**
 	 * Updates the Java outline page selection and this editor's range
@@ -263,6 +267,15 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		PlatformUI.getWorkbench().addWindowListener(fActivationListener);
 		editorSelectionChangedListener = new EditorSelectionChangedListener();
 		editorSelectionChangedListener.install(getSelectionProvider());
+		editorPreferences = new EclipsePreferences();
+		editorPreferences.addPreferenceChangeListener(
+				new org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener() {
+
+					@Override
+					public void preferenceChange(PreferenceChangeEvent event) {
+						handlePreferenceStoreChanged(new PropertyChangeEvent(event.getSource(), event.getKey(), event.getOldValue(), event.getNewValue()));
+					}
+				});
 	}
 
 	/*
@@ -271,7 +284,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
 
 		String property = event.getProperty();
-
+		System.err.println(property);
 		try {
 
 			ISourceViewer sourceViewer = getSourceViewer();
@@ -797,9 +810,14 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	public Object getAdapter(@SuppressWarnings("rawtypes") Class key) {
 		if (key.equals(IContentOutlinePage.class)) {
 			return getOutlinePage();
-		} else {
-			return super.getAdapter(key);
+		} else if (key.equals(IEclipsePreferences.class)) {
+			// support for .editorconfig
+			return editorPreferences;
+		} else if (key.equals(IPreferenceStore.class)) {
+			// support for .editorconfig
+			return getPreferenceStore();
 		}
+		return super.getAdapter(key);
 	}
 
 	/**

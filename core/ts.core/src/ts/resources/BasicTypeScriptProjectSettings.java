@@ -78,7 +78,7 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	}
 
 	@Override
-	public File getTslintJsonFile() {
+	public File getCustomTslintJsonFile() {
 		// TODO Auto-generated method stub
 		return null;
 	}
