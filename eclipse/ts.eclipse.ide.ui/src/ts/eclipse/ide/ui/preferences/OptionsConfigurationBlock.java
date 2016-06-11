@@ -187,6 +187,10 @@ public abstract class OptionsConfigurationBlock {
 	private int fRebuildCount; /// used to prevent multiple dialogs that ask for
 								/// a rebuild
 
+	public OptionsConfigurationBlock(IProject project, Key[] allKeys, IWorkbenchPreferenceContainer container) {
+		this(null, project, allKeys, container);
+	}
+
 	public OptionsConfigurationBlock(IStatusChangeListener context, IProject project, Key[] allKeys,
 			IWorkbenchPreferenceContainer container) {
 		fContext = context;
@@ -343,15 +347,15 @@ public abstract class OptionsConfigurationBlock {
 	protected Button addRadioBox(Composite parent, String label, Key key, String[] values, int indent) {
 		ControlData data = new ControlData(key, values);
 
-//		GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-//		gd.horizontalSpan = 3;
-//		gd.horizontalIndent = indent;
+		// GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+		// gd.horizontalSpan = 3;
+		// gd.horizontalIndent = indent;
 
 		Button checkBox = new Button(parent, SWT.RADIO);
 		checkBox.setFont(JFaceResources.getDialogFont());
 		checkBox.setText(label);
 		checkBox.setData(data);
-		//checkBox.setLayoutData(gd);
+		// checkBox.setLayoutData(gd);
 		checkBox.addSelectionListener(getSelectionListener());
 
 		makeScrollableCompositeAware(checkBox);
@@ -363,7 +367,7 @@ public abstract class OptionsConfigurationBlock {
 
 		return checkBox;
 	}
-	
+
 	protected Button addCheckBoxWithLink(Composite parent, String label, Key key, String[] values, int indent,
 			int widthHint, SelectionListener listener) {
 		ControlData data = new ControlData(key, values);
@@ -940,7 +944,7 @@ public abstract class OptionsConfigurationBlock {
 		combo.setEnabled(enabled);
 		label.setEnabled(enabled);
 	}
-	
+
 	public IProject getProject() {
 		return fProject;
 	}
