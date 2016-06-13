@@ -1,4 +1,4 @@
-package ts.eclipse.ide.internal.ui.preferences;
+package ts.eclipse.ide.ui.preferences;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;

@@ -39,12 +39,12 @@ public class TypeScriptCompilerLaunchShortcut implements ILaunchShortcut {
 	}
 
 	private void launch(IContainer buildPath, String mode) {
-		ILaunchConfigurationType tscLaunchConfiguraionType = DebugPlugin.getDefault().getLaunchManager()
+		ILaunchConfigurationType tscLaunchConfigurationType = DebugPlugin.getDefault().getLaunchManager()
 				.getLaunchConfigurationType(TypeScriptCompilerLaunchConstants.LAUNCH_CONFIGURATION_ID);
 		try {
 			// Check if configuration already exists
 			ILaunchConfiguration[] configurations = DebugPlugin.getDefault().getLaunchManager()
-					.getLaunchConfigurations(tscLaunchConfiguraionType);
+					.getLaunchConfigurations(tscLaunchConfigurationType);
 
 			ILaunchConfiguration existingConfiguraion = chooseLaunchConfiguration(configurations, buildPath,
 					TypeScriptCompilerLaunchConstants.BUILD_PATH);

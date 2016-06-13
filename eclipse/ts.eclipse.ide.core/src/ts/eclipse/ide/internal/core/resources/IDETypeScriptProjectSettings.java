@@ -13,8 +13,6 @@ package ts.eclipse.ide.internal.core.resources;
 import java.io.File;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
@@ -116,14 +114,6 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 				TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH, null);
 		File resolvedPath = resolvePath(path);
 		return resolvedPath != null ? IDETypeScriptRepositoryManager.getTsserverFile(resolvedPath) : null;
-	}
-
-	private File resolvePath(String path) {
-		if (!StringUtils.isEmpty(path)) {
-			IPath p = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getPath(path, super.getProject());
-			return p != null ? p.toFile() : new File(path);
-		}
-		return null;
 	}
 
 	private ITypeScriptRepository getRepository(String preferenceName) {
