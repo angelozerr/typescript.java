@@ -13,15 +13,16 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ISetSelectionTarget;
 
-import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
+import ts.eclipse.ide.terminal.interpreter.AbstractCommandInterpreter;
 
-public class CdCommandInterpreter implements ICommandInterpreter {
+public class CdCommandInterpreter extends AbstractCommandInterpreter {
+
+	public CdCommandInterpreter(List<String> parameters, String workingDir) {
+		super(parameters, workingDir);
+	}
 
 	@Override
 	public void execute(List<String> parameters, String workingDir) {
-		if (parameters.size() < 1) {
-			return;
-		}
 		String path = parameters.get(0);
 		try {
 			final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
@@ -44,7 +45,7 @@ public class CdCommandInterpreter implements ICommandInterpreter {
 	}
 
 	@Override
-	public void addLine(String line) {
+	public void onTrace(String line) {
 		// Do nothing
 	}
 

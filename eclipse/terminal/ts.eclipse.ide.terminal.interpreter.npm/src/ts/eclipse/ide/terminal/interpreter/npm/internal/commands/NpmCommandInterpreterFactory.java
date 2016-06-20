@@ -7,14 +7,11 @@ import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
 
 public class NpmCommandInterpreterFactory implements ICommandInterpreterFactory {
 
-	private static final ICommandInterpreter NPM_INSTALL_INTERPRETER = new NpmInstallCommandInterpreter();
-
 	@Override
-	public ICommandInterpreter create(List<String> parameters) {
+	public ICommandInterpreter create(List<String> parameters, String workingDir) {
 		if (parameters.contains("install")) {
-			return NPM_INSTALL_INTERPRETER;
+			return new NpmInstallCommandInterpreter(parameters, workingDir);
 		}
 		return null;
 	}
-
 }

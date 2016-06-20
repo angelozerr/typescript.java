@@ -21,25 +21,26 @@ import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnecto
 
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
+import ts.eclipse.ide.terminal.interpreter.internal.commands.CdCommandInterpreter;
 
 public class CommandInterpreterProcessor implements ITerminalServiceOutputStreamMonitorListener {
 
 	private final ICommandInterpreter NULL_INTERPRETER = new ICommandInterpreter() {
 
 		@Override
-		public void execute(List<String> parameters, String workingDir) {
+		public void execute() {
 
 		}
 
 		@Override
-		public void addLine(String line) {
+		public void onTrace(String line) {
 
 		}
 	};
 	private final Map<String, Object> properties;
 	private ICommandInterpreter interpreter;
 
-	private String workingDir;
+	private String lineInput;
 	private String encoding;
 	private String originalWorkingDir;
 
@@ -49,7 +50,6 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 
 	private String cmd;
 	private String cmdWithParameters;
-	private List<String> cmdParameters;
 	private String workingDirEnd;
 
 	public CommandInterpreterProcessor(Map<String, Object> properties) {
@@ -73,8 +73,9 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 					if (interpreter == null) {
 						ICommandInterpreterFactory factory = CommandInterpreterManager.getInstance().getFactory(cmd);
 						if (factory != null) {
-							cmdParameters = getParameters(cmdWithParameters);
-							interpreter = factory.create(cmdParameters);
+							String workingDir = getWorkingDir(lineInput);
+							List<String> parameters = getParameters(cmdWithParameters);
+							interpreter = factory.create(parameters, workingDir);
 						}
 						if (interpreter == null) {
 							interpreter = NULL_INTERPRETER;
@@ -83,27 +84,33 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 
 					List<String> l = lines.getLines();
 					String lastLine = lines.getLastLine();
-					if (isEndCommand(lastLine)) {
+					if (isEndCommand(lastLine)) {						
 						for (int i = 0; i < l.size() - 1; i++) {
-							interpreter.addLine(l.get(i));
+							interpreter.onTrace(l.get(i));
 						}
-						endCommand();
-						this.workingDir = lastLine;
+						boolean workingDirChanged = !this.lineInput.equals(lastLine);
+						if (workingDirChanged) {
+							String workingDir = getWorkingDir(lineInput);
+							List<String> parameters = getParameters(cmdWithParameters);
+							new CdCommandInterpreter(parameters, workingDir).execute();
+						}
+						endCommand();						
+						this.lineInput = lastLine;						
 					} else {
 						for (String line : lines.getLines()) {
-							interpreter.addLine(line);
+							interpreter.onTrace(line);
 						}
 					}
 				}
 			} else {
 				// Terminal was opened, get the last lines which is the working
 				// dir.
-				if (workingDir == null) {
-					this.workingDir = lines.getLastLine();
-					if (workingDir != null) {
+				if (lineInput == null) {
+					this.lineInput = lines.getLastLine();
+					if (lineInput != null) {
 						String originalWorkingDir = getOriginalWorkingDir();
-						if (workingDir.startsWith(originalWorkingDir)) {
-							this.workingDirEnd = workingDir.substring(originalWorkingDir.length(), workingDir.length());
+						if (lineInput.startsWith(originalWorkingDir)) {
+							this.workingDirEnd = lineInput.substring(originalWorkingDir.length(), lineInput.length());
 						}
 					}
 				} else {
@@ -114,7 +121,7 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 						// with parameters
 						// ex: "C:\User>cd a"
 						// get the command and their parameters
-						this.cmdWithParameters = lineCmd.substring(workingDir.length(), lineCmd.length()).trim();
+						this.cmdWithParameters = lineCmd.substring(lineInput.length(), lineCmd.length()).trim();
 						// here cmdWithParameters is equals to "cd a"
 						// get the first token to retrieve the command (ex:
 						// "cd")
@@ -129,7 +136,7 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 		if (line == null) {
 			return false;
 		}
-		if (workingDir.equals(line)) {
+		if (lineInput.equals(line)) {
 			return true;
 		}
 		if (!line.endsWith(workingDirEnd)) {
@@ -145,13 +152,11 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 
 	private void endCommand() {
 		if (interpreter != null) {
-			String dir = getWorkingDir(workingDir);
-			interpreter.execute(cmdParameters, dir);
+			interpreter.execute();
 		}
 		processingCommand = false;
 		cmd = null;
 		cmdWithParameters = null;
-		cmdParameters = null;
 		interpreter = null;
 	}
 

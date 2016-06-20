@@ -17,11 +17,12 @@ import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
 
 public class CdCommandInterpreterFactory implements ICommandInterpreterFactory {
 
-	private static final ICommandInterpreter INSTANCE = new CdCommandInterpreter();
-
 	@Override
-	public ICommandInterpreter create(List<String> parameters) {
-		return INSTANCE;
+	public ICommandInterpreter create(List<String> parameters, String workingDir) {
+		if (parameters.size() < 1) {
+			return null;
+		}
+		return new CdCommandInterpreter(parameters, workingDir);
 	}
 
 }

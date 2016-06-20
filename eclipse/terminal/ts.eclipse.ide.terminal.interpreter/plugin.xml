@@ -26,14 +26,15 @@
       </delegate>
    </extension>
    
-   <extension
+   <!--<extension
          point="ts.eclipse.ide.terminal.interpreter.commandInterpreterFactories">
       <factory
             id="ts.eclipse.ide.terminal.interpreter.commands.CdCommandInterpreterFactory"
             name="%interpreter.cd.name"
-            commands="cd,chdir"
+            commands="#"
             class="ts.eclipse.ide.terminal.interpreter.internal.commands.CdCommandInterpreterFactory">
       </factory>
-   </extension>	
+   </extension>
+   -->	
 
 </plugin>        
