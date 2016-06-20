@@ -11,6 +11,7 @@
 		<module>embed</module>
 		<module>jsdt</module>
      	<module>json</module>
+        <module>terminal</module>
 		<module>ts.eclipse</module>
 		<module>ts.eclipse.ide.core</module>
 		<module>ts.eclipse.ide.ui</module>
