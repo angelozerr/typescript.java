@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.io.File;
@@ -10,13 +20,14 @@ import org.eclipse.tm.terminal.view.core.interfaces.ITerminalServiceOutputStream
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
+import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
 
 public class CommandInterpreterProcessor implements ITerminalServiceOutputStreamMonitorListener {
 
 	private final ICommandInterpreter NULL_INTERPRETER = new ICommandInterpreter() {
 
 		@Override
-		public void process(java.util.List<String> parameters, String workingDir) {
+		public void execute(List<String> parameters, String workingDir) {
 
 		}
 
@@ -38,6 +49,7 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 
 	private String cmd;
 	private String cmdWithParameters;
+	private List<String> cmdParameters;
 	private String workingDirEnd;
 
 	public CommandInterpreterProcessor(Map<String, Object> properties) {
@@ -59,7 +71,11 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 				} else {
 					// Initialize interpreter if needed
 					if (interpreter == null) {
-						interpreter = CommandInterpreterManager.getInstance().getCommand(cmd);
+						ICommandInterpreterFactory factory = CommandInterpreterManager.getInstance().getFactory(cmd);
+						if (factory != null) {
+							cmdParameters = getParameters(cmdWithParameters);
+							interpreter = factory.create(cmdParameters);
+						}
 						if (interpreter == null) {
 							interpreter = NULL_INTERPRETER;
 						}
@@ -78,23 +94,6 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 							interpreter.addLine(line);
 						}
 					}
-					//
-					// if (lineCmd.contains("cd") || lineCmd.contains("chdir"))
-					// {
-					// queryCursorPosition = false;
-					// System.err.println("Finish!" + lineCmd);
-					// lineCmd = null;
-					// workingDir = lines.getLastLine();
-					// } else if (workingDir.equals(lines.getLastLine())) {
-					// //
-					// queryCursorPosition = false;
-					// System.err.println("Finish!" + lineCmd);
-					// lineCmd = null;
-					// } else {
-					// for (String line : lines.getLines()) {
-					// System.err.println("Add to " + lineCmd + ": " + line);
-					// }
-					// }
 				}
 			} else {
 				// Terminal was opened, get the last lines which is the working
@@ -147,11 +146,12 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 	private void endCommand() {
 		if (interpreter != null) {
 			String dir = getWorkingDir(workingDir);
-			interpreter.process(getParameters(cmdWithParameters), dir);
+			interpreter.execute(cmdParameters, dir);
 		}
 		processingCommand = false;
 		cmd = null;
 		cmdWithParameters = null;
+		cmdParameters = null;
 		interpreter = null;
 	}
 
@@ -205,6 +205,11 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 		return cmdWithParameters;
 	}
 
+	/**
+	 * Returns the encoding of the terminal.
+	 * 
+	 * @return the encoding of the terminal.
+	 */
 	private String getEncoding() {
 		if (encoding != null) {
 			return encoding;
@@ -213,6 +218,11 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 		return encoding;
 	}
 
+	/**
+	 * Returns the original working directory of the terminal.
+	 * 
+	 * @return the original working directory of the terminal.
+	 */
 	private String getOriginalWorkingDir() {
 		if (originalWorkingDir != null) {
 			return originalWorkingDir;
