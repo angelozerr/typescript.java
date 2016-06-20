@@ -67,7 +67,7 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 			if (processingCommand) {
 				// Enter was done
 				if (cmd == null) {
-					endCommand();
+					endCommand(null);
 				} else {
 					// Initialize interpreter if needed
 					if (interpreter == null) {
@@ -82,34 +82,25 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 						}
 					}
 
-					List<String> l = lines.getLines();
 					String lastLine = lines.getLastLine();
-					if (isEndCommand(lastLine)) {						
-						for (int i = 0; i < l.size() - 1; i++) {
-							interpreter.onTrace(l.get(i));
-						}
-						boolean workingDirChanged = !this.lineInput.equals(lastLine);
-						if (workingDirChanged) {
-							String workingDir = getWorkingDir(lineInput);
-							List<String> parameters = getParameters(cmdWithParameters);
-							new CdCommandInterpreter(parameters, workingDir).execute();
-						}
-						endCommand();						
-						this.lineInput = lastLine;						
+					if (isEndCommand(lastLine)) {
+						trace(lines.getLines(), 1);
+						endCommand(lastLine);
 					} else {
-						for (String line : lines.getLines()) {
-							interpreter.onTrace(line);
-						}
+						trace(lines.getLines(), 0);
 					}
 				}
 			} else {
-				// Terminal was opened, get the last lines which is the working
-				// dir.
+				// Terminal was opened, get the last lines which is the line
+				// input : "workingDir" concat with ('>' for Windows, '$' for
+				// Linux)
 				if (lineInput == null) {
 					this.lineInput = lines.getLastLine();
 					if (lineInput != null) {
 						String originalWorkingDir = getOriginalWorkingDir();
 						if (lineInput.startsWith(originalWorkingDir)) {
+							// retrieve the character used for line input ('>'
+							// for Windows, '$' for Linux)
 							this.workingDirEnd = lineInput.substring(originalWorkingDir.length(), lineInput.length());
 						}
 					}
@@ -132,6 +123,12 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 		}
 	}
 
+	private void trace(List<String> lines, int index) {
+		for (int i = 0; i < lines.size() - index; i++) {
+			interpreter.onTrace(lines.get(i));
+		}
+	}
+
 	private boolean isEndCommand(String line) {
 		if (line == null) {
 			return false;
@@ -150,9 +147,18 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 		}
 	}
 
-	private void endCommand() {
+	private void endCommand(String lastLine) {
 		if (interpreter != null) {
 			interpreter.execute();
+		}
+		if (lastLine != null) {
+			boolean workingDirChanged = !this.lineInput.equals(lastLine);
+			if (workingDirChanged) {
+				String workingDir = getWorkingDir(lineInput);
+				List<String> parameters = getParameters(cmdWithParameters);
+				new CdCommandInterpreter(parameters, workingDir).execute();
+			}
+			this.lineInput = lastLine;
 		}
 		processingCommand = false;
 		cmd = null;
