@@ -6,24 +6,31 @@
 		<content-type
 		    file-names="jsconfig.json"
 			priority="high"
-			name="%jsconfig_Content_Type_Extension_Element"
+			name="%jsconfig_Content_Type_Extension_Element.name"
 			id="ts.eclipse.ide.json.core.jsconfigsource"
 			base-type="org.eclipse.wst.json.core.jsonsource">
 		</content-type>
 		<content-type
 		    file-names="tsconfig.json"
 			priority="high"
-			name="%tsconfig_Content_Type_Extension_Element"
+			name="%tsconfig_Content_Type_Extension_Element.name"
 			id="ts.eclipse.ide.json.core.tsconfigsource"
 			base-type="org.eclipse.wst.json.core.jsonsource">
 		</content-type>
 		<content-type
 		    file-names="tslint.json"
 			priority="high"
-			name="%tslint_Content_Type_Extension_Element"
+			name="%tslint_Content_Type_Extension_Element.name"
 			id="ts.eclipse.ide.json.core.tslintsource"
 			base-type="org.eclipse.wst.json.core.jsonsource">
 		</content-type>
+		<content-type
+		    file-names="typings.json"
+			priority="high"
+			name="%typings_Content_Type_Extension_Element.name"
+			id="ts.eclipse.ide.json.core.typingssource"
+			base-type="org.eclipse.wst.json.core.jsonsource">
+		</content-type>		
 	</extension>
 			
  	<!-- See http://schemastore.org/api.html and https://github.com/SchemaStore/schemastore/blob/master/src/api/json/catalog.json -->
@@ -39,7 +46,12 @@
          			description="JSON schema for the TSLint configuration files"
          			fileMatch="tslint.json"
          			url="http://json.schemastore.org/tslint"
-         			uri="schemastore/tslint-neon" />         			
+         			uri="schemastore/tslint-neon" />
+			<schema name="typings.json"
+         			description="JSON schema for the typings configuration files"
+         			fileMatch="typings.json"
+         			url="http://json.schemastore.org/typings"
+         			uri="schemastore/typings" /> 
          </schemaCatalogContribution>
 	</extension>
 
