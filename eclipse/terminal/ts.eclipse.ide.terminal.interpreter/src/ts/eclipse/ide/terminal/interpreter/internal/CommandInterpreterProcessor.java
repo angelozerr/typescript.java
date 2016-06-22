@@ -102,6 +102,8 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 							// retrieve the character used for line input ('>'
 							// for Windows, '$' for Linux)
 							this.workingDirEnd = lineInput.substring(originalWorkingDir.length(), lineInput.length());
+						} else {
+							lineInput = null;
 						}
 					}
 				} else {
