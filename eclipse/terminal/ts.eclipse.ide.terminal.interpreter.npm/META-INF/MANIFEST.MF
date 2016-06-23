@@ -18,20 +18,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.ide,
  ts.eclipse.ide.terminal.interpreter;bundle-version="1.0.0"
-Export-Package: ts.eclipse.ide.terminal.interpreter,
- ts.eclipse.ide.terminal.interpreter.builder,
- ts.eclipse.ide.terminal.interpreter.compiler,
- ts.eclipse.ide.terminal.interpreter.console,
- ts.eclipse.ide.terminal.interpreter.launch,
- ts.eclipse.ide.terminal.interpreter.nodejs,
- ts.eclipse.ide.terminal.interpreter.preferences,
- ts.eclipse.ide.terminal.interpreter.repository,
- ts.eclipse.ide.terminal.interpreter.resources,
- ts.eclipse.ide.terminal.interpreter.resources.buildpath,
- ts.eclipse.ide.terminal.interpreter.resources.jsconfig,
- ts.eclipse.ide.terminal.interpreter.resources.watcher,
- ts.eclipse.ide.terminal.interpreter.tslint,
- ts.eclipse.ide.terminal.interpreter.utils
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.terminal.interpreter.npm.internal.NpmTerminalInterpreterPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
