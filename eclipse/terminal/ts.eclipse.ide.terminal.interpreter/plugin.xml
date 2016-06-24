@@ -31,10 +31,29 @@
       <factory
             id="ts.eclipse.ide.terminal.interpreter.commands.CdCommandInterpreterFactory"
             name="%interpreter.cd.name"
-            commands="#"
+            commands="cd"
             class="ts.eclipse.ide.terminal.interpreter.internal.commands.CdCommandInterpreterFactory">
       </factory>
    </extension>
    -->	
+   
+   <extension
+         point="ts.eclipse.ide.terminal.interpreter.commandInterpreterFactories">
+      <factory
+            id="ts.eclipse.ide.terminal.interpreter.commands.DelCommandInterpreterFactory"
+            name="%interpreter.del.name"
+            commands="del"
+            class="ts.eclipse.ide.terminal.interpreter.internal.commands.DelCommandInterpreterFactory">
+      </factory>
+   </extension>
 
+   <extension
+         point="ts.eclipse.ide.terminal.interpreter.commandInterpreterFactories">
+      <factory
+            id="ts.eclipse.ide.terminal.interpreter.commands.RdCommandInterpreterFactory"
+            name="%interpreter.rd.name"
+            commands="rd,rmdir"
+            class="ts.eclipse.ide.terminal.interpreter.internal.commands.RdCommandInterpreterFactory">
+      </factory>
+   </extension>
 </plugin>        
