@@ -26,7 +26,8 @@ public class DelCommandInterpreterFactory implements ICommandInterpreterFactory 
 		if (parameters.size() < 1) {
 			return null;
 		}
-		return new DelCommandInterpreter(parameters, workingDir);
+		String path = parameters.get(0);
+		return new DelCommandInterpreter(path, workingDir);
 	}
 
 }

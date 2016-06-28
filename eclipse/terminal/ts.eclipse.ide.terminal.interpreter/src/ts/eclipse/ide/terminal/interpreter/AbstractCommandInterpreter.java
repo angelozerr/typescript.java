@@ -10,25 +10,20 @@
  */
 package ts.eclipse.ide.terminal.interpreter;
 
-import java.util.List;
-
 /**
  * Abstract class for {@link ICommandInterpreter}.
  *
  */
 public abstract class AbstractCommandInterpreter implements ICommandInterpreter {
 
-	private final List<String> parameters;
 	private final String workingDir;
 
-	public AbstractCommandInterpreter(List<String> parameters, String workingDir) {
-		this.parameters = parameters;
+	public AbstractCommandInterpreter(String workingDir) {
 		this.workingDir = workingDir;
 	}
 
-	@Override
-	public void execute() {
-		execute(parameters, workingDir);
+	public String getWorkingDir() {
+		return workingDir;
 	}
 
 	@Override
@@ -37,12 +32,9 @@ public abstract class AbstractCommandInterpreter implements ICommandInterpreter 
 	}
 
 	/**
-	 * Execute the command interpreter with the given parameters and working
-	 * directory.
+	 * Execute the command interpreter.
 	 * 
-	 * @param parameters
-	 * @param workingDir
 	 */
-	protected abstract void execute(List<String> parameters, String workingDir);
+	public abstract void execute();
 
 }

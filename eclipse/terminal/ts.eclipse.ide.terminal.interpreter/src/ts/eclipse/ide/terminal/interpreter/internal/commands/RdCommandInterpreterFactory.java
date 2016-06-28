@@ -22,11 +22,17 @@ import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
 public class RdCommandInterpreterFactory implements ICommandInterpreterFactory {
 
 	@Override
-	public ICommandInterpreter create(List<String> parameters, String workingDir) {		
+	public ICommandInterpreter create(List<String> parameters, String workingDir) {
 		if (parameters.size() < 1) {
 			return null;
 		}
-		return new RdCommandInterpreter(parameters, workingDir);
+		return new RdCommandInterpreter(getPath(parameters), workingDir);
+	}
+
+	private String getPath(List<String> parameters) {
+		// RD [/S] [/Q] [drive:]path
+		// path is the last token
+		return parameters.get(parameters.size() - 1);
 	}
 
 }

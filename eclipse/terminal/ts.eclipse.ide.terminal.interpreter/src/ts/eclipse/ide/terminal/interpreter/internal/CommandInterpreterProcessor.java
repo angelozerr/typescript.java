@@ -21,7 +21,7 @@ import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnecto
 
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
-import ts.eclipse.ide.terminal.interpreter.internal.commands.CdCommandInterpreter;
+import ts.eclipse.ide.terminal.interpreter.internal.commands.CdCommandInterpreterFactory;
 
 public class CommandInterpreterProcessor implements ITerminalServiceOutputStreamMonitorListener {
 
@@ -37,6 +37,9 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 
 		}
 	};
+
+	private final ICommandInterpreterFactory CD_INTERPRETER_FACTORY = new CdCommandInterpreterFactory();
+
 	private final Map<String, Object> properties;
 	private ICommandInterpreter interpreter;
 
@@ -109,7 +112,7 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 				} else {
 					// User is typing command.
 					String lineCmd = lines.getLastLine();
-					if (lineCmd != null) {
+					if (lineCmd != null && lineCmd.length() >= lineInput.length()) {
 						// line cmd contains the working dir and the command
 						// with parameters
 						// ex: "C:\User>cd a"
@@ -158,7 +161,7 @@ public class CommandInterpreterProcessor implements ITerminalServiceOutputStream
 			if (workingDirChanged) {
 				String workingDir = getWorkingDir(lineInput);
 				List<String> parameters = getParameters(cmdWithParameters);
-				new CdCommandInterpreter(parameters, workingDir).execute();
+				CD_INTERPRETER_FACTORY.create(parameters, workingDir).execute();
 			}
 			this.lineInput = lastLine;
 		}

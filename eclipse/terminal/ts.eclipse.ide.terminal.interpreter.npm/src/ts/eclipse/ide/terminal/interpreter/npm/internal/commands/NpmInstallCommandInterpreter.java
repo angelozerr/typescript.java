@@ -1,7 +1,5 @@
 package ts.eclipse.ide.terminal.interpreter.npm.internal.commands;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,13 +18,13 @@ import ts.eclipse.ide.terminal.interpreter.AbstractCommandInterpreter;
 
 public class NpmInstallCommandInterpreter extends AbstractCommandInterpreter {
 
-	public NpmInstallCommandInterpreter(List<String> parameters, String workingDir) {
-		super(parameters, workingDir);
+	public NpmInstallCommandInterpreter(String workingDir) {
+		super(workingDir);
 	}
 
 	@Override
-	public void execute(List<String> parameters, String workingDir) {
-		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocation(new Path(workingDir));
+	public void execute() {
+		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocation(new Path(getWorkingDir()));
 		if (c != null && c.length > 0) {
 			final IContainer container = c[0];
 			new UIJob("Refresh npm project") {

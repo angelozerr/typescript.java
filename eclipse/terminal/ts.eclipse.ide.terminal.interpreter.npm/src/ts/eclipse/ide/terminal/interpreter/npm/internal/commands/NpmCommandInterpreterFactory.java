@@ -10,7 +10,7 @@ public class NpmCommandInterpreterFactory implements ICommandInterpreterFactory 
 	@Override
 	public ICommandInterpreter create(List<String> parameters, String workingDir) {
 		if (parameters.contains("install")) {
-			return new NpmInstallCommandInterpreter(parameters, workingDir);
+			return new NpmInstallCommandInterpreter(workingDir);
 		}
 		return null;
 	}

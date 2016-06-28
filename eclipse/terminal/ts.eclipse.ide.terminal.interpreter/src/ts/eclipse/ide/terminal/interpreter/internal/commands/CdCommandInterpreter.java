@@ -1,7 +1,5 @@
 package ts.eclipse.ide.terminal.interpreter.internal.commands;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
@@ -17,16 +15,18 @@ import ts.eclipse.ide.terminal.interpreter.AbstractCommandInterpreter;
 
 public class CdCommandInterpreter extends AbstractCommandInterpreter {
 
-	public CdCommandInterpreter(List<String> parameters, String workingDir) {
-		super(parameters, workingDir);
+	private final String path;
+
+	public CdCommandInterpreter(String path, String workingDir) {
+		super(workingDir);
+		this.path = path;
 	}
 
 	@Override
-	public void execute(List<String> parameters, String workingDir) {
-		String path = parameters.get(0);
+	public void execute() {
 		try {
 			final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
-					.findContainersForLocation(new Path(workingDir + "/" + path));
+					.findContainersForLocation(new Path(getWorkingDir() + "/" + path));
 			if (c != null && c.length > 0) {
 				IWorkbenchPage page = PlatformUI.getWorkbench().getWorkbenchWindows()[0].getActivePage();
 				final IViewPart view = page.findView(IPageLayout.ID_PROJECT_EXPLORER);

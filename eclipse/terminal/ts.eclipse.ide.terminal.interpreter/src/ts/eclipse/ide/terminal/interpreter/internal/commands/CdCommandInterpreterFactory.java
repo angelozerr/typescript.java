@@ -22,7 +22,8 @@ public class CdCommandInterpreterFactory implements ICommandInterpreterFactory {
 		if (parameters.size() < 1) {
 			return null;
 		}
-		return new CdCommandInterpreter(parameters, workingDir);
+		String path = parameters.get(0);
+		return new CdCommandInterpreter(path, workingDir);
 	}
 
 }
