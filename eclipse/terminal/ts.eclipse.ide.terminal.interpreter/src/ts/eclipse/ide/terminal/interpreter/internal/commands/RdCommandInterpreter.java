@@ -2,7 +2,6 @@ package ts.eclipse.ide.terminal.interpreter.internal.commands;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.progress.UIJob;
 
 import ts.eclipse.ide.terminal.interpreter.AbstractCommandInterpreter;
@@ -20,10 +19,10 @@ public class RdCommandInterpreter extends AbstractCommandInterpreter {
 	@Override
 	public void execute() {
 		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
-				.findContainersForLocation(new Path(getWorkingDir()).append(path));
+				.findContainersForLocation(getWorkingDirPath().append(path));
 		if (c != null && c.length > 0) {
 			for (int i = 0; i < c.length; i++) {
-				UIJob job = new RefreshContainerJob(c[i].getParent());
+				UIJob job = new RefreshContainerJob(c[i].getParent(), true);
 				job.schedule();
 			}
 		}

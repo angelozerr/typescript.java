@@ -10,6 +10,9 @@
  */
 package ts.eclipse.ide.terminal.interpreter;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
 /**
  * Abstract class for {@link ICommandInterpreter}.
  *
@@ -24,6 +27,10 @@ public abstract class AbstractCommandInterpreter implements ICommandInterpreter 
 
 	public String getWorkingDir() {
 		return workingDir;
+	}
+
+	public IPath getWorkingDirPath() {
+		return new Path(getWorkingDir());
 	}
 
 	@Override

@@ -2,21 +2,19 @@ package ts.eclipse.ide.terminal.interpreter.npm.internal.commands;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.ISetSelectionTarget;
 import org.eclipse.ui.progress.UIJob;
 
 import ts.eclipse.ide.terminal.interpreter.AbstractCommandInterpreter;
+import ts.eclipse.ide.terminal.interpreter.UIInterpreterHelper;
 
 public class NpmInstallCommandInterpreter extends AbstractCommandInterpreter {
+
+	private final IPath NODE_MODULES_PATH = new Path("node_modules");
 
 	public NpmInstallCommandInterpreter(String workingDir) {
 		super(workingDir);
@@ -24,26 +22,16 @@ public class NpmInstallCommandInterpreter extends AbstractCommandInterpreter {
 
 	@Override
 	public void execute() {
-		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocation(new Path(getWorkingDir()));
+		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocation(getWorkingDirPath());
 		if (c != null && c.length > 0) {
 			final IContainer container = c[0];
 			new UIJob("Refresh npm project") {
 
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
-					// try {
-					// container.refreshLocal(IResource.DEPTH_INFINITE,
-					// monitor);
-					if (container.exists(new Path("node_modules"))) {
-						IWorkbenchPage page = PlatformUI.getWorkbench().getWorkbenchWindows()[0].getActivePage();
-						final IViewPart view = page.findView(IPageLayout.ID_PROJECT_EXPLORER);
-						((ISetSelectionTarget) view)
-								.selectReveal(new StructuredSelection(container.getFolder(new Path("node_modules"))));
+					if (container.exists(NODE_MODULES_PATH)) {
+						UIInterpreterHelper.selectRevealInProjectExplorer(container.getFolder(NODE_MODULES_PATH));
 					}
-					// } catch (CoreException e) {
-					// // TODO Auto-generated catch block
-					// e.printStackTrace();
-					// }
 					return Status.OK_STATUS;
 				}
 			}.schedule();
