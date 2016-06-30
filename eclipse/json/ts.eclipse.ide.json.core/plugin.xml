@@ -4,19 +4,19 @@
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
-		    file-names="jsconfig.json"
-			priority="high"
-			name="%jsconfig_Content_Type_Extension_Element.name"
-			id="ts.eclipse.ide.json.core.jsconfigsource"
-			base-type="org.eclipse.wst.json.core.jsonsource">
-		</content-type>
-		<content-type
 		    file-names="tsconfig.json"
 			priority="high"
 			name="%tsconfig_Content_Type_Extension_Element.name"
 			id="ts.eclipse.ide.json.core.tsconfigsource"
 			base-type="org.eclipse.wst.json.core.jsonsource">
 		</content-type>
+		<content-type
+		    file-names="jsconfig.json"
+			priority="high"
+			name="%jsconfig_Content_Type_Extension_Element.name"
+			id="ts.eclipse.ide.json.core.jsconfigsource"
+			base-type="org.eclipse.wst.json.core.jsonsource">
+		</content-type>		
 		<content-type
 		    file-names="tslint.json"
 			priority="high"
@@ -42,6 +42,11 @@
          			fileMatch="tsconfig.json"
          			url="http://json.schemastore.org/tsconfig"
          			uri="schemastore/tsconfig-neon" />
+         	<schema name="jsconfig.json"
+         			description="JSON schema for the JavaScript configuration file"
+         			fileMatch="jsconfig.json"
+         			url="http://json.schemastore.org/jsconfig"
+         			uri="schemastore/jsconfig" />         			
          	<schema name="tslint.json"
          			description="JSON schema for the TSLint configuration files"
          			fileMatch="tslint.json"
