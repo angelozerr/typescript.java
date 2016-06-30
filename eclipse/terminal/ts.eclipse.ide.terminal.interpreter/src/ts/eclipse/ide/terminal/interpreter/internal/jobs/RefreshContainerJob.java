@@ -33,7 +33,7 @@ public class RefreshContainerJob extends UIJob {
 			}
 		}
 		// Select the container in the Project Explorer
-		UIInterpreterHelper.selectRevealInProjectExplorer(container);
+		UIInterpreterHelper.selectRevealInDefaultViews(container);
 		return Status.OK_STATUS;
 	}
 }

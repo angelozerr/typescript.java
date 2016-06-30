@@ -17,6 +17,9 @@ import org.eclipse.ui.part.ISetSelectionTarget;
  */
 public class UIInterpreterHelper {
 
+	private final static String[] DEFAULT_VIEW_IDS = { IPageLayout.ID_PROJECT_EXPLORER,
+			"org.eclipse.ui.views.ResourceNavigator" };
+
 	/**
 	 * Open in an editor the given file.
 	 * 
@@ -32,12 +35,15 @@ public class UIInterpreterHelper {
 	}
 
 	/**
-	 * Select the given element in the Project Explorer.
+	 * Select the given element in the default view (Project Explorer,
+	 * Navigator).
 	 * 
 	 * @param element
 	 */
-	public static void selectRevealInProjectExplorer(Object element) {
-		selectReveal(element, IPageLayout.ID_PROJECT_EXPLORER);
+	public static void selectRevealInDefaultViews(Object element) {
+		for (String viewId : DEFAULT_VIEW_IDS) {
+			selectReveal(element, viewId);
+		}
 	}
 
 	/**
