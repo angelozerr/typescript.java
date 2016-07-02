@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
@@ -37,6 +39,7 @@ import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog.Mode;
 import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
 import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
+import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
 /**
@@ -59,6 +62,8 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 
 	private Button browseFileSystemButton;
 	private Button browseWorkspaceButton;
+	private Label nodePathTitle;
+	private Text nodePath;
 
 	public NodejsConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {
@@ -102,7 +107,7 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 
 		controlsComposite = new Composite(composite, SWT.NONE);
 		controlsComposite.setFont(composite.getFont());
-		controlsComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		controlsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		layout = new GridLayout();
 		layout.marginHeight = 0;
@@ -117,13 +122,15 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 		Group group = new Group(controlsComposite, SWT.NONE);
 		group.setFont(controlsComposite.getFont());
 		group.setText(TypeScriptUIMessages.NodejsConfigurationBlock_nodejs_group_label);
-		group.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		group.setLayout(layout);
 
 		// Embedded node.js
 		createEmbeddedNodejsField(group);
 		// Installed node.js
 		createInstalledNodejsField(group);
+		// Path info.
+		createNodePathInfo(composite);
 		updateComboBoxes();
 		return pageContent;
 	}
@@ -168,7 +175,12 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 		String[] defaultPaths = IDENodejsProcessHelper.getDefaultNodejsPaths();
 		installedComboBox = newComboControl(parent, PREF_NODEJS_PATH, defaultPaths, defaultPaths, false);
 		installedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
+		installedComboBox.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updatePath();
+			}
+		});
 		// Create Browse buttons.
 		createBrowseButtons(parent, installedComboBox);
 
@@ -219,12 +231,44 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 		});
 	}
 
+	private void createNodePathInfo(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new GridLayout());
+		GridData gridData = new GridData(GridData.FILL_BOTH);
+		composite.setLayoutData(gridData);
+
+		// Node path label
+		nodePathTitle = new Label(composite, SWT.NONE);
+		nodePathTitle.setText(TypeScriptUIMessages.NodejsConfigurationBlock_nodePath_label);
+		gridData = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		nodePathTitle.setLayoutData(gridData);
+
+		nodePath = new Text(composite, SWT.WRAP | SWT.READ_ONLY);
+		nodePath.setText(""); //$NON-NLS-1$
+		gridData = new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan = 2;
+		gridData.widthHint = 200;
+		nodePath.setLayoutData(gridData);
+	}
+
 	private void updateComboBoxes() {
 		boolean embedded = useEmbedNodeJs.getSelection();
 		embeddedComboBox.setEnabled(embedded);
 		installedComboBox.setEnabled(!embedded);
 		browseFileSystemButton.setEnabled(!embedded);
 		browseWorkspaceButton.setEnabled(!embedded);
+		updatePath();
+	}
+
+	private void updatePath() {
+		boolean embedded = useEmbedNodeJs.getSelection();
+		if (embedded) {
+			IEmbeddedNodejs[] installs = TypeScriptCorePlugin.getNodejsInstallManager().getNodejsInstalls();
+			IEmbeddedNodejs install = installs[embeddedComboBox.getSelectionIndex()];
+			nodePath.setText(FileUtils.getPath(install.getPath()));
+		} else {
+			nodePath.setText(installedComboBox.getText());
+		}
 	}
 
 	@Override

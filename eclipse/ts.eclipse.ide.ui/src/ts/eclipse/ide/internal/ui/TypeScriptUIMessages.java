@@ -61,7 +61,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String NodejsConfigurationBlock_nodejs_group_label;
 	public static String NodejsConfigurationBlock_embedded_checkbox_label;
 	public static String NodejsConfigurationBlock_installed_checkbox_label;
-
+	public static String NodejsConfigurationBlock_nodePath_label;
 	// tsserver
 	public static String ServerConfigurationBlock_typescript_group_label;
 	public static String ServerConfigurationBlock_embedded_checkbox_label;
@@ -114,6 +114,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptBuilder_Error_title;
 	public static String TypeScriptBuilder_enable_Error_message;
 	public static String TypeScriptBuilder_disable_Error_message;
+
 
 	public static ResourceBundle getResourceBundle() {
 		try {
