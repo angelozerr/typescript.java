@@ -21,6 +21,7 @@ import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.internal.client.protocol.ConfigureRequestArguments;
 
 /**
  * TypeScript client API which communicates with tsserver.
@@ -80,5 +81,7 @@ public interface ITypeScriptServiceClient {
 	void dispose();
 
 	boolean isDisposed();
+
+	void configure(ConfigureRequestArguments arguments) throws TypeScriptException;
 
 }

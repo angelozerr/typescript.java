@@ -5,6 +5,12 @@ import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 public interface ITypeScriptEditorActionDefinitionIds extends ITextEditorActionDefinitionIds {
 
 	/**
+	 * Action definition ID of the source -> indent action
+	 * (value <code>"org.eclipse.wst.jsdt.ui.edit.text.java.indent"</code>).
+	 */
+	public static final String INDENT= "ts.eclipse.ide.jsdt.ui.edit.text.java.indent"; //$NON-NLS-1$
+	
+	/**
 	 * Action definition ID of the source -> format action (value
 	 * <code>"ts.eclipse.ide.ui.edit.text.java.format"</code>).
 	 */

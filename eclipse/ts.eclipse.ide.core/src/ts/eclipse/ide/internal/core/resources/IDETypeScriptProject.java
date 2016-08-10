@@ -174,6 +174,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		if (!tsFile.isOpened()) {
 			tsFile.open();
 		}
+		((IDETypeScriptFile) tsFile).update(document);
 		return tsFile;
 	}
 

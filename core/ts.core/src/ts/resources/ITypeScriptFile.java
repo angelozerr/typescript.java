@@ -16,6 +16,7 @@ import ts.TypeScriptException;
 import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
+import ts.client.format.FormatOptions;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.navbar.NavigationBarItem;
@@ -152,4 +153,8 @@ public interface ITypeScriptFile {
 	void removeNavbarListener(INavbarListener listener);
 	
 	List<NavigationBarItem> getNavBar();
+
+	FormatOptions getFormatOptions();
+	
+	void setFormatOptions(FormatOptions formatOptions);
 }

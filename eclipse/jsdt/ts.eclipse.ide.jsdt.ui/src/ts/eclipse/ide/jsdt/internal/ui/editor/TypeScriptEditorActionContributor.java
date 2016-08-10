@@ -50,6 +50,7 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 		// Source menu.
 		IActionBars bars = getActionBars();
 		bars.setGlobalActionHandler(TypeScriptActionConstants.FORMAT, getAction(textEditor, "Format")); //$NON-NLS-1$
+		bars.setGlobalActionHandler(TypeScriptActionConstants.INDENT, getAction(textEditor, "Indent")); //$NON-NLS-1$
 
 		fShowOutline.setAction(getAction(textEditor, ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE));
 

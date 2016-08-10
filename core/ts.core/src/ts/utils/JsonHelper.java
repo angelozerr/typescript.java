@@ -18,4 +18,14 @@ public class JsonHelper {
 		JsonValue value = obj.get(name);
 		return value != null ? value.asArray() : null;
 	}
+
+	public static Integer getInteger(JsonObject obj, String name) {
+		JsonValue value = obj.get(name);
+		return value != null ? value.asInt() : null;
+	}
+
+	public static Boolean getBoolean(JsonObject obj, String name) {
+		JsonValue value = obj.get(name);
+		return value != null ? value.asBoolean() : null;
+	}
 }

@@ -12,12 +12,11 @@ package ts.eclipse.ide.jsdt.internal.ui.editor;
 
 import java.util.Arrays;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.AbstractInformationControlManager;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
@@ -35,12 +34,13 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 import org.eclipse.wst.jsdt.internal.ui.text.ContentAssistPreference;
 import org.eclipse.wst.jsdt.internal.ui.text.java.ContentAssistProcessor;
+import org.eclipse.wst.jsdt.internal.ui.text.java.JavaStringAutoIndentStrategy;
+import org.eclipse.wst.jsdt.internal.ui.text.java.SmartSemicolonAutoEditStrategy;
+import org.eclipse.wst.jsdt.internal.ui.text.javadoc.JavaDocAutoIndentStrategy;
 import org.eclipse.wst.jsdt.ui.text.IColorManager;
 import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 
-import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptJavadocCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.format.TypeScriptContentFormatter;
@@ -48,6 +48,7 @@ import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.ui.outline.TypeScriptElementProvider;
 import ts.eclipse.ide.ui.outline.TypeScriptQuickOutlineDialog;
 import ts.eclipse.ide.ui.utils.EditorUtils;
+import ts.resources.ITypeScriptFile;
 
 /**
  * Extension of JSDT {@link JavaScriptSourceViewerConfiguration}
@@ -178,8 +179,7 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 			public IInformationControl createInformationControl(final Shell parent) {
 				int shellStyle = SWT.RESIZE;
 				try {
-					return new TypeScriptQuickOutlineDialog(parent, shellStyle,
-							((TypeScriptEditor) getEditor()).getTypeScriptFile());
+					return new TypeScriptQuickOutlineDialog(parent, shellStyle, getTypeScriptFile());
 				} catch (Exception e) {
 					return null;
 				}
@@ -189,54 +189,52 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 
 	@Override
 	public int getTabWidth(ISourceViewer sourceViewer) {
-		IResource file = EditorUtils.getResource(getEditor());
-		if (file == null) {
+		ITypeScriptFile tsFile = getTypeScriptFile();
+		if (tsFile == null) {
 			return super.getTabWidth(sourceViewer);
 		}
-		try {
-			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
-			if (tsProject != null) {
-				boolean convertTabsToSpaces = tsProject.getProjectSettings().isEditorOptionsConvertTabsToSpaces();
-				if (convertTabsToSpaces) {
-					// indentSize
-					return tsProject.getProjectSettings().getEditorOptionsIndentSize();
-				}
-				// tabSize
-				return tsProject.getProjectSettings().getEditorOptionsTabSize();
-			}
-		} catch (CoreException e) {
+		boolean convertTabsToSpaces = tsFile.getFormatOptions().getConvertTabsToSpaces();
+		if (convertTabsToSpaces) {
+			// indentSize
+			return tsFile.getFormatOptions().getIndentSize();
 		}
-		return super.getTabWidth(sourceViewer);
+		// tabSize
+		return tsFile.getFormatOptions().getTabSize();
+
+	}
+
+	private ITypeScriptFile getTypeScriptFile() {
+		try {
+			return ((TypeScriptEditor) getEditor()).getTypeScriptFile();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override
 	public String[] getIndentPrefixes(final ISourceViewer sourceViewer, final String contentType) {
-		IResource file = EditorUtils.getResource(getEditor());
-		if (file != null) {
-			try {
-				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
-				final int tabWidth = tsProject.getProjectSettings().getEditorOptionsTabSize();
-				final int indentWidth = tsProject.getProjectSettings().getEditorOptionsIndentSize();
-				boolean allowTabs = tabWidth <= indentWidth;
+		ITypeScriptFile tsFile = getTypeScriptFile();
+		if (tsFile != null) {
 
-				boolean useSpaces = !tsProject.getProjectSettings().isEditorOptionsConvertTabsToSpaces();
+			final int tabWidth = tsFile.getFormatOptions().getTabSize();
+			final int indentWidth = tsFile.getFormatOptions().getIndentSize();
+			boolean allowTabs = tabWidth <= indentWidth;
 
-				Assert.isLegal(allowTabs || useSpaces);
+			boolean useSpaces = tsFile.getFormatOptions().getConvertTabsToSpaces();
 
-				if (!allowTabs) {
-					char[] spaces = new char[indentWidth];
-					Arrays.fill(spaces, ' ');
-					return new String[] { new String(spaces), "" }; //$NON-NLS-1$
-				} else if (!useSpaces)
-					return getIndentPrefixesForTab(tabWidth);
-				else
-					return getIndentPrefixesForSpaces(tabWidth);
+			Assert.isLegal(allowTabs || useSpaces);
 
-			} catch (CoreException e) {
-
-			}
+			if (!allowTabs) {
+				char[] spaces = new char[indentWidth];
+				Arrays.fill(spaces, ' ');
+				return new String[] { new String(spaces), "" }; //$NON-NLS-1$
+			} else if (!useSpaces)
+				return getIndentPrefixesForTab(tabWidth);
+			else
+				return getIndentPrefixesForSpaces(tabWidth);
 		}
 		return super.getIndentPrefixes(sourceViewer, contentType);
+
 	}
 
 	/**
@@ -278,5 +276,22 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 		char[] spaceChars = new char[count];
 		Arrays.fill(spaceChars, ' ');
 		return new String(spaceChars);
+	}
+	
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+		String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
+		if (IJavaScriptPartitions.JAVA_DOC.equals(contentType) 
+					|| IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT.equals(contentType) 
+					|| IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL.equals(contentType))
+		{
+			return new IAutoEditStrategy[]{new JavaDocAutoIndentStrategy(partitioning)};
+		}
+		else if (IJavaScriptPartitions.JAVA_STRING.equals(contentType))
+			return new IAutoEditStrategy[]{new SmartSemicolonAutoEditStrategy(partitioning), new JavaStringAutoIndentStrategy(partitioning)};
+		else if (IJavaScriptPartitions.JAVA_CHARACTER.equals(contentType) || IDocument.DEFAULT_CONTENT_TYPE.equals(contentType))
+			return new IAutoEditStrategy[]{new SmartSemicolonAutoEditStrategy(partitioning), new TypeScriptAutoIndentStrategy(partitioning, getTypeScriptFile(), sourceViewer)};
+		else
+			return new IAutoEditStrategy[]{new TypeScriptAutoIndentStrategy(partitioning, getTypeScriptFile(), sourceViewer)};
 	}
 }

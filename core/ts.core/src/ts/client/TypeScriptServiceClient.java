@@ -45,6 +45,8 @@ import ts.internal.client.protocol.ChangeRequest;
 import ts.internal.client.protocol.CloseRequest;
 import ts.internal.client.protocol.CompletionDetailsRequest;
 import ts.internal.client.protocol.CompletionsRequest;
+import ts.internal.client.protocol.ConfigureRequest;
+import ts.internal.client.protocol.ConfigureRequestArguments;
 import ts.internal.client.protocol.DefinitionRequest;
 import ts.internal.client.protocol.FormatRequest;
 import ts.internal.client.protocol.GeterrRequest;
@@ -203,6 +205,15 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
 			throws TypeScriptException {
 		QuickInfoRequest request = new QuickInfoRequest(fileName, line, offset, collector);
+		execute(request);
+	}
+
+	// ---------------- Configure
+
+	@Override
+	public void configure(ConfigureRequestArguments arguments)
+			throws TypeScriptException {
+		ConfigureRequest request = new ConfigureRequest(arguments);
 		execute(request);
 	}
 

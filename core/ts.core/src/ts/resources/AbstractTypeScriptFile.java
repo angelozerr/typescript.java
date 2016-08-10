@@ -19,12 +19,14 @@ import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
+import ts.client.format.FormatOptions;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.internal.LocationReader;
+import ts.internal.client.protocol.ConfigureRequestArguments;
 
 /**
  * Abstract TypeScript file.
@@ -40,12 +42,15 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	private final List<INavbarListener> listeners;
 	private List<NavigationBarItem> navbar;
 	private TypeScriptNavBarCollector navBarCollector;
+	private FormatOptions formatOptions;
+	private boolean configureAlreadyDone;
 
 	public AbstractTypeScriptFile(ITypeScriptProject tsProject) {
 		this.tsProject = tsProject;
 		this.listeners = new ArrayList<INavbarListener>();
 		this.navBarCollector = new TypeScriptNavBarCollector();
 		this.setDirty(false);
+		this.configureAlreadyDone = false;
 	}
 
 	@Override
@@ -125,9 +130,29 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 			throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
+		this.ensureFormatOptions(client);
 		Location start = this.getLocation(startPosition);
 		Location end = this.getLocation(endPosition);
 		client.format(this.getName(), start.getLine(), start.getOffset(), end.getLine(), end.getOffset(), collector);
+	}
+
+	private void ensureFormatOptions(ITypeScriptServiceClient client) throws TypeScriptException {
+		FormatOptions oldFormatOptions = formatOptions;
+		FormatOptions newFormatOptions = getFormatOptions();
+		if (!configureAlreadyDone || !newFormatOptions.equals(oldFormatOptions)) {
+			configureAlreadyDone = true;
+			client.configure(new ConfigureRequestArguments(newFormatOptions, getName()));
+		}
+	}
+
+	@Override
+	public FormatOptions getFormatOptions() {
+		formatOptions = tsProject.getProjectSettings().getFormatOptions();
+		return formatOptions;
+	}
+
+	public void setFormatOptions(FormatOptions formatOptions) {
+		this.formatOptions = formatOptions;
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import java.io.File;
 
 import ts.TypeScriptException;
 import ts.client.completions.ICompletionEntryMatcher;
+import ts.client.format.FormatOptions;
 import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.internal.repository.TypeScriptRepository;
 import ts.repository.ITypeScriptRepository;
@@ -100,5 +101,11 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	@Override
 	public void dispose() {
 		// Do nothing
+	}
+
+	@Override
+	public FormatOptions getFormatOptions() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

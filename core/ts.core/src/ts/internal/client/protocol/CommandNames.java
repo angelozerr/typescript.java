@@ -18,8 +18,8 @@ public enum CommandNames {
 
 	Open("open"), Close("close"), Change("change"), NavBar("navbar"), Completions(
 			"completions"), CompletionEntryDetails("completionEntryDetails"), Reload("reload"), Definition(
-					"definition"), SignatureHelp("signatureHelp"), QuickInfo("quickinfo"), Geterr(
-							"geterr"), Format("format"), References("references"), Occurrences("occurrences");
+					"definition"), SignatureHelp("signatureHelp"), QuickInfo("quickinfo"), Geterr("geterr"), Format(
+							"format"), References("references"), Occurrences("occurrences"), Configure("configure");
 
 	private final String name;
 

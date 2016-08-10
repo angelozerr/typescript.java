@@ -157,57 +157,6 @@ public class EditorUtils {
 		return viewer;
 	}
 
-	/**
-	 * Returns the file from the given {@link IDocument}.
-	 */
-	public static IFile getFile(IDocument document) {
-		ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager(); // get
-																						// the
-																						// buffer
-																						// manager
-		ITextFileBuffer buffer = bufferManager.getTextFileBuffer(document);
-		IPath location = buffer == null ? null : buffer.getLocation();
-		if (location == null) {
-			return null;
-		}
-
-		return ResourcesPlugin.getWorkspace().getRoot().getFile(location);
-	}
-
-	/**
-	 * Returns the {@link IDocument} from the given file and null if it's not
-	 * possible.
-	 */
-	public static IDocument getDocument(IFile file) {
-		ITextFileBufferManager manager = FileBuffers.getTextFileBufferManager();
-		IPath location = file.getLocation();
-		boolean connected = false;
-		try {
-			ITextFileBuffer buffer = manager.getTextFileBuffer(location, LocationKind.NORMALIZE);
-			if (buffer == null) {
-				// no existing file buffer..create one
-				manager.connect(location, LocationKind.NORMALIZE, new NullProgressMonitor());
-				connected = true;
-				buffer = manager.getTextFileBuffer(location, LocationKind.NORMALIZE);
-				if (buffer == null) {
-					return null;
-				}
-			}
-
-			return buffer.getDocument();
-		} catch (CoreException ce) {
-			TypeScriptUIPlugin.log("Error while getting document from file", ce);
-			return null;
-		} finally {
-			if (connected) {
-				try {
-					manager.disconnect(location, LocationKind.NORMALIZE, new NullProgressMonitor());
-				} catch (CoreException e) {
-					TypeScriptUIPlugin.log("Error while getting document from file", e);
-				}
-			}
-		}
-	}
 
 	public static void openInEditor(IFile file, NavigationBarItem item) {
 		if (!item.hasSpans()) {

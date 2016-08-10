@@ -72,7 +72,7 @@ public class TypeScriptHover extends AbstractTypeScriptHover {
 			return EditorUtils.getFile(editor);
 		}
 
-		return EditorUtils.getFile(textViewer.getDocument());
+		return TypeScriptResourceUtil.getFile(textViewer.getDocument());
 	}
 
 }

@@ -13,6 +13,10 @@ package ts.eclipse.ide.core.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -20,12 +24,15 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.text.IDocument;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
@@ -365,5 +372,57 @@ public class TypeScriptResourceUtil {
 
 	public static String formatTscError(String code, String message) {
 		return formatError(TSC_TYPE, code, message);
+	}
+
+	/**
+	 * Returns the {@link IDocument} from the given file and null if it's not
+	 * possible.
+	 */
+	public static IDocument getDocument(IFile file) {
+		ITextFileBufferManager manager = FileBuffers.getTextFileBufferManager();
+		IPath location = file.getLocation();
+		boolean connected = false;
+		try {
+			ITextFileBuffer buffer = manager.getTextFileBuffer(location, LocationKind.NORMALIZE);
+			if (buffer == null) {
+				// no existing file buffer..create one
+				manager.connect(location, LocationKind.NORMALIZE, new NullProgressMonitor());
+				connected = true;
+				buffer = manager.getTextFileBuffer(location, LocationKind.NORMALIZE);
+				if (buffer == null) {
+					return null;
+				}
+			}
+
+			return buffer.getDocument();
+		} catch (CoreException ce) {
+			TypeScriptCorePlugin.logError(ce, "Error while getting document from file");
+			return null;
+		} finally {
+			if (connected) {
+				try {
+					manager.disconnect(location, LocationKind.NORMALIZE, new NullProgressMonitor());
+				} catch (CoreException e) {
+					TypeScriptCorePlugin.logError(e, "Error while getting document from file");
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Returns the file from the given {@link IDocument}.
+	 */
+	public static IFile getFile(IDocument document) {
+		ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager(); // get
+																						// the
+																						// buffer
+																						// manager
+		ITextFileBuffer buffer = bufferManager.getTextFileBuffer(document);
+		IPath location = buffer == null ? null : buffer.getLocation();
+		if (location == null) {
+			return null;
+		}
+
+		return ResourcesPlugin.getWorkspace().getRoot().getFile(location);
 	}
 }

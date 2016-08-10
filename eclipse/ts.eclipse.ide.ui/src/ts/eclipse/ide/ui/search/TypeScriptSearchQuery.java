@@ -91,7 +91,7 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 							if (tsFile != null) {
 
 								try {
-									IDocument document = EditorUtils.getDocument(tsFile);
+									IDocument document = TypeScriptResourceUtil.getDocument(tsFile);
 									int lineNumber = startLine - 1;
 									int lineStartOffset = startLineOffset - 1;
 									int beginOfLineStartOffset = document.getLineOffset(lineNumber);

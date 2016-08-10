@@ -80,62 +80,44 @@ public class TypeScriptCorePreferenceConstants {
 
 	public static final int EDITOR_OPTIONS_TAB_SIZE_DEFAULT = 4; // $NON-NLS-1$
 
+	// Format Options
+	
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER = "insertSpaceAfterCommaDelimiter"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER_DEFAULT = true; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS = "insertSpaceAfterSemicolonInForStatements"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS_DEFAULT = true; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS = "insertSpaceBeforeAndAfterBinaryOperators"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS_DEFAULT = true; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS = "insertSpaceAfterKeywordsInControlFlowStatements"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS_DEFAULT = true; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS = "insertSpaceAfterFunctionKeywordForAnonymousFunctions"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS_DEFAULT = false; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS = "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS_DEFAULT = true; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS = "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS_DEFAULT = false; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS = "placeOpenBraceOnNewLineForFunctions"; // $NON-NLS-1$
 
+	public static final boolean FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS_DEFAULT = false; // $NON-NLS-1$
+	
 	public static final String FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS = "placeOpenBraceOnNewLineForControlBlocks"; // $NON-NLS-1$
 
-	// Format Options
-
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_indentSize = "indentSize"; //
-	// $NON-NLS-1$
-	// public static final String FORMAT_convertTabsToSpaces =
-	// "convertTabsToSpaces"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// public static final String FORMAT_tabSize = "tabSize"; // $NON-NLS-1$
-	// "format.insertSpaceAfterCommaDelimiter": "Defines space handling after a
-	// comma delimiter",
-	// "format.insertSpaceAfterSemicolonInForStatements": " Defines space
-	// handling after a semicolon in a for statement",
-	// "format.insertSpaceBeforeAndAfterBinaryOperators": "Defines space
-	// handling after a binary operator",
-	// "format.insertSpaceAfterKeywordsInControlFlowStatements": "Defines space
-	// handling after keywords in control flow statement",
-	// "format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": "Defines
-	// space handling after function keyword for anonymous functions",
-	// "format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis":
-	// "Defines space handling after opening and before closing non empty
-	// parenthesis",
-	// "format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets":
-	// "Defines space handling after opening and before closing non empty
-	// brackets",
-	// "format.placeOpenBraceOnNewLineForFunctions": "Defines whether an open
-	// brace is put onto a new line for functions or not",
-	// "format.placeOpenBraceOnNewLineForControlBlocks": "Defines whether an
-	// open brace is put onto a new line for control blocks or not",
-
+	public static final boolean FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS_DEFAULT = false; // $NON-NLS-1$
+	
 	private TypeScriptCorePreferenceConstants() {
 	}
 }

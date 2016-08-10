@@ -36,10 +36,5 @@ public interface IIDETypeScriptProjectSettings extends ITypeScriptProjectSetting
 	 */
 	boolean isTraceOnConsole();
 
-	boolean isEditorOptionsConvertTabsToSpaces();
-
-	int getEditorOptionsIndentSize();
-
-	int getEditorOptionsTabSize();
 
 }

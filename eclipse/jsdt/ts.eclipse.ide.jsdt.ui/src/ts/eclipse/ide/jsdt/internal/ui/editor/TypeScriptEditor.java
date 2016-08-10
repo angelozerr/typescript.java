@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
@@ -26,8 +25,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -56,6 +53,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
@@ -67,10 +65,12 @@ import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.wst.jsdt.internal.ui.IJavaHelpContextIds;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
+import org.eclipse.wst.jsdt.ui.actions.IJavaEditorActionDefinitionIds;
 
 import ts.TypeScriptException;
 import ts.client.ICancellationToken;
@@ -84,6 +84,7 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.ide.jsdt.internal.ui.actions.CompositeActionGroup;
+import ts.eclipse.ide.jsdt.internal.ui.actions.IndentAction;
 import ts.eclipse.ide.jsdt.internal.ui.actions.JavaSearchActionGroup;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -125,8 +126,6 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	 * 
 	 */
 	private ActivationListener fActivationListener = new ActivationListener();
-
-	private IEclipsePreferences editorPreferences;
 
 	/**
 	 * Updates the Java outline page selection and this editor's range
@@ -197,6 +196,24 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.FORMAT_ACTION);
 
+		action= new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, false); //$NON-NLS-1$
+		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.INDENT);
+		setAction("Indent", action); //$NON-NLS-1$
+		markAsStateDependentAction("Indent", true); //$NON-NLS-1$
+		markAsSelectionDependentAction("Indent", true); //$NON-NLS-1$
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.INDENT_ACTION);
+
+		action= new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, true); //$NON-NLS-1$
+		setAction("IndentOnTab", action); //$NON-NLS-1$
+		markAsStateDependentAction("IndentOnTab", true); //$NON-NLS-1$
+		markAsSelectionDependentAction("IndentOnTab", true); //$NON-NLS-1$
+		
+		if (getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_SMART_TAB)) {
+			// don't replace Shift Right - have to make sure their enablement is mutually exclusive
+//			removeActionActivationCode(ITextEditorActionConstants.SHIFT_RIGHT);
+			setActionActivationCode("IndentOnTab", '\t', -1, SWT.NONE); //$NON-NLS-1$
+		}
+		
 		action = new TextOperationAction(TypeScriptEditorMessages.getResourceBundle(), "ShowOutline.", this, //$NON-NLS-1$
 				TypeScriptSourceViewer.SHOW_OUTLINE, true);
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
@@ -267,15 +284,6 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		PlatformUI.getWorkbench().addWindowListener(fActivationListener);
 		editorSelectionChangedListener = new EditorSelectionChangedListener();
 		editorSelectionChangedListener.install(getSelectionProvider());
-		editorPreferences = new EclipsePreferences();
-		editorPreferences.addPreferenceChangeListener(
-				new org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener() {
-
-					@Override
-					public void preferenceChange(PreferenceChangeEvent event) {
-						handlePreferenceStoreChanged(new PropertyChangeEvent(event.getSource(), event.getKey(), event.getOldValue(), event.getNewValue()));
-					}
-				});
 	}
 
 	/*
@@ -283,8 +291,12 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	 */
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
 
+		ITypeScriptFile tsFile = null;
+		try {
+			tsFile = getTypeScriptFile();
+		} catch (Exception e) {
+		}
 		String property = event.getProperty();
-		System.err.println(property);
 		try {
 
 			ISourceViewer sourceViewer = getSourceViewer();
@@ -300,20 +312,26 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 			 * equals(property)) {
 			 */
 			if (TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES.equals(property)) {
-
-				// if (SPACES_FOR_TABS.equals(p)) {
 				if (isTabsToSpacesConversionEnabled())
 					installTabsToSpacesConverter();
 				else
 					uninstallTabsToSpacesConverter();
-				// return;
-				// }
-
-				StyledText textWidget = sourceViewer.getTextWidget();
-				int tabWidth = getSourceViewerConfiguration().getTabWidth(sourceViewer);
-				if (textWidget.getTabs() != tabWidth)
-					textWidget.setTabs(tabWidth);
+				updateTabs(sourceViewer);
 				return;
+			}
+
+			if (TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE.equals(property)
+					|| TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE.equals(property)) {
+				updateTabs(sourceViewer);
+				return;
+			}
+			
+			if (PreferenceConstants.EDITOR_SMART_TAB.equals(property)) {
+				if (getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_SMART_TAB)) {
+					setActionActivationCode("IndentOnTab", '\t', -1, SWT.NONE); //$NON-NLS-1$
+				} else {
+					removeActionActivationCode("IndentOnTab"); //$NON-NLS-1$
+				}
 			}
 
 			boolean newBooleanValue = false;
@@ -334,6 +352,13 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		} finally {
 			super.handlePreferenceStoreChanged(event);
 		}
+	}
+
+	private void updateTabs(ISourceViewer sourceViewer) {
+		StyledText textWidget = sourceViewer.getTextWidget();
+		int tabWidth = getSourceViewerConfiguration().getTabWidth(sourceViewer);
+		if (textWidget.getTabs() != tabWidth)
+			textWidget.setTabs(tabWidth);
 	}
 
 	@Override
@@ -430,9 +455,8 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		}
 
 		private boolean isCanceled() {
-			return fCanceled || fProgressMonitor.isCanceled()
-					|| fPostSelectionValidator != null && !(fPostSelectionValidator.isValid(fSelection)
-							|| fForcedMarkOccurrencesSelection == fSelection)
+			return fCanceled || fProgressMonitor.isCanceled() || fPostSelectionValidator != null
+					&& !(fPostSelectionValidator.isValid(fSelection) || fForcedMarkOccurrencesSelection == fSelection)
 					|| LinkedModeModel.hasInstalledModel(fDocument);
 		}
 
@@ -675,19 +699,27 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		occurrencesCollector.setDocument(document);
 		try {
 			ITypeScriptFile tsFile = getTypeScriptFile(document);
-			occurrencesCollector.setSelection(selection);
-			tsFile.occurrences(selection.getOffset(), occurrencesCollector);
+			if (tsFile != null) {
+				occurrencesCollector.setSelection(selection);
+				tsFile.occurrences(selection.getOffset(), occurrencesCollector);
+			}
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
 		}
 
 	}
 
-	private ITypeScriptFile getTypeScriptFile(IDocument document) throws CoreException, TypeScriptException {
+	private ITypeScriptFile getTypeScriptFile(IDocument document) {
 		IResource file = EditorUtils.getResource(this);
 		if (file != null) {
-			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
-			return tsProject.openFile(file, document);
+			IIDETypeScriptProject tsProject;
+			try {
+				tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
+				return tsProject.openFile(file, document);
+			} catch (Exception e) {
+				Trace.trace(Trace.SEVERE, "Error while getting typscript file", e);
+				return null;
+			}
 		}
 		IFileStore fs = EditorUtils.getFileStore(this);
 		if (fs != null) {
@@ -696,11 +728,8 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		return null;
 	}
 
-	public ITypeScriptFile getTypeScriptFile() throws CoreException, TypeScriptException {
+	public ITypeScriptFile getTypeScriptFile() {
 		final IDocument document = getSourceViewer().getDocument();
-		if (document == null) {
-			return null;
-		}
 		return getTypeScriptFile(document);
 	}
 
@@ -810,12 +839,6 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	public Object getAdapter(@SuppressWarnings("rawtypes") Class key) {
 		if (key.equals(IContentOutlinePage.class)) {
 			return getOutlinePage();
-		} else if (key.equals(IEclipsePreferences.class)) {
-			// support for .editorconfig
-			return editorPreferences;
-		} else if (key.equals(IPreferenceStore.class)) {
-			// support for .editorconfig
-			return getPreferenceStore();
 		}
 		return super.getAdapter(key);
 	}
@@ -832,10 +855,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 			IDocument document = getSourceViewer().getDocument();
 			try {
 				setOutlinePageInput(getTypeScriptFile(document));
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TypeScriptException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -990,15 +1010,14 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		}
 	}
 
+	@Override
 	protected boolean isTabsToSpacesConversionEnabled() {
-		IResource file = EditorUtils.getResource(this);
-		if (file != null) {
-			try {
-				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
-				return tsProject.getProjectSettings().isEditorOptionsConvertTabsToSpaces();
-			} catch (CoreException e) {
-			}
+		ITypeScriptFile tsFile = getTypeScriptFile();
+		if (tsFile != null) {
+			return tsFile.getFormatOptions().getConvertTabsToSpaces();
 		}
-		return false;
+		return super.isTabsToSpacesConversionEnabled();
 	}
+
+	
 }

@@ -85,6 +85,19 @@
 	   </javaCompletionProposalComputer>
 	 </extension>
 
+	<!-- template proposals -->
+	<extension
+		point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
+		id="TemplateProposalComputer">
+		<javaCompletionProposalComputer
+			class="ts.eclipse.ide.jsdt.internal.ui.template.contentassist.TypeScriptTemplateCompletionProposalComputer"
+			categoryId="org.eclipse.wst.jsdt.ui.templateProposalCategory">
+			<partition type="__dftl_partition_content_type"/>
+			<partition type="__java_singleline_comment"/> <!-- to get NLS templates -->
+			<partition type="__java_javadoc"/>
+		</javaCompletionProposalComputer>
+	</extension>
+	
 	<!-- Hyperlink for JavaScript (inside TypeScript file) -->
         
    <extension
@@ -160,7 +173,13 @@
                menubarPath="ts.eclipse.ide.jsdt.ui.source.menu/editGroup"
                id="ts.eclipse.ide.jsdt.ui.actions.Format">
          </action>
-                  
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.indent"
+               label="%IndentAction.label"
+               retarget="true"
+               menubarPath="ts.eclipse.ide.jsdt.ui.source.menu/editGroup"
+               id="ts.eclipse.ide.jsdt.ui.actions.Indent">
+         </action>
       </actionSet>
    </extension>
    
@@ -236,6 +255,12 @@
             categoryId="ts.eclipse.ide.jsdt.ui.category.source"
             id="ts.eclipse.ide.jsdt.ui.edit.text.java.format">
       </command>
+	  <command
+            name="%ActionDefinition.indent.name"
+            description="%ActionDefinition.indent.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.source"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.indent">
+      </command>      
 <!-- search -->
       <command
             name="%ActionDefinition.referencesInProject.name"
@@ -271,6 +296,11 @@
 	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
 	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.format"
 	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	      <key
+	            sequence="M1+I"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.indent"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>	            
 <!-- search -->
 	      <key
 	            sequence="M1+M2+G"

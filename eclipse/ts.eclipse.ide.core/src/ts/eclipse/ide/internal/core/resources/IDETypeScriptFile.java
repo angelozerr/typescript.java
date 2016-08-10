@@ -31,17 +31,12 @@ import ts.resources.SynchStrategy;
 public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETypeScriptFile, IDocumentListener {
 
 	private final IResource file;
-	private final IDocument document;
+	private IDocument document;
 
 	public IDETypeScriptFile(IResource file, IDocument document, IIDETypeScriptProject tsProject) {
 		super(tsProject);
 		this.file = file;
-		if (document != null) {
-			this.document = document;
-			this.document.addDocumentListener(this);
-		} else {
-			this.document = null;
-		}
+		update(document);
 	}
 
 	@Override
@@ -97,6 +92,9 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 
 	@Override
 	public Location getLocation(int position) throws TypeScriptException {
+		if (document == null) {
+			return null;
+		}
 		try {
 			int line = document.getLineOfOffset(position);
 			int offset = position - document.getLineOffset(line);
@@ -129,5 +127,16 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	@Override
 	public IResource getResource() {
 		return file;
+	}
+
+	void update(IDocument document) {
+		if (this.document == null) {
+			if (document != null) {
+				this.document = document;
+				this.document.addDocumentListener(this);
+			} else {
+				this.document = null;
+			}
+		}
 	}
 }

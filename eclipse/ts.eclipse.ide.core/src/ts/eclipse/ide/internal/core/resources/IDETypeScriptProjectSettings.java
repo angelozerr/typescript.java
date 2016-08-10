@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 import ts.client.completions.ICompletionEntryMatcher;
+import ts.client.format.FormatOptions;
 import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
@@ -40,6 +41,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	private SaveProjectPreferencesJob savePreferencesJob;
 	private boolean updatingBuildPath;
 	private TslintSettingsStrategy tslintStrategy;
+	private FormatOptions formatOptions;
 
 	public IDETypeScriptProjectSettings(IDETypeScriptProject tsProject) {
 		super(tsProject.getProject(), TypeScriptCorePlugin.PLUGIN_ID);
@@ -126,7 +128,9 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
-		if (isNodejsPreferencesChanged(event)) {
+		if (isFormatPreferencesChanged(event)) {
+			this.formatOptions = null;
+		} else if (isNodejsPreferencesChanged(event)) {
 			getTypeScriptProject().disposeServer();
 			getTypeScriptProject().disposeCompiler();
 		} else if (isTsserverPreferencesChanged(event)) {
@@ -139,6 +143,30 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 			this.tslintStrategy = null;
 			getTypeScriptProject().disposeTslint();
 		}
+	}
+
+	private boolean isFormatPreferencesChanged(PreferenceChangeEvent event) {
+		return TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS
+						.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS
+						.equals(event.getKey());
 	}
 
 	private boolean isNodejsPreferencesChanged(PreferenceChangeEvent event) {
@@ -252,22 +280,49 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
-	public boolean isEditorOptionsConvertTabsToSpaces() {
-		return super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES,
-				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES_DEFAULT);
+	public FormatOptions getFormatOptions() {
+		if (formatOptions != null) {
+			return formatOptions;
+		}
+		formatOptions = new FormatOptions();
+		// Editor options
+		formatOptions.setConvertTabsToSpaces(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES,
+				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES_DEFAULT));
+		formatOptions.setIndentSize(
+				super.getIntegerPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE,
+						TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE_DEFAULT));
+		formatOptions
+				.setTabSize(super.getIntegerPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE,
+						TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE_DEFAULT));
+		// Format Options
+		formatOptions.setInsertSpaceAfterCommaDelimiter(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER_DEFAULT));
+		formatOptions.setInsertSpaceAfterSemicolonInForStatements(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS_DEFAULT));
+		formatOptions.setInsertSpaceBeforeAndAfterBinaryOperators(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS_DEFAULT));
+		formatOptions.setInsertSpaceAfterKeywordsInControlFlowStatements(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS_DEFAULT));
+		formatOptions.setInsertSpaceAfterFunctionKeywordForAnonymousFunctions(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS_DEFAULT));
+		formatOptions.setInsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS_DEFAULT));
+		formatOptions.setInsertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS_DEFAULT));
+		formatOptions.setPlaceOpenBraceOnNewLineForFunctions(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS_DEFAULT));
+		formatOptions.setPlaceOpenBraceOnNewLineForControlBlocks(super.getBooleanPreferencesValue(
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS,
+				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS_DEFAULT));
+		return formatOptions;
 	}
-
-	@Override
-	public int getEditorOptionsIndentSize() {
-		return super.getIntegerPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE,
-				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_INDENT_SIZE_DEFAULT);
-	}
-
-	@Override
-	public int getEditorOptionsTabSize() {
-		return super.getIntegerPreferencesValue(TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE,
-				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_TAB_SIZE_DEFAULT);
-
-	}
-
 }
