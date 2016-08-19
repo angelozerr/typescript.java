@@ -51,6 +51,13 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 		IActionBars bars = getActionBars();
 		bars.setGlobalActionHandler(TypeScriptActionConstants.FORMAT, getAction(textEditor, "Format")); //$NON-NLS-1$
 		bars.setGlobalActionHandler(TypeScriptActionConstants.INDENT, getAction(textEditor, "Indent")); //$NON-NLS-1$
+		bars.setGlobalActionHandler(TypeScriptActionConstants.COMMENT, getAction(textEditor, "Comment")); //$NON-NLS-1$
+		bars.setGlobalActionHandler(TypeScriptActionConstants.UNCOMMENT, getAction(textEditor, "Uncomment")); //$NON-NLS-1$
+		bars.setGlobalActionHandler(TypeScriptActionConstants.TOGGLE_COMMENT, getAction(textEditor, "ToggleComment")); //$NON-NLS-1$
+		bars.setGlobalActionHandler(TypeScriptActionConstants.ADD_BLOCK_COMMENT,
+				getAction(textEditor, "AddBlockComment")); //$NON-NLS-1$
+		bars.setGlobalActionHandler(TypeScriptActionConstants.REMOVE_BLOCK_COMMENT,
+				getAction(textEditor, "RemoveBlockComment")); //$NON-NLS-1$
 
 		fShowOutline.setAction(getAction(textEditor, ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE));
 

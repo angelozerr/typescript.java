@@ -160,6 +160,9 @@
                label="%SourceMenu.label"
                path="edit"
                id="ts.eclipse.ide.jsdt.ui.source.menu">
+		    <separator
+                  name="commentGroup">
+            </separator>               
             <separator
                   name="editGroup">
             </separator>
@@ -180,6 +183,47 @@
                menubarPath="ts.eclipse.ide.jsdt.ui.source.menu/editGroup"
                id="ts.eclipse.ide.jsdt.ui.actions.Indent">
          </action>
+<!-- Comment Group -->
+         <!--<action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.add.javadoc.comment"
+               label="%AddJavaDocCommentAction.label"
+               retarget="true"
+               menubarPath="ts.eclipse.ide.jsdt.ui.source.menu/commentGroup"
+               id="ts.eclipse.ide.jsdt.ui.actions.AddJavaDocComment">
+         </action>-->
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.uncomment"
+               label="%UncommentAction.label"
+               retarget="true"
+               id="ts.eclipse.ide.jsdt.ui.actions.Uncomment">
+         </action>
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.comment"
+               label="%CommentAction.label"
+               retarget="true"
+               id="ts.eclipse.ide.jsdt.ui.actions.Comment">
+         </action>
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.remove.block.comment"
+               label="%RemoveBlockCommentAction.label"
+               retarget="true"
+               menubarPath="ts.eclipse.ide.jsdt.ui.source.menu/commentGroup"
+               id="ts.eclipse.ide.jsdt.ui.actions.RemoveBlockComment">
+         </action>
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.add.block.comment"
+               label="%AddBlockCommentAction.label"
+               retarget="true"
+               menubarPath="ts.eclipse.ide.jsdt.ui.source.menu/commentGroup"
+               id="ts.eclipse.ide.jsdt.ui.actions.AddBlockComment">
+         </action>
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.toggle.comment"
+               label="%ToggleCommentAction.label"
+               retarget="true"
+               menubarPath="ts.eclipse.ide.jsdt.ui.source.menu/commentGroup"
+               id="ts.eclipse.ide.jsdt.ui.actions.ToggleComment">
+         </action>                  
       </actionSet>
    </extension>
    
@@ -260,6 +304,36 @@
             description="%ActionDefinition.indent.description"
             categoryId="ts.eclipse.ide.jsdt.ui.category.source"
             id="ts.eclipse.ide.jsdt.ui.edit.text.java.indent">
+      </command>
+      <command
+            name="%ActionDefinition.comment.name"
+            description="%ActionDefinition.comment.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.source"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.comment">
+      </command>
+      <command
+            name="%ActionDefinition.uncomment.name"
+            description="%ActionDefinition.uncomment.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.source"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.uncomment">
+      </command>
+      <command
+            name="%ActionDefinition.toggleComment.name"
+            description="%ActionDefinition.toggleComment.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.source"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.toggle.comment">
+      </command>
+            <command
+            name="%ActionDefinition.addBlockComment.name"
+            description="%ActionDefinition.addBlockComment.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.source"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.add.block.comment">
+      </command>
+      <command
+            name="%ActionDefinition.removeBlockComment.name"
+            description="%ActionDefinition.removeBlockComment.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.source"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.remove.block.comment">
       </command>      
 <!-- search -->
       <command
@@ -300,7 +374,47 @@
 	            sequence="M1+I"
 	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
 	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.indent"
-	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>	            
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	      <key
+	            sequence="M1+M2+C"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.toggle.comment"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	      <key
+	            sequence="M1+7"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.toggle.comment"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	      <key
+	            sequence="M1+/"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.toggle.comment"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	      <!-- alternative for some gtk input modes -->
+	      <key
+	            platform="gtk"
+	            sequence="ESC CTRL+C"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.toggle.comment"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	      <key
+	            sequence="M1+M2+/"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.add.block.comment"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	      <!-- free this on MAC, see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=113981 -->
+	      <key
+	            platform="carbon"
+	            sequence="M1+M2+/"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId=""
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	
+	      <key
+	            sequence="M1+M2+\"
+	            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+	            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.remove.block.comment"
+	            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>	            	            
 <!-- search -->
 	      <key
 	            sequence="M1+M2+G"

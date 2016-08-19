@@ -66,7 +66,10 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.wst.jsdt.internal.ui.IJavaHelpContextIds;
+import org.eclipse.wst.jsdt.internal.ui.actions.AddBlockCommentAction;
+import org.eclipse.wst.jsdt.internal.ui.actions.RemoveBlockCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider;
+import org.eclipse.wst.jsdt.internal.ui.javaeditor.ToggleCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
@@ -196,6 +199,27 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.FORMAT_ACTION);
 
+		action= new ToggleCommentAction(TypeScriptEditorMessages.getResourceBundle(), "ToggleComment.", this); //$NON-NLS-1$
+		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.TOGGLE_COMMENT);
+		setAction("ToggleComment", action); //$NON-NLS-1$
+		markAsStateDependentAction("ToggleComment", true); //$NON-NLS-1$
+		//PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.TOGGLE_COMMENT_ACTION);
+		configureToggleCommentAction();
+		
+		action= new AddBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "AddBlockComment.", this);  //$NON-NLS-1$
+		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.ADD_BLOCK_COMMENT);
+		setAction("AddBlockComment", action); //$NON-NLS-1$
+		markAsStateDependentAction("AddBlockComment", true); //$NON-NLS-1$
+		markAsSelectionDependentAction("AddBlockComment", true); //$NON-NLS-1$
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.ADD_BLOCK_COMMENT_ACTION);
+
+		action= new RemoveBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "RemoveBlockComment.", this);  //$NON-NLS-1$
+		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.REMOVE_BLOCK_COMMENT);
+		setAction("RemoveBlockComment", action); //$NON-NLS-1$
+		markAsStateDependentAction("RemoveBlockComment", true); //$NON-NLS-1$
+		markAsSelectionDependentAction("RemoveBlockComment", true); //$NON-NLS-1$
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.REMOVE_BLOCK_COMMENT_ACTION);
+		
 		action= new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, false); //$NON-NLS-1$
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.INDENT);
 		setAction("Indent", action); //$NON-NLS-1$
@@ -823,7 +847,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	@Override
 	protected void doSetInput(IEditorInput input) throws CoreException {
 		super.doSetInput(input);
-
+		configureToggleCommentAction();
 		// try {
 		// //IDocument document = getSourceViewer().getDocument();
 		// //setOutlinePageInput(getTypeScriptFile(document));
@@ -991,6 +1015,20 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		}
 	}
 
+	/**
+	 * Configures the toggle comment action
+	 *
+	 * 
+	 */
+	private void configureToggleCommentAction() {
+		IAction action= getAction("ToggleComment"); //$NON-NLS-1$
+		if (action instanceof ToggleCommentAction) {
+			ISourceViewer sourceViewer= getSourceViewer();
+			SourceViewerConfiguration configuration= getSourceViewerConfiguration();
+			((ToggleCommentAction)action).configure(sourceViewer, configuration);
+		}
+	}
+	
 	@Override
 	protected void installTabsToSpacesConverter() {
 		ISourceViewer sourceViewer = getSourceViewer();
