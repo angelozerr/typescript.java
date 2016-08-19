@@ -47,6 +47,9 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	public IDETypeScriptProject getTypeScriptProject(Object obj, boolean force) throws IOException {
 		if (obj instanceof IProject) {
 			IProject project = (IProject) obj;
+			if (project.getLocation() == null) {
+				return null;
+			}
 			try {
 				if (force) {
 					// Dispose TypeScript project if exists
@@ -62,7 +65,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 				return tsProject;
 			} catch (Exception ex) {
 				Trace.trace(Trace.SEVERE,
-						"Error while creating TypeScript ptoject [" + project.getName() + "]: " + ex.getMessage(), ex);
+						"Error while creating TypeScript project [" + project.getName() + "]: " + ex.getMessage(), ex);
 			}
 		}
 		return null;
