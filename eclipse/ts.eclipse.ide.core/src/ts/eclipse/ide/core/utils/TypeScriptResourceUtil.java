@@ -206,7 +206,8 @@ public class TypeScriptResourceUtil {
 		if (StringUtils.isEmpty(tsFilename)) {
 			return false;
 		}
-		return jsOrJsMapFile.getParent().exists(new Path(tsFilename));
+		return jsOrJsMapFile.getParent().exists(new Path(tsFilename))
+				|| jsOrJsMapFile.getParent().exists(new Path(tsFilename + "x"));
 	}
 
 	public static Object[] getEmittedFiles(IFile tsFile) throws CoreException {
@@ -408,7 +409,7 @@ public class TypeScriptResourceUtil {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns the file from the given {@link IDocument}.
 	 */
