@@ -15,6 +15,9 @@ import ts.utils.FileUtils;
 
 public class NodejsProcess extends AbstractNodejsProcess {
 
+	// tsserver works with UTF_8 enconding.
+	private static final String UTF_8 = "UTF-8";
+
 	private final File tsFile;
 
 	/**
@@ -71,7 +74,7 @@ public class NodejsProcess extends AbstractNodejsProcess {
 			try {
 				try {
 					notifyStartProcess(0);
-					BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8));
 					String line = null;
 					while ((line = r.readLine()) != null && process != null) {
 						notifyMessage(line);
@@ -121,7 +124,7 @@ public class NodejsProcess extends AbstractNodejsProcess {
 			builder.directory(getProjectDir());
 
 			this.process = builder.start();
-			this.out = new PrintStream(process.getOutputStream());
+			this.out = new PrintStream(process.getOutputStream(), false, UTF_8);
 
 			errThread = new Thread(new StdErr());
 			errThread.setDaemon(true);
