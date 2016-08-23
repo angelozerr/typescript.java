@@ -15,7 +15,7 @@
    <feature id="ts-nodejs.embed-feature">
       <category name="Embed Node.js"/>
    </feature>
-   <feature url="features/ts-json-feature_1.0.0.qualifier.jar" id="ts-json-feature" version="1.0.0.qualifier">
+   <feature id="ts-json-feature" >
       <category name="JSON Editors"/>
    </feature>
    <bundle id="minimal-json">

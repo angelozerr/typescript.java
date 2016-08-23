@@ -4,7 +4,7 @@ Bundle-Name: %pluginName
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-SymbolicName: ts.samples
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: ts.server.internal.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.eclipsesource.json;version="0.9.4",
