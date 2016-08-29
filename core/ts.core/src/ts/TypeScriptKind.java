@@ -24,6 +24,7 @@ public enum TypeScriptKind {
 	CLASS, /** Interface. */
 	INTERFACE, /** Module. */
 	MODULE, /** Property. */
+	SCRIPT, /** Script. */
 	PROPERTY, /** Method. */
 	METHOD, /** Constructor. */
 	CONSTRUCTOR, /** Function. */
