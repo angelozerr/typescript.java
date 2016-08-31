@@ -8,6 +8,7 @@ import org.eclipse.ui.PlatformUI;
 
 import ts.eclipse.ide.jsdt.internal.ui.ITypeScriptThemeConstants;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
+import ts.eclipse.ide.jsdt.internal.ui.text.ITypeScriptColorConstants;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.IJSXColorConstants;
 
 /**
@@ -164,6 +165,42 @@ public class PreferenceConstants {
 			+ EDITOR_ITALIC_SUFFIX;
 
 	/**
+	 * A named preference that holds the color used to render TypeScript
+	 * decorator.
+	 * 
+	 * <p>
+	 * Value is of type <code>String</code>. A RGB color value encoded as a
+	 * string using class <code>PreferenceConverter</code>
+	 * </p>
+	 * 
+	 * @see org.eclipse.jface.resource.StringConverter
+	 * @see org.eclipse.jface.preference.PreferenceConverter
+	 */
+	public final static String EDITOR_TYPESCRIPT_DECORATOR_COLOR = ITypeScriptColorConstants.DECORATOR;
+
+	/**
+	 * A named preference that controls whether TypeScript decorator are
+	 * rendered in bold.
+	 * <p>
+	 * Value is of type <code>Boolean</code>.
+	 * </p>
+	 */
+	public final static String EDITOR_TYPESCRIPT_DECORATOR_BOLD = ITypeScriptColorConstants.DECORATOR
+			+ EDITOR_BOLD_SUFFIX;
+
+	/**
+	 * A named preference that controls whether TypeScript decorator rendered in
+	 * italic.
+	 * <p>
+	 * Value is of type <code>Boolean</code>.
+	 * </p>
+	 * 
+	 * 
+	 */
+	public final static String EDITOR_TYPESCRIPT_DECORATOR_ITALIC = ITypeScriptColorConstants.DECORATOR
+			+ EDITOR_ITALIC_SUFFIX;
+
+	/**
 	 * Initializes the given preference store with the default values.
 	 * 
 	 * @param store
@@ -172,6 +209,12 @@ public class PreferenceConstants {
 	 */
 	public static void initializeDefaultValues(IPreferenceStore store) {
 		ColorRegistry registry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+
+		// JSX tag border
+		setDefaultAndFireEvent(store, PreferenceConstants.EDITOR_TYPESCRIPT_DECORATOR_COLOR,
+				findRGB(registry, ITypeScriptThemeConstants.EDITOR_TYPESCRIPT_DECORATOR_COLOR, new RGB(100, 100, 100)));
+		store.setDefault(PreferenceConstants.EDITOR_TYPESCRIPT_DECORATOR_BOLD, false);
+		store.setDefault(PreferenceConstants.EDITOR_TYPESCRIPT_DECORATOR_ITALIC, false);
 
 		// JSX tag border
 		setDefaultAndFireEvent(store, PreferenceConstants.EDITOR_JSX_TAG_BORDER_COLOR,

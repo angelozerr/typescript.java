@@ -50,6 +50,7 @@ import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptJavadocCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.format.TypeScriptContentFormatter;
+import ts.eclipse.ide.jsdt.internal.ui.text.TypeScriptCodeScanner;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.IJSXPartitions;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.JSXScanner;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
@@ -65,6 +66,12 @@ import ts.resources.ITypeScriptFile;
 public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerConfiguration {
 
 	/**
+	 * The TypeScript source code scanner.
+	 *
+	 */
+	private AbstractJavaScanner fCodeScanner;
+
+	/**
 	 * The JSX source scanner.
 	 *
 	 */
@@ -73,6 +80,7 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 	public TypeScriptSourceViewerConfiguration(IColorManager colorManager, IPreferenceStore preferenceStore,
 			ITextEditor editor, String partitioning) {
 		super(colorManager, preferenceStore, editor, partitioning);
+		fCodeScanner = new TypeScriptCodeScanner(colorManager, preferenceStore);
 		jsxScanner = new JSXScanner(colorManager, preferenceStore);
 
 	}
@@ -336,17 +344,36 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 
 	}
 
+	/**
+	 * Returns the TypeScript source code scanner for this configuration.
+	 *
+	 * @return the TypeScript source code scanner
+	 */
+	@Override
+	protected RuleBasedScanner getCodeScanner() {
+		return fCodeScanner;
+	}
+
+	/**
+	 * Returns the JSX source code scanner for this configuration.
+	 *
+	 * @return the JSX source code scanner
+	 */
 	protected RuleBasedScanner getJSXScanner() {
 		return jsxScanner;
 	}
 
 	public boolean affectsTextPresentation(final PropertyChangeEvent event) {
-		return super.affectsTextPresentation(event) || jsxScanner.affectsBehavior(event);
+		return super.affectsTextPresentation(event) || fCodeScanner.affectsBehavior(event)
+				|| jsxScanner.affectsBehavior(event);
 	}
 
 	@Override
 	public void handlePropertyChangeEvent(final PropertyChangeEvent event) {
 		super.handlePropertyChangeEvent(event);
+		if (fCodeScanner.affectsBehavior(event)) {
+			fCodeScanner.adaptToPreferenceChange(event);
+		}
 		if (jsxScanner.affectsBehavior(event)) {
 			jsxScanner.adaptToPreferenceChange(event);
 		}

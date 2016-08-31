@@ -26,6 +26,13 @@ public interface ITypeScriptThemeConstants {
 	 * A theme constant that holds the color used to render JSX tag border
 	 * constants.
 	 */
+	public final String EDITOR_TYPESCRIPT_DECORATOR_COLOR = ID_PREFIX
+			+ PreferenceConstants.EDITOR_TYPESCRIPT_DECORATOR_COLOR;
+
+	/**
+	 * A theme constant that holds the color used to render JSX tag border
+	 * constants.
+	 */
 	public final String EDITOR_JSX_TAG_BORDER_COLOR = ID_PREFIX + PreferenceConstants.EDITOR_JSX_TAG_BORDER_COLOR;
 
 	/**
@@ -47,4 +54,5 @@ public interface ITypeScriptThemeConstants {
 	 */
 	public final String EDITOR_JSX_TAG_ATTRIBUTE_VALUE_COLOR = ID_PREFIX
 			+ PreferenceConstants.EDITOR_JSX_TAG_ATTRIBUTE_VALUE_COLOR;
+
 }
