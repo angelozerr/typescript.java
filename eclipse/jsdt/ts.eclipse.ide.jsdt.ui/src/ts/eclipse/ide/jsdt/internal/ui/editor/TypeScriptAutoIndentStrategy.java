@@ -47,16 +47,15 @@ import org.eclipse.wst.jsdt.core.dom.IfStatement;
 import org.eclipse.wst.jsdt.core.dom.JavaScriptUnit;
 import org.eclipse.wst.jsdt.core.dom.Statement;
 import org.eclipse.wst.jsdt.core.dom.WhileStatement;
-import org.eclipse.wst.jsdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.wst.jsdt.internal.corext.dom.NodeFinder;
-import org.eclipse.wst.jsdt.internal.corext.util.CodeFormatterUtil;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
-import org.eclipse.wst.jsdt.internal.ui.text.FastJavaPartitionScanner;
 import org.eclipse.wst.jsdt.internal.ui.text.JavaHeuristicScanner;
 import org.eclipse.wst.jsdt.internal.ui.text.Symbols;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 
+import ts.eclipse.ide.jsdt.internal.ui.text.FastTypeScriptPartitionScanner;
+import ts.eclipse.ide.jsdt.internal.ui.text.jsx.IJSXPartitions;
 import ts.resources.ITypeScriptFile;
 
 
@@ -505,7 +504,14 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 	}
 
 	private boolean isClosed(IDocument document, int offset, int length) {
-
+		
+//		char[]c = {'{', '}'};
+//		JavaPairMatcher matcher = new JavaPairMatcher(c);
+//		IRegion r= matcher.match(document, offset, length);
+//		if (true) {
+//			return r != null;
+//		}
+		
 		CompilationUnitInfo info= getCompilationUnitForMethod(document, offset);
 		if (info == null)
 			return false;
@@ -609,9 +615,10 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 									  IJavaScriptPartitions.JAVA_STRING,
 									  IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL,
 									  IJavaScriptPartitions.JAVA_CHARACTER,
+									  IJSXPartitions.JSX,
 									  IDocument.DEFAULT_CONTENT_TYPE
 		};
-		FastPartitioner partitioner= new FastPartitioner(new FastJavaPartitionScanner(), types);
+		FastPartitioner partitioner= new FastPartitioner(new FastTypeScriptPartitionScanner(), types);
 		partitioner.connect(document);
 		document.setDocumentPartitioner(IJavaScriptPartitions.JAVA_PARTITIONING, partitioner);
 	}

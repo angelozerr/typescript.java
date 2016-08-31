@@ -75,14 +75,14 @@ public class TypeScriptNavigatorContentProvider
 	private Object[] getChildren(IResource resource) {
 		switch (resource.getType()) {
 		case IResource.PROJECT:
-			return getTypescriptResources((IProject) resource);
+			return getTypeScriptResources((IProject) resource);
 		case IResource.FILE:
 			return getEmmitedFiles((IFile) resource);
 		}
 		return null; // super.getChildren(resource);
 	}
 
-	private Object[] getTypescriptResources(IProject project) {
+	private Object[] getTypeScriptResources(IProject project) {
 		if (TypeScriptResourceUtil.isTypeScriptProject(project)) {
 			try {
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);

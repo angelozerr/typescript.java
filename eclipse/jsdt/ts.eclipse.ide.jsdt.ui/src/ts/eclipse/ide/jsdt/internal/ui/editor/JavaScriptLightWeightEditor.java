@@ -264,6 +264,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 	protected void addPreferenceStores(List stores, IEditorInput input) {
 		stores.add(JavaScriptPlugin.getDefault().getPreferenceStore());
 		stores.add(new PreferencesAdapter(JavaScriptCore.getPlugin().getPluginPreferences()));
+		stores.add(new PreferencesAdapter(JSDTTypeScriptUIPlugin.getDefault().getPluginPreferences()));
 		stores.add(EditorsUI.getPreferenceStore());
 	}
 

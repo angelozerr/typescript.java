@@ -13,8 +13,6 @@
 ###############################################################################
  -->
 <plugin>
-
-  <!-- TypeScript editor -->
 	
   <extension
          id="TypeScriptDocumentSetupParticipant"
@@ -23,10 +21,10 @@
       <participant
             contentTypeId="ts.eclipse.ide.core.tsSource"
             extensions="ts,tsx,jsx"
-            class="org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaDocumentSetupParticipant">
+            class="ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptDocumentSetupParticipant">
       </participant>
    </extension>
-
+	
    <!-- JavaScript Editor -->
    <extension
          point="org.eclipse.ui.editors">
@@ -54,13 +52,28 @@
             class="ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor"
             symbolicFontName="org.eclipse.wst.jsdt.ui.editors.textfont"
             id="ts.eclipse.ide.jsdt.ui.editor.TypeScriptEditor"
-            extensions="ts,tsx,jsx">
+            extensions="ts">
             <contentTypeBinding contentTypeId="ts.eclipse.ide.core.tsSource" /> 
-            <contentTypeBinding contentTypeId="ts.eclipse.ide.core.tsxSource" />
-            <contentTypeBinding contentTypeId="ts.eclipse.ide.core.jsxSource" />
       </editor>
    </extension>
-     	
+
+   <!-- JSX Editor -->
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="%JSXEditor.name"
+            default="true"
+            icon="$nl$/icons/full/obj16/jsx.png"
+            contributorClass="ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditorActionContributor"
+            class="ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor"
+            symbolicFontName="org.eclipse.wst.jsdt.ui.editors.textfont"
+            id="ts.eclipse.ide.jsdt.ui.editor.JSXEditor"
+            extensions="jsx,tsx">
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.core.jsxSource" />
+            <contentTypeBinding contentTypeId="ts.eclipse.ide.core.tsxSource" />
+      </editor>
+   </extension>
+        	
    <!-- dark theme defaults -->
    <extension
       point="org.eclipse.e4.ui.css.swt.theme">
@@ -82,6 +95,14 @@
 	   <javaCompletionProposalComputer
 	      class="ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProposalComputer"
 	      categoryId="ts.eclipse.ide.jsdt.ui.TypeScriptCompletionProposalCategory">
+	      <partition type="__dftl_partition_content_type"/>
+	      <partition type="__java_singleline_comment"/>
+		  <partition type="__java_multiline_comment"/>
+		  <partition type="__javascript_template_literal"/>		  
+		  <partition type="__java_string"/>
+		  <partition type="__java_character"/>
+		  <partition type="__java_javadoc"/>
+		  <partition type="__jsx"/>
 	   </javaCompletionProposalComputer>
 	 </extension>
 
@@ -496,5 +517,9 @@
          </action>
       </viewerContribution>
    </extension>
+   
+    <extension point="org.eclipse.core.runtime.preferences">
+        <initializer class="ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPreferenceInitializer"/>
+    </extension>
    
 </plugin>        

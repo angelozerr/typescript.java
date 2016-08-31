@@ -27,11 +27,17 @@ import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
+import org.eclipse.wst.jsdt.internal.ui.text.AbstractJavaScanner;
 import org.eclipse.wst.jsdt.internal.ui.text.ContentAssistPreference;
 import org.eclipse.wst.jsdt.internal.ui.text.java.ContentAssistProcessor;
 import org.eclipse.wst.jsdt.internal.ui.text.java.JavaStringAutoIndentStrategy;
@@ -44,6 +50,8 @@ import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptJavadocCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.format.TypeScriptContentFormatter;
+import ts.eclipse.ide.jsdt.internal.ui.text.jsx.IJSXPartitions;
+import ts.eclipse.ide.jsdt.internal.ui.text.jsx.JSXScanner;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.ui.outline.TypeScriptElementProvider;
 import ts.eclipse.ide.ui.outline.TypeScriptQuickOutlineDialog;
@@ -56,9 +64,25 @@ import ts.resources.ITypeScriptFile;
  */
 public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerConfiguration {
 
+	/**
+	 * The JSX source scanner.
+	 *
+	 */
+	private AbstractJavaScanner jsxScanner;
+
 	public TypeScriptSourceViewerConfiguration(IColorManager colorManager, IPreferenceStore preferenceStore,
 			ITextEditor editor, String partitioning) {
 		super(colorManager, preferenceStore, editor, partitioning);
+		jsxScanner = new JSXScanner(colorManager, preferenceStore);
+
+	}
+
+	@Override
+	public String[] getConfiguredContentTypes(final ISourceViewer sourceViewer) {
+		return new String[] { IDocument.DEFAULT_CONTENT_TYPE, IJavaScriptPartitions.JAVA_DOC,
+				IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT, IJavaScriptPartitions.JAVA_SINGLE_LINE_COMMENT,
+				IJavaScriptPartitions.JAVA_STRING, IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL,
+				IJavaScriptPartitions.JAVA_CHARACTER, IJSXPartitions.JSX };
 	}
 
 	@Override
@@ -82,12 +106,15 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 			ContentAssistProcessor stringProcessor = new TypeScriptCompletionProcessor(getEditor(), assistant,
 					IJavaScriptPartitions.JAVA_STRING);
 			assistant.setContentAssistProcessor(stringProcessor, IJavaScriptPartitions.JAVA_STRING);
-
 			assistant.setContentAssistProcessor(stringProcessor, IJavaScriptPartitions.JAVA_CHARACTER);
 
 			ContentAssistProcessor multiLineProcessor = new TypeScriptCompletionProcessor(getEditor(), assistant,
 					IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT);
 			assistant.setContentAssistProcessor(multiLineProcessor, IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT);
+
+			ContentAssistProcessor jsxProcessor = new TypeScriptCompletionProcessor(getEditor(), assistant,
+					IJSXPartitions.JSX);
+			assistant.setContentAssistProcessor(jsxProcessor, IJSXPartitions.JSX);
 
 			ContentAssistProcessor javadocProcessor = new TypeScriptJavadocCompletionProcessor(getEditor(), assistant);
 			assistant.setContentAssistProcessor(javadocProcessor, IJavaScriptPartitions.JAVA_DOC);
@@ -277,21 +304,51 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 		Arrays.fill(spaceChars, ' ');
 		return new String(spaceChars);
 	}
-	
+
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
 		String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-		if (IJavaScriptPartitions.JAVA_DOC.equals(contentType) 
-					|| IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT.equals(contentType) 
-					|| IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL.equals(contentType))
-		{
-			return new IAutoEditStrategy[]{new JavaDocAutoIndentStrategy(partitioning)};
-		}
-		else if (IJavaScriptPartitions.JAVA_STRING.equals(contentType))
-			return new IAutoEditStrategy[]{new SmartSemicolonAutoEditStrategy(partitioning), new JavaStringAutoIndentStrategy(partitioning)};
-		else if (IJavaScriptPartitions.JAVA_CHARACTER.equals(contentType) || IDocument.DEFAULT_CONTENT_TYPE.equals(contentType))
-			return new IAutoEditStrategy[]{new SmartSemicolonAutoEditStrategy(partitioning), new TypeScriptAutoIndentStrategy(partitioning, getTypeScriptFile(), sourceViewer)};
+		if (IJavaScriptPartitions.JAVA_DOC.equals(contentType)
+				|| IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT.equals(contentType)
+				|| IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL.equals(contentType)) {
+			return new IAutoEditStrategy[] { new JavaDocAutoIndentStrategy(partitioning) };
+		} else if (IJavaScriptPartitions.JAVA_STRING.equals(contentType))
+			return new IAutoEditStrategy[] { new SmartSemicolonAutoEditStrategy(partitioning),
+					new JavaStringAutoIndentStrategy(partitioning) };
+		else if (IJavaScriptPartitions.JAVA_CHARACTER.equals(contentType)
+				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType))
+			return new IAutoEditStrategy[] { new SmartSemicolonAutoEditStrategy(partitioning),
+					new TypeScriptAutoIndentStrategy(partitioning, getTypeScriptFile(), sourceViewer) };
 		else
-			return new IAutoEditStrategy[]{new TypeScriptAutoIndentStrategy(partitioning, getTypeScriptFile(), sourceViewer)};
+			return new IAutoEditStrategy[] {
+					new TypeScriptAutoIndentStrategy(partitioning, getTypeScriptFile(), sourceViewer) };
+	}
+
+	@Override
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
+
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getJSXScanner());
+		reconciler.setDamager(dr, IJSXPartitions.JSX);
+		reconciler.setRepairer(dr, IJSXPartitions.JSX);
+
+		return reconciler;
+
+	}
+
+	protected RuleBasedScanner getJSXScanner() {
+		return jsxScanner;
+	}
+
+	public boolean affectsTextPresentation(final PropertyChangeEvent event) {
+		return super.affectsTextPresentation(event) || jsxScanner.affectsBehavior(event);
+	}
+
+	@Override
+	public void handlePropertyChangeEvent(final PropertyChangeEvent event) {
+		super.handlePropertyChangeEvent(event);
+		if (jsxScanner.affectsBehavior(event)) {
+			jsxScanner.adaptToPreferenceChange(event);
+		}
 	}
 }

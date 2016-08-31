@@ -73,7 +73,6 @@ import org.eclipse.wst.jsdt.internal.ui.javaeditor.ToggleCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
-import org.eclipse.wst.jsdt.ui.actions.IJavaEditorActionDefinitionIds;
 
 import ts.TypeScriptException;
 import ts.client.ICancellationToken;
