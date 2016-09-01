@@ -42,6 +42,15 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 	private IDocument document;
 	private ProjectionViewer viewer;
 	private ProjectionAnnotationModel projectionAnnotationModel;
+	private final String lineStartsWithKeyword;
+
+	public IndentFoldingStrategy() {
+		this(null);
+	}
+
+	public IndentFoldingStrategy(String lineStartsWithKeyword) {
+		this.lineStartsWithKeyword = lineStartsWithKeyword;
+	}
 
 	/**
 	 * A FoldingAnnotation is a ProjectionAnnotation it is folding and
@@ -174,19 +183,8 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 
 	@Override
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion) {
-		//long start = System.currentTimeMillis();
+		// long start = System.currentTimeMillis();
 		if (projectionAnnotationModel != null) {
-			// try {
-			// model =
-			// StructuredModelManager.getModelManager().getExistingModelForRead(getDocument());
-			// if(model != null) {
-			// //use the structured doc to get all of the regions effected by
-			// the given dirty region
-			// IStructuredDocument structDoc = model.getStructuredDocument();
-			// IStructuredDocumentRegion[] structRegions =
-			// structDoc.getStructuredDocumentRegions(dirtyRegion.getOffset(),
-			// dirtyRegion.getLength());
-			// Set indexedRegions = getIndexedRegions(model, structRegions);
 
 			// these are what are passed off to the annotation model to
 			// actually create and maintain the annotations
@@ -214,53 +212,66 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 				// int length = dirtyRegion.getLength();
 				// int startLine = 0; //document.getLineOfOffset(offset);
 				int endLine = document.getNumberOfLines() - 1; // startLine +
-															// document.getNumberOfLines(offset,
-															// length) - 1;
+																// document.getNumberOfLines(offset,
+																// length) - 1;
 
 				// sentinel, to make sure there's at least one entry
 				previousRegions.add(new LineIndent(endLine, -1));
 
-				for (int line = endLine; line >= 0; line--) {
+				int lineEmptyCount = 0;
+				Integer lastLineForKeyword = null;
+				int line = endLine;
+				for (line = endLine; line >= 0; line--) {
 					int lineOffset = document.getLineOffset(line);
 					String delim = document.getLineDelimiter(line);
 					int lineLength = document.getLineLength(line) - (delim != null ? delim.length() : 0);
 					String lineContent = document.get(lineOffset, lineLength);
 
-					int indent = computeIndentLevel(lineContent, tabSize);
-					if (indent == -1) {
-						continue; // only whitespace
-					}
+					LineState state = getLineState(lineContent, lastLineForKeyword);
+					switch (state) {
+					case StartWithKeyWord:
+						lineEmptyCount = 1;
+						if (lastLineForKeyword == null) {
+							lastLineForKeyword = line;
+						}
+						break;
+					case EmptyLine:
+						lineEmptyCount++;
+						break;
+					default:
+						addAnnotationForKeyword(modifications, deletions, existing, additions, lineEmptyCount,
+								lastLineForKeyword, line);
+						lastLineForKeyword = null;
+						lineEmptyCount = 0;
+						int indent = computeIndentLevel(lineContent, tabSize);
+						if (indent == -1) {
+							continue; // only whitespace
+						}
 
-					LineIndent previous = previousRegions.get(previousRegions.size() - 1);
-					if (previous.indent > indent) {
-						// discard all regions with larger indent
-						do {
-							previousRegions.remove(previousRegions.size() - 1);
-							previous = previousRegions.get(previousRegions.size() - 1);
-						} while (previous.indent > indent);
+						LineIndent previous = previousRegions.get(previousRegions.size() - 1);
+						if (previous.indent > indent) {
+							// discard all regions with larger indent
+							do {
+								previousRegions.remove(previousRegions.size() - 1);
+								previous = previousRegions.get(previousRegions.size() - 1);
+							} while (previous.indent > indent);
 
-						// new folding range
-						int endLineNumber = previous.line - 1;
-						if (endLineNumber - line >= minimumRangeSize) {
-							int startOffset = document.getLineOffset(line);
-							int endOffset = document.getLineOffset(endLineNumber + 1);
-							Position newPos = new Position(startOffset, endOffset - startOffset);
-							if (existing.size() > 0) {
-								FoldingAnnotation existingAnnotation = existing.remove(existing.size() - 1);
-								updateAnnotations(existingAnnotation, newPos, additions, modifications, deletions);
-							} else {
-								additions.put(new FoldingAnnotation(false), newPos);
+							// new folding range
+							int endLineNumber = previous.line - 1;
+							if (endLineNumber - line >= minimumRangeSize) {
+								updateAnnotation(modifications, deletions, existing, additions, line, endLineNumber);
 							}
-
+						}
+						if (previous.indent == indent) {
+							previous.line = line;
+						} else { // previous.indent < indent
+							// new region with a bigger indent
+							previousRegions.add(new LineIndent(line, indent));
 						}
 					}
-					if (previous.indent == indent) {
-						previous.line = line;
-					} else { // previous.indent < indent
-						// new region with a bigger indent
-						previousRegions.add(new LineIndent(line, indent));
-					}
 				}
+				addAnnotationForKeyword(modifications, deletions, existing, additions, lineEmptyCount,
+						lastLineForKeyword, line);
 			} catch (BadLocationException e) {
 				// should never done
 				e.printStackTrace();
@@ -294,8 +305,8 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 			 * deletions.add(annotation); } } }
 			 */
 
-			//long end = System.currentTimeMillis();
-			//System.err.println((end - start) + "ms");
+			// long end = System.currentTimeMillis();
+			// System.err.println((end - start) + "ms");
 
 			// be sure projection has not been disabled
 			if (projectionAnnotationModel != null) {
@@ -308,8 +319,60 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 						additions, (Annotation[]) modifications.toArray(new Annotation[0]));
 			}
 
-			//end = System.currentTimeMillis();
-			//System.err.println((end - start) + "ms");
+			// end = System.currentTimeMillis();
+			// System.err.println((end - start) + "ms");
+		}
+	}
+
+	private void addAnnotationForKeyword(List<Annotation> modifications, List<FoldingAnnotation> deletions,
+			List<FoldingAnnotation> existing, Map<Annotation, Position> additions, int previousLineIsEmpty,
+			Integer lastLineForKeyword, int line) throws BadLocationException {
+		if (lastLineForKeyword != null) {
+			updateAnnotation(modifications, deletions, existing, additions, line + previousLineIsEmpty,
+					lastLineForKeyword);
+		}
+	}
+
+	private enum LineState {
+		StartWithKeyWord, DontStartWithKeyWord, EmptyLine
+	}
+
+	/**
+	 * Returns the line state for line which starts with a given keyword.
+	 * 
+	 * @param lineContent
+	 *            line content.
+	 * @param lastLineForKeyword
+	 *            last line for the given keyword.
+	 * @return
+	 */
+	private LineState getLineState(String lineContent, Integer lastLineForKeyword) {
+		if (lineStartsWithKeyword == null) {
+			// none keyword defined.
+			return LineState.DontStartWithKeyWord;
+		}
+		if (lineContent != null && lineContent.trim().startsWith(lineStartsWithKeyword)) {
+			// The line starts with the given keyword (ex: starts with "import")
+			return LineState.StartWithKeyWord;
+		}
+		if (lastLineForKeyword != null && (lineContent == null || lineContent.trim().length() == 0)) {
+			// a last line for keyword was defined, line is empty
+			return LineState.EmptyLine;
+		}
+		return LineState.DontStartWithKeyWord;
+	}
+
+	private void updateAnnotation(List<Annotation> modifications, List<FoldingAnnotation> deletions,
+			List<FoldingAnnotation> existing, Map<Annotation, Position> additions, int line, int endLineNumber)
+			throws BadLocationException {
+		int startOffset = document.getLineOffset(line);
+		int endOffset = document.getLineOffset(endLineNumber + 1);
+		Position newPos = new Position(startOffset, endOffset - startOffset);
+		if (existing.size() > 0) {
+			FoldingAnnotation existingAnnotation = existing.remove(existing.size() - 1);
+			updateAnnotations(existingAnnotation, newPos, additions, modifications, deletions);
+		} else {
+			additions.put(new FoldingAnnotation(false), newPos);
 		}
 	}
 

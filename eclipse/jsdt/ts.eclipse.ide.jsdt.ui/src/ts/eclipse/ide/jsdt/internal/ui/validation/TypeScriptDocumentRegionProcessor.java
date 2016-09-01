@@ -20,6 +20,7 @@ import org.eclipse.wst.sse.ui.internal.reconcile.DocumentRegionProcessor;
 import org.eclipse.wst.sse.ui.internal.reconcile.validator.ValidatorStrategy;
 
 import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
+import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptFoldingStrategy;
 import ts.eclipse.ide.ui.folding.IndentFoldingStrategy;
 import ts.utils.FileUtils;
 
@@ -88,7 +89,7 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 			return super.getFoldingStrategy();
 		}
 		if (foldingStrategy == null) {
-			foldingStrategy = new IndentFoldingStrategy();
+			foldingStrategy = new TypeScriptFoldingStrategy();
 			foldingStrategy.setViewer((ProjectionViewer) getTextViewer());
 			foldingStrategy.setDocument(getDocument());
 		}
