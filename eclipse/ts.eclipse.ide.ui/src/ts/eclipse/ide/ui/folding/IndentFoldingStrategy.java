@@ -218,6 +218,7 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 				// sentinel, to make sure there's at least one entry
 				previousRegions.add(new LineIndent(endLine, -1));
 
+				int lastLineWhichIsNotEmpty = 0;
 				int lineEmptyCount = 0;
 				Integer lastLineForKeyword = null;
 				int line = endLine;
@@ -230,7 +231,8 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 					LineState state = getLineState(lineContent, lastLineForKeyword);
 					switch (state) {
 					case StartWithKeyWord:
-						lineEmptyCount = 1;
+						lineEmptyCount = 0;
+						lastLineWhichIsNotEmpty = line;
 						if (lastLineForKeyword == null) {
 							lastLineForKeyword = line;
 						}
@@ -239,10 +241,11 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 						lineEmptyCount++;
 						break;
 					default:
-						addAnnotationForKeyword(modifications, deletions, existing, additions, lineEmptyCount,
-								lastLineForKeyword, line);
+						addAnnotationForKeyword(modifications, deletions, existing, additions,
+								line + 1 + lineEmptyCount, lastLineForKeyword);
 						lastLineForKeyword = null;
 						lineEmptyCount = 0;
+						lastLineWhichIsNotEmpty = line;
 						int indent = computeIndentLevel(lineContent, tabSize);
 						if (indent == -1) {
 							continue; // only whitespace
@@ -270,8 +273,8 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 						}
 					}
 				}
-				addAnnotationForKeyword(modifications, deletions, existing, additions, lineEmptyCount,
-						lastLineForKeyword, line);
+				addAnnotationForKeyword(modifications, deletions, existing, additions, lastLineWhichIsNotEmpty,
+						lastLineForKeyword);
 			} catch (BadLocationException e) {
 				// should never done
 				e.printStackTrace();
@@ -325,11 +328,10 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 	}
 
 	private void addAnnotationForKeyword(List<Annotation> modifications, List<FoldingAnnotation> deletions,
-			List<FoldingAnnotation> existing, Map<Annotation, Position> additions, int previousLineIsEmpty,
-			Integer lastLineForKeyword, int line) throws BadLocationException {
+			List<FoldingAnnotation> existing, Map<Annotation, Position> additions, int startLine,
+			Integer lastLineForKeyword) throws BadLocationException {
 		if (lastLineForKeyword != null) {
-			updateAnnotation(modifications, deletions, existing, additions, line + previousLineIsEmpty,
-					lastLineForKeyword);
+			updateAnnotation(modifications, deletions, existing, additions, startLine, lastLineForKeyword);
 		}
 	}
 
@@ -366,7 +368,7 @@ public class IndentFoldingStrategy implements IReconcilingStrategy, IProjectionL
 			List<FoldingAnnotation> existing, Map<Annotation, Position> additions, int line, int endLineNumber)
 			throws BadLocationException {
 		int startOffset = document.getLineOffset(line);
-		int endOffset = document.getLineOffset(endLineNumber + 1);
+		int endOffset = document.getLineOffset(endLineNumber) + document.getLineLength(endLineNumber);
 		Position newPos = new Position(startOffset, endOffset - startOffset);
 		if (existing.size() > 0) {
 			FoldingAnnotation existingAnnotation = existing.remove(existing.size() - 1);
