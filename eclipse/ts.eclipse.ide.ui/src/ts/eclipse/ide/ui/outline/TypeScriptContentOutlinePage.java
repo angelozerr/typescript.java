@@ -1,8 +1,21 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.ui.outline;
 
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -11,24 +24,37 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.ui.views.navigator.ToggleLinkingAction;
 
 import ts.client.navbar.NavigationBarItem;
+import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.resources.INavbarListener;
 import ts.resources.ITypeScriptFile;
 
-public class TypeScriptContentOutlinePage extends Page implements IContentOutlinePage, INavbarListener {
+/**
+ * TypeScript Outline.
+ *
+ */
+public class TypeScriptContentOutlinePage extends Page
+		implements IContentOutlinePage, IPostSelectionProvider, INavbarListener {
 
 	private static final String OUTLINE_COMMON_NAVIGATOR_ID = TypeScriptUIPlugin.PLUGIN_ID + ".outline"; //$NON-NLS-1$
+
+	private static final String EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE = "TypeScriptEditor.SyncOutlineOnCursorMove"; //$NON-NLS-1$
 
 	private CommonViewer fOutlineViewer;
 	private ITypeScriptFile tsFile;
 
 	private ListenerList fSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
 	private ListenerList fPostSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
+
+	private ToggleLinkingAction fToggleLinkingAction;
 
 	public TypeScriptContentOutlinePage() {
 	}
@@ -55,6 +81,10 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 		}
 
 		fOutlineViewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
+		fOutlineViewer.setUseHashlookup(true);
+
+		IActionBars actionBars = getSite().getActionBars();
+		registerToolbarActions(actionBars);
 
 	}
 
@@ -94,10 +124,7 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 		}
 	}
 
-	/*
-	 * @see
-	 * ISelectionProvider#addSelectionChangedListener(ISelectionChangedListener)
-	 */
+	@Override
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		if (fOutlineViewer != null)
 			fOutlineViewer.addSelectionChangedListener(listener);
@@ -105,10 +132,7 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 			fSelectionChangedListeners.add(listener);
 	}
 
-	/*
-	 * @see ISelectionProvider#removeSelectionChangedListener(
-	 * ISelectionChangedListener)
-	 */
+	@Override
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		if (fOutlineViewer != null)
 			fOutlineViewer.removeSelectionChangedListener(listener);
@@ -116,28 +140,20 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 			fSelectionChangedListeners.remove(listener);
 	}
 
-	/*
-	 * @see ISelectionProvider#setSelection(ISelection)
-	 */
+	@Override
 	public void setSelection(ISelection selection) {
 		if (fOutlineViewer != null)
 			fOutlineViewer.setSelection(selection);
 	}
 
-	/*
-	 * @see ISelectionProvider#getSelection()
-	 */
+	@Override
 	public ISelection getSelection() {
 		if (fOutlineViewer == null)
 			return StructuredSelection.EMPTY;
 		return fOutlineViewer.getSelection();
 	}
 
-	/*
-	 * @see org.eclipse.jface.text.IPostSelectionProvider#
-	 * addPostSelectionChangedListener(org.eclipse.jface.viewers.
-	 * ISelectionChangedListener)
-	 */
+	@Override
 	public void addPostSelectionChangedListener(ISelectionChangedListener listener) {
 		if (fOutlineViewer != null)
 			fOutlineViewer.addPostSelectionChangedListener(listener);
@@ -145,11 +161,7 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 			fPostSelectionChangedListeners.add(listener);
 	}
 
-	/*
-	 * @see org.eclipse.jface.text.IPostSelectionProvider#
-	 * removePostSelectionChangedListener(org.eclipse.jface.viewers.
-	 * ISelectionChangedListener)
-	 */
+	@Override
 	public void removePostSelectionChangedListener(ISelectionChangedListener listener) {
 		if (fOutlineViewer != null)
 			fOutlineViewer.removePostSelectionChangedListener(listener);
@@ -167,6 +179,40 @@ public class TypeScriptContentOutlinePage extends Page implements IContentOutlin
 		fPostSelectionChangedListeners.clear();
 		fPostSelectionChangedListeners = null;
 
+	}
+
+	/**
+	 * Register toolbar actions.
+	 * 
+	 * @param actionBars
+	 */
+	private void registerToolbarActions(IActionBars actionBars) {
+		IToolBarManager toolBarManager = actionBars.getToolBarManager();
+		toolBarManager.add(new CollapseAllAction(this.fOutlineViewer));
+	}
+
+	/**
+	 * Collapse all action
+	 *
+	 */
+	private class CollapseAllAction extends Action {
+
+		private final TreeViewer viewer;
+
+		CollapseAllAction(TreeViewer viewer) {
+			super(TypeScriptUIMessages.TypeScriptContentOutlinePage_CollapseAllAction_label);
+			setDescription(TypeScriptUIMessages.TypeScriptContentOutlinePage_CollapseAllAction_description);
+			setToolTipText(TypeScriptUIMessages.TypeScriptContentOutlinePage_CollapseAllAction_tooltip);
+			super.setImageDescriptor(
+					TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_COLLAPSE_ALL_ENABLED));
+			super.setDisabledImageDescriptor(
+					TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_COLLAPSE_ALL_DISABLED));
+			this.viewer = viewer;
+		}
+
+		public void run() {
+			this.viewer.collapseAll();
+		}
 	}
 
 }

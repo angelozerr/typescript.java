@@ -44,7 +44,7 @@ public class TypeScriptUIImageResource {
 	private static final String URL_ELCL = "full/elcl16/";
 	private static final String URL_OBJ = "full/obj16/";
 	private static final String URL_OVR = "full/ovr16/";
-	
+
 	// General Object Images
 	public static final String IMG_LOGO = "logo";
 	public static final String IMG_TYPESCRIPT_RESOURCES = "tsresources_obj";
@@ -52,14 +52,15 @@ public class TypeScriptUIImageResource {
 	// Enabled/Disbaled
 	public static final String IMG_STOP_ENABLED = "stop_enabled";
 	public static final String IMG_STOP_DISABLED = "stop_disabled";
+	public static final String IMG_COLLAPSE_ALL_ENABLED = "collapseall_enabled";
+	public static final String IMG_COLLAPSE_ALL_DISABLED = "collapseall_disabled";
 
 	public static final String DESC_OVR_LIBRARY = "ovr_library";
-	
+
 	private static Map<ImageDescriptor, URL> fURLMap;
 	private static final File fTempDir;
+
 	private static int fImageCount;
-
-
 
 	static {
 		try {
@@ -150,7 +151,9 @@ public class TypeScriptUIImageResource {
 
 		registerImage(IMG_STOP_ENABLED, URL_ELCL + "launch_stop.gif");
 		registerImage(IMG_STOP_DISABLED, URL_DLCL + "launch_stop.gif");
-		
+		registerImage(IMG_COLLAPSE_ALL_ENABLED, URL_ELCL + "collapseall.gif");
+		registerImage(IMG_COLLAPSE_ALL_DISABLED, URL_DLCL + "collapseall.gif");
+
 		registerImage(DESC_OVR_LIBRARY, URL_OVR + "library_ovr.gif");
 	}
 

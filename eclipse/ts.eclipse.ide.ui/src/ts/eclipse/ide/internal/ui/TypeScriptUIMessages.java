@@ -115,6 +115,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptBuilder_enable_Error_message;
 	public static String TypeScriptBuilder_disable_Error_message;
 
+	// Outline
+	public static String TypeScriptContentOutlinePage_CollapseAllAction_label;
+	public static String TypeScriptContentOutlinePage_CollapseAllAction_description;
+	public static String TypeScriptContentOutlinePage_CollapseAllAction_tooltip;
 
 	public static ResourceBundle getResourceBundle() {
 		try {
