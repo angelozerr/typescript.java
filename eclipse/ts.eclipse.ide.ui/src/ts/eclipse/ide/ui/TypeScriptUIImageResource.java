@@ -54,6 +54,8 @@ public class TypeScriptUIImageResource {
 	public static final String IMG_STOP_DISABLED = "stop_disabled";
 	public static final String IMG_COLLAPSE_ALL_ENABLED = "collapseall_enabled";
 	public static final String IMG_COLLAPSE_ALL_DISABLED = "collapseall_disabled";
+	public static final String IMG_ALPHAB_SORT_CO_ENABLED = "alphab_sort_co_enabled";
+	public static final String IMG_ALPHAB_SORT_CO_DISABLED = "alphab_sort_co_disabled";
 
 	public static final String DESC_OVR_LIBRARY = "ovr_library";
 
@@ -153,6 +155,8 @@ public class TypeScriptUIImageResource {
 		registerImage(IMG_STOP_DISABLED, URL_DLCL + "launch_stop.gif");
 		registerImage(IMG_COLLAPSE_ALL_ENABLED, URL_ELCL + "collapseall.gif");
 		registerImage(IMG_COLLAPSE_ALL_DISABLED, URL_DLCL + "collapseall.gif");
+		registerImage(IMG_ALPHAB_SORT_CO_ENABLED, URL_ELCL + "alphab_sort_co.gif");
+		registerImage(IMG_ALPHAB_SORT_CO_DISABLED, URL_DLCL + "alphab_sort_co.gif");
 
 		registerImage(DESC_OVR_LIBRARY, URL_OVR + "library_ovr.gif");
 	}

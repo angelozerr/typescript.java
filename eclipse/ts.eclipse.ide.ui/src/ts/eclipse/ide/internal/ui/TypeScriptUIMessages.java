@@ -119,6 +119,9 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptContentOutlinePage_CollapseAllAction_label;
 	public static String TypeScriptContentOutlinePage_CollapseAllAction_description;
 	public static String TypeScriptContentOutlinePage_CollapseAllAction_tooltip;
+	public static String TypeScriptContentOutlinePage_LexicalSortingAction_label;
+	public static String TypeScriptContentOutlinePage_LexicalSortingAction_description;
+	public static String TypeScriptContentOutlinePage_LexicalSortingAction_tooltip;
 
 	public static ResourceBundle getResourceBundle() {
 		try {
