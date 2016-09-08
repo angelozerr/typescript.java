@@ -54,7 +54,9 @@ public class TypeScriptUIImageResource {
 	public static final String IMG_STOP_DISABLED = "stop_disabled";
 	public static final String IMG_COLLAPSE_ALL_ENABLED = "collapseall_enabled";
 	public static final String IMG_COLLAPSE_ALL_DISABLED = "collapseall_disabled";
-
+	public static final String IMG_SYNCED_ENABLED = "synced_enabled";
+	public static final String IMG_SYNCED_DISABLED = "synced_disabled";
+	
 	public static final String DESC_OVR_LIBRARY = "ovr_library";
 
 	private static Map<ImageDescriptor, URL> fURLMap;
@@ -153,6 +155,8 @@ public class TypeScriptUIImageResource {
 		registerImage(IMG_STOP_DISABLED, URL_DLCL + "launch_stop.gif");
 		registerImage(IMG_COLLAPSE_ALL_ENABLED, URL_ELCL + "collapseall.gif");
 		registerImage(IMG_COLLAPSE_ALL_DISABLED, URL_DLCL + "collapseall.gif");
+		registerImage(IMG_SYNCED_ENABLED, URL_ELCL + "synced.gif");
+		registerImage(IMG_SYNCED_DISABLED, URL_DLCL + "synced.gif");
 
 		registerImage(DESC_OVR_LIBRARY, URL_OVR + "library_ovr.gif");
 	}

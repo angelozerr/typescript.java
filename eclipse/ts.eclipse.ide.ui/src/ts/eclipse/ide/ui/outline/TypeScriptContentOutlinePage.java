@@ -14,7 +14,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -44,7 +46,8 @@ public class TypeScriptContentOutlinePage extends Page
 		implements IContentOutlinePage, IPostSelectionProvider, INavbarListener {
 
 	private static final String OUTLINE_COMMON_NAVIGATOR_ID = TypeScriptUIPlugin.PLUGIN_ID + ".outline"; //$NON-NLS-1$
-
+	private static final String EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE = "TypeScriptEditor.SyncOutlineOnCursorMove"; //$NON-NLS-1$
+	
 	private CommonViewer fOutlineViewer;
 	private ITypeScriptFile tsFile;
 
@@ -182,8 +185,15 @@ public class TypeScriptContentOutlinePage extends Page
 	 * @param actionBars
 	 */
 	private void registerToolbarActions(IActionBars actionBars) {
+		// Toolbar
 		IToolBarManager toolBarManager = actionBars.getToolBarManager();
 		toolBarManager.add(new CollapseAllAction(this.fOutlineViewer));
+
+		// Menu
+		IMenuManager viewMenuManager = actionBars.getMenuManager();
+		viewMenuManager.add(new Separator("EndFilterGroup")); //$NON-NLS-1$
+		viewMenuManager.add(new ToggleLinkingAction());
+
 	}
 
 	/**
@@ -209,5 +219,34 @@ public class TypeScriptContentOutlinePage extends Page
 			this.viewer.collapseAll();
 		}
 	}
+
+	/**
+	 * Link with editor.
+	 *
+	 */
+	private class ToggleLinkingAction extends Action {
+		public ToggleLinkingAction() {
+			super(TypeScriptUIMessages.TypeScriptContentOutlinePage_ToggleLinkingAction_label);
+			setDescription(TypeScriptUIMessages.TypeScriptContentOutlinePage_ToggleLinkingAction_description);
+			setToolTipText(TypeScriptUIMessages.TypeScriptContentOutlinePage_ToggleLinkingAction_tooltip);
+			super.setImageDescriptor(
+					TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_SYNCED_ENABLED));
+			super.setDisabledImageDescriptor(
+					TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_SYNCED_DISABLED));
+			boolean isLinkingEnabled = TypeScriptUIPlugin.getDefault().getPreferenceStore()
+					.getBoolean(EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE);
+			setChecked(isLinkingEnabled);
+		}
+
+		@Override
+		public void run() {
+			TypeScriptUIPlugin.getDefault().getPreferenceStore().setValue(EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE,
+					isChecked());
+			// TODO
+			//if (isChecked() && fEditor != null)
+			//	fEditor.synchronizeOutlinePage(fEditor.computeHighlightRangeSourceReference(), false);
+		}
+	}
+
 
 }
