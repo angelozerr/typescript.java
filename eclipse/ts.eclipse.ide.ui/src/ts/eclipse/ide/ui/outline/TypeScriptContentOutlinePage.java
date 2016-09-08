@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IActionBars;
@@ -184,46 +183,7 @@ public class TypeScriptContentOutlinePage extends Page
 	 */
 	private void registerToolbarActions(IActionBars actionBars) {
 		IToolBarManager toolBarManager = actionBars.getToolBarManager();
-		toolBarManager.add(new LexicalSortingAction());
 		toolBarManager.add(new CollapseAllAction(this.fOutlineViewer));
-	}
-
-	/**
-	 * Sort action
-	 *
-	 */
-	class LexicalSortingAction extends Action {
-
-		public LexicalSortingAction() {
-			super(TypeScriptUIMessages.TypeScriptContentOutlinePage_LexicalSortingAction_label);
-			setDescription(TypeScriptUIMessages.TypeScriptContentOutlinePage_LexicalSortingAction_description);
-			setToolTipText(TypeScriptUIMessages.TypeScriptContentOutlinePage_LexicalSortingAction_tooltip);
-			super.setImageDescriptor(
-					TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_ALPHAB_SORT_CO_ENABLED));
-			super.setDisabledImageDescriptor(TypeScriptUIImageResource
-					.getImageDescriptor(TypeScriptUIImageResource.IMG_ALPHAB_SORT_CO_DISABLED));
-			boolean checked = TypeScriptUIPlugin.getDefault().getPreferenceStore()
-					.getBoolean("LexicalSortingAction.isChecked");
-			// $NON-NLS-1$
-			valueChanged(checked, false);
-		}
-
-		public void run() {
-			valueChanged(isChecked(), true);
-		}
-
-		private void valueChanged(final boolean on, boolean store) {
-			setChecked(on);
-			BusyIndicator.showWhile(fOutlineViewer.getControl().getDisplay(), new Runnable() {
-				public void run() {
-					// TODO
-				}
-			});
-
-			if (store) {
-				TypeScriptUIPlugin.getDefault().getPreferenceStore().setValue("LexicalSortingAction.isChecked", on); // $NON-NLS-1$
-			}
-		}
 	}
 
 	/**
