@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import ts.eclipse.ide.jsdt.ui.PreferenceConstants;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
 
 /**
  * Preferences initializer for JSX.
@@ -25,6 +27,10 @@ public class JSDTTypeScriptUIPreferenceInitializer extends AbstractPreferenceIni
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = PreferenceConstants.getPreferenceStore();
 		PreferenceConstants.initializeDefaultValues(store);
+
+		// Link Editor with Outline
+		TypeScriptUIPlugin.getDefault().getPreferenceStore()
+				.setValue(TypeScriptContentOutlinePage.EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE, true);
 	}
 
 }

@@ -294,8 +294,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// ----------------- Navbar
 
 	@Override
-	public void navbar(String fileName, ITypeScriptNavBarCollector collector) throws TypeScriptException {
-		NavBarRequest request = new NavBarRequest(fileName, collector);
+	public void navbar(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector) throws TypeScriptException {
+		NavBarRequest request = new NavBarRequest(fileName, positionProvider, collector);
 		execute(request);
 	}
 

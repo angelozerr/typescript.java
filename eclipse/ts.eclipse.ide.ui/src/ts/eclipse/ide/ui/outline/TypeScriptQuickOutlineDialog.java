@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.internal.ide.StringMatcher;
 
 import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.INavbarListener;
@@ -671,13 +672,13 @@ public class TypeScriptQuickOutlineDialog extends PopupDialog implements IInform
 	}
 
 	@Override
-	public void navBarChanged(final List<NavigationBarItem> items) {
+	public void navBarChanged(final NavigationBarItemRoot navbar) {
 		if (treeViewer != null) {
 			treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 
 				@Override
 				public void run() {
-					treeViewer.setInput(items);
+					treeViewer.setInput(navbar);
 				}
 			});
 		}

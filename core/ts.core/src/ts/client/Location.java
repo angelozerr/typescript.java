@@ -10,23 +10,39 @@
  */
 package ts.client;
 
+import ts.TypeScriptException;
+
 /**
  * Bean for location line/offset used by tsserver.
  *
  */
 public class Location {
 
+	private static final int NO_POSITION = -1;
+
+	private final IPositionProvider positionProvider;
 	private int line;
 	private int offset;
-	private int position = -1;
+	private int position;
+
+	public Location(IPositionProvider positionProvider) {
+		this.positionProvider = positionProvider;
+		this.position = NO_POSITION;
+	}
 
 	public Location() {
+		this(null);
+	}
 
+	public Location(int line, int offset, int position) {
+		this();
+		this.line = line;
+		this.offset = offset;
+		this.position = position;
 	}
 
 	public Location(int line, int offset) {
-		this.line = line;
-		this.offset = offset;
+		this(line, offset, NO_POSITION);
 	}
 
 	/**
@@ -48,6 +64,13 @@ public class Location {
 	}
 
 	public int getPosition() {
+		if (position == NO_POSITION && positionProvider != null) {
+			try {
+				position = positionProvider.getPosition(line, offset);
+			} catch (TypeScriptException e) {
+				e.printStackTrace();
+			}
+		}
 		return position;
 	}
 

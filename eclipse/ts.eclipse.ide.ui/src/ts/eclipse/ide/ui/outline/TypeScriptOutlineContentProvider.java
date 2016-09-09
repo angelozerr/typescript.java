@@ -16,24 +16,14 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
+import ts.client.navbar.TextSpan;
 
 /**
  * TypeScript outline content provider.
  *
  */
 public class TypeScriptOutlineContentProvider implements ITreeContentProvider {
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void inputChanged(Viewer arg0, Object arg1, Object arg2) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public Object[] getChildren(Object element) {
@@ -45,23 +35,26 @@ public class TypeScriptOutlineContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object element) {
+		if (element instanceof NavigationBarItemRoot) {
+			return getChildren(element);
+		}
 		if (element instanceof List<?>) {
 			return ((List<?>) element).toArray();
-//			try {
-//				long start = System.currentTimeMillis();
-//				Object[]  o =  ((ITypeScriptFile) element).getNavBar().toArray();
-//				System.err.println(System.currentTimeMillis() - start);
-//				return o;
-//			} catch (TypeScriptException e) {
-//				e.printStackTrace();
-//			}
 		}
 		return null;
 	}
 
 	@Override
-	public Object getParent(Object arg0) {
-		// TODO Auto-generated method stub
+	public Object getParent(Object element) {
+		if (element instanceof NavigationBarItemRoot) {
+			return null;
+		}
+		if (element instanceof NavigationBarItem) {
+			return ((NavigationBarItem) element).getParent();
+		}
+		if (element instanceof TextSpan) {
+			return ((TextSpan) element).getParent();
+		}
 		return null;
 	}
 
@@ -73,4 +66,11 @@ public class TypeScriptOutlineContentProvider implements ITreeContentProvider {
 		return false;
 	}
 
+	@Override
+	public void dispose() {
+	}
+
+	@Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	}
 }

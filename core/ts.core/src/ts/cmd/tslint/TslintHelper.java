@@ -129,9 +129,7 @@ public class TslintHelper {
 			return null;
 		}
 		JsonObject loc = value.asObject();
-		Location location = new Location(loc.getInt("line", -1), loc.getInt("character", -1));
-		location.setPosition(loc.getInt("position", -1));
-		return location;
+		return new Location(loc.getInt("line", -1), loc.getInt("character", -1), loc.getInt("position", -1));
 	}
 
 }

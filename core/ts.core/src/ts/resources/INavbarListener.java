@@ -1,10 +1,8 @@
 package ts.resources;
 
-import java.util.List;
-
-import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
 
 public interface INavbarListener {
 
-	void navBarChanged(List<NavigationBarItem> items);
+	void navBarChanged(NavigationBarItemRoot navbar);
 }

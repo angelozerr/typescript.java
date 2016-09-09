@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.ui.outline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -17,10 +18,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -31,7 +34,10 @@ import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+import ts.TypeScriptException;
 import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
+import ts.client.navbar.TextSpan;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -46,15 +52,19 @@ public class TypeScriptContentOutlinePage extends Page
 		implements IContentOutlinePage, IPostSelectionProvider, INavbarListener {
 
 	private static final String OUTLINE_COMMON_NAVIGATOR_ID = TypeScriptUIPlugin.PLUGIN_ID + ".outline"; //$NON-NLS-1$
-	private static final String EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE = "TypeScriptEditor.SyncOutlineOnCursorMove"; //$NON-NLS-1$
-	
+	public static final String EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE = "TypeScriptEditor.SyncOutlineOnCursorMove"; //$NON-NLS-1$
+
 	private CommonViewer fOutlineViewer;
 	private ITypeScriptFile tsFile;
 
 	private ListenerList fSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
 	private ListenerList fPostSelectionChangedListeners = new ListenerList(ListenerList.IDENTITY);
+	private ITextSelection textSelection;
 
-	public TypeScriptContentOutlinePage() {
+	private final IEditorOutlineFeatures editor;
+
+	public TypeScriptContentOutlinePage(IEditorOutlineFeatures editor) {
+		this.editor = editor;
 	}
 
 	@Override
@@ -78,12 +88,10 @@ public class TypeScriptContentOutlinePage extends Page
 			fOutlineViewer.addPostSelectionChangedListener((ISelectionChangedListener) listeners[i]);
 		}
 
-		fOutlineViewer.setAutoExpandLevel(TreeViewer.ALL_LEVELS);
 		fOutlineViewer.setUseHashlookup(true);
 
 		IActionBars actionBars = getSite().getActionBars();
 		registerToolbarActions(actionBars);
-
 	}
 
 	public void setInput(ITypeScriptFile tsFile) {
@@ -110,14 +118,54 @@ public class TypeScriptContentOutlinePage extends Page
 	}
 
 	@Override
-	public void navBarChanged(final List<NavigationBarItem> items) {
+	public void navBarChanged(final NavigationBarItemRoot navbar) {
 		if (fOutlineViewer != null && !fOutlineViewer.getTree().isDisposed()) {
 			fOutlineViewer.getTree().getDisplay().asyncExec(new Runnable() {
 
 				@Override
 				public void run() {
-					fOutlineViewer.setInput(items);
+					boolean firstRefresh = fOutlineViewer.getInput() == null;
+					List<TreePath> newExpandedTreePaths = !firstRefresh ? mapTreePaths(navbar) : null;
+					// Refresh the tree
+					fOutlineViewer.setInput(navbar);
+					if (firstRefresh) {
+						// first time, expand all the tree
+						if (navbar.getChildItems().size() < 500) {
+							fOutlineViewer.expandAll();
+						}
+					} else {
+						// second time, keep the last expansion of the tree
+						fOutlineViewer.setExpandedTreePaths(newExpandedTreePaths.toArray(new TreePath[0]));
+					}
+					// update selection
+					updateSelection();
 				}
+
+				private List<TreePath> mapTreePaths(NavigationBarItem navbar) {
+					List<TreePath> treePaths = new ArrayList<TreePath>();
+					for (TreePath treePath : fOutlineViewer.getExpandedTreePaths()) {
+						TreePath newTreePath = TreePath.EMPTY;
+						for (int i = 0; i < treePath.getSegmentCount(); i++) {
+							NavigationBarItem segment = (NavigationBarItem) treePath.getSegment(i);
+							NavigationBarItem newSegment = mapSegment(navbar, segment);
+							if (newSegment != null) {
+								newTreePath = newTreePath.createChildPath(newSegment);
+							}
+						}
+						treePaths.add(newTreePath);
+					}
+					return treePaths;
+				}
+
+				private NavigationBarItem mapSegment(NavigationBarItem lexicalStructure, NavigationBarItem segment) {
+					for (NavigationBarItem item : lexicalStructure.getChildItems()) {
+						if (segment.getText().equals(item.getText())) {
+							return item;
+						}
+					}
+					return null;
+				}
+
 			});
 		}
 	}
@@ -140,8 +188,61 @@ public class TypeScriptContentOutlinePage extends Page
 
 	@Override
 	public void setSelection(ISelection selection) {
-		if (fOutlineViewer != null)
+		this.textSelection = selection instanceof ITextSelection ? (ITextSelection) selection : null;
+		if (fOutlineViewer != null && textSelection == null) {
 			fOutlineViewer.setSelection(selection);
+		} else {
+			updateSelection();
+		}
+	}
+
+	private void updateSelection() {
+		if (fOutlineViewer == null) {
+			return;
+		}
+		if (textSelection == null) {
+			return;
+		}
+		int offset = textSelection.getOffset();
+		updateSelection(offset);
+	}
+
+	private void updateSelection(int offset) {
+		if (fOutlineViewer.getInput() != null) {
+			NavigationBarItemRoot root = (NavigationBarItemRoot) fOutlineViewer.getInput();
+
+			try {
+				NavigationBarItem bestItem = this.findBestMatch(root, offset, null, -1);
+				if (bestItem != null) {
+					fOutlineViewer.setSelection(new StructuredSelection(bestItem), true);
+				}
+			} catch (TypeScriptException e) {
+				e.printStackTrace();
+			}
+			this.textSelection = null;
+		}
+	}
+
+	private NavigationBarItem findBestMatch(NavigationBarItem navbar, int offset, NavigationBarItem bestItem,
+			int bestSpanLength) throws TypeScriptException {
+		for (NavigationBarItem navigateToItem : navbar.getChildItems()) {
+			List<TextSpan> spans = navigateToItem.getSpans();
+
+			for (TextSpan span : spans) {
+				if (span.contains(offset)) {
+					// the best item is the one with the smallest span which
+					// contains the offset
+					if (bestItem == null || (span.getLength() < bestSpanLength)) {
+						bestItem = navigateToItem;
+						bestSpanLength = span.getLength();
+					}
+				}
+			}
+
+			bestItem = this.findBestMatch(navigateToItem, offset, bestItem, bestSpanLength);
+		}
+
+		return bestItem;
 	}
 
 	@Override
@@ -233,20 +334,21 @@ public class TypeScriptContentOutlinePage extends Page
 					TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_SYNCED_ENABLED));
 			super.setDisabledImageDescriptor(
 					TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.IMG_SYNCED_DISABLED));
-			boolean isLinkingEnabled = TypeScriptUIPlugin.getDefault().getPreferenceStore()
-					.getBoolean(EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE);
-			setChecked(isLinkingEnabled);
+			setChecked(isLinkingEnabled());
 		}
 
 		@Override
 		public void run() {
 			TypeScriptUIPlugin.getDefault().getPreferenceStore().setValue(EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE,
 					isChecked());
-			// TODO
-			//if (isChecked() && fEditor != null)
-			//	fEditor.synchronizeOutlinePage(fEditor.computeHighlightRangeSourceReference(), false);
+			if (isChecked() && editor != null) {
+				int offset = editor.getCursorOffset();
+				updateSelection(offset);
+			}
 		}
 	}
 
-
+	public boolean isLinkingEnabled() {
+		return TypeScriptUIPlugin.getDefault().getPreferenceStore().getBoolean(EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE);
+	}
 }

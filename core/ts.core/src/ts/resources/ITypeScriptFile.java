@@ -10,16 +10,14 @@
  */
 package ts.resources;
 
-import java.util.List;
-
 import ts.TypeScriptException;
-import ts.client.Location;
+import ts.client.IPositionProvider;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.FormatOptions;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
-import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 
@@ -27,7 +25,7 @@ import ts.client.references.ITypeScriptReferencesCollector;
  * TypeScript file API.
  *
  */
-public interface ITypeScriptFile {
+public interface ITypeScriptFile extends IPositionProvider {
 
 	/**
 	 * Returns the owner project of the file.
@@ -63,12 +61,6 @@ public interface ITypeScriptFile {
 	boolean isDirty();
 
 	String getPrefix(int position);
-
-	Location getLocation(int position) throws TypeScriptException;
-	
-	int getPosition(int line, int offset) throws TypeScriptException;
-
-	int getPosition(Location loc) throws TypeScriptException;
 
 	String getContents();
 
@@ -149,12 +141,12 @@ public interface ITypeScriptFile {
 	void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException;
 
 	void addNavbarListener(INavbarListener listener);
-	
+
 	void removeNavbarListener(INavbarListener listener);
-	
-	List<NavigationBarItem> getNavBar();
+
+	NavigationBarItemRoot getNavBar();
 
 	FormatOptions getFormatOptions();
-	
+
 	void setFormatOptions(FormatOptions formatOptions);
 }

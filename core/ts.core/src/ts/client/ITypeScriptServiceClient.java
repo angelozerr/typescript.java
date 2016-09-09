@@ -66,7 +66,8 @@ public interface ITypeScriptServiceClient {
 	void occurrences(String fileName, int line, int offset, ITypeScriptOccurrencesCollector collector)
 			throws TypeScriptException;
 
-	void navbar(String fileName, ITypeScriptNavBarCollector collector) throws TypeScriptException;
+	void navbar(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
+			throws TypeScriptException;
 
 	void join() throws InterruptedException;
 

@@ -39,6 +39,7 @@ import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextInputListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.ITextViewerExtension7;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TabsToSpacesConverter;
@@ -90,6 +91,7 @@ import ts.eclipse.ide.jsdt.internal.ui.actions.IndentAction;
 import ts.eclipse.ide.jsdt.internal.ui.actions.JavaSearchActionGroup;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.eclipse.ide.ui.outline.IEditorOutlineFeatures;
 import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
@@ -98,7 +100,7 @@ import ts.resources.ITypeScriptFile;
  * TypeScript editor.
  *
  */
-public class TypeScriptEditor extends JavaScriptLightWeightEditor {
+public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEditorOutlineFeatures {
 
 	protected CompositeActionGroup fActionGroups;
 	private CompositeActionGroup fContextMenuGroup;
@@ -147,8 +149,16 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 
 			ISelection selection = event.getSelection();
 			if (selection instanceof ITextSelection) {
+				// Update occurrences
 				ITextSelection textSelection = (ITextSelection) selection;
 				updateOccurrenceAnnotations(textSelection);
+
+				TypeScriptContentOutlinePage outlinePage = getOutlinePage();
+				if (outlinePage != null && outlinePage.isLinkingEnabled()) {
+					fOutlineSelectionChangedListener.uninstall(outlinePage);
+					outlinePage.setSelection(selection);
+					fOutlineSelectionChangedListener.install(outlinePage);
+				}
 			}
 		}
 	}
@@ -198,45 +208,50 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.FORMAT_ACTION);
 
-		action= new ToggleCommentAction(TypeScriptEditorMessages.getResourceBundle(), "ToggleComment.", this); //$NON-NLS-1$
+		action = new ToggleCommentAction(TypeScriptEditorMessages.getResourceBundle(), "ToggleComment.", this); //$NON-NLS-1$
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.TOGGLE_COMMENT);
 		setAction("ToggleComment", action); //$NON-NLS-1$
 		markAsStateDependentAction("ToggleComment", true); //$NON-NLS-1$
-		//PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.TOGGLE_COMMENT_ACTION);
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
+		// IJavaHelpContextIds.TOGGLE_COMMENT_ACTION);
 		configureToggleCommentAction();
-		
-		action= new AddBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "AddBlockComment.", this);  //$NON-NLS-1$
+
+		action = new AddBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "AddBlockComment.", this); //$NON-NLS-1$
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.ADD_BLOCK_COMMENT);
 		setAction("AddBlockComment", action); //$NON-NLS-1$
 		markAsStateDependentAction("AddBlockComment", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("AddBlockComment", true); //$NON-NLS-1$
-		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.ADD_BLOCK_COMMENT_ACTION);
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
+		// IJavaHelpContextIds.ADD_BLOCK_COMMENT_ACTION);
 
-		action= new RemoveBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "RemoveBlockComment.", this);  //$NON-NLS-1$
+		action = new RemoveBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "RemoveBlockComment.", //$NON-NLS-1$
+				this);
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.REMOVE_BLOCK_COMMENT);
 		setAction("RemoveBlockComment", action); //$NON-NLS-1$
 		markAsStateDependentAction("RemoveBlockComment", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("RemoveBlockComment", true); //$NON-NLS-1$
-		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.REMOVE_BLOCK_COMMENT_ACTION);
-		
-		action= new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, false); //$NON-NLS-1$
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
+		// IJavaHelpContextIds.REMOVE_BLOCK_COMMENT_ACTION);
+
+		action = new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, false); //$NON-NLS-1$
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.INDENT);
 		setAction("Indent", action); //$NON-NLS-1$
 		markAsStateDependentAction("Indent", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("Indent", true); //$NON-NLS-1$
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.INDENT_ACTION);
 
-		action= new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, true); //$NON-NLS-1$
+		action = new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, true); //$NON-NLS-1$
 		setAction("IndentOnTab", action); //$NON-NLS-1$
 		markAsStateDependentAction("IndentOnTab", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("IndentOnTab", true); //$NON-NLS-1$
-		
+
 		if (getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_SMART_TAB)) {
-			// don't replace Shift Right - have to make sure their enablement is mutually exclusive
-//			removeActionActivationCode(ITextEditorActionConstants.SHIFT_RIGHT);
+			// don't replace Shift Right - have to make sure their enablement is
+			// mutually exclusive
+			// removeActionActivationCode(ITextEditorActionConstants.SHIFT_RIGHT);
 			setActionActivationCode("IndentOnTab", '\t', -1, SWT.NONE); //$NON-NLS-1$
 		}
-		
+
 		action = new TextOperationAction(TypeScriptEditorMessages.getResourceBundle(), "ShowOutline.", this, //$NON-NLS-1$
 				TypeScriptSourceViewer.SHOW_OUTLINE, true);
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
@@ -348,7 +363,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 				updateTabs(sourceViewer);
 				return;
 			}
-			
+
 			if (PreferenceConstants.EDITOR_SMART_TAB.equals(property)) {
 				if (getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_SMART_TAB)) {
 					setActionActivationCode("IndentOnTab", '\t', -1, SWT.NONE); //$NON-NLS-1$
@@ -873,7 +888,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	 */
 	public TypeScriptContentOutlinePage getOutlinePage() {
 		if (contentOutlinePage == null) {
-			contentOutlinePage = new TypeScriptContentOutlinePage();
+			contentOutlinePage = new TypeScriptContentOutlinePage(this);
 			fOutlineSelectionChangedListener.install(contentOutlinePage);
 			IDocument document = getSourceViewer().getDocument();
 			try {
@@ -1020,14 +1035,14 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 	 * 
 	 */
 	private void configureToggleCommentAction() {
-		IAction action= getAction("ToggleComment"); //$NON-NLS-1$
+		IAction action = getAction("ToggleComment"); //$NON-NLS-1$
 		if (action instanceof ToggleCommentAction) {
-			ISourceViewer sourceViewer= getSourceViewer();
-			SourceViewerConfiguration configuration= getSourceViewerConfiguration();
-			((ToggleCommentAction)action).configure(sourceViewer, configuration);
+			ISourceViewer sourceViewer = getSourceViewer();
+			SourceViewerConfiguration configuration = getSourceViewerConfiguration();
+			((ToggleCommentAction) action).configure(sourceViewer, configuration);
 		}
 	}
-	
+
 	@Override
 	protected void installTabsToSpacesConverter() {
 		ISourceViewer sourceViewer = getSourceViewer();
@@ -1056,5 +1071,19 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor {
 		return super.isTabsToSpacesConversionEnabled();
 	}
 
-	
+	@Override
+	public int getCursorOffset() {
+		ISourceViewer sourceViewer = getSourceViewer();
+		StyledText styledText = sourceViewer.getTextWidget();
+		if (styledText == null) {
+			return 0;
+		}
+		if (sourceViewer instanceof ITextViewerExtension5) {
+			ITextViewerExtension5 extension = (ITextViewerExtension5) sourceViewer;
+			return extension.widgetOffset2ModelOffset(styledText.getCaretOffset());
+		} else {
+			int offset = sourceViewer.getVisibleRegion().getOffset();
+			return offset + styledText.getCaretOffset();
+		}
+	}
 }

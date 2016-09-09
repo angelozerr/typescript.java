@@ -23,6 +23,7 @@ import ts.client.format.FormatOptions;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
 import ts.internal.LocationReader;
@@ -40,7 +41,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	private boolean opened;
 
 	private final List<INavbarListener> listeners;
-	private List<NavigationBarItem> navbar;
+	private NavigationBarItemRoot navbar;
 	private TypeScriptNavBarCollector navBarCollector;
 	private FormatOptions formatOptions;
 	private boolean configureAlreadyDone;
@@ -179,15 +180,15 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	public void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
-		client.navbar(this.getName(), collector);
+		client.navbar(this.getName(), this, collector);
 	}
 
 	private class TypeScriptNavBarCollector implements ITypeScriptNavBarCollector, ITypeScriptAsynchCollector {
 
 		@Override
-		public void setNavBar(List<NavigationBarItem> list) {
-			navbar = list;
-			fireNavBarListeners(list);
+		public void setNavBar(NavigationBarItemRoot navbar) {
+			AbstractTypeScriptFile.this.navbar = navbar;
+			fireNavBarListeners(navbar);
 		}
 
 		@Override
@@ -220,10 +221,10 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		}
 	}
 
-	private void fireNavBarListeners(List<NavigationBarItem> items) {
+	private void fireNavBarListeners(NavigationBarItemRoot navbar) {
 		synchronized (listeners) {
 			for (INavbarListener listener : listeners) {
-				listener.navBarChanged(items);
+				listener.navBarChanged(navbar);
 			}
 		}
 	}
@@ -247,7 +248,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public List<NavigationBarItem> getNavBar() {
+	public NavigationBarItemRoot getNavBar() {
 		return navbar;
 	}
 

@@ -14,6 +14,7 @@ import ts.client.definition.DefinitionsInfo;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
 import ts.utils.FileUtils;
 
 public class Main {
@@ -60,11 +61,11 @@ public class Main {
 			}
 		});
 		
-		client.navbar(fileName, new ITypeScriptNavBarCollector() {
+		client.navbar(fileName, null, new ITypeScriptNavBarCollector() {
 			
 			@Override
-			public void setNavBar(List<NavigationBarItem> items) {
-				System.err.println(items);
+			public void setNavBar(NavigationBarItemRoot root) {
+				System.err.println(root);
 			}
 		});
 

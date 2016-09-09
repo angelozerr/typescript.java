@@ -2,7 +2,6 @@ package ts.core.tests;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
@@ -11,7 +10,7 @@ import ts.client.completions.ICompletionEntry;
 import ts.client.completions.ICompletionInfo;
 import ts.client.definition.DefinitionsInfo;
 import ts.client.navbar.ITypeScriptNavBarCollector;
-import ts.client.navbar.NavigationBarItem;
+import ts.client.navbar.NavigationBarItemRoot;
 import ts.utils.FileUtils;
 
 public class NavBarTest {
@@ -47,11 +46,11 @@ public class NavBarTest {
 			@Override
 			public void run() {
 				try {
-					client.navbar(fileName, new ITypeScriptNavBarCollector() {
+					client.navbar(fileName, null, new ITypeScriptNavBarCollector() {
 
 						@Override
-						public void setNavBar(List<NavigationBarItem> items) {
-							System.err.println(items);
+						public void setNavBar(NavigationBarItemRoot root) {
+							System.err.println(root);
 						}
 					});
 				} catch (TypeScriptException e) {
@@ -64,7 +63,7 @@ public class NavBarTest {
 		t1.start();
 		t2.start();
 		// client.join();
-		//client.dispose();
+		// client.dispose();
 
 	}
 
