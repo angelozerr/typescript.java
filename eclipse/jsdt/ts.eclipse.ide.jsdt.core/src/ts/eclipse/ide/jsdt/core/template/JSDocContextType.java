@@ -14,19 +14,19 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 
 /**
- * TypeScript context type.
+ * JSDoc context type.
  *
  */
-public class TypeScriptContextType extends AbstractTypeScriptContextType {
+public class JSDocContextType extends AbstractTypeScriptContextType {
 
-	public static final String NAME = "TypeScript"; //$NON-NLS-1$
+	public static final String NAME = "JSDoc"; //$NON-NLS-1$
 
-	public TypeScriptContextType() {
+	public JSDocContextType() {
 		super(NAME);
 	}
 
 	@Override
-	public TypeScriptContext createContext(IDocument document, Position position) {
-		return new TypeScriptContext(this, document, position);
+	public JSDocContext createContext(IDocument document, Position position) {
+		return new JSDocContext(this, document, position);
 	}
 }

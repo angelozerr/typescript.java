@@ -63,6 +63,10 @@ public class TypeScriptResourceUtil {
 		return IDEResourcesManager.getInstance().isTsOrTsxOrJsxFile(element);
 	}
 
+	public static boolean isTsxOrJsxFile(Object element) {
+		return IDEResourcesManager.getInstance().isTsxOrJsxFile(element);
+	}
+	
 	public static boolean isJsOrJsMapFile(Object element) {
 		return IDEResourcesManager.getInstance().isJsOrJsMapFile(element);
 	}

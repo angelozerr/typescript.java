@@ -26,6 +26,7 @@ import org.eclipse.wst.jsdt.ui.text.java.JavaContentAssistInvocationContext;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
+import ts.eclipse.ide.jsdt.ui.editor.contentassist.TypeScriptContentAssistInvocationContext;
 import ts.eclipse.jface.text.contentassist.CompletionProposalCollector;
 import ts.resources.ITypeScriptFile;
 

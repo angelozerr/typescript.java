@@ -61,6 +61,7 @@ import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptTextTools;
 
+import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.jsdt.internal.ui.actions.GotoMatchingBracketAction;
 
@@ -324,7 +325,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 
 		int selectionLength = Math.abs(selection.getLength());
 		if (selectionLength > 1) {
-			setStatusLineErrorMessage(TypeScriptEditorMessages.GotoMatchingBracket_error_invalidSelection);
+			setStatusLineErrorMessage(JSDTTypeScriptUIMessages.GotoMatchingBracket_error_invalidSelection);
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}
@@ -336,7 +337,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 
 		IRegion region = fBracketMatcher.match(document, sourceCaretOffset);
 		if (region == null) {
-			setStatusLineErrorMessage(TypeScriptEditorMessages.GotoMatchingBracket_error_noMatchingBracket);
+			setStatusLineErrorMessage(JSDTTypeScriptUIMessages.GotoMatchingBracket_error_noMatchingBracket);
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}
@@ -363,7 +364,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		}
 
 		if (!visible) {
-			setStatusLineErrorMessage(TypeScriptEditorMessages.GotoMatchingBracket_error_bracketOutsideSelectedElement);
+			setStatusLineErrorMessage(JSDTTypeScriptUIMessages.GotoMatchingBracket_error_bracketOutsideSelectedElement);
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}

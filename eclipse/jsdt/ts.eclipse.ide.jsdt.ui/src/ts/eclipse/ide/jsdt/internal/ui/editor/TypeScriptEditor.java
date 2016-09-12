@@ -85,6 +85,7 @@ import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.ide.jsdt.internal.ui.actions.CompositeActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.IndentAction;
@@ -199,7 +200,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 				new ActionGroup[] { /* oeg, ovg, */ jsg });
 
 		// Format Action
-		IAction action = new TextOperationAction(TypeScriptEditorMessages.getResourceBundle(), "Format.", this, //$NON-NLS-1$
+		IAction action = new TextOperationAction(JSDTTypeScriptUIMessages.getResourceBundle(), "Format.", this, //$NON-NLS-1$
 				ISourceViewer.FORMAT);
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.FORMAT);
 		setAction("Format", action); //$NON-NLS-1$
@@ -208,7 +209,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.FORMAT_ACTION);
 
-		action = new ToggleCommentAction(TypeScriptEditorMessages.getResourceBundle(), "ToggleComment.", this); //$NON-NLS-1$
+		action = new ToggleCommentAction(JSDTTypeScriptUIMessages.getResourceBundle(), "ToggleComment.", this); //$NON-NLS-1$
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.TOGGLE_COMMENT);
 		setAction("ToggleComment", action); //$NON-NLS-1$
 		markAsStateDependentAction("ToggleComment", true); //$NON-NLS-1$
@@ -216,7 +217,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		// IJavaHelpContextIds.TOGGLE_COMMENT_ACTION);
 		configureToggleCommentAction();
 
-		action = new AddBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "AddBlockComment.", this); //$NON-NLS-1$
+		action = new AddBlockCommentAction(JSDTTypeScriptUIMessages.getResourceBundle(), "AddBlockComment.", this); //$NON-NLS-1$
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.ADD_BLOCK_COMMENT);
 		setAction("AddBlockComment", action); //$NON-NLS-1$
 		markAsStateDependentAction("AddBlockComment", true); //$NON-NLS-1$
@@ -224,7 +225,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.ADD_BLOCK_COMMENT_ACTION);
 
-		action = new RemoveBlockCommentAction(TypeScriptEditorMessages.getResourceBundle(), "RemoveBlockComment.", //$NON-NLS-1$
+		action = new RemoveBlockCommentAction(JSDTTypeScriptUIMessages.getResourceBundle(), "RemoveBlockComment.", //$NON-NLS-1$
 				this);
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.REMOVE_BLOCK_COMMENT);
 		setAction("RemoveBlockComment", action); //$NON-NLS-1$
@@ -233,14 +234,14 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.REMOVE_BLOCK_COMMENT_ACTION);
 
-		action = new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, false); //$NON-NLS-1$
+		action = new IndentAction(JSDTTypeScriptUIMessages.getResourceBundle(), "Indent.", this, false); //$NON-NLS-1$
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.INDENT);
 		setAction("Indent", action); //$NON-NLS-1$
 		markAsStateDependentAction("Indent", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("Indent", true); //$NON-NLS-1$
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(action, IJavaHelpContextIds.INDENT_ACTION);
 
-		action = new IndentAction(TypeScriptEditorMessages.getResourceBundle(), "Indent.", this, true); //$NON-NLS-1$
+		action = new IndentAction(JSDTTypeScriptUIMessages.getResourceBundle(), "Indent.", this, true); //$NON-NLS-1$
 		setAction("IndentOnTab", action); //$NON-NLS-1$
 		markAsStateDependentAction("IndentOnTab", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("IndentOnTab", true); //$NON-NLS-1$
@@ -252,7 +253,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			setActionActivationCode("IndentOnTab", '\t', -1, SWT.NONE); //$NON-NLS-1$
 		}
 
-		action = new TextOperationAction(TypeScriptEditorMessages.getResourceBundle(), "ShowOutline.", this, //$NON-NLS-1$
+		action = new TextOperationAction(JSDTTypeScriptUIMessages.getResourceBundle(), "ShowOutline.", this, //$NON-NLS-1$
 				TypeScriptSourceViewer.SHOW_OUTLINE, true);
 		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
 		setAction(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE, action);
@@ -477,7 +478,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		private Position[] fPositions;
 
 		public OccurrencesFinderJob(IDocument document, Position[] positions, ISelection selection) {
-			super(TypeScriptEditorMessages.TypeScriptEditor_markOccurrences_job_name);
+			super(JSDTTypeScriptUIMessages.TypeScriptEditor_markOccurrences_job_name);
 			fDocument = document;
 			fSelection = selection;
 			fPositions = positions;
@@ -502,25 +503,24 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		 * @see Job#run(org.eclipse.core.runtime.IProgressMonitor)
 		 */
 		public IStatus run(IProgressMonitor progressMonitor) {
-
 			fProgressMonitor = progressMonitor;
 
-			if (isCanceled())
+			if (isCanceled()) {
+				if (LinkedModeModel.hasInstalledModel(fDocument)) {
+					// Template completion applied, remove occurrences
+					removeOccurrenceAnnotations();
+				}
 				return Status.CANCEL_STATUS;
-
+			}
 			ITextViewer textViewer = getViewer();
 			if (textViewer == null)
 				return Status.CANCEL_STATUS;
-
+			
 			IDocument document = textViewer.getDocument();
 			if (document == null)
 				return Status.CANCEL_STATUS;
 
-			IDocumentProvider documentProvider = getDocumentProvider();
-			if (documentProvider == null)
-				return Status.CANCEL_STATUS;
-
-			IAnnotationModel annotationModel = documentProvider.getAnnotationModel(getEditorInput());
+			IAnnotationModel annotationModel = getAnnotationModel();
 			if (annotationModel == null)
 				return Status.CANCEL_STATUS;
 
@@ -562,10 +562,18 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 					}
 				}
 				fOccurrenceAnnotations = (Annotation[]) annotationMap.keySet()
-						.toArray(new Annotation[annotationMap.keySet().size()]);
+						.toArray(new Annotation[annotationMap.keySet().size()]);				
 			}
 
 			return Status.OK_STATUS;
+		}
+
+		private IAnnotationModel getAnnotationModel() {
+			IDocumentProvider documentProvider = getDocumentProvider();
+			if (documentProvider == null) {
+				return null;
+			}
+			return documentProvider.getAnnotationModel(getEditorInput());
 		}
 	}
 
@@ -715,7 +723,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	 *            the text selection
 	 * 
 	 */
-	private void updateOccurrenceAnnotations(ITextSelection selection) {
+	private void updateOccurrenceAnnotations(ITextSelection selection) {		
 		if (fOccurrencesFinderJob != null)
 			fOccurrencesFinderJob.cancel();
 

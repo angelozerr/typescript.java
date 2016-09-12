@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  See https://github.com/xabikos/vscode-react/blob/master/snippets/snippets.json -->
+
+<templates>
+
+<template name="rcc" description="%Templates.react.rcc" id="ts.eclipse.ide.jsdt.ui.templates.react.rcc" context="React" enabled="true" autoinsert="false">import React, {Component} from 'react';
+
+class ${componentName} extends Component {
+	render() {
+		return (
+			&lt;div&gt;
+				${cursor}
+			&lt;/div&gt;
+		);
+	}
+}
+
+export default ${componentName};</template>
+
+<template name="rcjc" description="%Templates.react.rcjc" id="ts.eclipse.ide.jsdt.ui.templates.react.rcjc" context="React" enabled="true" autoinsert="false">class ${componentName} extends Component {
+	render() {
+		return (
+			&lt;div&gt;
+				${cursor}
+			&lt;/div&gt;
+		);
+	}
+}</template>
+
+<template name="rccp" description="%Templates.react.rccp" id="ts.eclipse.ide.jsdt.ui.templates.react.rccp" context="React" enabled="true" autoinsert="false">import React, {Component, PropTypes} from 'react';
+
+class ${componentName} extends Component {
+	render() {
+		return (
+			&lt;div&gt;
+				${cursor}
+			&lt;/div&gt;
+		);
+	}
+}
+
+${componentName}.propTypes = {
+
+};
+
+export default ${componentName};</template>
+
+<template name="rcfc" description="%Templates.react.rcfc" id="ts.eclipse.ide.jsdt.ui.templates.react.rcfc" context="React" enabled="true" autoinsert="false">import React, {Component, PropTypes} from 'react';
+
+class ${componentName} extends Component {
+	constructor(props) {
+		super(props);
+	}
+	
+	componentWillMount() {
+	
+	}
+
+	componentDidMount() {
+	
+	}
+	
+	componentWillReceiveProps(nextProps) {
+	
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+	
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+	
+	}
+
+	componentWillUnmount() {
+	
+	}
+					
+	render() {
+		return (
+			&lt;div&gt;
+				${cursor}
+			&lt;/div&gt;
+		);
+	}
+}
+
+${componentName}.propTypes = {
+	${cursor}
+};
+
+export default ${componentName};</template>
+
+<template name="rsc" description="%Templates.react.rsc" id="ts.eclipse.ide.jsdt.ui.templates.react.rsc" context="React" enabled="true" autoinsert="false">import React from 'react';
+
+const ${componentName} = () => {
+	return (
+		&lt;div&gt;
+			${cursor}
+		&lt;/div&gt;
+	);
+};
+
+export default ${componentName};</template>
+
+<template name="rscp" description="%Templates.react.rscp" id="ts.eclipse.ide.jsdt.ui.templates.react.rscp" context="React" enabled="true" autoinsert="false">import React, {PropTypes} from 'react';
+
+const ${componentName} = props => {
+	return (
+		&lt;div&gt;
+			${cursor}
+		&lt;/div&gt;
+	);
+}
+
+${componentName}.propTypes = {
+	${cursor}
+};
+
+export default ${componentName};</template>
+
+<template name="con" description="%Templates.react.con" id="ts.eclipse.ide.jsdt.ui.templates.react.con" context="React" enabled="true" autoinsert="false">constructor(props) {
+	super(props);
+	${cursor}
+}</template>
+
+<template name="conc" description="%Templates.react.conc" id="ts.eclipse.ide.jsdt.ui.templates.react.conc" context="React" enabled="true" autoinsert="false">constructor(props, context) {
+	super(props, context);
+	${cursor}
+}</template>
+
+<template name="est" description="%Templates.react.est" id="ts.eclipse.ide.jsdt.ui.templates.react.est" context="React" enabled="true" autoinsert="false">this.state = {
+	${cursor}
+}</template>
+
+<template name="cwm" description="%Templates.react.cwm" id="ts.eclipse.ide.jsdt.ui.templates.react.cwm" context="React" enabled="true" autoinsert="false">componentWillMount() {
+	${cursor}
+}</template>
+  
+<template name="cdm" description="%Templates.react.cdm" id="ts.eclipse.ide.jsdt.ui.templates.react.cdm" context="React" enabled="true" autoinsert="false">componentDidMount() {
+	${cursor}
+}</template>
+
+<template name="cwr" description="%Templates.react.cwr" id="ts.eclipse.ide.jsdt.ui.templates.react.cwr" context="React" enabled="true" autoinsert="false">componentWillReceiveProps(nextProps) {
+	${cursor}
+}</template>
+
+<template name="scu" description="%Templates.react.scu" id="ts.eclipse.ide.jsdt.ui.templates.react.scu" context="React" enabled="true" autoinsert="false">shouldComponentUpdate(nextProps, nextState) {
+	${cursor}
+}</template>
+
+<template name="cwup" description="%Templates.react.cwup" id="ts.eclipse.ide.jsdt.ui.templates.react.cwup" context="React" enabled="true" autoinsert="false">componentWillUpdate(nextProps, nextState) {
+	${cursor}
+}</template>
+
+<template name="cdup" description="%Templates.react.cdup" id="ts.eclipse.ide.jsdt.ui.templates.react.cdup" context="React" enabled="true" autoinsert="false">componentDidUpdate(prevProps, prevState) {
+	${cursor}
+}</template>
+  
+<template name="cwun" description="%Templates.react.cwun" id="ts.eclipse.ide.jsdt.ui.templates.react.cwun" context="React" enabled="true" autoinsert="false">componentWillUnmount() {
+	${cursor}
+}</template>
+
+<template name="ren" description="%Templates.react.ren" id="ts.eclipse.ide.jsdt.ui.templates.react.ren" context="React" enabled="true" autoinsert="false">
+	render() {
+		return (
+			&lt;div&gt;
+				${cursor}
+			&lt;/div&gt;
+		);
+	}</template>
+
+<template name="sst" description="%Templates.react.sst" id="ts.eclipse.ide.jsdt.ui.templates.react.sst" context="React" enabled="true" autoinsert="false">this.setState(${cursor});</template>
+
+<template name="ssf" description="%Templates.react.ssf" id="ts.eclipse.ide.jsdt.ui.templates.react.ssf" context="React" enabled="true" autoinsert="false">this.setState((state, props) => { return { ${cursor} }});
+</template>
+
+<template name="props" description="%Templates.react.props" id="ts.eclipse.ide.jsdt.ui.templates.react.props" context="React" enabled="true" autoinsert="false">this.props.${cursor}</template>
+
+<template name="state" description="%Templates.react.state" id="ts.eclipse.ide.jsdt.ui.templates.react.state" context="React" enabled="true" autoinsert="false">this.state.${cursor}</template>
+
+<template name="bnd" description="%Templates.react.bnd" id="ts.eclipse.ide.jsdt.ui.templates.react.bnd" context="React" enabled="true" autoinsert="false">this.${prop} = this.${prop}.bind(this);</template>
+
+<template name="rpt" description="%Templates.react.rpt" id="ts.eclipse.ide.jsdt.ui.templates.react.rpt" context="React" enabled="true" autoinsert="false">${prop1}.propTypes = {
+	${prop2}
+}</template>
+
+<template name="pta" description="%Templates.react.pta" id="ts.eclipse.ide.jsdt.ui.templates.react.pta" context="React" enabled="true" autoinsert="false">PropTypes.array,</template>
+  
+<template name="ptar" description="%Templates.react.ptar" id="ts.eclipse.ide.jsdt.ui.templates.react.ptar" context="React" enabled="true" autoinsert="false">PropTypes.array.isRequired,</template>
+
+<template name="ptb" description="%Templates.react.ptb" id="ts.eclipse.ide.jsdt.ui.templates.react.ptb" context="React" enabled="true" autoinsert="false">PropTypes.bool,</template>
+  
+<template name="ptbr" description="%Templates.react.ptbr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptbr" context="React" enabled="true" autoinsert="false">PropTypes.bool.isRequired,</template>
+
+<template name="ptf" description="%Templates.react.ptf" id="ts.eclipse.ide.jsdt.ui.templates.react.ptf" context="React" enabled="true" autoinsert="false">PropTypes.func,</template>
+  
+<template name="ptfr" description="%Templates.react.ptfr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptfr" context="React" enabled="true" autoinsert="false">PropTypes.func.isRequired,</template>
+  
+<template name="ptn" description="%Templates.react.ptn" id="ts.eclipse.ide.jsdt.ui.templates.react.ptn" context="React" enabled="true" autoinsert="false">PropTypes.number,</template>
+  
+<template name="ptnr" description="%Templates.react.ptnr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptnr" context="React" enabled="true" autoinsert="false">PropTypes.number.isRequired,</template>
+
+<template name="pto" description="%Templates.react.pto" id="ts.eclipse.ide.jsdt.ui.templates.react.pto" context="React" enabled="true" autoinsert="false">PropTypes.object,</template>
+  
+<template name="ptor" description="%Templates.react.ptor" id="ts.eclipse.ide.jsdt.ui.templates.react.ptor" context="React" enabled="true" autoinsert="false">PropTypes.object.isRequired,</template>
+
+<template name="pts" description="%Templates.react.pts" id="ts.eclipse.ide.jsdt.ui.templates.react.pts" context="React" enabled="true" autoinsert="false">PropTypes.string,</template>
+  
+<template name="ptsr" description="%Templates.react.ptsr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptsr" context="React" enabled="true" autoinsert="false">PropTypes.string.isRequired,</template>
+
+<template name="ptnd" description="%Templates.react.ptnd" id="ts.eclipse.ide.jsdt.ui.templates.react.ptnd" context="React" enabled="true" autoinsert="false">PropTypes.node,</template>
+  
+<template name="ptndr" description="%Templates.react.ptndr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptndr" context="React" enabled="true" autoinsert="false">PropTypes.node.isRequired,</template>
+
+<template name="ptel" description="%Templates.react.ptel" id="ts.eclipse.ide.jsdt.ui.templates.react.ptelr" context="React" enabled="true" autoinsert="false">PropTypes.element,</template>
+  
+<template name="ptelr" description="%Templates.react.ptelr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptelr" context="React" enabled="true" autoinsert="false">PropTypes.element.isRequired,</template>
+
+<template name="pti" description="%Templates.react.pti" id="ts.eclipse.ide.jsdt.ui.templates.react.ptir" context="React" enabled="true" autoinsert="false">PropTypes.element,</template>
+  
+<template name="ptir" description="%Templates.react.ptir" id="ts.eclipse.ide.jsdt.ui.templates.react.ptir" context="React" enabled="true" autoinsert="false">PropTypes.element.isRequired,</template>
+
+<template name="pte" description="%Templates.react.pte" id="ts.eclipse.ide.jsdt.ui.templates.react.pte" context="React" enabled="true" autoinsert="false">PropTypes.instanceOf(${cursor}),</template>
+  
+<template name="pter" description="%Templates.react.pter" id="ts.eclipse.ide.jsdt.ui.templates.react.pter" context="React" enabled="true" autoinsert="false">PropTypes.instanceOf(${cursor}).isRequired,</template>
+
+<template name="ptet" description="%Templates.react.ptet" id="ts.eclipse.ide.jsdt.ui.templates.react.ptet" context="React" enabled="true" autoinsert="false">PropTypes.oneOfType([
+	${cursor}
+]),</template>
+  
+<template name="ptetr" description="%Templates.react.ptetr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptetr" context="React" enabled="true" autoinsert="false">PropTypes.oneOfType([
+	${cursor}
+]).isRequired,</template>
+
+<template name="ptao" description="%Templates.react.ptao" id="ts.eclipse.ide.jsdt.ui.templates.react.ptao" context="React" enabled="true" autoinsert="false">PropTypes.arrayOf(${cursor}),</template>
+  
+<template name="ptaor" description="%Templates.react.ptaor" id="ts.eclipse.ide.jsdt.ui.templates.react.ptaor" context="React" enabled="true" autoinsert="false">PropTypes.arrayOf(${cursor}).isRequired,</template>
+
+<template name="ptoo" description="%Templates.react.ptoo" id="ts.eclipse.ide.jsdt.ui.templates.react.ptoo" context="React" enabled="true" autoinsert="false">PropTypes.objectOf(${cursor}),</template>
+  
+<template name="ptoor" description="%Templates.react.ptoor" id="ts.eclipse.ide.jsdt.ui.templates.react.ptoor" context="React" enabled="true" autoinsert="false">PropTypes.objectOf(${cursor}).isRequired,</template>
+
+<template name="ptsh" description="%Templates.react.ptsh" id="ts.eclipse.ide.jsdt.ui.templates.react.ptsh" context="React" enabled="true" autoinsert="false">PropTypes.shape({
+	${cursor}
+}),</template>
+  
+<template name="ptshr" description="%Templates.react.ptshr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptshr" context="React" enabled="true" autoinsert="false">PropTypes.shape({
+	${cursor}
+}).isRequired,</template>
+
+</templates>

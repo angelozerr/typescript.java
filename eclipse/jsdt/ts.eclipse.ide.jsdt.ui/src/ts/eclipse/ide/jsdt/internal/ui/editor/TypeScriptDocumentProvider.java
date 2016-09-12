@@ -10,6 +10,8 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui.editor;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.ForwardingDocumentProvider;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -23,5 +25,12 @@ public class TypeScriptDocumentProvider extends TextFileDocumentProvider {
 		provider = new ForwardingDocumentProvider(IJavaScriptPartitions.JAVA_PARTITIONING,
 				new JavaDocumentSetupParticipant(), provider);
 		setParentDocumentProvider(provider);
+	}
+	
+	@Override
+	protected DocumentProviderOperation createSaveOperation(Object element, IDocument document, boolean overwrite)
+			throws CoreException {
+		// TODO Auto-generated method stub
+		return super.createSaveOperation(element, document, overwrite);
 	}
 }

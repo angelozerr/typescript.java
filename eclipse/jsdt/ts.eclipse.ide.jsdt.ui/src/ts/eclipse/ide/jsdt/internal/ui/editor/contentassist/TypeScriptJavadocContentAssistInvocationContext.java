@@ -4,6 +4,8 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.wst.jsdt.internal.ui.text.javadoc.JavadocContentAssistInvocationContext;
 
+import ts.eclipse.ide.jsdt.ui.editor.contentassist.TypeScriptContentAssistInvocationContext;
+
 public class TypeScriptJavadocContentAssistInvocationContext extends TypeScriptContentAssistInvocationContext {
 
 	private final int fFlags;

@@ -19,6 +19,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
 import org.eclipse.ui.texteditor.RetargetTextEditorAction;
 
+import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.jsdt.ui.actions.TypeScriptActionConstants;
 
@@ -31,7 +32,7 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 	private RetargetTextEditorAction fShowOutline;
 
 	public TypeScriptEditorActionContributor() {
-		fShowOutline = new RetargetTextEditorAction(TypeScriptEditorMessages.getResourceBundle(), "ShowOutline."); //$NON-NLS-1$
+		fShowOutline = new RetargetTextEditorAction(JSDTTypeScriptUIMessages.getResourceBundle(), "ShowOutline."); //$NON-NLS-1$
 		fShowOutline.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
 	}
 

@@ -12,21 +12,20 @@ package ts.eclipse.ide.jsdt.core.template;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.templates.TemplateContextType;
 
 /**
- * TypeScript context type.
+ * ReactJS context.
  *
  */
-public class TypeScriptContextType extends AbstractTypeScriptContextType {
+public class ReactContext extends AbstractTypeScriptContext {
 
-	public static final String NAME = "TypeScript"; //$NON-NLS-1$
-
-	public TypeScriptContextType() {
-		super(NAME);
+	public ReactContext(TemplateContextType type, IDocument document, int offset, int length) {
+		super(type, document, offset, length);
 	}
 
-	@Override
-	public TypeScriptContext createContext(IDocument document, Position position) {
-		return new TypeScriptContext(this, document, position);
+	public ReactContext(TemplateContextType type, IDocument document, Position position) {
+		super(type, document, position);
 	}
+
 }

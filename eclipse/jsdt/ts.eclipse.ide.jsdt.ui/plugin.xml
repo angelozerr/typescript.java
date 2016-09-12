@@ -109,16 +109,27 @@
 	<!-- template proposals -->
 	<extension
 		point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
-		id="TemplateProposalComputer">
+		id="TypeScriptTemplateProposalComputer">
 		<javaCompletionProposalComputer
 			class="ts.eclipse.ide.jsdt.internal.ui.template.contentassist.TypeScriptTemplateCompletionProposalComputer"
 			categoryId="org.eclipse.wst.jsdt.ui.templateProposalCategory">
 			<partition type="__dftl_partition_content_type"/>
 			<partition type="__java_singleline_comment"/> <!-- to get NLS templates -->
 			<partition type="__java_javadoc"/>
-		</javaCompletionProposalComputer>
+		</javaCompletionProposalComputer>		
 	</extension>
-	
+	<extension
+		point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
+		id="ReactTemplateProposalComputer">
+		<javaCompletionProposalComputer
+			class="ts.eclipse.ide.jsdt.internal.ui.template.contentassist.ReactTemplateCompletionProposalComputer"
+			categoryId="org.eclipse.wst.jsdt.ui.templateProposalCategory">
+			<partition type="__dftl_partition_content_type"/>
+			<partition type="__java_singleline_comment"/> <!-- to get NLS templates -->
+			<partition type="__java_javadoc"/>
+		</javaCompletionProposalComputer>		
+	</extension>
+		
 	<!-- Hyperlink for JavaScript (inside TypeScript file) -->
         
    <extension
@@ -518,8 +529,56 @@
       </viewerContribution>
    </extension>
    
+     <!-- Preference Pages -->          		
+  <extension
+         point="org.eclipse.ui.preferencePages">		      
+      <page
+            name="%templatePageName"        
+            class="ts.eclipse.ide.jsdt.internal.ui.template.preferences.TypeScriptTemplatePreferencePage"
+            id="ts.eclipse.ide.jsdt.ui.template.preferences.TypeScriptTemplatePreferencePage"
+            category="ts.eclipse.ide.ui.preference.EditorPreferencePage">
+            <keywordReference id="ts.eclipse.ide.jsdt.ui.templates"/>
+      </page>
+   </extension>
+   
     <extension point="org.eclipse.core.runtime.preferences">
         <initializer class="ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPreferenceInitializer"/>
+    </extension>
+   
+<!-- =========================================================================== -->
+<!-- Templates                                                                   -->
+<!-- =========================================================================== -->
+   <extension
+         point="org.eclipse.ui.editors.templates">
+	  <contextTypeRegistry
+            id="ts.eclipse.ide.jsdt.ui.ContextTypeRegistry">
+      </contextTypeRegistry>         
+      <contextType
+            name="%templates.typescript.contextType.name"
+            class="ts.eclipse.ide.jsdt.core.template.TypeScriptContextType"
+            registryId="ts.eclipse.ide.jsdt.ui.ContextTypeRegistry"
+            id="TypeScript">
+      </contextType>            
+      <contextType
+            name="%templates.jsdoc.contextType.name"
+            class="ts.eclipse.ide.jsdt.core.template.JSDocContextType"
+            registryId="ts.eclipse.ide.jsdt.ui.ContextTypeRegistry"
+            id="JSDoc">
+      </contextType>
+      <include
+      		file="templates/default-templates.xml"
+      		translations="$nl$/templates/default-templates.properties">
+      </include>
+      <contextType
+            name="%templates.react.contextType.name"
+            class="ts.eclipse.ide.jsdt.core.template.ReactContextType"
+            registryId="ts.eclipse.ide.jsdt.ui.ContextTypeRegistry"
+            id="React">
+      </contextType>
+      <include
+      		file="templates/react-templates.xml"
+      		translations="$nl$/templates/react-templates.properties">
+      </include>            
     </extension>
    
 </plugin>        

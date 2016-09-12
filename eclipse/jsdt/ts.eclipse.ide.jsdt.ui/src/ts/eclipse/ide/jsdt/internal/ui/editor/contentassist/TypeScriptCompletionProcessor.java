@@ -9,6 +9,8 @@ import org.eclipse.wst.jsdt.internal.ui.text.java.JavaCompletionProcessor;
 import org.eclipse.wst.jsdt.internal.ui.text.java.RelevanceSorter;
 import org.eclipse.wst.jsdt.ui.text.java.ContentAssistInvocationContext;
 
+import ts.eclipse.ide.jsdt.ui.editor.contentassist.TypeScriptContentAssistInvocationContext;
+
 public class TypeScriptCompletionProcessor extends JavaCompletionProcessor {
 
 	private static final RelevanceSorter RELEVANCE_SORTER = new RelevanceSorter();

@@ -11,15 +11,26 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui;
 
+import java.io.IOException;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
+import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.wst.jsdt.core.JavaScriptCore;
+import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.osgi.framework.BundleContext;
 
+import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptDocumentProvider;
 import ts.eclipse.ide.jsdt.internal.ui.text.TypeScriptTextTools;
 
@@ -39,6 +50,32 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 	private TypeScriptDocumentProvider documentProvider;
 
 	private TypeScriptTextTools fJavaTextTools;
+
+	/**
+	 * The key to store customized templates.
+	 * 
+	 */
+	private static final String TEMPLATES_KEY = "ts.eclipse.ide.jsdt.ui.text.custom_templates"; //$NON-NLS-1$
+
+	private static final String CONTEXT_TYPE_REGISTRY_ID = "ts.eclipse.ide.jsdt.ui.ContextTypeRegistry";
+
+	/**
+	 * The template context type registry for the java editor.
+	 * 
+	 */
+	private ContextTypeRegistry fContextTypeRegistry;
+
+	/**
+	 * The template store for the java editor.
+	 * 
+	 */
+	private TemplateStore fTemplateStore;
+
+	/**
+	 * The combined preference store.
+	 * 
+	 */
+	private IPreferenceStore fCombinedPreferenceStore;
 
 	/**
 	 * The constructor
@@ -113,6 +150,59 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Returns the template context type registry for the java plug-in.
+	 * 
+	 * @return the template context type registry for the java plug-in
+	 * 
+	 */
+	public ContextTypeRegistry getTemplateContextRegistry() {
+		if (fContextTypeRegistry == null) {
+			ContributionContextTypeRegistry registry = new ContributionContextTypeRegistry(CONTEXT_TYPE_REGISTRY_ID);
+			fContextTypeRegistry = registry;
+		}
+
+		return fContextTypeRegistry;
+	}
+
+	/**
+	 * Returns the template store for the java editor templates.
+	 * 
+	 * @return the template store for the java editor templates
+	 * 
+	 */
+	public TemplateStore getTemplateStore() {
+		if (fTemplateStore == null) {
+			final IPreferenceStore store = getPreferenceStore();
+			fTemplateStore = new ContributionTemplateStore(getTemplateContextRegistry(), store, TEMPLATES_KEY);
+			try {
+				fTemplateStore.load();
+			} catch (IOException e) {
+				log(e);
+			}
+			fTemplateStore.startListeningForPreferenceChanges();
+		}
+
+		return fTemplateStore;
+	}
+
+	/**
+	 * Returns a combined preference store, this store is read-only.
+	 * 
+	 * @return the combined preference store
+	 * 
+	 * 
+	 */
+	public IPreferenceStore getCombinedPreferenceStore() {
+		if (fCombinedPreferenceStore == null) {
+			IPreferenceStore generalTextStore = EditorsUI.getPreferenceStore();
+			fCombinedPreferenceStore = new ChainedPreferenceStore(new IPreferenceStore[] { getPreferenceStore(),
+					new PreferencesAdapter(JSDTTypeScriptCorePlugin.getDefault().getPluginPreferences()),
+					generalTextStore });
+		}
+		return fCombinedPreferenceStore;
 	}
 
 }

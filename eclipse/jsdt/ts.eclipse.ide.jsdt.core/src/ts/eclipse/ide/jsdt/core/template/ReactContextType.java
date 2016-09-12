@@ -14,19 +14,19 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 
 /**
- * TypeScript context type.
+ * ReactJS context type.
  *
  */
-public class TypeScriptContextType extends AbstractTypeScriptContextType {
+public class ReactContextType extends AbstractTypeScriptContextType {
 
-	public static final String NAME = "TypeScript"; //$NON-NLS-1$
+	public static final String NAME = "React"; //$NON-NLS-1$
 
-	public TypeScriptContextType() {
+	public ReactContextType() {
 		super(NAME);
 	}
 
 	@Override
-	public TypeScriptContext createContext(IDocument document, Position position) {
-		return new TypeScriptContext(this, document, position);
+	public ReactContext createContext(IDocument document, Position position) {
+		return new ReactContext(this, document, position);
 	}
 }

@@ -22,8 +22,8 @@ import ts.client.format.ITypeScriptFormatCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
-import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditorMessages;
 
 /**
  * Content formatter which consumes tsserver "format" command to format a
@@ -71,8 +71,8 @@ public class TypeScriptContentFormatter implements IContentFormatter {
 			textEdit.apply(document, TextEdit.CREATE_UNDO);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, JSDTTypeScriptUIPlugin.PLUGIN_ID, e.getMessage(), e);
-			ErrorDialog.openError(getShell(), TypeScriptEditorMessages.TypeScriptContentFormatter_Error_title,
-					TypeScriptEditorMessages.TypeScriptContentFormatter_Error_message, status);
+			ErrorDialog.openError(getShell(), JSDTTypeScriptUIMessages.TypeScriptContentFormatter_Error_title,
+					JSDTTypeScriptUIMessages.TypeScriptContentFormatter_Error_message, status);
 		}
 	}
 

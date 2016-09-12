@@ -30,7 +30,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.jsdt.debug.ui,
  org.eclipse.wst.jsdt.debug.core,
  org.eclipse.ui.views,
- org.eclipse.core.filesystem
+ org.eclipse.core.filesystem,
+ org.eclipse.ui.forms
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
+Export-Package: ts.eclipse.ide.jsdt.ui,
+ ts.eclipse.ide.jsdt.ui.actions,
+ ts.eclipse.ide.jsdt.ui.editor.contentassist,
+ ts.eclipse.ide.jsdt.ui.template,
+ ts.eclipse.ide.jsdt.ui.template.contentassist

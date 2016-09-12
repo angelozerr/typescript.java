@@ -96,4 +96,12 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 		return null;
 	}
 
+	@Override
+	public boolean isTsxOrJsxFile(Object fileObject) {
+		String ext = getExtension(fileObject);
+		ext = ext != null ? ext.toLowerCase() : null;
+		return ext != null && (FileUtils.TSX_EXTENSION.equals(ext)
+				|| FileUtils.JSX_EXTENSION.equals(ext));
+	}
+
 }
