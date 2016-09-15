@@ -16,6 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.wst.json.core,
  org.eclipse.wst.json.ui,
- org.eclipse.json
+ org.eclipse.json,
+ org.eclipse.ui.forms
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
