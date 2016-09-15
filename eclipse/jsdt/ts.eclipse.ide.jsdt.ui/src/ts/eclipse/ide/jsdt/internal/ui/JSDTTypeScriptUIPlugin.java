@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
@@ -205,4 +206,19 @@ public class JSDTTypeScriptUIPlugin extends AbstractUIPlugin {
 		return fCombinedPreferenceStore;
 	}
 
+	/**
+	 * Returns a section in the Java plugin's dialog settings. If the section doesn't exist yet, it is created.
+	 *
+	 * @param name the name of the section
+	 * @return the section of the given name
+	 * @since 3.2
+	 */
+	public IDialogSettings getDialogSettingsSection(String name) {
+		IDialogSettings dialogSettings= getDialogSettings();
+		IDialogSettings section= dialogSettings.getSection(name);
+		if (section == null) {
+			section= dialogSettings.addNewSection(name);
+		}
+		return section;
+	}
 }

@@ -64,6 +64,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionContext;
 import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.wst.jsdt.internal.ui.IJavaHelpContextIds;
@@ -72,7 +73,6 @@ import org.eclipse.wst.jsdt.internal.ui.actions.RemoveBlockCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ToggleCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
-import org.eclipse.wst.jsdt.ui.IContextMenuConstants;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
 import ts.TypeScriptException;
@@ -89,7 +89,9 @@ import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.ide.jsdt.internal.ui.actions.CompositeActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.IndentAction;
-import ts.eclipse.ide.jsdt.internal.ui.actions.JavaSearchActionGroup;
+import ts.eclipse.ide.jsdt.internal.ui.actions.RefactorActionGroup;
+import ts.eclipse.ide.jsdt.internal.ui.actions.TypeScriptSearchActionGroup;
+import ts.eclipse.ide.jsdt.ui.IContextMenuConstants;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.outline.IEditorOutlineFeatures;
@@ -190,14 +192,10 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	protected void createActions() {
 		super.createActions();
 
-		ActionGroup oeg, ovg, jsg;
-		fActionGroups = new CompositeActionGroup(
-				new ActionGroup[] { /*
-									 * oeg = new OpenEditorActionGroup(this),
-									 * ovg = new OpenViewActionGroup(this),
-									 */ jsg = new JavaSearchActionGroup(this) });
-		fContextMenuGroup = new CompositeActionGroup(
-				new ActionGroup[] { /* oeg, ovg, */ jsg });
+		RefactorActionGroup refactorActionGroup = new RefactorActionGroup(this, ITextEditorActionConstants.GROUP_EDIT);
+		ActionGroup searchActionGroup = new TypeScriptSearchActionGroup(this);
+		fActionGroups = new CompositeActionGroup(new ActionGroup[] { refactorActionGroup, searchActionGroup });
+		fContextMenuGroup = new CompositeActionGroup(new ActionGroup[] { refactorActionGroup, searchActionGroup });
 
 		// Format Action
 		IAction action = new TextOperationAction(JSDTTypeScriptUIMessages.getResourceBundle(), "Format.", this, //$NON-NLS-1$
@@ -259,6 +257,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		setAction(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE, action);
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.SHOW_OUTLINE_ACTION);
+
 	}
 
 	@Override
@@ -515,7 +514,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			ITextViewer textViewer = getViewer();
 			if (textViewer == null)
 				return Status.CANCEL_STATUS;
-			
+
 			IDocument document = textViewer.getDocument();
 			if (document == null)
 				return Status.CANCEL_STATUS;
@@ -562,7 +561,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 					}
 				}
 				fOccurrenceAnnotations = (Annotation[]) annotationMap.keySet()
-						.toArray(new Annotation[annotationMap.keySet().size()]);				
+						.toArray(new Annotation[annotationMap.keySet().size()]);
 			}
 
 			return Status.OK_STATUS;
@@ -723,7 +722,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	 *            the text selection
 	 * 
 	 */
-	private void updateOccurrenceAnnotations(ITextSelection selection) {		
+	private void updateOccurrenceAnnotations(ITextSelection selection) {
 		if (fOccurrencesFinderJob != null)
 			fOccurrencesFinderJob.cancel();
 

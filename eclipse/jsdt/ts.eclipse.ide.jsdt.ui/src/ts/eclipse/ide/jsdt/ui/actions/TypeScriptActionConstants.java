@@ -73,4 +73,9 @@ public class TypeScriptActionConstants {
 	 */
 	public static final String FIND_REFERENCES_IN_PROJECT = "ts.eclipse.ide.jsdt.ui.actions.ReferencesInProject"; //$NON-NLS-1$
 
+	/**
+	 * Refactor menu: name of standard Rename Element global action
+	 * (value <code>"ts.eclipse.ide.jsdt.ui.actions.Rename"</code>).
+	 */
+	public static final String RENAME= "ts.eclipse.ide.jsdt.ui.actions.Rename"; //$NON-NLS-1$
 }

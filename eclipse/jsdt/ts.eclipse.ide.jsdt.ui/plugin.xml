@@ -186,6 +186,40 @@
             visible="false"
             id="ts.eclipse.ide.jsdt.ui.CodingActionSet">
 <!-- =========================================================================== -->
+<!-- Refactoring Menu                                                            -->
+<!-- =========================================================================== -->
+         <menu
+               label="%Refactoring.menu.label"
+               path="edit"
+               id="ts.eclipse.ide.jsdt.ui.refactoring.menu">
+            <separator name="undoRedoGroup"/>
+            <separator name="reorgGroup"/>
+            <separator name="codingGroup"/>
+            <separator name="reorgGroup2"/>
+            <separator name="typeGroup"/>
+            <separator name="typeGroup2"/>
+            <separator name="codingGroup2"/>
+            <separator name="typeGroup3"/>
+            <separator name="scriptGroup"/>
+         </menu>
+         
+<!-- reorg group  -->
+         <!--<action
+               definitionId="org.eclipse.jdt.ui.edit.text.java.move.element"
+               label="%Refactoring.moveAction.label"
+               retarget="true"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/reorgGroup"
+               id="org.eclipse.jdt.ui.actions.Move">
+         </action>-->
+         <action
+               definitionId="ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"
+               label="%Refactoring.renameAction.label"
+               retarget="true"
+               menubarPath="ts.eclipse.ide.jsdt.ui.refactoring.menu/reorgGroup"
+               id="ts.eclipse.ide.jsdt.ui.actions.Rename">
+         </action>
+            
+<!-- =========================================================================== -->
 <!-- Source Menu                                                                 -->
 <!-- =========================================================================== -->
          <menu
@@ -323,7 +357,25 @@
             name="%category.source.name"
             description="%category.source.description"
             id="ts.eclipse.ide.jsdt.ui.category.source">
-      </category>         
+      </category>
+      <category
+            name="%category.refactoring.name"
+            description="%category.refactoring.description"
+            id="ts.eclipse.ide.jsdt.ui.category.refactoring">
+      </category>      
+<!-- refactoring -->
+      <command
+            name="%ActionDefinition.refactorQuickMenu.name"
+            description="%ActionDefinition.refactorQuickMenu.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.refactoring"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.refactor.quickMenu">
+      </command>
+      <command
+            name="%ActionDefinition.renameElement.name"
+            description="%ActionDefinition.renameElement.description"
+            categoryId="ts.eclipse.ide.jsdt.ui.category.refactoring"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element">
+      </command>      
 <!-- edit -->
       <command
             name="%ActionDefinition.format.name"
@@ -459,7 +511,41 @@
             contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
             commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
-            	            	                        
+<!-- refactoring -->
+      <key
+            sequence="M2+M3+T"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.refactor.quickMenu"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            platform="carbon"
+            sequence="M2+M3+T"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId=""
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            platform="carbon"
+            sequence="COMMAND+ALT+T"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.refactor.quickMenu"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            sequence="M2+M3+R"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            platform="carbon"
+            sequence="M2+M3+R"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId=""
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            platform="carbon"
+            sequence="COMMAND+ALT+R"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>            	            	                        
 	</extension>
 	   
 	 <!-- I don't know why, but startup should be done, otherwise TypeScriptCompletionProposalComputer is not registered? -->

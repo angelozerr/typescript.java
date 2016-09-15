@@ -46,7 +46,7 @@ import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
  * from pioneering adopters on the understanding that any code that uses this API will almost certainly be broken
  * (repeatedly) as the API evolves.
  */
-public class JavaSearchActionGroup extends ActionGroup {
+public class TypeScriptSearchActionGroup extends ActionGroup {
 
 	private TypeScriptEditor fEditor;
 
@@ -65,7 +65,7 @@ public class JavaSearchActionGroup extends ActionGroup {
 	 * 
 	 * @param part the view part that owns this action group
 	 */
-	public JavaSearchActionGroup(IViewPart part) {
+	public TypeScriptSearchActionGroup(IViewPart part) {
 		this(part.getViewSite());
 	}
 	
@@ -76,7 +76,7 @@ public class JavaSearchActionGroup extends ActionGroup {
 	 * 
 	 * @param page the page that owns this action group
 	 */
-	public JavaSearchActionGroup(Page page) {
+	public TypeScriptSearchActionGroup(Page page) {
 		this(page.getSite());
 	}
 
@@ -84,7 +84,7 @@ public class JavaSearchActionGroup extends ActionGroup {
 	 * Note: This constructor is for internal use only. Clients should not call this constructor.
 	 * @param editor the JavaScript editor
 	 */
-	public JavaSearchActionGroup(TypeScriptEditor editor) {
+	public TypeScriptSearchActionGroup(TypeScriptEditor editor) {
 		Assert.isNotNull(editor);
 		fEditor= editor;
 		
@@ -96,7 +96,7 @@ public class JavaSearchActionGroup extends ActionGroup {
 //		fOccurrencesGroup= new OccurrencesSearchGroup(fEditor);
 	}
 
-	private JavaSearchActionGroup(IWorkbenchSite site) {
+	private TypeScriptSearchActionGroup(IWorkbenchSite site) {
 		fReferencesGroup= new ReferencesSearchGroup(site);
 //		fReadAccessGroup= new ReadReferencesSearchGroup(site);
 //		fWriteAccessGroup= new WriteReferencesSearchGroup(site);
