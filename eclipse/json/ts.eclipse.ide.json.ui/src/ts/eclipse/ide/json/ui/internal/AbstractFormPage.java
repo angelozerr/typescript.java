@@ -1,18 +1,23 @@
 package ts.eclipse.ide.json.ui.internal;
 
-import java.util.Properties;
-
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.json.jsonpath.IJSONPath;
+import org.eclipse.json.jsonpath.JSONPath;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.wst.json.core.databinding.JSONProperties;
 
 public abstract class AbstractFormPage extends FormPage {
+
+	private DataBindingContext bindingContext;
 
 	public AbstractFormPage(AbstractFormEditor editor, String id, String title) {
 		super(editor, id, title);
@@ -37,7 +42,7 @@ public abstract class AbstractFormPage extends FormPage {
 			form.setImage(titleImage);
 		}
 		toolkit.decorateFormHeading(form.getForm());
-		createUI(managedForm, toolkit);
+		createUI(managedForm);
 	}
 
 	protected boolean contributeToToolbar(IToolBarManager manager) {
@@ -52,51 +57,40 @@ public abstract class AbstractFormPage extends FormPage {
 		return null;
 	}
 
-	protected static class InputField {
-
-		private final Text text;
-		private final ControlDecoration decoration;
-		private final String propertyName;
-		private final IFile file;
-
-		public InputField(Text text, ControlDecoration decoration, String propertyName, IFile file) {
-			this.text = text;
-			this.decoration = decoration;
-			this.propertyName = propertyName;
-			this.file = file;
-		}
-
-		public Text getText() {
-			return text;
-		}
-
-		public ControlDecoration getDecoration() {
-			return decoration;
-		}
-
-		public void refresh() {
-			decoration.setDescriptionText("");
-			decoration.hide();
-
-			text.setText("");
-			if (file.exists()) {
-				Properties properties = new Properties();
-				try {
-					properties.load(file.getContents());
-					String value = (String) properties.get(propertyName);
-					if (value != null) {
-						text.setText(value);
-					}
-				} catch (Exception e) {
-					decoration.setDescriptionText(e.getMessage());
-					decoration.show();
-				}
-			} else {
-				decoration.setDescriptionText("Le fichier de propriété '" + file.getLocation() + "' n'existe pas.");
-				decoration.show();
-			}
-		}
+	protected void bind(Button checkbox, JSONPath jsonPath) {
+		bind(checkbox, jsonPath, null);
 	}
 
-	protected abstract void createUI(IManagedForm managedForm, FormToolkit toolkit);
+	protected void bind(Button checkbox, IJSONPath jsonPath, Boolean defaultValue) {
+		getBindingContext().bindValue(WidgetProperties.selection().observe(checkbox),
+				JSONProperties.value(jsonPath, defaultValue).observe(getEditor().getDocument()));
+	}
+
+	protected Button createCheckbox(Composite parent, String label, IJSONPath path) {
+		return createCheckbox(parent, label, path, null);
+	}
+
+	protected Button createCheckbox(Composite parent, String label, IJSONPath path, Boolean defaultValue) {
+		Button checkbox = getToolkit().createButton(parent, label, SWT.CHECK);
+		bind(checkbox, path, defaultValue);
+		return checkbox;
+	}
+
+	protected FormToolkit getToolkit() {
+		return getManagedForm().getToolkit();
+	}
+
+	public DataBindingContext getBindingContext() {
+		if (bindingContext == null) {
+			bindingContext = new DataBindingContext();
+		}
+		return bindingContext;
+	}
+
+	@Override
+	public AbstractFormEditor getEditor() {
+		return (AbstractFormEditor) super.getEditor();
+	}
+
+	protected abstract void createUI(IManagedForm managedForm);
 }

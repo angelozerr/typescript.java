@@ -22,9 +22,27 @@ public class TsconfigEditorMessages extends NLS {
 	
 	// Overview Page
 	public static String OverviewPage_title;
-	public static String OverviewPage_GeneralInformationSection_desc;
-	public static String OverviewPage_GeneralInformationSection_title;
 	
+	public static String OverviewPage_GeneralInformationSection_title;
+	public static String OverviewPage_GeneralInformationSection_desc;
+	public static String OverviewPage_compileOnSave_label;
+	public static String OverviewPage_buildOnSave_label;
+
+	public static String OverviewPage_DebuggingSection_title;
+	public static String OverviewPage_DebuggingSection_desc;
+	public static String OverviewPage_sourceMap_label;
+
+	// Files page
+	public static String FilesPage_title;
+	public static String FilesPage_FilesSection_title;
+	public static String FilesPage_FilesSection_desc;
+	public static String FilesPage_ExcludeSection_title;
+	public static String FilesPage_ExcludeSection_desc;
+	public static String FilesPage_IncludeSection_title;
+	public static String FilesPage_IncludeSection_desc;
+	public static String FilesPage_ScopeSection_title;
+	public static String FilesPage_ScopeSection_desc;
+
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, TsconfigEditorMessages.class);
 	}

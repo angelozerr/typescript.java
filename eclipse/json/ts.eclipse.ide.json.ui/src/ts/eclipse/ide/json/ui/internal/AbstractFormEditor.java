@@ -1,5 +1,8 @@
 package ts.eclipse.ide.json.ui.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.PartInitException;
@@ -11,6 +14,12 @@ public abstract class AbstractFormEditor extends FormEditor {
 
 	private StructuredTextEditor jsonEditor;
 	private int jsonEditorIndex;
+
+	private final Map<Integer, AbstractFormPage> pageIndexes;
+
+	public AbstractFormEditor() {
+		pageIndexes = new HashMap<Integer, AbstractFormPage>();
+	}
 
 	@Override
 	protected void addPages() {
@@ -55,6 +64,21 @@ public abstract class AbstractFormEditor extends FormEditor {
 			return (T) jsonEditor.getAdapter(adapter);
 		}
 		return a;
+	}
+
+	@Override
+	protected void pageChange(int newPageIndex) {
+		super.pageChange(newPageIndex);
+		AbstractFormPage page = pageIndexes.get(newPageIndex);
+		if (page != null) {
+			page.getBindingContext().updateTargets();
+		}
+	}
+
+	public int addPage(AbstractFormPage page) throws PartInitException {
+		int index = super.addPage(page);
+		pageIndexes.put(index, page);
+		return index;
 	}
 
 	protected abstract void doAddPages() throws PartInitException;

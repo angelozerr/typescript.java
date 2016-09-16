@@ -1,8 +1,18 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.json.ui.internal.tsconfig;
 
+import org.eclipse.json.jsonpath.JSONPath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -12,6 +22,10 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import ts.eclipse.ide.json.ui.internal.AbstractFormPage;
 import ts.eclipse.ide.json.ui.internal.FormLayoutFactory;
 
+/**
+ * Overview page for tsconfig.json editor.
+ *
+ */
 public class OverviewPage extends AbstractFormPage {
 
 	private static final String ID = "overview";
@@ -26,28 +40,24 @@ public class OverviewPage extends AbstractFormPage {
 	}
 
 	@Override
-	protected void createUI(IManagedForm managedForm, FormToolkit toolkit) {
+	protected void createUI(IManagedForm managedForm) {
 		Composite body = managedForm.getForm().getBody();
 		body.setLayout(FormLayoutFactory.createFormTableWrapLayout(true, 2));
-
-		// Left part
-		Composite left = toolkit.createComposite(body);
-		left.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
-		left.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-
-		// General Information
-		createGeneralInformationSection(toolkit, left);
-		createOutputSection(toolkit, left);
-		
-		// Right part
-		Composite right = toolkit.createComposite(body);
-		right.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
-		right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-		createDebuggingSection(toolkit, right);
-
+		createLeftContent(body);
+		createRightContent(body);
 	}
 
-	private void createGeneralInformationSection(FormToolkit toolkit, Composite parent) {
+	private void createLeftContent(Composite parent) {
+		FormToolkit toolkit = super.getToolkit();
+		Composite left = toolkit.createComposite(parent);
+		left.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
+		left.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		// General Information
+		createGeneralInformationSection(left);
+	}
+
+	private void createGeneralInformationSection(Composite parent) {
+		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription(TsconfigEditorMessages.OverviewPage_GeneralInformationSection_desc);
 		section.setText(TsconfigEditorMessages.OverviewPage_GeneralInformationSection_title);
@@ -62,20 +72,31 @@ public class OverviewPage extends AbstractFormPage {
 		glayout.numColumns = 1;
 		sbody.setLayout(glayout);
 
-		
 		Composite sectionClient = toolkit.createComposite(sbody);
 		sectionClient.setLayout(new GridLayout(2, false));
-		Button button = toolkit.createButton(sectionClient, "ES3", SWT.RADIO);
-		button = toolkit.createButton(sectionClient, "ES6", SWT.RADIO);
+		// Button button = toolkit.createButton(sectionClient, "ES3",
+		// SWT.RADIO);
+		// button = toolkit.createButton(sectionClient, "ES6", SWT.RADIO);
 
-		toolkit.createButton(sbody, "Compile on save", SWT.CHECK);
-
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_compileOnSave_label, new JSONPath("compileOnSave"),
+				true);
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_buildOnSave_label, new JSONPath("buildOnSave"));
 	}
-	
-	private void createDebuggingSection(FormToolkit toolkit, Composite parent) {
+
+	private void createRightContent(Composite parent) {
+		FormToolkit toolkit = super.getToolkit();
+		Composite right = toolkit.createComposite(parent);
+		right.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
+		right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		// Debugging section
+		createDebuggingSection(right);
+	}
+
+	private void createDebuggingSection(Composite parent) {
+		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
-		section.setDescription("Debugging...");
-		section.setText("Debugging");
+		section.setDescription(TsconfigEditorMessages.OverviewPage_DebuggingSection_desc);
+		section.setText(TsconfigEditorMessages.OverviewPage_DebuggingSection_title);
 		TableWrapData data = new TableWrapData(TableWrapData.FILL_GRAB);
 		section.setLayoutData(data);
 
@@ -86,11 +107,13 @@ public class OverviewPage extends AbstractFormPage {
 		// glayout.horizontalSpacing = 10;
 		glayout.numColumns = 1;
 		sbody.setLayout(glayout);
-		
-		toolkit.createButton(sbody, "Generate source maps", SWT.CHECK);
+
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_sourceMap_label,
+				new JSONPath("compilerOptions.sourceMap"));
 	}
-	
-	private void createOutputSection(FormToolkit toolkit, Composite parent) {
+
+	private void createOutputSection(Composite parent) {
+		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription("Output...");
 		section.setText("Output");
@@ -104,11 +127,11 @@ public class OverviewPage extends AbstractFormPage {
 		// glayout.horizontalSpacing = 10;
 		glayout.numColumns = 1;
 		sbody.setLayout(glayout);
-		
+
 		toolkit.createButton(sbody, "Keep comments in JavaScript output", SWT.CHECK);
-		
+
 		toolkit.createButton(sbody, "Generate declaration files", SWT.CHECK);
-		
+
 		toolkit.createButton(sbody, "Do not emit outputs if any erros are reported", SWT.CHECK);
 
 	}

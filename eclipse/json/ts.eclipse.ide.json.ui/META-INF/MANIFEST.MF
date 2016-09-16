@@ -17,6 +17,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.json.core,
  org.eclipse.wst.json.ui,
  org.eclipse.json,
- org.eclipse.ui.forms
+ org.eclipse.ui.forms,
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.observable,
+ org.eclipse.jface.databinding,
+ org.eclipse.core.databinding.property,
+ ts.eclipse.ide.json.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
