@@ -71,7 +71,7 @@ public abstract class AbstractFormEditor extends FormEditor {
 		super.pageChange(newPageIndex);
 		AbstractFormPage page = pageIndexes.get(newPageIndex);
 		if (page != null) {
-			page.getBindingContext().updateTargets();
+			page.updateUIBindings();
 		}
 	}
 

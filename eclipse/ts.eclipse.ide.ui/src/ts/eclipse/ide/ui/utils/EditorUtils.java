@@ -2,20 +2,12 @@ package ts.eclipse.ide.ui.utils;
 
 import java.io.File;
 
-import org.eclipse.core.filebuffers.FileBuffers;
-import org.eclipse.core.filebuffers.ITextFileBuffer;
-import org.eclipse.core.filebuffers.ITextFileBufferManager;
-import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
@@ -33,6 +25,10 @@ import ts.client.navbar.TextSpan;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 public class EditorUtils {
+
+	public static IEditorPart openInEditor(IFile file, boolean activate) {
+		return openInEditor(file, null, null, null, null, activate);
+	}
 
 	public static IEditorPart openInEditor(IFile file, Integer startLine, Integer startOffset, Integer endLine,
 			Integer endOffset, boolean activate) {
@@ -156,7 +152,6 @@ public class EditorUtils {
 
 		return viewer;
 	}
-
 
 	public static void openInEditor(IFile file, NavigationBarItem item) {
 		if (!item.hasSpans()) {

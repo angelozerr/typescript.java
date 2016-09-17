@@ -19,15 +19,7 @@ public class JSONUpdaterHelper {
 			IJSONPair pair = findByPath(model.getDocument(), path.getSegments());
 			if (pair != null) {
 				IJSONValue value = pair.getValue();
-				switch (value.getNodeType()) {
-				case IJSONNode.VALUE_BOOLEAN_NODE:
-					return Boolean.parseBoolean(value.getSimpleValue().replaceAll("[\n\ts]", ""));
-				case IJSONNode.VALUE_NUMBER_NODE:
-					return Integer.parseInt(value.getSimpleValue());
-				case IJSONNode.VALUE_STRING_NODE:
-					return value.getSimpleValue();
-				}
-				return value;
+				return getValue(value);
 			}
 		} finally {
 			if (model != null) {
@@ -35,6 +27,29 @@ public class JSONUpdaterHelper {
 			}
 		}
 		return null;
+	}
+
+	public static Object getValue(IJSONValue value) {
+		switch (value.getNodeType()) {
+		case IJSONNode.VALUE_BOOLEAN_NODE:
+			return Boolean.parseBoolean(trimSPaces(value.getSimpleValue()));
+		case IJSONNode.VALUE_NUMBER_NODE:
+			return Integer.parseInt(trimSPaces(value.getSimpleValue()));
+		case IJSONNode.VALUE_STRING_NODE:
+			String s = trimSPaces(value.getSimpleValue());
+			if (s.startsWith("\"")) {
+				s = s.substring(1, s.length());
+			}
+			if (s.endsWith("\"")) {
+				s = s.substring(0, s.length() - 1);
+			}
+			return s;
+		}
+		return value;
+	}
+
+	private static String trimSPaces(String s) {
+		return s.replaceAll("[\n\t]", "").trim();
 	}
 
 	public static void setValue(IStructuredDocument document, IJSONPath path, Object value) {

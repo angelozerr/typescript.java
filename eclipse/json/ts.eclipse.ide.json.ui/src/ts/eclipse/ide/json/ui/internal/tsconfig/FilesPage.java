@@ -11,29 +11,35 @@
 package ts.eclipse.ide.json.ui.internal.tsconfig;
 
 import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.json.jsonpath.JSONPath;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.wst.json.core.databinding.JSONProperties;
 
 import ts.eclipse.ide.json.ui.internal.AbstractFormPage;
 import ts.eclipse.ide.json.ui.internal.FormLayoutFactory;
+import ts.eclipse.ide.ui.utils.EditorUtils;
 
 /**
  * Scope (files, include, exclude) page for tsconfig.json editor.
@@ -42,6 +48,9 @@ import ts.eclipse.ide.json.ui.internal.FormLayoutFactory;
 public class FilesPage extends AbstractFormPage {
 
 	private static final String ID = "files";
+	private TableViewer filesViewer;
+	private TableViewer includeViewer;
+	private TableViewer excludeViewer;
 
 	public FilesPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.FilesPage_title);
@@ -69,6 +78,11 @@ public class FilesPage extends AbstractFormPage {
 		createIncludeSection(left);
 	}
 
+	/**
+	 * Create Files section.
+	 * 
+	 * @param parent
+	 */
 	private void createFilesSection(Composite parent) {
 		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
@@ -87,41 +101,82 @@ public class FilesPage extends AbstractFormPage {
 
 		Table table = toolkit.createTable(client, SWT.NONE);
 		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.heightHint = 20;
+		gd.minimumHeight = 100;
 		gd.widthHint = 100;
 		table.setLayoutData(gd);
 
 		toolkit.paintBordersFor(client);
 
+		// Buttons
 		Composite buttonsComposite = toolkit.createComposite(client);
 		buttonsComposite.setLayout(new GridLayout());
 		buttonsComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-		Button addButton = toolkit.createButton(buttonsComposite, "Add...", SWT.PUSH); //$NON-NLS-1$
+
+		final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		addButton.setLayoutData(gd);
+		addButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+			}
+		});
 
-		Button removeButton = toolkit.createButton(buttonsComposite, "Remove...", SWT.PUSH); //$NON-NLS-1$
+		Button removeButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		removeButton.setLayoutData(gd);
+		removeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+			}
+		});
 
-		TableViewer viewer = new TableViewer(table);
+		Button openButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_open, SWT.PUSH);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		openButton.setLayoutData(gd);
+		openButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openFile(filesViewer.getSelection());
+			}
+		});
+
+		// Files table
+		filesViewer = new TableViewer(table);
+		filesViewer.setLabelProvider(FilesLabelProvider.getInstance());
+		filesViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+			@Override
+			public void doubleClick(DoubleClickEvent e) {
+				openFile(filesViewer.getSelection());
+			}
+		});
 
 		IObservableList files = JSONProperties.list(new JSONPath("files")).observe(getEditor().getDocument());
-		viewer.setContentProvider(new ObservableListContentProvider());
-		viewer.setInput(files);
+		filesViewer.setContentProvider(new ObservableListContentProvider());
+		filesViewer.setInput(files);
 
-		TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-		viewerColumn.getColumn().setWidth(100);
-		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return element.toString();
-			};
+	}
 
-			public Image getImage(Object element) {
-				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-			};
-		});
+	/**
+	 * Open in an editor the selected file of the table files.
+	 * 
+	 * @param selection
+	 */
+	private void openFile(ISelection selection) {
+		if (selection.isEmpty()) {
+			return;
+		}
+		String file = (String) ((IStructuredSelection) selection).getFirstElement();
+		IEditorInput input = getEditorInput();
+		if (input instanceof FileEditorInput) {
+			IFile tsconfigFile = ((FileEditorInput) input).getFile();
+			IFile tsFile = tsconfigFile.getParent().getFile(new Path(file));
+			if (tsFile.exists()) {
+				EditorUtils.openInEditor(tsFile, true);
+			}
+		}
 	}
 
 	private void createExcludeSection(Composite parent) {
@@ -151,32 +206,32 @@ public class FilesPage extends AbstractFormPage {
 		Composite buttonsComposite = toolkit.createComposite(client);
 		buttonsComposite.setLayout(new GridLayout());
 		buttonsComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-		Button addButton = toolkit.createButton(buttonsComposite, "Add...", SWT.PUSH); //$NON-NLS-1$
+		final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		addButton.setLayoutData(gd);
+		addButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+			}
+		});
 
-		Button removeButton = toolkit.createButton(buttonsComposite, "Remove...", SWT.PUSH); //$NON-NLS-1$
+		Button removeButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		removeButton.setLayoutData(gd);
-
-		TableViewer viewer = new TableViewer(table);
-		
-		IObservableList exclude = JSONProperties.list(new JSONPath("exclude")).observe(getEditor().getDocument());
-		viewer.setContentProvider(new ObservableListContentProvider());
-		viewer.setInput(exclude);
-		
-		TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-		viewerColumn.getColumn().setWidth(100);
-		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
+		removeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public String getText(Object element) {
-				return element.toString();
-			};
-
-			public Image getImage(Object element) {
-				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-			};
+			public void widgetSelected(SelectionEvent e) {
+				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+			}
 		});
+
+		excludeViewer = new TableViewer(table);
+
+		IObservableList exclude = JSONProperties.list(new JSONPath("exclude")).observe(getEditor().getDocument());
+		excludeViewer.setContentProvider(new ObservableListContentProvider());
+		excludeViewer.setInput(exclude);
+
 	}
 
 	private void createIncludeSection(Composite parent) {
@@ -206,32 +261,33 @@ public class FilesPage extends AbstractFormPage {
 		Composite buttonsComposite = toolkit.createComposite(client);
 		buttonsComposite.setLayout(new GridLayout());
 		buttonsComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-		Button addButton = toolkit.createButton(buttonsComposite, "Add...", SWT.PUSH); //$NON-NLS-1$
+
+		final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		addButton.setLayoutData(gd);
+		addButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+			}
+		});
 
-		Button removeButton = toolkit.createButton(buttonsComposite, "Remove...", SWT.PUSH); //$NON-NLS-1$
+		Button removeButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		removeButton.setLayoutData(gd);
+		removeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+			}
+		});
 
-		TableViewer viewer = new TableViewer(table);
+		includeViewer = new TableViewer(table);
 
 		IObservableList include = JSONProperties.list(new JSONPath("include")).observe(getEditor().getDocument());
-		viewer.setContentProvider(new ObservableListContentProvider());
-		viewer.setInput(include);
-		
-		TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-		viewerColumn.getColumn().setWidth(100);
-		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return element.toString();
-			};
+		includeViewer.setContentProvider(new ObservableListContentProvider());
+		includeViewer.setInput(include);
 
-			public Image getImage(Object element) {
-				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-			};
-		});
 	}
 
 	private void createRightContent(Composite parent) {
@@ -264,5 +320,13 @@ public class FilesPage extends AbstractFormPage {
 		gd.heightHint = 200;
 		gd.widthHint = 100;
 		table.setLayoutData(gd);
+	}
+
+	@Override
+	protected void updateUIBindings() {
+		super.updateUIBindings();
+		excludeViewer.refresh();
+		includeViewer.refresh();
+		filesViewer.refresh();
 	}
 }

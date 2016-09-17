@@ -22,6 +22,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.databinding.observable,
  org.eclipse.jface.databinding,
  org.eclipse.core.databinding.property,
- ts.eclipse.ide.json.core
+ ts.eclipse.ide.json.core,
+ ts.eclipse.ide.core,
+ ts.eclipse.ide.ui,
+ org.eclipse.ui.ide
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

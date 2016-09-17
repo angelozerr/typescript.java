@@ -93,4 +93,8 @@ public abstract class AbstractFormPage extends FormPage {
 	}
 
 	protected abstract void createUI(IManagedForm managedForm);
+
+	protected void updateUIBindings() {
+		getBindingContext().updateTargets();
+	}
 }

@@ -43,6 +43,11 @@ public class TsconfigEditorMessages extends NLS {
 	public static String FilesPage_ScopeSection_title;
 	public static String FilesPage_ScopeSection_desc;
 
+	// Buttons
+	public static String Button_add;
+	public static String Button_remove;
+	public static String Button_open;
+	
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, TsconfigEditorMessages.class);
 	}
