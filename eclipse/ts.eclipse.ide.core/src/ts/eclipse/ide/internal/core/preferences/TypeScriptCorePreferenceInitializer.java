@@ -48,6 +48,20 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 			ITypeScriptRepository defaultRepository = TypeScriptCorePlugin.getTypeScriptRepositoryManager()
 					.createDefaultRepository(tsRepositoryBaseDir);
 
+			// Loop for archives of TypeScript (1.8.10, etc)
+			File archivesDir = new File(tsRepositoryBaseDir, "archives");
+			if (archivesDir.exists()) {
+				File[] oldRepostoryBaseDirs = archivesDir.listFiles();
+				File oldRepostoryBaseDir = null;
+				for (int i = 0; i < oldRepostoryBaseDirs.length; i++) {
+					oldRepostoryBaseDir = oldRepostoryBaseDirs[i];
+					if (oldRepostoryBaseDir.isDirectory()) {
+						TypeScriptCorePlugin.getTypeScriptRepositoryManager().createRepository(oldRepostoryBaseDir);
+					}
+				}
+
+			}
+
 			// Initialize tsc preferences
 			initializeTscPreferences(node, defaultRepository);
 			// Initialize tsserver preferences
