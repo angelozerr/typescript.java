@@ -35,6 +35,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.wst.json.core.databinding.ExtendedJSONPath;
 import org.eclipse.wst.json.core.databinding.JSONProperties;
 
 import ts.eclipse.ide.json.ui.internal.AbstractFormPage;
@@ -64,7 +65,7 @@ public class FilesPage extends AbstractFormPage {
 	@Override
 	protected void createUI(IManagedForm managedForm) {
 		Composite body = managedForm.getForm().getBody();
-		body.setLayout(FormLayoutFactory.createFormTableWrapLayout(true, 2));
+		body.setLayout(FormLayoutFactory.createFormGridLayout(true, 2));
 		createLeftContent(body);
 		createRightContent(body);
 	}
@@ -72,10 +73,9 @@ public class FilesPage extends AbstractFormPage {
 	private void createLeftContent(Composite parent) {
 		FormToolkit toolkit = super.getToolkit();
 		Composite left = toolkit.createComposite(parent);
-		left.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
-		left.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-		createExcludeSection(left);
-		createIncludeSection(left);
+		left.setLayout(FormLayoutFactory.createFormPaneGridLayout(false, 1));
+		left.setLayoutData(new GridData(GridData.FILL_BOTH));
+		createFilesSection(left);
 	}
 
 	/**
@@ -88,11 +88,8 @@ public class FilesPage extends AbstractFormPage {
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription(TsconfigEditorMessages.FilesPage_FilesSection_desc);
 		section.setText(TsconfigEditorMessages.FilesPage_FilesSection_title);
-		TableWrapData data = new TableWrapData(TableWrapData.FILL_GRAB);
-		section.setLayoutData(data);
 
 		Composite client = toolkit.createComposite(section);
-		section.setClient(client);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		layout.marginWidth = 2;
@@ -104,8 +101,6 @@ public class FilesPage extends AbstractFormPage {
 		gd.minimumHeight = 100;
 		gd.widthHint = 100;
 		table.setLayoutData(gd);
-
-		toolkit.paintBordersFor(client);
 
 		// Buttons
 		Composite buttonsComposite = toolkit.createComposite(client);
@@ -153,7 +148,13 @@ public class FilesPage extends AbstractFormPage {
 			}
 		});
 
-		IObservableList files = JSONProperties.list(new JSONPath("files")).observe(getEditor().getDocument());
+		toolkit.paintBordersFor(client);
+		section.setClient(client);
+		section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
+		section.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		IObservableList files = JSONProperties.list(new ExtendedJSONPath("files[*]"))
+				.observe(getEditor().getDocument());
 		filesViewer.setContentProvider(new ObservableListContentProvider());
 		filesViewer.setInput(files);
 
@@ -169,9 +170,8 @@ public class FilesPage extends AbstractFormPage {
 			return;
 		}
 		String file = (String) ((IStructuredSelection) selection).getFirstElement();
-		IEditorInput input = getEditorInput();
-		if (input instanceof FileEditorInput) {
-			IFile tsconfigFile = ((FileEditorInput) input).getFile();
+		IFile tsconfigFile = getTsconfigFile();
+		if (tsconfigFile != null) {
 			IFile tsFile = tsconfigFile.getParent().getFile(new Path(file));
 			if (tsFile.exists()) {
 				EditorUtils.openInEditor(tsFile, true);
@@ -179,16 +179,21 @@ public class FilesPage extends AbstractFormPage {
 		}
 	}
 
+	private IFile getTsconfigFile() {
+		IEditorInput input = getEditorInput();
+		if (input instanceof FileEditorInput) {
+			return ((FileEditorInput) input).getFile();
+		}
+		return null;
+	}
+
 	private void createExcludeSection(Composite parent) {
 		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription(TsconfigEditorMessages.FilesPage_ExcludeSection_desc);
 		section.setText(TsconfigEditorMessages.FilesPage_ExcludeSection_title);
-		TableWrapData data = new TableWrapData(TableWrapData.FILL_GRAB);
-		section.setLayoutData(data);
 
 		Composite client = toolkit.createComposite(section);
-		section.setClient(client);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		layout.marginWidth = 2;
@@ -200,8 +205,6 @@ public class FilesPage extends AbstractFormPage {
 		gd.heightHint = 20;
 		gd.widthHint = 100;
 		table.setLayoutData(gd);
-
-		toolkit.paintBordersFor(client);
 
 		Composite buttonsComposite = toolkit.createComposite(client);
 		buttonsComposite.setLayout(new GridLayout());
@@ -227,8 +230,12 @@ public class FilesPage extends AbstractFormPage {
 		});
 
 		excludeViewer = new TableViewer(table);
+		toolkit.paintBordersFor(client);
+		section.setClient(client);
+		section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
+		section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		IObservableList exclude = JSONProperties.list(new JSONPath("exclude")).observe(getEditor().getDocument());
+		IObservableList exclude = JSONProperties.list(new ExtendedJSONPath("exclude[*]")).observe(getEditor().getDocument());
 		excludeViewer.setContentProvider(new ObservableListContentProvider());
 		excludeViewer.setInput(exclude);
 
@@ -239,11 +246,8 @@ public class FilesPage extends AbstractFormPage {
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription(TsconfigEditorMessages.FilesPage_IncludeSection_desc);
 		section.setText(TsconfigEditorMessages.FilesPage_IncludeSection_title);
-		TableWrapData data = new TableWrapData(TableWrapData.FILL_GRAB);
-		section.setLayoutData(data);
 
 		Composite client = toolkit.createComposite(section);
-		section.setClient(client);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		layout.marginWidth = 2;
@@ -255,8 +259,6 @@ public class FilesPage extends AbstractFormPage {
 		gd.heightHint = 20;
 		gd.widthHint = 100;
 		table.setLayoutData(gd);
-
-		toolkit.paintBordersFor(client);
 
 		Composite buttonsComposite = toolkit.createComposite(client);
 		buttonsComposite.setLayout(new GridLayout());
@@ -284,7 +286,12 @@ public class FilesPage extends AbstractFormPage {
 
 		includeViewer = new TableViewer(table);
 
-		IObservableList include = JSONProperties.list(new JSONPath("include")).observe(getEditor().getDocument());
+		toolkit.paintBordersFor(client);
+		section.setClient(client);
+		section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
+		section.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		IObservableList include = JSONProperties.list(new ExtendedJSONPath("include[*]")).observe(getEditor().getDocument());
 		includeViewer.setContentProvider(new ObservableListContentProvider());
 		includeViewer.setInput(include);
 
@@ -293,10 +300,11 @@ public class FilesPage extends AbstractFormPage {
 	private void createRightContent(Composite parent) {
 		FormToolkit toolkit = super.getToolkit();
 		Composite right = toolkit.createComposite(parent);
-		right.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
-		right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-		createFilesSection(right);
-		createScopeSection(right);
+		right.setLayout(FormLayoutFactory.createFormPaneGridLayout(false, 1));
+		right.setLayoutData(new GridData(GridData.FILL_BOTH));
+		createExcludeSection(right);
+		createIncludeSection(right);
+		// createScopeSection(right);
 	}
 
 	private void createScopeSection(Composite parent) {

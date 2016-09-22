@@ -1,6 +1,7 @@
 package org.eclipse.wst.json.core.databinding.internal;
 
 import org.eclipse.json.jsonpath.IJSONPath;
+import org.eclipse.wst.json.core.databinding.IExtendedJSONPath;
 import org.eclipse.wst.json.core.document.IJSONDocument;
 import org.eclipse.wst.json.core.document.IJSONModel;
 import org.eclipse.wst.json.core.document.IJSONNode;
@@ -11,6 +12,8 @@ import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
 public class JSONUpdaterHelper {
+
+	private static final int NO_START_INDEX = -2;
 
 	public static Object getValue(IStructuredDocument document, IJSONPath path) {
 		IJSONModel model = null;
@@ -56,33 +59,43 @@ public class JSONUpdaterHelper {
 		IJSONModel model = null;
 		try {
 			model = (IJSONModel) StructuredModelManager.getModelManager().getModelForEdit(document);
-			IJSONNode root = model.getDocument().getFirstChild();
-			IJSONNode lastParentNotNull = validateParent(root);
+			IJSONNode parent = model.getDocument().getFirstChild();
 			String[] segments = path.getSegments();
-			StringBuilder newContent = new StringBuilder();
-			int nbObjectToClose = 0;
-			IJSONPair pair = null;
-			IJSONNode parent = lastParentNotNull;
 			String name = null;
-			int startIndex = -1;
+			int replaceOffset = 0;
+			int replaceLength = 0;
+			boolean isArray = false;
+			int startIndex = NO_START_INDEX;
+			StringBuilder newContent = new StringBuilder();
 			for (int i = 0; i < segments.length; i++) {
 				name = segments[i];
+				isArray = isArray(path, i);
 				IJSONPair node = findByPath(parent, name);
 				if (node != null) {
-					// JSON pair founded
-					pair = ((IJSONPair) node);
-					parent = validateParent(pair.getValue());
-					if (parent != null) {
-						lastParentNotNull = parent;
+					parent = node;
+					IJSONNode jsonValue = node.getValue();
+					if (isObjectOrArray(jsonValue)) {
+						parent = jsonValue;
+						replaceOffset = getEndOffset(parent, true);
+					} else {
+						if (jsonValue != null) {
+							replaceOffset = jsonValue.getStartOffset();
+							replaceLength = jsonValue.getFirstStructuredDocumentRegion().getFirstRegion().getLength();
+						} else {
+
+						}
 					}
 				} else {
-					// JSON pair not founded
-					if (parent == null) {
-						newContent.append("{");
-						nbObjectToClose++;
-					}
-					if (startIndex == -1) {
-						startIndex = i + 1;
+					if (isObjectOrArray(parent)) {
+						replaceOffset = getEndOffset(parent, true);
+						if (parent.hasChildNodes()) {
+							newContent.append(",");
+						}
+					} else {
+						newContent.append(isArray ? "[" : "{");
+						if (startIndex == NO_START_INDEX) {
+							startIndex = i - 1;
+						}
 					}
 					newLineAndIndent(i, newContent);
 					newContent.append("\"");
@@ -90,45 +103,80 @@ public class JSONUpdaterHelper {
 					newContent.append("\": ");
 					parent = null;
 				}
-
 			}
 			newContent.append(value);
 
-			for (int i = 0; i < nbObjectToClose; i++) {
-				newLineAndIndent(nbObjectToClose - i - startIndex, newContent);
-				newContent.append("}");
-			}
-
-			if (root == null) {
-				// newContent.append("\n}");
-				document.set(newContent.toString());
-			} else {
-				if (pair != null) {
-					IJSONValue replaceValue = pair.getValue();
-					int offset = replaceValue.getStartOffset();
-					int length = replaceValue.getEndOffset() - replaceValue.getStartOffset();
-					if (isObjectOrArray(replaceValue)) {
-						offset++;
-						length = length - 2;
+			if (startIndex != NO_START_INDEX) {
+				// close JSON object or Array
+				for (int i = segments.length - 1; i > startIndex; i--) {
+					if (i == -1) {
+						newLineAndIndent(0, newContent);
+						newContent.append("}");
+					} else {
+						name = segments[i];
+						isArray = isArray(path, i);
+						newLineAndIndent(i - 1, newContent);
+						newContent.append(isArray ? "]" : "}");
 					}
-					document.replaceText(document, offset, length, newContent.toString());
-				} else {
-					if (lastParentNotNull.hasChildNodes()) {
-						newContent.append(",");
-					}
-					document.replaceText(document, lastParentNotNull.getStartOffset() + 1, 0, newContent.toString());
 				}
 			}
+			document.replaceText(document, replaceOffset, replaceLength, newContent.toString());
 		} finally {
 			if (model != null) {
 				model.releaseFromEdit();
 			}
 		}
-
 	}
 
-	private static IJSONNode validateParent(IJSONNode node) {
-		return isObjectOrArray(node) ? node : null;
+	private static boolean isArray(IJSONPath path, int i) {
+		if (path instanceof IExtendedJSONPath) {
+			return ((IExtendedJSONPath) path).isArray(i);
+		}
+		return false;
+	}
+
+	private static int getEndOffset(IJSONNode parent, boolean inside) {
+		if (parent == null) {
+			return 0;
+		}
+		switch (parent.getNodeType()) {
+		case IJSONNode.OBJECT_NODE:
+			if (parent.hasChildNodes()) {
+				IJSONNode lastChild = parent.getLastChild();
+				boolean childInside = inside
+						&& (isSimpleValue(lastChild) || (lastChild.getNodeType() == IJSONNode.PAIR_NODE
+								&& isSimpleValue(((IJSONPair) lastChild).getValue())));
+				return getEndOffset(lastChild, childInside);
+			}
+			return parent.getStartOffset() + (inside ? 1 : 0);
+		case IJSONNode.PAIR_NODE:
+			if (!inside) {
+				return parent.getEndOffset();
+			}
+
+			IJSONPair pair = (IJSONPair) parent;
+			IJSONValue value = (IJSONValue) pair.getValue();
+			if (value != null) {
+				return getEndOffset(value, false);
+			}
+			return pair.getEndOffset();
+		case IJSONNode.VALUE_BOOLEAN_NODE:
+		case IJSONNode.VALUE_NULL_NODE:
+		case IJSONNode.VALUE_NUMBER_NODE:
+		case IJSONNode.VALUE_STRING_NODE:
+			return parent.getStartOffset() + parent.getFirstStructuredDocumentRegion().getFirstRegion().getLength();
+		default:
+			return parent.getEndOffset();
+		}
+	}
+
+	private static boolean isSimpleValue(IJSONNode node) {
+		if (node == null) {
+			return false;
+		}
+		return node.getNodeType() == IJSONNode.VALUE_BOOLEAN_NODE || node.getNodeType() == IJSONNode.VALUE_NULL_NODE
+				|| node.getNodeType() == IJSONNode.VALUE_NUMBER_NODE
+				|| node.getNodeType() == IJSONNode.VALUE_STRING_NODE;
 	}
 
 	private static boolean isObjectOrArray(IJSONNode node) {

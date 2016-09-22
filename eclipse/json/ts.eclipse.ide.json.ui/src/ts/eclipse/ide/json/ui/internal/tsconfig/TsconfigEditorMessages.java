@@ -32,6 +32,10 @@ public class TsconfigEditorMessages extends NLS {
 	public static String OverviewPage_DebuggingSection_desc;
 	public static String OverviewPage_sourceMap_label;
 
+	public static String OverviewPage_OutputSection_title;
+	public static String OverviewPage_OutputSection_desc;
+	public static String OverviewPage_declaration_label;
+	
 	// Files page
 	public static String FilesPage_title;
 	public static String FilesPage_FilesSection_title;
@@ -47,6 +51,7 @@ public class TsconfigEditorMessages extends NLS {
 	public static String Button_add;
 	public static String Button_remove;
 	public static String Button_open;
+
 	
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, TsconfigEditorMessages.class);
