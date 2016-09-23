@@ -6,7 +6,7 @@
 		<editor
 			name="%tsconfig_Editor.name"
 			icon="$nl$/icons/full/obj16/tsconfig-16.png"
-			class="org.eclipse.wst.sse.ui.StructuredTextEditor"
+			class="ts.eclipse.ide.json.ui.internal.tsconfig.TsconfigEditor"
 			symbolicFontName="org.eclipse.wst.sse.ui.textfont"
 			id="ts.eclipse.ide.json.ui.TsconfigEditor">
 			<contentTypeBinding

@@ -77,9 +77,7 @@ public abstract class AbstractFormPage extends FormPage {
 
 	protected void createTextAndBrowseButton(Composite parent, String label, IJSONPath path, boolean file) {
 		Composite composite = getToolkit().createComposite(parent, SWT.NONE);
-		GridData gd = new GridData();
-		// gd.heightHint=0;
-		// composite.setLayoutData(gd);
+		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		GridLayout layout = new GridLayout(3, false);
 		layout.marginWidth = 0;
 		layout.marginBottom = 0;
@@ -87,11 +85,10 @@ public abstract class AbstractFormPage extends FormPage {
 		layout.marginHeight = 0;
 		layout.verticalSpacing = 0;
 		composite.setLayout(layout);
+
 		final Button checkbox = getToolkit().createButton(composite, label, SWT.CHECK);
-		// GridData gd = new GridData();
-		// gd.verticalIndent=0;
-		checkbox.setLayoutData(gd);
 		final Text text = getToolkit().createText(composite, "");
+		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		final Button browse = getToolkit().createButton(composite, TsconfigEditorMessages.Button_browse, SWT.PUSH);
 		// return text;
 
@@ -105,9 +102,15 @@ public abstract class AbstractFormPage extends FormPage {
 				browse.setEnabled(checkbox.getSelection());
 			}
 		});
+
+		bind(text, path, null);
 	}
 
-	protected void createCombo(Composite parent, String label, IJSONPath path, String[] values) {
+	protected CCombo createCombo(Composite parent, String label, IJSONPath path, String[] values) {
+		return createCombo(parent, label, path, values, null);
+	}
+
+	protected CCombo createCombo(Composite parent, String label, IJSONPath path, String[] values, String defaultValue) {
 		FormToolkit toolkit = getToolkit();
 		Composite composite = toolkit.createComposite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -126,8 +129,36 @@ public abstract class AbstractFormPage extends FormPage {
 		combo.setItems(values);
 		toolkit.adapt(combo, true, false);
 
-		bind(combo, path);
+		bind(combo, path, defaultValue);
+		return combo;
+	}
 
+	protected Text createText(Composite parent, String label, JSONPath path) {
+		return createText(parent, label, path, null, null);
+	}
+
+	protected Text createText(Composite parent, String label, JSONPath path, String defaultValue, String message) {
+		FormToolkit toolkit = getToolkit();
+		Composite composite = toolkit.createComposite(parent, SWT.NONE);
+		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginBottom = 0;
+		layout.marginTop = 0;
+		layout.marginHeight = 0;
+		layout.verticalSpacing = 0;
+		composite.setLayout(layout);
+
+		toolkit.createLabel(composite, label);
+
+		Text text = toolkit.createText(composite, "");
+		if (message != null) {
+			text.setMessage(message);
+		}
+		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		bind(text, path, defaultValue);
+		return text;
 	}
 
 	protected FormToolkit getToolkit() {
@@ -163,8 +194,13 @@ public abstract class AbstractFormPage extends FormPage {
 				JSONProperties.value(jsonPath, defaultValue).observe(getEditor().getDocument()));
 	}
 
-	protected void bind(CCombo combo, IJSONPath path) {
+	protected void bind(CCombo combo, IJSONPath path, String defaultValue) {
 		getBindingContext().bindValue(WidgetProperties.selection().observe(combo),
-				JSONProperties.value(path, null).observe(getEditor().getDocument()));
+				JSONProperties.value(path, defaultValue).observe(getEditor().getDocument()));
+	}
+
+	protected void bind(Text text, IJSONPath path, String defaultValue) {
+		getBindingContext().bindValue(WidgetProperties.text(SWT.Modify).observe(text),
+				JSONProperties.value(path, defaultValue).observe(getEditor().getDocument()));
 	}
 }

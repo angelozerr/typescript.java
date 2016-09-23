@@ -20,6 +20,7 @@ import ts.eclipse.ide.json.ui.internal.AbstractFormEditor;
  * <ul>
  * <li>Overview page.</li>
  * <li>Files page.</li>
+ * <li>Output page.</li>
  * <li>Source page.</li>
  * </ul>
  * 
@@ -32,5 +33,6 @@ public class TsconfigEditor extends AbstractFormEditor {
 	protected void doAddPages() throws PartInitException {
 		addPage(new OverviewPage(this));
 		addPage(new FilesPage(this));
+		addPage(new OutputPage(this));
 	}
 }
