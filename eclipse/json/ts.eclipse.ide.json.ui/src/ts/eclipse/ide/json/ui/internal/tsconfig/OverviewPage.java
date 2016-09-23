@@ -11,7 +11,6 @@
 package ts.eclipse.ide.json.ui.internal.tsconfig;
 
 import org.eclipse.json.jsonpath.JSONPath;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
@@ -69,20 +68,21 @@ public class OverviewPage extends AbstractFormPage {
 		section.setClient(sbody);
 
 		GridLayout glayout = new GridLayout();
-		// glayout.horizontalSpacing = 10;
 		glayout.numColumns = 1;
 		sbody.setLayout(glayout);
 
-		Composite sectionClient = toolkit.createComposite(sbody);
-		sectionClient.setLayout(new GridLayout(2, false));
-		// Button button = toolkit.createButton(sectionClient, "ES3",
-		// SWT.RADIO);
-		// button = toolkit.createButton(sectionClient, "ES6", SWT.RADIO);
-//		createCombo(sbody, TsconfigEditorMessages.OverviewPage_compileOnSave_label, new JSONPath("compileOnSave"),
-//				true);
+		// Compile/Build on save
 		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_compileOnSave_label, new JSONPath("compileOnSave"),
 				true);
 		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_buildOnSave_label, new JSONPath("buildOnSave"));
+		// Module
+		createCombo(sbody, TsconfigEditorMessages.OverviewPage_module_label, new JSONPath("compilerOptions.module"),
+				new String[] { "none", "commonjs", "amd", "umd", "system", "es6", "es2015" });
+		createCombo(sbody, TsconfigEditorMessages.OverviewPage_moduleResolution_label,
+				new JSONPath("compilerOptions.moduleResolution"), new String[] { "node", "classic" });
+		// Others....
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_experimentalDecorators_label,
+				new JSONPath("compilerOptions.experimentalDecorators"));
 	}
 
 	private void createRightContent(Composite parent) {
@@ -92,6 +92,7 @@ public class OverviewPage extends AbstractFormPage {
 		right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 		// Debugging section
 		createDebuggingSection(right);
+		// createJSXSection(right);
 	}
 
 	private void createDebuggingSection(Composite parent) {
@@ -112,7 +113,38 @@ public class OverviewPage extends AbstractFormPage {
 
 		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_sourceMap_label,
 				new JSONPath("compilerOptions.sourceMap"));
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_inlineSourceMap_label,
+				new JSONPath("compilerOptions.inlineSourceMap"));
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_inlineSources_label,
+				new JSONPath("compilerOptions.inlineSources"));
 	}
+
+	// private void createJSXSection(Composite parent) {
+	// FormToolkit toolkit = super.getToolkit();
+	// Section section = toolkit.createSection(parent, Section.DESCRIPTION |
+	// Section.TITLE_BAR);
+	// section.setDescription(TsconfigEditorMessages.OverviewPage_JSXSection_desc);
+	// section.setText(TsconfigEditorMessages.OverviewPage_JSXSection_title);
+	// TableWrapData data = new TableWrapData(TableWrapData.FILL_GRAB);
+	// section.setLayoutData(data);
+	//
+	// Composite sbody = toolkit.createComposite(section);
+	// section.setClient(sbody);
+	//
+	// GridLayout glayout = new GridLayout();
+	// // glayout.horizontalSpacing = 10;
+	// glayout.numColumns = 1;
+	// sbody.setLayout(glayout);
+	//
+	//// createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_jsx_label,
+	//// new JSONPath("compilerOptions.jsx"));
+	//// createCheckbox(sbody,
+	// TsconfigEditorMessages.OverviewPage_inlineSourceMap_label,
+	//// new JSONPath("compilerOptions.inlineSources"));
+	//// createCheckbox(sbody,
+	// TsconfigEditorMessages.OverviewPage_inlineSourceMap_label,
+	//// new JSONPath("compilerOptions.inlineSources"));
+	// }
 
 	private void createOutputSection(Composite parent) {
 		FormToolkit toolkit = super.getToolkit();
@@ -130,14 +162,28 @@ public class OverviewPage extends AbstractFormPage {
 		glayout.numColumns = 1;
 		sbody.setLayout(glayout);
 
-		//toolkit.createButton(sbody, "Keep comments in JavaScript output", SWT.CHECK);
+		// toolkit.createButton(sbody, "Keep comments in JavaScript output",
+		// SWT.CHECK);
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_noEmit_label, new JSONPath("compilerOptions.noEmit"));
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_noEmitHelpers_label,
+				new JSONPath("compilerOptions.noEmitHelpers"));
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_noEmitOnError_label,
+				new JSONPath("compilerOptions.noEmitOnError"));
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_emitDecoratorMetadata_label,
+				new JSONPath("compilerOptions.emitDecoratorMetadata"));
 
 		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_declaration_label,
 				new JSONPath("compilerOptions.declaration"));
-		
-//		toolkit.createButton(sbody, "Generate declaration files", SWT.CHECK);
-//
-//		toolkit.createButton(sbody, "Do not emit outputs if any erros are reported", SWT.CHECK);
+		createTextAndBrowseButton(sbody, TsconfigEditorMessages.OverviewPage_declarationDir_label,
+				new JSONPath("compilerOptions.declarationDir"), false);
+		createCheckbox(sbody, TsconfigEditorMessages.OverviewPage_emitBOM_label,
+				new JSONPath("compilerOptions.emitBOM"));
+
+		// toolkit.createButton(sbody, "Generate declaration files", SWT.CHECK);
+		//
+		// toolkit.createButton(sbody, "Do not emit outputs if any erros are
+		// reported", SWT.CHECK);
 
 	}
+
 }

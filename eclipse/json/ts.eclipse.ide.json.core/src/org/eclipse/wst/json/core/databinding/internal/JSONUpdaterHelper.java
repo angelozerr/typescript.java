@@ -104,7 +104,14 @@ public class JSONUpdaterHelper {
 					parent = null;
 				}
 			}
-			newContent.append(value);
+
+			if (value instanceof String) {
+				newContent.append("\"");
+				newContent.append(value);
+				newContent.append("\"");
+			} else {
+				newContent.append(value);
+			}
 
 			if (startIndex != NO_START_INDEX) {
 				// close JSON object or Array
