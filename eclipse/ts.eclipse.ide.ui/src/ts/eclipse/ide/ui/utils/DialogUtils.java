@@ -26,6 +26,7 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import ts.eclipse.ide.internal.ui.dialogs.FolderSelectionDialog;
+import ts.eclipse.ide.internal.ui.dialogs.OpenResourceDialog;
 import ts.utils.StringUtils;
 
 public class DialogUtils {
@@ -33,10 +34,8 @@ public class DialogUtils {
 	private DialogUtils() {
 	}
 
-	public static IResource openFolderDialog(String initialFolder, 
-			IProject project, boolean showAllProjects, Shell shell) {
-		SelectionDialog dialog = createFolderDialog(initialFolder, project,
-				showAllProjects, shell);
+	public static IResource openResourceDialog(IProject project, Shell shell) {
+		OpenResourceDialog dialog = new OpenResourceDialog(shell, false, project, IResource.FILE);
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
@@ -47,15 +46,39 @@ public class DialogUtils {
 		return null;
 	}
 
-	private static SelectionDialog createFolderDialog(String initialFolder,
-			final IProject project, final boolean showAllProjects, Shell shell) {
+	public static IResource[] openMultiResourcesDialog(IProject project, Shell shell) {
+		OpenResourceDialog dialog = new OpenResourceDialog(shell, true, project, IResource.FILE);
+		if (dialog.open() != Window.OK) {
+			return null;
+		}
+		Object[] results = dialog.getResult();
+		if (results != null && results.length > 0) {
+			return (IResource[]) results;
+		}
+		return null;
+	}
+
+	public static IResource openFolderDialog(String initialFolder, IProject project, boolean showAllProjects,
+			Shell shell) {
+		SelectionDialog dialog = createFolderDialog(initialFolder, project, showAllProjects, shell);
+		if (dialog.open() != Window.OK) {
+			return null;
+		}
+		Object[] results = dialog.getResult();
+		if (results != null && results.length > 0) {
+			return (IResource) results[0];
+		}
+		return null;
+	}
+
+	private static SelectionDialog createFolderDialog(String initialFolder, final IProject project,
+			final boolean showAllProjects, Shell shell) {
 
 		ILabelProvider lp = new WorkbenchLabelProvider();
 		ITreeContentProvider cp = new WorkbenchContentProvider();
 		FolderSelectionDialog dialog = new FolderSelectionDialog(shell, lp, cp);
-		//dialog.setTitle(TypeScriptUIMessages.TernModuleOptionsPanel_selectPathDialogTitle);
-		IFolder folder = StringUtils.isEmpty(initialFolder) ? null : project
-				.getFolder(initialFolder);
+		// dialog.setTitle(TypeScriptUIMessages.TernModuleOptionsPanel_selectPathDialogTitle);
+		IFolder folder = StringUtils.isEmpty(initialFolder) ? null : project.getFolder(initialFolder);
 		if (folder != null && folder.exists()) {
 			dialog.setInitialSelection(folder);
 		}
@@ -63,8 +86,7 @@ public class DialogUtils {
 		ViewerFilter filter = new ViewerFilter() {
 
 			@Override
-			public boolean select(Viewer viewer, Object parentElement,
-					Object element) {
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (element instanceof IProject) {
 					if (showAllProjects)
 						return true;

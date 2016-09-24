@@ -110,8 +110,8 @@ public abstract class AbstractFormPage extends FormPage {
 			}
 		});
 
+		final IFile tsconfigFile = ((FileEditorInput) getEditorInput()).getFile();
 		if (!isFile) {
-			final IFile tsconfigFile = ((FileEditorInput) getEditorInput()).getFile();
 			browseButton.addSelectionListener(new SelectionAdapter() {
 
 				@Override
@@ -125,7 +125,18 @@ public abstract class AbstractFormPage extends FormPage {
 				}
 			});
 		} else {
+			browseButton.addSelectionListener(new SelectionAdapter() {
 
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					IResource resource = DialogUtils.openResourceDialog(tsconfigFile.getProject(),
+							browseButton.getShell());
+					if (resource != null) {
+						IPath path = WorkbenchResourceUtil.getRelativePath(resource, tsconfigFile.getParent());
+						textField.setText(path.toString());
+					}
+				}
+			});
 		}
 		bind(textField, path, null);
 	}
