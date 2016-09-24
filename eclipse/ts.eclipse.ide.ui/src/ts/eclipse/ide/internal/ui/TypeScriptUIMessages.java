@@ -28,7 +28,8 @@ public class TypeScriptUIMessages extends NLS {
 	// Buttons
 	public static String Browse_FileSystem_button;
 	public static String Browse_Workspace_button;
-
+	public static String Button_newFolder;
+	
 	// Errors
 	public static String TypeScriptUIPlugin_internal_error;
 

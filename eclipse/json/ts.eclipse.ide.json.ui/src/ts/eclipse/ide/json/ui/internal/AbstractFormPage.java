@@ -1,6 +1,9 @@
 package ts.eclipse.ide.json.ui.internal;
 
 import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.json.jsonpath.IJSONPath;
@@ -19,9 +22,12 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.wst.json.core.databinding.JSONProperties;
 
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.json.ui.internal.tsconfig.TsconfigEditorMessages;
+import ts.eclipse.ide.ui.utils.DialogUtils;
 
 public abstract class AbstractFormPage extends FormPage {
 
@@ -75,7 +81,7 @@ public abstract class AbstractFormPage extends FormPage {
 		return checkbox;
 	}
 
-	protected void createTextAndBrowseButton(Composite parent, String label, IJSONPath path, boolean file) {
+	protected void createTextAndBrowseButton(Composite parent, String label, IJSONPath path, boolean isFile) {
 		Composite composite = getToolkit().createComposite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		GridLayout layout = new GridLayout(3, false);
@@ -87,23 +93,41 @@ public abstract class AbstractFormPage extends FormPage {
 		composite.setLayout(layout);
 
 		final Button checkbox = getToolkit().createButton(composite, label, SWT.CHECK);
-		final Text text = getToolkit().createText(composite, "");
-		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final Button browse = getToolkit().createButton(composite, TsconfigEditorMessages.Button_browse, SWT.PUSH);
-		// return text;
+		final Text textField = getToolkit().createText(composite, "");
+		textField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		text.setEnabled(false);
-		browse.setEnabled(false);
+		final Button browseButton = getToolkit().createButton(composite, TsconfigEditorMessages.Button_browse,
+				SWT.PUSH);
+
+		textField.setEnabled(false);
+		browseButton.setEnabled(false);
 
 		checkbox.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				text.setEnabled(checkbox.getSelection());
-				browse.setEnabled(checkbox.getSelection());
+				textField.setEnabled(checkbox.getSelection());
+				browseButton.setEnabled(checkbox.getSelection());
 			}
 		});
 
-		bind(text, path, null);
+		if (!isFile) {
+			final IFile tsconfigFile = ((FileEditorInput) getEditorInput()).getFile();
+			browseButton.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					IResource resource = DialogUtils.openFolderDialog(textField.getText(), tsconfigFile.getProject(),
+							false, browseButton.getShell());
+					if (resource != null) {
+						IPath path = WorkbenchResourceUtil.getRelativePath(resource, tsconfigFile.getParent());
+						textField.setText(path.toString());
+					}
+				}
+			});
+		} else {
+
+		}
+		bind(textField, path, null);
 	}
 
 	protected CCombo createCombo(Composite parent, String label, IJSONPath path, String[] values) {
