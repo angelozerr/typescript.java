@@ -18,9 +18,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.json.jsonpath.JSONPath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -53,6 +54,11 @@ public class FilesPage extends AbstractFormPage {
 	private TableViewer includeViewer;
 	private TableViewer excludeViewer;
 
+	private Button filesOpenButton;
+	private Button filesRemoveButton;
+	private Button includeRemoveButton;
+	private Button excludeRemoveButton;
+
 	public FilesPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.FilesPage_title);
 	}
@@ -68,6 +74,15 @@ public class FilesPage extends AbstractFormPage {
 		body.setLayout(FormLayoutFactory.createFormGridLayout(true, 2));
 		createLeftContent(body);
 		createRightContent(body);
+		updateButtons();
+	}
+
+	private void updateButtons() {
+		boolean hasSelectedFile = !filesViewer.getSelection().isEmpty();
+		filesOpenButton.setEnabled(hasSelectedFile);
+		filesRemoveButton.setEnabled(hasSelectedFile);
+		includeRemoveButton.setEnabled(!includeViewer.getSelection().isEmpty());
+		excludeRemoveButton.setEnabled(!excludeViewer.getSelection().isEmpty());
 	}
 
 	private void createLeftContent(Composite parent) {
@@ -96,7 +111,7 @@ public class FilesPage extends AbstractFormPage {
 		layout.marginHeight = 2;
 		client.setLayout(layout);
 
-		Table table = toolkit.createTable(client, SWT.NONE);
+		Table table = toolkit.createTable(client, SWT.MULTI);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.minimumHeight = 100;
 		gd.widthHint = 100;
@@ -117,20 +132,20 @@ public class FilesPage extends AbstractFormPage {
 			}
 		});
 
-		Button removeButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
+		filesRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		removeButton.setLayoutData(gd);
-		removeButton.addSelectionListener(new SelectionAdapter() {
+		filesRemoveButton.setLayoutData(gd);
+		filesRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
 			}
 		});
 
-		Button openButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_open, SWT.PUSH);
+		filesOpenButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_open, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		openButton.setLayoutData(gd);
-		openButton.addSelectionListener(new SelectionAdapter() {
+		filesOpenButton.setLayoutData(gd);
+		filesOpenButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				openFile(filesViewer.getSelection());
@@ -145,6 +160,14 @@ public class FilesPage extends AbstractFormPage {
 			@Override
 			public void doubleClick(DoubleClickEvent e) {
 				openFile(filesViewer.getSelection());
+			}
+		});
+		filesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				filesOpenButton.setEnabled(true);
+				filesRemoveButton.setEnabled(true);
 			}
 		});
 
@@ -200,7 +223,7 @@ public class FilesPage extends AbstractFormPage {
 		layout.marginHeight = 2;
 		client.setLayout(layout);
 
-		Table table = toolkit.createTable(client, SWT.NONE);
+		Table table = toolkit.createTable(client, SWT.MULTI);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.heightHint = 20;
 		gd.widthHint = 100;
@@ -219,10 +242,10 @@ public class FilesPage extends AbstractFormPage {
 			}
 		});
 
-		Button removeButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
+		excludeRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		removeButton.setLayoutData(gd);
-		removeButton.addSelectionListener(new SelectionAdapter() {
+		excludeRemoveButton.setLayoutData(gd);
+		excludeRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
@@ -230,12 +253,21 @@ public class FilesPage extends AbstractFormPage {
 		});
 
 		excludeViewer = new TableViewer(table);
+		excludeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				excludeRemoveButton.setEnabled(true);
+			}
+		});
+		
 		toolkit.paintBordersFor(client);
 		section.setClient(client);
 		section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
 		section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		IObservableList exclude = JSONProperties.list(new ExtendedJSONPath("exclude[*]")).observe(getEditor().getDocument());
+		IObservableList exclude = JSONProperties.list(new ExtendedJSONPath("exclude[*]"))
+				.observe(getEditor().getDocument());
 		excludeViewer.setContentProvider(new ObservableListContentProvider());
 		excludeViewer.setInput(exclude);
 
@@ -254,7 +286,7 @@ public class FilesPage extends AbstractFormPage {
 		layout.marginHeight = 2;
 		client.setLayout(layout);
 
-		Table table = toolkit.createTable(client, SWT.NONE);
+		Table table = toolkit.createTable(client, SWT.MULTI);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.heightHint = 20;
 		gd.widthHint = 100;
@@ -274,10 +306,10 @@ public class FilesPage extends AbstractFormPage {
 			}
 		});
 
-		Button removeButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
+		includeRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		removeButton.setLayoutData(gd);
-		removeButton.addSelectionListener(new SelectionAdapter() {
+		includeRemoveButton.setLayoutData(gd);
+		includeRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
@@ -285,13 +317,20 @@ public class FilesPage extends AbstractFormPage {
 		});
 
 		includeViewer = new TableViewer(table);
+		includeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				includeRemoveButton.setEnabled(true);
+			}
+		});
 		toolkit.paintBordersFor(client);
 		section.setClient(client);
 		section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
 		section.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		IObservableList include = JSONProperties.list(new ExtendedJSONPath("include[*]")).observe(getEditor().getDocument());
+		IObservableList include = JSONProperties.list(new ExtendedJSONPath("include[*]"))
+				.observe(getEditor().getDocument());
 		includeViewer.setContentProvider(new ObservableListContentProvider());
 		includeViewer.setInput(include);
 
@@ -336,5 +375,6 @@ public class FilesPage extends AbstractFormPage {
 		excludeViewer.refresh();
 		includeViewer.refresh();
 		filesViewer.refresh();
+		updateButtons();
 	}
 }
