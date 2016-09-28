@@ -26,7 +26,18 @@ import ts.eclipse.ide.validator.internal.core.Trace;
  * WTP TypeScript Validator V2 to validate TypeScript. This validator can be
  * called when project is Build or Validate at hand (with Validate context
  * menu).
+ * 
+ * This validator is deprectaed since 1.1.0 because:
+ * 
+ * <ul>
+ * <li>TypeScriptBuilder which compiles files does the same thing and compile ts
+ * -> js files</li>
+ * <li>TypeScriptValidator is very slow when it loop for each files of the
+ * project (node_modules folder), etc. WTP Validator doesn't provide
+ * IResourceVisitor which is better to exclude files.</li>
+ * </ul>
  */
+@Deprecated
 public class TypeScriptValidator extends AbstractValidator implements IValidatorJob {
 
 	private static final String TYPESCRIPT_VALIDATOR_CONTEXT = "ts.eclipse.ide.validator.internal.core.validation.validatorContext"; //$NON-NLS-1$

@@ -27,6 +27,7 @@
       <persistent value="true"/>
    </extension>
 
+   <!-- WTP TypeScript Validator is deprecated, it's better for performance to use TypeScriptBuilder.
    <extension id="TypeScript" 
    			  name="%TypeScript_Validator.name" 
    			  point="org.eclipse.wst.validation.validatorV2">
@@ -43,9 +44,6 @@
               <contentType id="ts.eclipse.ide.core.tsSource"></contentType>
               <contentType id="ts.eclipse.ide.core.jsxSource"></contentType>
               <contentType id="ts.eclipse.ide.core.tsxSource"></contentType>
-              <!--<contentType id="org.eclipse.wst.html.core.htmlsource"></contentType>
-               <contentType id="org.eclipse.jst.jsp.core.jspsource"></contentType>
-               -->
                <fileext
                      caseSensitive="false"
                      ext="js">
@@ -62,25 +60,9 @@
                      caseSensitive="false"
                      ext="tsx">
                </fileext>                                             
-               <!--<fileext
-                     caseSensitive="false"
-                     ext="html">
-               </fileext>
-               <fileext
-                     caseSensitive="false"
-                     ext="htm">
-               </fileext>
-               <fileext
-                     caseSensitive="false"
-                     ext="jsp">
-               </fileext>
-               <fileext
-                     caseSensitive="false"
-                     ext="php">
-               </fileext>-->
             </rules>
          </include>                     
       </validator>
    </extension>
-   				
+   -->				
 </plugin>        
