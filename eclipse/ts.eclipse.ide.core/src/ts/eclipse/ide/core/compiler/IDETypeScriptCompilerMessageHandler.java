@@ -68,7 +68,7 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 		if (container.exists(path)) {
 			return container.getFile(path);
 		}
-		return null;
+		return WorkbenchResourceUtil.findFileFromWorkspace(filePath);
 	}
 
 	public List<IFile> getFilesToRefresh() {
