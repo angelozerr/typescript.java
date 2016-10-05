@@ -118,11 +118,19 @@ public class FilesPage extends AbstractFormPage {
 	}
 
 	private void updateButtons() {
-		boolean hasSelectedFile = !filesViewer.getSelection().isEmpty();
-		filesOpenButton.setEnabled(hasSelectedFile);
+		ISelection selection = filesViewer.getSelection();
+		boolean hasSelectedFile = !selection.isEmpty();
+		updateFilesOpenButton(selection);
 		filesRemoveButton.setEnabled(hasSelectedFile);
 		includeRemoveButton.setEnabled(!includeViewer.getSelection().isEmpty());
 		excludeRemoveButton.setEnabled(!excludeViewer.getSelection().isEmpty());
+	}
+
+	private void updateFilesOpenButton(ISelection selection) {
+		if (filesOpenButton != null) {
+			filesOpenButton.setEnabled(
+					!selection.isEmpty() && fileExists((String) ((IStructuredSelection) selection).getFirstElement()));
+		}
 	}
 
 	private void createLeftContent(Composite parent) {
@@ -139,6 +147,7 @@ public class FilesPage extends AbstractFormPage {
 	 * @param parent
 	 */
 	private void createFilesSection(Composite parent) {
+		final IFile tsconfigFile = getTsconfigFile();
 		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription(TsconfigEditorMessages.FilesPage_FilesSection_desc);
@@ -162,45 +171,47 @@ public class FilesPage extends AbstractFormPage {
 		buttonsComposite.setLayout(new GridLayout());
 		buttonsComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 
-		final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add, SWT.PUSH);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		addButton.setLayoutData(gd);
-		addButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				IFile tsconfigFile = getTsconfigFile();
-				// Get existing ts files
-				Collection<IResource> existingFiles = getExistingFiles(tsconfigFile.getParent());
-				Object[] resources = DialogUtils.openTypeScriptResourcesDialog(tsconfigFile.getProject(), existingFiles,
-						addButton.getShell());
-				if (resources != null && resources.length > 0) {
-					IPath path = null;
-					Collection<String> elements = new ArrayList<String>(resources.length);
-					for (int i = 0; i < resources.length; i++) {
-						path = WorkbenchResourceUtil.getRelativePath((IResource) resources[i],
-								tsconfigFile.getParent());
-						elements.add(path.toString());
+		if (tsconfigFile != null) {
+			final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add,
+					SWT.PUSH);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			addButton.setLayoutData(gd);
+			addButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					// Get existing ts files
+					Collection<IResource> existingFiles = getExistingFiles(tsconfigFile.getParent());
+					Object[] resources = DialogUtils.openTypeScriptResourcesDialog(tsconfigFile.getProject(),
+							existingFiles, addButton.getShell());
+					if (resources != null && resources.length > 0) {
+						IPath path = null;
+						Collection<String> elements = new ArrayList<String>(resources.length);
+						for (int i = 0; i < resources.length; i++) {
+							path = WorkbenchResourceUtil.getRelativePath((IResource) resources[i],
+									tsconfigFile.getParent());
+							elements.add(path.toString());
+						}
+						IObservableList list = ((IObservableList) filesViewer.getInput());
+						list.addAll(elements);
 					}
-					IObservableList list = ((IObservableList) filesViewer.getInput());
-					list.addAll(elements);
 				}
-			}
 
-			private Collection<IResource> getExistingFiles(IContainer parent) {
-				if (filesViewer.getSelection().isEmpty()) {
-					return null;
-				}
-				Collection<IResource> resources = new ArrayList<IResource>();
-				Object[] files = filesViewer.getStructuredSelection().toArray();
-				for (int i = 0; i < files.length; i++) {
-					IResource f = parent.getFile(new Path((String) files[i]));
-					if (f.exists()) {
-						resources.add(f);
+				private Collection<IResource> getExistingFiles(IContainer parent) {
+					if (filesViewer.getSelection().isEmpty()) {
+						return null;
 					}
+					Collection<IResource> resources = new ArrayList<IResource>();
+					Object[] files = filesViewer.getStructuredSelection().toArray();
+					for (int i = 0; i < files.length; i++) {
+						IResource f = parent.getFile(new Path((String) files[i]));
+						if (f.exists()) {
+							resources.add(f);
+						}
+					}
+					return resources;
 				}
-				return resources;
-			}
-		});
+			});
+		}
 
 		filesRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -213,15 +224,17 @@ public class FilesPage extends AbstractFormPage {
 			}
 		});
 
-		filesOpenButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_open, SWT.PUSH);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		filesOpenButton.setLayoutData(gd);
-		filesOpenButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				openFile(filesViewer.getSelection());
-			}
-		});
+		if (tsconfigFile != null) {
+			filesOpenButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_open, SWT.PUSH);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			filesOpenButton.setLayoutData(gd);
+			filesOpenButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					openFile(filesViewer.getSelection());
+				}
+			});
+		}
 
 		// Files table
 		filesViewer = new TableViewer(table);
@@ -238,7 +251,7 @@ public class FilesPage extends AbstractFormPage {
 
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				filesOpenButton.setEnabled(true);
+				updateFilesOpenButton(event.getSelection());
 				filesRemoveButton.setEnabled(true);
 			}
 		});
@@ -283,6 +296,7 @@ public class FilesPage extends AbstractFormPage {
 	}
 
 	private void createExcludeSection(Composite parent) {
+		final IFile tsconfigFile = getTsconfigFile();
 		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription(TsconfigEditorMessages.FilesPage_ExcludeSection_desc);
@@ -304,15 +318,19 @@ public class FilesPage extends AbstractFormPage {
 		Composite buttonsComposite = toolkit.createComposite(client);
 		buttonsComposite.setLayout(new GridLayout());
 		buttonsComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-		final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add, SWT.PUSH);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		addButton.setLayoutData(gd);
-		addButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
-			}
-		});
+
+		if (tsconfigFile != null) {
+			final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add,
+					SWT.PUSH);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			addButton.setLayoutData(gd);
+			addButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+				}
+			});
+		}
 
 		excludeRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -320,7 +338,7 @@ public class FilesPage extends AbstractFormPage {
 		excludeRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+				MessageDialog.openInformation(excludeRemoveButton.getShell(), "TODO!", "TODO!");
 			}
 		});
 
@@ -346,6 +364,7 @@ public class FilesPage extends AbstractFormPage {
 	}
 
 	private void createIncludeSection(Composite parent) {
+		final IFile tsconfigFile = getTsconfigFile();
 		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
 		section.setDescription(TsconfigEditorMessages.FilesPage_IncludeSection_desc);
@@ -368,15 +387,18 @@ public class FilesPage extends AbstractFormPage {
 		buttonsComposite.setLayout(new GridLayout());
 		buttonsComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 
-		final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add, SWT.PUSH);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		addButton.setLayoutData(gd);
-		addButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
-			}
-		});
+		if (tsconfigFile != null) {
+			final Button addButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add,
+					SWT.PUSH);
+			gd = new GridData(GridData.FILL_HORIZONTAL);
+			addButton.setLayoutData(gd);
+			addButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+				}
+			});
+		}
 
 		includeRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -384,7 +406,7 @@ public class FilesPage extends AbstractFormPage {
 		includeRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+				MessageDialog.openInformation(includeRemoveButton.getShell(), "TODO!", "TODO!");
 			}
 		});
 
