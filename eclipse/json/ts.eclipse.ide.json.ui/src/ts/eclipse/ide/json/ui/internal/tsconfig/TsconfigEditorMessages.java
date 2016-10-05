@@ -104,10 +104,15 @@ public class TsconfigEditorMessages extends NLS {
 
 	// Buttons
 	public static String Button_add;
+	public static String Button_add_pattern;
 	public static String Button_remove;
 	public static String Button_open;
 	public static String Button_browse;
 
+	// Add Pattern dialog
+	public static String AddPatternDialog_title;
+	public static String AddPatternDialog_message;
+	
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, TsconfigEditorMessages.class);
 	}

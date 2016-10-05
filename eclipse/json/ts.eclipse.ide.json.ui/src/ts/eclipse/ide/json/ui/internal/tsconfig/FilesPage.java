@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -48,6 +49,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.wst.json.core.databinding.ExtendedJSONPath;
 import org.eclipse.wst.json.core.databinding.JSONProperties;
 
@@ -74,21 +76,35 @@ public class FilesPage extends AbstractFormPage {
 	private Button filesRemoveButton;
 	private Button includeRemoveButton;
 	private Button excludeRemoveButton;
+	private final FilesLabelProvider filesLabelProvider;
+	private static final WorkbenchLabelProvider WORKBENCH_LABEL_PROVIDER = new WorkbenchLabelProvider();
 
 	public FilesPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.FilesPage_title);
+		filesLabelProvider = new FilesLabelProvider();
 	}
 
 	private class FilesLabelProvider extends LabelProvider implements ILabelDecorator {
 
 		@Override
 		public Image getImage(Object element) {
-			if (TypeScriptResourceUtil.isTsxOrJsxFile(element)) {
+			if (isGlobPattern(element)) {
+				// glob-like file patterns
+				return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_GLOB_PATTERN);
+			} else if (TypeScriptResourceUtil.isTsxOrJsxFile(element)) {
 				return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_JSX);
 			} else if (TypeScriptResourceUtil.isTsOrTsxFile(element)) {
 				return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_TS);
 			}
+			IResource resource = getResource(element.toString());
+			if (resource != null && resource.exists()) {
+				return WORKBENCH_LABEL_PROVIDER.getImage(resource);
+			}
 			return super.getImage(element);
+		}
+
+		private boolean isGlobPattern(Object element) {
+			return element.toString().contains("*") || element.toString().contains("?");
 		}
 
 		@Override
@@ -98,7 +114,9 @@ public class FilesPage extends AbstractFormPage {
 
 		@Override
 		public String decorateText(String label, Object object) {
-			if (!fileExists((String) label)) {
+			if (isGlobPattern(label)) {
+				return null;
+			} else if (!fileExists((String) label)) {
 				return label + " (not found)";
 			}
 			return null;
@@ -239,8 +257,7 @@ public class FilesPage extends AbstractFormPage {
 
 		// Files table
 		filesViewer = new TableViewer(table);
-		FilesLabelProvider labelProvider = new FilesLabelProvider();
-		filesViewer.setLabelProvider(new DecoratingLabelProvider(labelProvider, labelProvider));
+		filesViewer.setLabelProvider(new DecoratingLabelProvider(filesLabelProvider, filesLabelProvider));
 		// open file when row is double clicked
 		filesViewer.addDoubleClickListener(new IDoubleClickListener() {
 
@@ -345,10 +362,39 @@ public class FilesPage extends AbstractFormPage {
 			addButton.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+					Object[] resources = DialogUtils.openResourcesDialog(tsconfigFile.getProject(),
+							addButton.getShell());
+					if (resources != null && resources.length > 0) {
+						IPath path = null;
+						Collection<String> elements = new ArrayList<String>(resources.length);
+						for (int i = 0; i < resources.length; i++) {
+							path = WorkbenchResourceUtil.getRelativePath((IResource) resources[i],
+									tsconfigFile.getParent());
+							elements.add(path.toString());
+						}
+						IObservableList list = ((IObservableList) excludeViewer.getInput());
+						list.addAll(elements);
+					}
 				}
 			});
 		}
+
+		final Button addGlobButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add_pattern,
+				SWT.PUSH);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		addGlobButton.setLayoutData(gd);
+		addGlobButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				InputDialog dialog = new InputDialog(addGlobButton.getShell(),
+						TsconfigEditorMessages.AddPatternDialog_title, TsconfigEditorMessages.AddPatternDialog_message,
+						"**/*.spec.ts", null);
+				if (dialog.open() == Window.OK) {
+					IObservableList list = ((IObservableList) excludeViewer.getInput());
+					list.add(dialog.getValue());
+				}
+			}
+		});
 
 		excludeRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -361,6 +407,7 @@ public class FilesPage extends AbstractFormPage {
 		});
 
 		excludeViewer = new TableViewer(table);
+		excludeViewer.setLabelProvider(new DecoratingLabelProvider(filesLabelProvider, filesLabelProvider));
 		// update enable/disable of buttons when selection changed
 		excludeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
@@ -422,10 +469,40 @@ public class FilesPage extends AbstractFormPage {
 			addButton.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+					Object[] resources = DialogUtils.openResourcesDialog(tsconfigFile.getProject(),
+							addButton.getShell());
+					if (resources != null && resources.length > 0) {
+						IPath path = null;
+						Collection<String> elements = new ArrayList<String>(resources.length);
+						for (int i = 0; i < resources.length; i++) {
+							path = WorkbenchResourceUtil.getRelativePath((IResource) resources[i],
+									tsconfigFile.getParent());
+							elements.add(path.toString());
+						}
+						IObservableList list = ((IObservableList) includeViewer.getInput());
+						list.addAll(elements);
+					}
+
 				}
 			});
 		}
+
+		final Button addGlobButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_add_pattern,
+				SWT.PUSH);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		addGlobButton.setLayoutData(gd);
+		addGlobButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				InputDialog dialog = new InputDialog(addGlobButton.getShell(),
+						TsconfigEditorMessages.AddPatternDialog_title, TsconfigEditorMessages.AddPatternDialog_message,
+						"src/**/*", null);
+				if (dialog.open() == Window.OK) {
+					IObservableList list = ((IObservableList) includeViewer.getInput());
+					list.add(dialog.getValue());
+				}
+			}
+		});
 
 		includeRemoveButton = toolkit.createButton(buttonsComposite, TsconfigEditorMessages.Button_remove, SWT.PUSH);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -438,6 +515,7 @@ public class FilesPage extends AbstractFormPage {
 		});
 
 		includeViewer = new TableViewer(table);
+		includeViewer.setLabelProvider(new DecoratingLabelProvider(filesLabelProvider, filesLabelProvider));
 		// update enable/disable of buttons when selection changed
 		includeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
@@ -514,6 +592,15 @@ public class FilesPage extends AbstractFormPage {
 			return true;
 		}
 		return tsconfigFile.getParent().exists(new Path(file));
+	}
+
+	private IResource getResource(String file) {
+		IFile tsconfigFile = getTsconfigFile();
+		if (tsconfigFile == null) {
+			return null;
+		}
+		return tsconfigFile.getParent().findMember(new Path(file));
+
 	}
 
 }

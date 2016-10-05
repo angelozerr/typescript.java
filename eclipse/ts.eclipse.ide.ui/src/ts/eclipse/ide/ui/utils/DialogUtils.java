@@ -38,7 +38,7 @@ public class DialogUtils {
 	}
 
 	public static IResource openResourceDialog(IProject project, Shell shell) {
-		OpenResourceDialog dialog = new OpenResourceDialog(shell, false, project, IResource.FILE);
+		OpenResourceDialog dialog = new OpenResourceDialog(shell, false, project, IResource.FILE | IResource.FOLDER);
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
@@ -49,8 +49,18 @@ public class DialogUtils {
 		return null;
 	}
 
-	public static Object[] openTypeScriptResourcesDialog(IProject project, Collection<IResource> existingFiles, Shell shell) {
-		OpenTypeScriptResourceDialog dialog = new OpenTypeScriptResourceDialog(shell, true, project, existingFiles, IResource.FILE);
+	public static Object[] openResourcesDialog(IProject project, Shell shell) {
+		OpenResourceDialog dialog = new OpenResourceDialog(shell, false, project, IResource.FILE | IResource.FOLDER);
+		if (dialog.open() != Window.OK) {
+			return null;
+		}
+		return dialog.getResult();
+	}
+
+	public static Object[] openTypeScriptResourcesDialog(IProject project, Collection<IResource> existingFiles,
+			Shell shell) {
+		OpenTypeScriptResourceDialog dialog = new OpenTypeScriptResourceDialog(shell, true, project, existingFiles,
+				IResource.FILE);
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
