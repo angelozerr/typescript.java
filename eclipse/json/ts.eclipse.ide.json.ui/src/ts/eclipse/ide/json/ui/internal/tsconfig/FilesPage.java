@@ -221,7 +221,7 @@ public class FilesPage extends AbstractFormPage {
 		filesRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeSelectedFiles();
+				removeSelectedItems(filesViewer);
 			}
 		});
 
@@ -255,14 +255,14 @@ public class FilesPage extends AbstractFormPage {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				updateFilesOpenButton(event.getSelection());
-				filesRemoveButton.setEnabled(true);
+				filesRemoveButton.setEnabled(!event.getSelection().isEmpty());
 			}
 		});
 		filesViewer.getTable().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.DEL) {
-					removeSelectedFiles();
+					removeSelectedItems(filesViewer);
 				}
 			}
 		});
@@ -281,9 +281,9 @@ public class FilesPage extends AbstractFormPage {
 	/**
 	 * Remove selected files.
 	 */
-	private void removeSelectedFiles() {
-		IObservableList list = ((IObservableList) filesViewer.getInput());
-		list.removeAll(filesViewer.getStructuredSelection().toList());
+	private void removeSelectedItems(TableViewer viewer) {
+		IObservableList list = ((IObservableList) viewer.getInput());
+		list.removeAll(viewer.getStructuredSelection().toList());
 	}
 
 	/**
@@ -356,16 +356,25 @@ public class FilesPage extends AbstractFormPage {
 		excludeRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(excludeRemoveButton.getShell(), "TODO!", "TODO!");
+				removeSelectedItems(excludeViewer);
 			}
 		});
 
 		excludeViewer = new TableViewer(table);
+		// update enable/disable of buttons when selection changed
 		excludeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				excludeRemoveButton.setEnabled(true);
+				excludeRemoveButton.setEnabled(!event.getSelection().isEmpty());
+			}
+		});
+		excludeViewer.getTable().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.DEL) {
+					removeSelectedItems(excludeViewer);
+				}
 			}
 		});
 
@@ -424,16 +433,25 @@ public class FilesPage extends AbstractFormPage {
 		includeRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(includeRemoveButton.getShell(), "TODO!", "TODO!");
+				removeSelectedItems(includeViewer);
 			}
 		});
 
 		includeViewer = new TableViewer(table);
+		// update enable/disable of buttons when selection changed
 		includeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				includeRemoveButton.setEnabled(true);
+				includeRemoveButton.setEnabled(!event.getSelection().isEmpty());
+			}
+		});
+		includeViewer.getTable().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.DEL) {
+					removeSelectedItems(includeViewer);
+				}
 			}
 		});
 		toolkit.paintBordersFor(client);
