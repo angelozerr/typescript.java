@@ -10,37 +10,51 @@
  */
 package ts.eclipse.ide.json.ui.internal.tsconfig;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.wst.json.core.databinding.ExtendedJSONPath;
 import org.eclipse.wst.json.core.databinding.JSONProperties;
 
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.json.ui.internal.AbstractFormPage;
 import ts.eclipse.ide.json.ui.internal.FormLayoutFactory;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
+import ts.eclipse.ide.ui.utils.DialogUtils;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
 /**
@@ -61,6 +75,32 @@ public class FilesPage extends AbstractFormPage {
 
 	public FilesPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.FilesPage_title);
+	}
+
+	private class FilesLabelProvider extends LabelProvider implements ILabelDecorator {
+
+		@Override
+		public Image getImage(Object element) {
+			if (TypeScriptResourceUtil.isTsxOrJsxFile(element)) {
+				return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_JSX);
+			} else if (TypeScriptResourceUtil.isTsOrTsxFile(element)) {
+				return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_TS);
+			}
+			return super.getImage(element);
+		}
+
+		@Override
+		public Image decorateImage(Image image, Object object) {
+			return null;
+		}
+
+		@Override
+		public String decorateText(String label, Object object) {
+			if (!fileExists((String) label)) {
+				return label + " (not found)";
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -128,7 +168,37 @@ public class FilesPage extends AbstractFormPage {
 		addButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+				IFile tsconfigFile = getTsconfigFile();
+				// Get existing ts files
+				Collection<IResource> existingFiles = getExistingFiles(tsconfigFile.getParent());
+				Object[] resources = DialogUtils.openTypeScriptResourcesDialog(tsconfigFile.getProject(), existingFiles,
+						addButton.getShell());
+				if (resources != null && resources.length > 0) {
+					IPath path = null;
+					Collection<String> elements = new ArrayList<String>(resources.length);
+					for (int i = 0; i < resources.length; i++) {
+						path = WorkbenchResourceUtil.getRelativePath((IResource) resources[i],
+								tsconfigFile.getParent());
+						elements.add(path.toString());
+					}
+					IObservableList list = ((IObservableList) filesViewer.getInput());
+					list.addAll(elements);
+				}
+			}
+
+			private Collection<IResource> getExistingFiles(IContainer parent) {
+				if (filesViewer.getSelection().isEmpty()) {
+					return null;
+				}
+				Collection<IResource> resources = new ArrayList<IResource>();
+				Object[] files = filesViewer.getStructuredSelection().toArray();
+				for (int i = 0; i < files.length; i++) {
+					IResource f = parent.getFile(new Path((String) files[i]));
+					if (f.exists()) {
+						resources.add(f);
+					}
+				}
+				return resources;
 			}
 		});
 
@@ -138,7 +208,8 @@ public class FilesPage extends AbstractFormPage {
 		filesRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(addButton.getShell(), "TODO!", "TODO!");
+				IObservableList list = ((IObservableList) filesViewer.getInput());
+				list.removeAll(filesViewer.getStructuredSelection().toList());
 			}
 		});
 
@@ -154,7 +225,8 @@ public class FilesPage extends AbstractFormPage {
 
 		// Files table
 		filesViewer = new TableViewer(table);
-		filesViewer.setLabelProvider(FilesLabelProvider.getInstance());
+		FilesLabelProvider labelProvider = new FilesLabelProvider();
+		filesViewer.setLabelProvider(new DecoratingLabelProvider(labelProvider, labelProvider));
 		filesViewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			@Override
@@ -204,8 +276,8 @@ public class FilesPage extends AbstractFormPage {
 
 	private IFile getTsconfigFile() {
 		IEditorInput input = getEditorInput();
-		if (input instanceof FileEditorInput) {
-			return ((FileEditorInput) input).getFile();
+		if (input instanceof IFileEditorInput) {
+			return ((IFileEditorInput) input).getFile();
 		}
 		return null;
 	}
@@ -260,7 +332,7 @@ public class FilesPage extends AbstractFormPage {
 				excludeRemoveButton.setEnabled(true);
 			}
 		});
-		
+
 		toolkit.paintBordersFor(client);
 		section.setClient(client);
 		section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
@@ -377,4 +449,13 @@ public class FilesPage extends AbstractFormPage {
 		filesViewer.refresh();
 		updateButtons();
 	}
+
+	public boolean fileExists(String file) {
+		IFile tsconfigFile = getTsconfigFile();
+		if (tsconfigFile == null) {
+			return true;
+		}
+		return tsconfigFile.getParent().exists(new Path(file));
+	}
+
 }

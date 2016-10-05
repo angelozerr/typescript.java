@@ -12,8 +12,6 @@ package ts.client.completions;
 
 import ts.client.AbstractTypeScriptCollector;
 import ts.client.ITypeScriptServiceClient;
-import ts.internal.matcher.LCSS;
-import ts.utils.StringUtils;
 
 public abstract class AbstractCompletionCollector extends AbstractTypeScriptCollector
 		implements ITypeScriptCompletionCollector {

@@ -32,7 +32,7 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
  *
  */
 public class JSONListProperty extends SimpleListProperty {
-	private final IJSONPath propertyDescriptor;
+	private final IJSONPath path;
 	private final Class elementType;
 
 	/**
@@ -40,7 +40,7 @@ public class JSONListProperty extends SimpleListProperty {
 	 * @param elementType
 	 */
 	public JSONListProperty(IJSONPath propertyDescriptor, Class elementType) {
-		this.propertyDescriptor = propertyDescriptor;
+		this.path = propertyDescriptor;
 		this.elementType = null;
 		// this.elementType = elementType == null ? BeanPropertyHelper
 		// .getCollectionPropertyElementType(propertyDescriptor)
@@ -55,7 +55,6 @@ public class JSONListProperty extends SimpleListProperty {
 	@Override
 	protected List doGetList(Object source) {
 		IStructuredDocument document = (IStructuredDocument) source;
-		IJSONPath path = propertyDescriptor;
 		Object value = JSONUpdaterHelper.getValue(document, path);
 		if (value instanceof IJSONArray) {
 			IJSONArray array = (IJSONArray) value;
@@ -91,8 +90,7 @@ public class JSONListProperty extends SimpleListProperty {
 
 	@Override
 	protected void doSetList(Object source, List list) {
-		// BeanPropertyHelper.writeProperty(source, propertyDescriptor,
-		// convertListToBeanPropertyType(list));
+		JSONUpdaterHelper.setValue((IStructuredDocument) source, path, list);
 	}
 
 	private Object convertListToBeanPropertyType(List list) {

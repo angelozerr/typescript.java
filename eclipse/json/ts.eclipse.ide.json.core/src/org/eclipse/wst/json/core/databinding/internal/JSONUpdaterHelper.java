@@ -1,5 +1,7 @@
 package org.eclipse.wst.json.core.databinding.internal;
 
+import java.util.Collection;
+
 import org.eclipse.json.jsonpath.IJSONPath;
 import org.eclipse.wst.json.core.databinding.IExtendedJSONPath;
 import org.eclipse.wst.json.core.document.IJSONDocument;
@@ -74,15 +76,16 @@ public class JSONUpdaterHelper {
 				if (node != null) {
 					parent = node;
 					IJSONNode jsonValue = node.getValue();
-					if (isObjectOrArray(jsonValue)) {
+					if (isObject(jsonValue)) {
 						parent = jsonValue;
 						replaceOffset = getEndOffset(parent, true);
 					} else {
 						if (jsonValue != null) {
 							replaceOffset = jsonValue.getStartOffset();
-							replaceLength = jsonValue.getFirstStructuredDocumentRegion().getFirstRegion().getLength();
-						} else {
-
+							replaceLength = isArray(jsonValue)
+									? jsonValue.getEndStructuredDocumentRegion().getEndOffset()
+											- jsonValue.getFirstStructuredDocumentRegion().getStartOffset()
+									: jsonValue.getFirstStructuredDocumentRegion().getFirstRegion().getLength();
 						}
 					}
 				} else {
@@ -105,13 +108,7 @@ public class JSONUpdaterHelper {
 				}
 			}
 
-			if (value instanceof String) {
-				newContent.append("\"");
-				newContent.append(value);
-				newContent.append("\"");
-			} else {
-				newContent.append(value);
-			}
+			addValue(value, newContent);
 
 			if (startIndex != NO_START_INDEX) {
 				// close JSON object or Array
@@ -132,6 +129,28 @@ public class JSONUpdaterHelper {
 			if (model != null) {
 				model.releaseFromEdit();
 			}
+		}
+	}
+
+	private static void addValue(Object value, StringBuilder newContent) {
+		if (value instanceof String) {
+			newContent.append("\"");
+			newContent.append(value);
+			newContent.append("\"");
+		} else if (value instanceof Collection) {
+			Collection list = (Collection) value;
+			int i = 0;
+			newContent.append("[");
+			for (Object object : list) {
+				if (i > 0) {
+					newContent.append(",");
+				}
+				addValue(object, newContent);
+				i++;
+			}
+			newContent.append("]");
+		} else {
+			newContent.append(value);
 		}
 	}
 
@@ -194,6 +213,22 @@ public class JSONUpdaterHelper {
 		return nodeType == IJSONNode.OBJECT_NODE || nodeType == IJSONNode.ARRAY_NODE;
 	}
 
+	private static boolean isObject(IJSONNode node) {
+		if (node == null) {
+			return false;
+		}
+		int nodeType = node.getNodeType();
+		return nodeType == IJSONNode.OBJECT_NODE;
+	}
+
+	private static boolean isArray(IJSONNode node) {
+		if (node == null) {
+			return false;
+		}
+		int nodeType = node.getNodeType();
+		return nodeType == IJSONNode.ARRAY_NODE;
+	}
+
 	private static void newLineAndIndent(int indent, StringBuilder newContent) {
 		newContent.append("\n");
 		for (int j = 0; j <= indent; j++) {
@@ -233,6 +268,34 @@ public class JSONUpdaterHelper {
 			}
 		}
 		return null;
+	}
+
+	public static boolean isValueExists(IStructuredDocument document, IJSONPath path) {
+		IJSONModel model = null;
+		try {
+			model = (IJSONModel) StructuredModelManager.getModelManager().getModelForRead(document);
+			IJSONPair pair = findByPath(model.getDocument(), path.getSegments());
+			return pair != null;
+		} finally {
+			if (model != null) {
+				model.releaseFromRead();
+			}
+		}
+	}
+
+	public static void removePath(IStructuredDocument document, IJSONPath path) {
+		IJSONModel model = null;
+		try {
+			model = (IJSONModel) StructuredModelManager.getModelManager().getModelForRead(document);
+			IJSONPair pair = findByPath(model.getDocument(), path.getSegments());
+			if (pair != null) {
+				document.replaceText(document, pair.getStartOffset(), pair.getEndOffset() - pair.getStartOffset(), "");
+			}
+		} finally {
+			if (model != null) {
+				model.releaseFromRead();
+			}
+		}
 	}
 
 }

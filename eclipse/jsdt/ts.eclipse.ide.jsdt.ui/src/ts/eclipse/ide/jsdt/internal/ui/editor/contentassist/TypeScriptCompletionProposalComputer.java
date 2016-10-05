@@ -60,11 +60,14 @@ public class TypeScriptCompletionProposalComputer
 						IDocument document = context.getDocument();
 						ITypeScriptFile tsFile = tsProject.openFile(resource, document);
 						CharSequence prefix = context.computeIdentifierPrefix();
-
+						
+						// tsserver completion
 						CompletionProposalCollector collector = new JSDTCompletionProposalCollector(position,
 								prefix != null ? prefix.toString() : null,
 								tsProject.getProjectSettings().getCompletionEntryMatcher());
 						tsFile.completions(position, collector);
+						// auto import completion
+						// coll
 						return collector.getProposals();
 					}
 				}

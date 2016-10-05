@@ -4,6 +4,7 @@ import org.eclipse.json.jsonpath.IJSONPath;
 import org.eclipse.json.jsonpath.JSONPath;
 import org.eclipse.wst.json.core.databinding.internal.JSONListProperty;
 import org.eclipse.wst.json.core.databinding.internal.JSONListPropertyDecorator;
+import org.eclipse.wst.json.core.databinding.internal.JSONValueExistsProperty;
 import org.eclipse.wst.json.core.databinding.internal.JSONValueProperty;
 import org.eclipse.wst.json.core.databinding.internal.JSONValuePropertyDecorator;
 
@@ -26,5 +27,9 @@ public class JSONProperties {
 
 	public static IJSONListProperty list(IJSONPath path) {
 		return new JSONListPropertyDecorator(new JSONListProperty(path, null), path);
+	}
+
+	public static IJSONValueProperty valueExists(IJSONPath path, Object defaultValue) {
+		return new JSONValuePropertyDecorator(new JSONValueExistsProperty(path, defaultValue), path);
 	}
 }

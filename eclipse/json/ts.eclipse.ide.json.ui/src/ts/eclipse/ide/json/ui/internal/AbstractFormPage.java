@@ -1,37 +1,32 @@
 package ts.eclipse.ide.json.ui.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.json.jsonpath.IJSONPath;
 import org.eclipse.json.jsonpath.JSONPath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.wst.json.core.databinding.JSONProperties;
-
-import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
-import ts.eclipse.ide.json.ui.internal.tsconfig.TsconfigEditorMessages;
-import ts.eclipse.ide.ui.utils.DialogUtils;
 
 public abstract class AbstractFormPage extends FormPage {
 
 	private DataBindingContext bindingContext;
+	private List<TextAndBrowseButton> textAndBrowseButtons;
 
 	public AbstractFormPage(AbstractFormEditor editor, String id, String title) {
 		super(editor, id, title);
@@ -81,64 +76,18 @@ public abstract class AbstractFormPage extends FormPage {
 		return checkbox;
 	}
 
-	protected void createTextAndBrowseButton(Composite parent, String label, IJSONPath path, boolean isFile) {
-		Composite composite = getToolkit().createComposite(parent, SWT.NONE);
-		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout layout = new GridLayout(3, false);
-		layout.marginWidth = 0;
-		layout.marginBottom = 0;
-		layout.marginTop = 0;
-		layout.marginHeight = 0;
-		layout.verticalSpacing = 0;
-		composite.setLayout(layout);
-
-		final Button checkbox = getToolkit().createButton(composite, label, SWT.CHECK);
-		final Text textField = getToolkit().createText(composite, "");
-		textField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		final Button browseButton = getToolkit().createButton(composite, TsconfigEditorMessages.Button_browse,
-				SWT.PUSH);
-
-		textField.setEnabled(false);
-		browseButton.setEnabled(false);
-
-		checkbox.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				textField.setEnabled(checkbox.getSelection());
-				browseButton.setEnabled(checkbox.getSelection());
-			}
-		});
-
-		final IFile tsconfigFile = ((FileEditorInput) getEditorInput()).getFile();
-		if (!isFile) {
-			browseButton.addSelectionListener(new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					IResource resource = DialogUtils.openFolderDialog(textField.getText(), tsconfigFile.getProject(),
-							false, browseButton.getShell());
-					if (resource != null) {
-						IPath path = WorkbenchResourceUtil.getRelativePath(resource, tsconfigFile.getParent());
-						textField.setText(path.toString());
-					}
-				}
-			});
-		} else {
-			browseButton.addSelectionListener(new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					IResource resource = DialogUtils.openResourceDialog(tsconfigFile.getProject(),
-							browseButton.getShell());
-					if (resource != null) {
-						IPath path = WorkbenchResourceUtil.getRelativePath(resource, tsconfigFile.getParent());
-						textField.setText(path.toString());
-					}
-				}
-			});
+	protected TextAndBrowseButton createTextAndBrowseButton(Composite parent, String label, IJSONPath path,
+			boolean isFile) {
+		IEditorInput input = getEditorInput();
+		IFile tsconfigFile = (input instanceof IFileEditorInput) ? ((IFileEditorInput) input).getFile() : null;
+		TextAndBrowseButton control = new TextAndBrowseButton(label, getToolkit(), tsconfigFile, isFile, parent,
+				SWT.NONE);
+		control.bind(path, getEditor().getDocument(), getBindingContext());
+		if (textAndBrowseButtons == null) {
+			textAndBrowseButtons = new ArrayList<TextAndBrowseButton>();
 		}
-		bind(textField, path, null);
+		textAndBrowseButtons.add(control);
+		return control;
 	}
 
 	protected CCombo createCombo(Composite parent, String label, IJSONPath path, String[] values) {
@@ -218,24 +167,31 @@ public abstract class AbstractFormPage extends FormPage {
 
 	protected void updateUIBindings() {
 		getBindingContext().updateTargets();
+		if (textAndBrowseButtons != null) {
+			for (TextAndBrowseButton control : textAndBrowseButtons) {
+
+			}
+		}
 	}
 
-	protected void bind(Button checkbox, JSONPath jsonPath) {
+	protected void bindExists(Button checkbox, IJSONPath jsonPath, Object defaultValue) {
+		JSONBindingUIHelper.bindExists(checkbox, jsonPath, defaultValue, getEditor().getDocument(),
+				getBindingContext());
+	}
+
+	protected void bind(Button checkbox, IJSONPath jsonPath) {
 		bind(checkbox, jsonPath, null);
 	}
 
 	protected void bind(Button checkbox, IJSONPath jsonPath, Boolean defaultValue) {
-		getBindingContext().bindValue(WidgetProperties.selection().observe(checkbox),
-				JSONProperties.value(jsonPath, defaultValue).observe(getEditor().getDocument()));
+		JSONBindingUIHelper.bind(checkbox, jsonPath, defaultValue, getEditor().getDocument(), getBindingContext());
 	}
 
 	protected void bind(CCombo combo, IJSONPath path, String defaultValue) {
-		getBindingContext().bindValue(WidgetProperties.selection().observe(combo),
-				JSONProperties.value(path, defaultValue).observe(getEditor().getDocument()));
+		JSONBindingUIHelper.bind(combo, path, defaultValue, getEditor().getDocument(), getBindingContext());
 	}
 
 	protected void bind(Text text, IJSONPath path, String defaultValue) {
-		getBindingContext().bindValue(WidgetProperties.text(SWT.Modify).observe(text),
-				JSONProperties.value(path, defaultValue).observe(getEditor().getDocument()));
+		JSONBindingUIHelper.bind(text, path, defaultValue, getEditor().getDocument(), getBindingContext());
 	}
 }

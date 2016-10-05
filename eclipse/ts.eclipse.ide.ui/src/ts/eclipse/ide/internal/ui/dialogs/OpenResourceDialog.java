@@ -16,9 +16,7 @@ import org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog;
 
 public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 
-	public OpenResourceDialog(Shell shell, boolean multi, IContainer container,
-			int typesMask) {
+	public OpenResourceDialog(Shell shell, boolean multi, IContainer container, int typesMask) {
 		super(shell, multi, container, typesMask);
 	}
-
 }

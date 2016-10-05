@@ -10,6 +10,8 @@
  */
 package ts.eclipse.ide.ui.utils;
 
+import java.util.Collection;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -27,6 +29,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import ts.eclipse.ide.internal.ui.dialogs.FolderSelectionDialog;
 import ts.eclipse.ide.internal.ui.dialogs.OpenResourceDialog;
+import ts.eclipse.ide.internal.ui.dialogs.OpenTypeScriptResourceDialog;
 import ts.utils.StringUtils;
 
 public class DialogUtils {
@@ -46,16 +49,12 @@ public class DialogUtils {
 		return null;
 	}
 
-	public static IResource[] openMultiResourcesDialog(IProject project, Shell shell) {
-		OpenResourceDialog dialog = new OpenResourceDialog(shell, true, project, IResource.FILE);
+	public static Object[] openTypeScriptResourcesDialog(IProject project, Collection<IResource> existingFiles, Shell shell) {
+		OpenTypeScriptResourceDialog dialog = new OpenTypeScriptResourceDialog(shell, true, project, existingFiles, IResource.FILE);
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
-		Object[] results = dialog.getResult();
-		if (results != null && results.length > 0) {
-			return (IResource[]) results;
-		}
-		return null;
+		return dialog.getResult();
 	}
 
 	public static IResource openFolderDialog(String initialFolder, IProject project, boolean showAllProjects,
