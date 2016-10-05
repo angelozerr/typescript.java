@@ -32,6 +32,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -219,8 +221,7 @@ public class FilesPage extends AbstractFormPage {
 		filesRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				IObservableList list = ((IObservableList) filesViewer.getInput());
-				list.removeAll(filesViewer.getStructuredSelection().toList());
+				removeSelectedFiles();
 			}
 		});
 
@@ -240,6 +241,7 @@ public class FilesPage extends AbstractFormPage {
 		filesViewer = new TableViewer(table);
 		FilesLabelProvider labelProvider = new FilesLabelProvider();
 		filesViewer.setLabelProvider(new DecoratingLabelProvider(labelProvider, labelProvider));
+		// open file when row is double clicked
 		filesViewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			@Override
@@ -247,6 +249,7 @@ public class FilesPage extends AbstractFormPage {
 				openFile(filesViewer.getSelection());
 			}
 		});
+		// update enable/disable of buttons when selection changed
 		filesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
@@ -255,7 +258,14 @@ public class FilesPage extends AbstractFormPage {
 				filesRemoveButton.setEnabled(true);
 			}
 		});
-
+		filesViewer.getTable().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.DEL) {
+					removeSelectedFiles();
+				}
+			}
+		});
 		toolkit.paintBordersFor(client);
 		section.setClient(client);
 		section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
@@ -266,6 +276,14 @@ public class FilesPage extends AbstractFormPage {
 		filesViewer.setContentProvider(new ObservableListContentProvider());
 		filesViewer.setInput(files);
 
+	}
+
+	/**
+	 * Remove selected files.
+	 */
+	private void removeSelectedFiles() {
+		IObservableList list = ((IObservableList) filesViewer.getInput());
+		list.removeAll(filesViewer.getStructuredSelection().toList());
 	}
 
 	/**
