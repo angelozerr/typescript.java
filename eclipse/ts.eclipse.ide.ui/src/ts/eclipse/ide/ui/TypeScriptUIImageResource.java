@@ -16,12 +16,17 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Utility class to handle image resources.
@@ -52,7 +57,7 @@ public class TypeScriptUIImageResource {
 	public static final String IMG_JSX = "jsx";
 	public static final String IMG_GLOB_PATTERN = "glob_pattern";
 	public static final String IMG_BUILD = "build";
-	
+
 	// Enabled/Disbaled
 	public static final String IMG_STOP_ENABLED = "stop_enabled";
 	public static final String IMG_STOP_DISABLED = "stop_disabled";
@@ -63,7 +68,6 @@ public class TypeScriptUIImageResource {
 	public static final String IMG_VIEW_MENU_ENABLED = "view_menu_enabled";
 	public static final String IMG_VIEW_MENU_DISABLED = "view_menu_disabled";
 
-	
 	public static final String DESC_OVR_LIBRARY = "ovr_library";
 
 	private static Map<ImageDescriptor, URL> fURLMap;
@@ -117,8 +121,7 @@ public class TypeScriptUIImageResource {
 	 * @return org.eclipse.swt.graphics.Image
 	 */
 	public static Image getImage(String key, String keyIfImageNull) {
-		if (imageRegistry == null)
-			initializeImageRegistry();
+		initializeIfNeeded();
 		Image image = imageRegistry.get(key);
 		if (image == null) {
 			if (keyIfImageNull != null) {
@@ -138,8 +141,7 @@ public class TypeScriptUIImageResource {
 	 * @return org.eclipse.jface.resource.ImageDescriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String key) {
-		if (imageRegistry == null)
-			initializeImageRegistry();
+		initializeIfNeeded();
 		ImageDescriptor id = imageDescriptors.get(key);
 		if (id != null)
 			return id;
@@ -161,7 +163,7 @@ public class TypeScriptUIImageResource {
 		registerImage(IMG_JSX, URL_OBJ + IMG_JSX + ".png");
 		registerImage(IMG_GLOB_PATTERN, URL_OBJ + IMG_GLOB_PATTERN + ".gif");
 		registerImage(IMG_BUILD, URL_OBJ + IMG_BUILD + ".gif");
-		
+
 		registerImage(IMG_STOP_ENABLED, URL_ELCL + "launch_stop.gif");
 		registerImage(IMG_STOP_DISABLED, URL_DLCL + "launch_stop.gif");
 		registerImage(IMG_COLLAPSE_ALL_ENABLED, URL_ELCL + "collapseall.gif");
@@ -170,7 +172,7 @@ public class TypeScriptUIImageResource {
 		registerImage(IMG_SYNCED_DISABLED, URL_DLCL + "synced.gif");
 		registerImage(IMG_VIEW_MENU_ENABLED, URL_ELCL + "view_menu.png");
 		registerImage(IMG_VIEW_MENU_DISABLED, URL_DLCL + "view_menu.png");
-		
+
 		registerImage(DESC_OVR_LIBRARY, URL_OVR + "library_ovr.gif");
 	}
 
@@ -192,10 +194,14 @@ public class TypeScriptUIImageResource {
 	}
 
 	public static void registerImageDescriptor(String key, ImageDescriptor id) {
-		if (imageRegistry == null)
-			initializeImageRegistry();
+		initializeIfNeeded();
 		imageRegistry.put(key, id);
 		imageDescriptors.put(key, id);
+	}
+
+	public static void initializeIfNeeded() {
+		if (imageRegistry == null)
+			initializeImageRegistry();
 	}
 
 	private static File getTempDir() {
@@ -267,5 +273,37 @@ public class TypeScriptUIImageResource {
 
 	private static synchronized int getImageCount() {
 		return fImageCount++;
+	}
+
+	private static final Point size = new Point(16, 16);
+
+	public static Image getDecoratedImage(Image baseImage, int severity) {
+		initializeIfNeeded();
+		String baseImageId = baseImage.toString();
+		// Construct a new image identifier
+		String decoratedImageId = baseImageId.concat(String.valueOf(severity));
+		ImageDescriptor overlay = null;
+		switch (severity) {
+		case IStatus.ERROR:
+			overlay = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEC_FIELD_ERROR);
+			break;
+		case IStatus.WARNING:
+			overlay = PlatformUI.getWorkbench().getSharedImages()
+					.getImageDescriptor(ISharedImages.IMG_DEC_FIELD_WARNING);
+			break;
+		default:
+			return baseImage;
+		}
+		// Return the stored image if we have one
+		Image image = imageRegistry.get(decoratedImageId);
+		if (image != null) {
+			return image;
+		}
+		// Otherwise create a new image and store it
+		DecorationOverlayIcon decoratedImage = new DecorationOverlayIcon(baseImage,
+				new ImageDescriptor[] { null, null, null, overlay, null }, size) {
+		};
+		imageRegistry.put(decoratedImageId, decoratedImage);
+		return imageRegistry.get(decoratedImageId);
 	}
 }

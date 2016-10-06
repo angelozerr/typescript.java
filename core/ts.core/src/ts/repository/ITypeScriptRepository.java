@@ -36,6 +36,13 @@ public interface ITypeScriptRepository {
 	void setBaseDir(File baseDir);;
 
 	/**
+	 * Returns the TypeScript version and null otherwise.
+	 * 
+	 * @return the TypeScript version and null otherwise.
+	 */
+	String getTypesScriptVersion();
+
+	/**
 	 * Returns the tsc file.
 	 * 
 	 * @return the tsc file.
@@ -48,6 +55,13 @@ public interface ITypeScriptRepository {
 	 * @return the tsserver file.
 	 */
 	File getTsserverFile();
+
+	/**
+	 * Returns the tslint version and null otherwise.
+	 * 
+	 * @return the tslint version and null otherwise.
+	 */
+	String getTslintVersion();
 
 	/**
 	 * Returns the tslint file.

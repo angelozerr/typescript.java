@@ -102,6 +102,25 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
+	public String getTscVersion() {
+		if (super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.TSC_USE_EMBEDDED_TYPESCRIPT, false)) {
+			// Use TypeScript Repository.
+			ITypeScriptRepository repository = getRepository(
+					TypeScriptCorePreferenceConstants.TSC_EMBEDDED_TYPESCRIPT_ID);
+			return (repository != null) ? repository.getTypesScriptVersion() : null;
+		}
+
+		// Use Installed TypScript
+		String path = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.TSC_INSTALLED_TYPESCRIPT_PATH,
+				null);
+		File resolvedPath = resolvePath(path);
+		File tscFile = resolvedPath != null ? IDETypeScriptRepositoryManager.getTscFile(resolvedPath) : null;
+		return tscFile != null
+				? IDETypeScriptRepositoryManager.getPackageJsonVersion(tscFile.getParentFile().getParentFile())
+				: null;
+	}
+
+	@Override
 	public File getTsserverFile() {
 		if (super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.TSSERVER_USE_EMBEDDED_TYPESCRIPT,
 				false)) {
@@ -116,6 +135,26 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 				TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH, null);
 		File resolvedPath = resolvePath(path);
 		return resolvedPath != null ? IDETypeScriptRepositoryManager.getTsserverFile(resolvedPath) : null;
+	}
+
+	@Override
+	public String getTsserverVersion() {
+		if (super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.TSSERVER_USE_EMBEDDED_TYPESCRIPT,
+				false)) {
+			// Use TypeScript Repository.
+			ITypeScriptRepository repository = getRepository(
+					TypeScriptCorePreferenceConstants.TSSERVER_EMBEDDED_TYPESCRIPT_ID);
+			return (repository != null) ? repository.getTypesScriptVersion() : null;
+		}
+
+		// Use Installed TypScript
+		String path = super.getStringPreferencesValue(
+				TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH, null);
+		File resolvedPath = resolvePath(path);
+		File tsserverFile = resolvedPath != null ? IDETypeScriptRepositoryManager.getTsserverFile(resolvedPath) : null;
+		return tsserverFile != null
+				? IDETypeScriptRepositoryManager.getPackageJsonVersion(tsserverFile.getParentFile().getParentFile())
+				: null;
 	}
 
 	private ITypeScriptRepository getRepository(String preferenceName) {

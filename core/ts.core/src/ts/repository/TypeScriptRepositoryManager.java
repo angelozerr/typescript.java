@@ -1,10 +1,15 @@
 package ts.repository;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+
 import ts.internal.repository.TypeScriptRepository;
+import ts.utils.IOUtils;
 
 public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager {
 
@@ -68,5 +73,15 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 
 	public static File getTslintFile(File tslintScriptDir) {
 		return new File(tslintScriptDir, "bin/tslint");
+	}
+	
+	public static String getPackageJsonVersion(File baseDir) {
+		File packageJsonFile = new File(baseDir, "package.json");
+		try {
+			JsonObject json = Json.parse(IOUtils.toString(new FileInputStream(packageJsonFile))).asObject();
+			return json.getString("version", null);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

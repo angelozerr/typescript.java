@@ -261,16 +261,6 @@ public class TypeScriptProject implements ITypeScriptProject {
 			compiler = null;
 		}
 	}
-	// private void closeFiles() {
-	// for (ITypeScriptFile openedFile : openedFiles.values()) {
-	// try {
-	// openedFile.close();
-	// } catch (TSException e) {
-	// // ignore error
-	// }
-	// }
-	// openedFiles.clear();
-	// }
 
 	@SuppressWarnings("unchecked")
 	public <T> T getData(String key) {

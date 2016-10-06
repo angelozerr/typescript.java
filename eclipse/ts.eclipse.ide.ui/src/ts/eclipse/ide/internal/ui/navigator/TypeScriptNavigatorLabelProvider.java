@@ -2,6 +2,7 @@ package ts.eclipse.ide.internal.ui.navigator;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -33,7 +34,22 @@ public class TypeScriptNavigatorLabelProvider implements ICommonLabelProvider {
 	@Override
 	public String getText(Object element) {
 		if (element instanceof ITypeScriptProject) {
-			return TypeScriptUIMessages.TypeScriptResources;
+			ITypeScriptProject tsProject = ((ITypeScriptProject) element);
+			String tscVersion = tsProject.getProjectSettings().getTscVersion();
+			String tsserverVersion = tsProject.getProjectSettings().getTsserverVersion();
+			if (tscVersion == null) {
+				if (tsserverVersion == null) {
+					return NLS.bind(TypeScriptUIMessages.TypeScriptResources, "?");
+				} else {
+					return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tsserverVersion);
+				}
+			} else if (tsserverVersion == null) {
+				return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tscVersion);
+			}
+			if (tscVersion.equals(tsserverVersion)) {
+				return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tscVersion);
+			}
+			return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tscVersion + "|" + tsserverVersion);
 		} else if (element instanceof ITypeScriptRootContainer) {
 			IContainer container = ((ITypeScriptRootContainer) element).getContainer();
 			return TypeScriptResourceUtil.getBuildPathLabel(container);

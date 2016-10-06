@@ -45,12 +45,26 @@ public interface ITypeScriptProjectSettings {
 	File getTscFile() throws TypeScriptException;
 
 	/**
+	 * Returns the version of tsc and null otherwise.
+	 * 
+	 * @return the version of tsc and null otherwise.
+	 */
+	String getTscVersion();
+
+	/**
 	 * Returns the typescript/bin/tsserver file to execute.
 	 * 
 	 * @return the typescript/bin/tsserver file to execute.
 	 * @throws TypeScriptException
 	 */
 	File getTsserverFile() throws TypeScriptException;
+
+	/**
+	 * Returns the version of tsserver and null otherwise.
+	 * 
+	 * @return the version of tsserver and null otherwise.
+	 */
+	String getTsserverVersion();
 
 	/**
 	 * Returns the tslint/bin/tslint file to execute.
@@ -66,9 +80,9 @@ public interface ITypeScriptProjectSettings {
 	ICompletionEntryMatcher getCompletionEntryMatcher();
 
 	boolean isUseCodeSnippetsOnMethodSuggest();
-	
+
 	// ------------- tslint settings
-	
+
 	TslintSettingsStrategy getTslintStrategy();
 
 	File getCustomTslintJsonFile();

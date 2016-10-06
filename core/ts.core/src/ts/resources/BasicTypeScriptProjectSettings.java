@@ -105,7 +105,16 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 
 	@Override
 	public FormatOptions getFormatOptions() {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public String getTscVersion() {
+		return repository.getTypesScriptVersion();
+	}
+
+	@Override
+	public String getTsserverVersion() {
+		return repository.getTypesScriptVersion();
 	}
 }
