@@ -28,6 +28,7 @@ public class TextAndBrowseButton extends Composite {
 	private final boolean isFile;
 	private Text textField;
 	private Button checkbox;
+	private Button browseButton;
 
 	public TextAndBrowseButton(String checkBoxLabel, FormToolkit toolkit, IFile tsconfigFile, boolean isFile,
 			Composite parent, int style) {
@@ -64,7 +65,7 @@ public class TextAndBrowseButton extends Composite {
 		textField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		if (fromWorkspace) {
-			final Button browseButton = getToolkit().createButton(composite, TsconfigEditorMessages.Button_browse,
+			browseButton = getToolkit().createButton(composite, TsconfigEditorMessages.Button_browse,
 					SWT.PUSH);
 
 			textField.setEnabled(false);
@@ -74,8 +75,10 @@ public class TextAndBrowseButton extends Composite {
 				checkbox.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						textField.setEnabled(checkbox.getSelection());
-						browseButton.setEnabled(checkbox.getSelection());
+						updateEnable();
+						if (!checkbox.getSelection()) {
+							textField.setText("");
+						}
 					}
 				});
 			}
@@ -128,5 +131,10 @@ public class TextAndBrowseButton extends Composite {
 
 	public FormToolkit getToolkit() {
 		return toolkit;
+	}
+
+	public void updateEnable() {
+		textField.setEnabled(checkbox.getSelection());
+		browseButton.setEnabled(checkbox.getSelection());
 	}
 }

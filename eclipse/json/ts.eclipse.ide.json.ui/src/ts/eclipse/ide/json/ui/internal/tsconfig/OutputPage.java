@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.json.ui.internal.tsconfig;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.json.jsonpath.JSONPath;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,6 +34,12 @@ public class OutputPage extends AbstractFormPage {
 
 	public OutputPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.OutputPage_title);
+	}
+	
+	@Override
+	protected boolean contributeToToolbar(IToolBarManager manager) {
+		manager.add(new BuildAction((TsconfigEditor) getEditor()));
+		return true;
 	}
 
 	@Override

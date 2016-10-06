@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.json.ui.internal.tsconfig;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.json.jsonpath.JSONPath;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -31,6 +32,12 @@ public class OverviewPage extends AbstractFormPage {
 
 	public OverviewPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.OverviewPage_title);
+	}
+
+	@Override
+	protected boolean contributeToToolbar(IToolBarManager manager) {
+		manager.add(new BuildAction((TsconfigEditor) getEditor()));
+		return true;
 	}
 
 	@Override

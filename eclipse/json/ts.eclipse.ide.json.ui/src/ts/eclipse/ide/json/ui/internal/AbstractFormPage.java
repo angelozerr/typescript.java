@@ -169,7 +169,7 @@ public abstract class AbstractFormPage extends FormPage {
 		getBindingContext().updateTargets();
 		if (textAndBrowseButtons != null) {
 			for (TextAndBrowseButton control : textAndBrowseButtons) {
-
+				control.updateEnable();
 			}
 		}
 	}

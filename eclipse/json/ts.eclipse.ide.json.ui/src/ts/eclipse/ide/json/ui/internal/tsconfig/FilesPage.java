@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
@@ -82,6 +83,12 @@ public class FilesPage extends AbstractFormPage {
 	public FilesPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.FilesPage_title);
 		filesLabelProvider = new FilesLabelProvider();
+	}
+
+	@Override
+	protected boolean contributeToToolbar(IToolBarManager manager) {
+		manager.add(new BuildAction((TsconfigEditor) getEditor()));
+		return true;
 	}
 
 	private class FilesLabelProvider extends LabelProvider implements ILabelDecorator {

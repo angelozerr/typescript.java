@@ -20,6 +20,9 @@ public class TsconfigEditorMessages extends NLS {
 
 	private static final String BUNDLE_NAME = "ts.eclipse.ide.json.ui.internal.tsconfig.TsconfigEditorMessages"; //$NON-NLS-1$
 
+	// Actions
+	public static String BuildAction_text;
+
 	// Overview Page
 	public static String OverviewPage_title;
 
