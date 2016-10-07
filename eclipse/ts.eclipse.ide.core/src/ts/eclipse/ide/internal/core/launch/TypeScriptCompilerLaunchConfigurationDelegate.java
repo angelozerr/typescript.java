@@ -23,8 +23,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
 import ts.TypeScriptException;
 import ts.cmd.tsc.CompilerOptions;
@@ -39,7 +39,7 @@ import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
  * files *.ts to *.js/*.js.map files.
  *
  */
-public class TypeScriptCompilerLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
+public class TypeScriptCompilerLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	@Override
 	public void launch(ILaunchConfiguration configuration, String arg1, ILaunch launch, IProgressMonitor monitor)

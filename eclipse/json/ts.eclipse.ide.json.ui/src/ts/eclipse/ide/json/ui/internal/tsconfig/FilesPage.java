@@ -232,6 +232,7 @@ public class FilesPage extends AbstractFormPage {
 						}
 						IObservableList list = ((IObservableList) filesViewer.getInput());
 						list.addAll(elements);
+						filesViewer.refresh();
 					}
 				}
 

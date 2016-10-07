@@ -28,21 +28,20 @@ public class TsconfigEditorMessages extends NLS {
 
 	public static String OverviewPage_GeneralInformationSection_title;
 	public static String OverviewPage_GeneralInformationSection_desc;
-	public static String OverviewPage_compileOnSave_label;
-	public static String OverviewPage_buildOnSave_label;
 	public static String OverviewPage_target_label;
 	public static String OverviewPage_module_label;
 	public static String OverviewPage_moduleResolution_label;
 	public static String OverviewPage_experimentalDecorators_label;
 
-	public static String OverviewPage_DebuggingSection_title;
-	public static String OverviewPage_DebuggingSection_desc;
-	public static String OverviewPage_sourceMap_label;
-	public static String OverviewPage_sourceRoot_label;
-	public static String OverviewPage_mapRoot_label;
-	public static String OverviewPage_inlineSourceMap_label;
-	public static String OverviewPage_inlineSources_label;
-
+	public static String OverviewPage_CompilerSection_title;
+	public static String OverviewPage_CompilerSection_desc;
+	public static String OverviewPage_typeScriptBuilder_label;
+	public static String OverviewPage_compileOnSave_label;
+	public static String OverviewPage_buildOnSave_label;
+	protected static String TypeScriptBuilder_Error_title;
+	protected static String TypeScriptBuilder_enable_Error_message;
+	protected static String TypeScriptBuilder_disable_Error_message;
+	
 	public static String OverviewPage_ValidatingSection_title;
 	public static String OverviewPage_ValidatingSection_desc;
 	public static String OverviewPage_noImplicitAny_label;
@@ -61,11 +60,6 @@ public class TsconfigEditorMessages extends NLS {
 	public static String OverviewPage_allowSyntheticDefaultImports_label;
 	public static String OverviewPage_strictNullChecks_label;
 	
-	public static String OverviewPage_JSXSection_title;
-	public static String OverviewPage_JSXSection_desc;
-	public static String OutputPage_jsx_label;
-	public static String OutputPage_reactNamespace_label;
-
 	// Files page
 	public static String FilesPage_title;
 	public static String FilesPage_FilesSection_title;
@@ -104,6 +98,19 @@ public class TsconfigEditorMessages extends NLS {
 	public static String OutputPage_traceResolution_label;
 	public static String OutputPage_pretty_label;
 	public static String OutputPage_listEmittedFiles_label;
+
+	public static String OutputPage_DebuggingSection_title;
+	public static String OutputPage_DebuggingSection_desc;
+	public static String OutputPage_sourceMap_label;
+	public static String OutputPage_sourceRoot_label;
+	public static String OutputPage_mapRoot_label;
+	public static String OutputPage_inlineSourceMap_label;
+	public static String OutputPage_inlineSources_label;
+
+	public static String OutputPage_JSXSection_title;
+	public static String OutputPage_JSXSection_desc;
+	public static String OutputPage_jsx_label;
+	public static String OutputPage_reactNamespace_label;
 
 	// Buttons
 	public static String Button_add;

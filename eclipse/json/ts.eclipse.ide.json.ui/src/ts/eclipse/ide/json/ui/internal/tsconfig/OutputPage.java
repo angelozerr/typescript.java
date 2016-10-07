@@ -68,6 +68,7 @@ public class OutputPage extends AbstractFormPage {
 		Composite right = toolkit.createComposite(parent);
 		right.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
 		right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		createDebuggingSection(right);
 		createReportingSection(right);
 		createJSXSection(right);
 	}
@@ -111,6 +112,27 @@ public class OutputPage extends AbstractFormPage {
 				new JSONPath("compilerOptions.stripInternal"));
 	}
 
+	private void createDebuggingSection(Composite parent) {
+		FormToolkit toolkit = super.getToolkit();
+		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
+		section.setDescription(TsconfigEditorMessages.OutputPage_DebuggingSection_desc);
+		section.setText(TsconfigEditorMessages.OutputPage_DebuggingSection_title);
+		TableWrapData data = new TableWrapData(TableWrapData.FILL_GRAB);
+		section.setLayoutData(data);
+		Composite body = createBody(section);
+
+		createCheckbox(body, TsconfigEditorMessages.OutputPage_sourceMap_label,
+				new JSONPath("compilerOptions.sourceMap"));
+		createTextAndBrowseButton(body, TsconfigEditorMessages.OutputPage_sourceRoot_label,
+				new JSONPath("compilerOptions.sourceRoot"), false);
+		createTextAndBrowseButton(body, TsconfigEditorMessages.OutputPage_mapRoot_label,
+				new JSONPath("compilerOptions.mapRoot"), false);
+		createCheckbox(body, TsconfigEditorMessages.OutputPage_inlineSourceMap_label,
+				new JSONPath("compilerOptions.inlineSourceMap"));
+		createCheckbox(body, TsconfigEditorMessages.OutputPage_inlineSources_label,
+				new JSONPath("compilerOptions.inlineSources"));
+	}
+
 	private void createReportingSection(Composite parent) {
 		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
@@ -128,14 +150,13 @@ public class OutputPage extends AbstractFormPage {
 				new JSONPath("compilerOptions.traceResolution"));
 		createCheckbox(body, TsconfigEditorMessages.OutputPage_listEmittedFiles_label,
 				new JSONPath("compilerOptions.listEmittedFiles"));
-
 	}
 
 	private void createJSXSection(Composite parent) {
 		FormToolkit toolkit = super.getToolkit();
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION | Section.TITLE_BAR);
-		section.setDescription(TsconfigEditorMessages.OverviewPage_JSXSection_desc);
-		section.setText(TsconfigEditorMessages.OverviewPage_JSXSection_title);
+		section.setDescription(TsconfigEditorMessages.OutputPage_JSXSection_desc);
+		section.setText(TsconfigEditorMessages.OutputPage_JSXSection_title);
 		TableWrapData data = new TableWrapData(TableWrapData.FILL_GRAB);
 		section.setLayoutData(data);
 
@@ -146,7 +167,7 @@ public class OutputPage extends AbstractFormPage {
 		Text reactNamespaceText = createText(body, TsconfigEditorMessages.OutputPage_reactNamespace_label,
 				new JSONPath("compilerOptions.reactNamespace"), null, "jsxFactory");
 	}
-
+	
 	private Composite createBody(Section section) {
 		FormToolkit toolkit = super.getToolkit();
 		Composite body = toolkit.createComposite(section);
