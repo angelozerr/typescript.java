@@ -30,8 +30,8 @@ import ts.TypeScriptException;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
+import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.format.ITypeScriptFormatCollector;
-import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
@@ -57,7 +57,9 @@ import ts.internal.client.protocol.QuickInfoRequest;
 import ts.internal.client.protocol.ReferencesRequest;
 import ts.internal.client.protocol.ReloadRequest;
 import ts.internal.client.protocol.Request;
+import ts.internal.client.protocol.SemanticDiagnosticsSyncRequest;
 import ts.internal.client.protocol.SignatureHelpRequest;
+import ts.internal.client.protocol.SyntacticDiagnosticsSyncRequest;
 import ts.nodejs.INodejsLaunchConfiguration;
 import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
@@ -211,8 +213,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// ---------------- Configure
 
 	@Override
-	public void configure(ConfigureRequestArguments arguments)
-			throws TypeScriptException {
+	public void configure(ConfigureRequestArguments arguments) throws TypeScriptException {
 		ConfigureRequest request = new ConfigureRequest(arguments);
 		execute(request);
 	}
@@ -225,7 +226,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	@Override
-	public void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException {
+	public void geterr(String[] files, int delay, ITypeScriptDiagnosticsCollector collector)
+			throws TypeScriptException {
 		Request request = new GeterrRequest(files, delay, collector);
 		if (delay == 0) {
 			try {
@@ -244,7 +246,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
-	private void collect(JsonObject response, ITypeScriptGeterrCollector collector) {
+	private void collect(JsonObject response, ITypeScriptDiagnosticsCollector collector) {
 		String event = response.getString("event", null);
 		JsonObject body = response.get("body").asObject();
 		String file = body.getString("file", null);
@@ -294,8 +296,27 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// ----------------- Navbar
 
 	@Override
-	public void navbar(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector) throws TypeScriptException {
+	public void navbar(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
+			throws TypeScriptException {
 		NavBarRequest request = new NavBarRequest(fileName, positionProvider, collector);
+		execute(request);
+	}
+
+	// ------------------- Since 2.0.3
+
+	@Override
+	public void semanticDiagnosticsSync(String fileName, Boolean includeLinePosition,
+			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException {
+		SemanticDiagnosticsSyncRequest request = new SemanticDiagnosticsSyncRequest(fileName, includeLinePosition,
+				collector);
+		execute(request);
+	}
+
+	@Override
+	public void syntacticDiagnosticsSync(String fileName, Boolean includeLinePosition,
+			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException {
+		SyntacticDiagnosticsSyncRequest request = new SyntacticDiagnosticsSyncRequest(fileName, includeLinePosition,
+				collector);
 		execute(request);
 	}
 

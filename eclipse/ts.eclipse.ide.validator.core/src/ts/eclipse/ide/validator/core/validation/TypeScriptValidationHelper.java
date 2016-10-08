@@ -11,11 +11,10 @@ import ts.eclipse.ide.validator.internal.core.validation.TypeScriptReporterColle
 public class TypeScriptValidationHelper {
 
 	public static void validate(IIDETypeScriptFile tsFile, IReporter reporter, IValidator validator) {
-		int delay = 0;
 		try {
 			IIDETypeScriptProject tsProject = (IIDETypeScriptProject) tsFile.getProject();
 			TypeScriptReporterCollector collector = new TypeScriptReporterCollector(tsFile, reporter, validator);
-			tsProject.geterr(tsFile, delay, collector);
+			tsProject.diagnostics(tsFile, collector);
 			// tsProject.getTslint().lint((IFile) tsFile.getResource(), collector);
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while TypeScript validation.", e);

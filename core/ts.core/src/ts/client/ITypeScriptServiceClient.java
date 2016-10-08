@@ -14,8 +14,8 @@ import ts.TypeScriptException;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
+import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.format.ITypeScriptFormatCollector;
-import ts.client.geterr.ITypeScriptGeterrCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
@@ -55,7 +55,7 @@ public interface ITypeScriptServiceClient {
 	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
 			throws TypeScriptException;
 
-	void geterr(String[] files, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException;
+	void geterr(String[] files, int delay, ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
 
 	void format(String fileName, int line, int offset, int endLine, int endOffset, ITypeScriptFormatCollector collector)
 			throws TypeScriptException;
@@ -84,5 +84,12 @@ public interface ITypeScriptServiceClient {
 	boolean isDisposed();
 
 	void configure(ConfigureRequestArguments arguments) throws TypeScriptException;
+
+	// @Since("2.0.3")
+	void semanticDiagnosticsSync(String file, Boolean includeLinePosition, ITypeScriptDiagnosticsCollector collector)
+			throws TypeScriptException;
+
+	void syntacticDiagnosticsSync(String file, Boolean includeLinePosition, ITypeScriptDiagnosticsCollector collector)
+			throws TypeScriptException;
 
 }

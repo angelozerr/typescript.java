@@ -21,13 +21,14 @@ import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
 import ts.client.TypeScriptServiceClient;
-import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tsc.TypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
 import ts.cmd.tslint.TypeScriptLint;
+import ts.internal.client.protocol.CommandNames;
 
 /**
  * TypeScript project implementation.
@@ -50,12 +51,15 @@ public class TypeScriptProject implements ITypeScriptProject {
 	protected final Object serverLock = new Object();
 	private ITypeScriptLint tslint;
 
+	private final Map<CommandNames, Boolean> serverCapabilities;
+
 	public TypeScriptProject(File projectDir, ITypeScriptProjectSettings projectSettings) {
 		this.projectDir = projectDir;
 		this.projectSettings = projectSettings;
 		this.openedFiles = new HashMap<String, ITypeScriptFile>();
 		this.data = new HashMap<String, Object>();
 		this.listeners = new ArrayList<ITypeScriptClientListener>();
+		this.serverCapabilities = new HashMap<CommandNames, Boolean>();
 	}
 
 	protected void setProjectSettings(ITypeScriptProjectSettings projectSettings) {
@@ -125,10 +129,38 @@ public class TypeScriptProject implements ITypeScriptProject {
 	}
 
 	@Override
-	public void geterr(ITypeScriptFile file, int delay, ITypeScriptGeterrCollector collector)
+	public void geterr(ITypeScriptFile file, int delay, ITypeScriptDiagnosticsCollector collector)
 			throws TypeScriptException {
 		file.synch();
 		getClient().geterr(new String[] { file.getName() }, delay, collector);
+	}
+
+	@Override
+	public void semanticDiagnosticsSync(ITypeScriptFile file, Boolean includeLinePosition,
+			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException {
+		file.synch();
+		getClient().semanticDiagnosticsSync(file.getName(), includeLinePosition, collector);
+	}
+
+	@Override
+	public void syntacticDiagnosticsSync(ITypeScriptFile file, Boolean includeLinePosition,
+			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException {
+		file.synch();
+		getClient().syntacticDiagnosticsSync(file.getName(), includeLinePosition, collector);
+	}
+
+	@Override
+	public void diagnostics(ITypeScriptFile file, ITypeScriptDiagnosticsCollector collector)
+			throws TypeScriptException {
+		file.synch();
+		if (canSupport(CommandNames.SemanticDiagnosticsSync)) {
+			// TypeScript >=2.0.3, uses syntactic/semantic command names which
+			// seems having better performance.
+			getClient().syntacticDiagnosticsSync(file.getName(), true, collector);
+			getClient().semanticDiagnosticsSync(file.getName(), true, collector);
+		} else {
+			getClient().geterr(new String[] { file.getName() }, 0, collector);
+		}
 	}
 
 	@Override
@@ -252,6 +284,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 				}
 			}
 		}
+		serverCapabilities.clear();
 	}
 
 	@Override
@@ -320,5 +353,14 @@ public class TypeScriptProject implements ITypeScriptProject {
 	@Override
 	public ITypeScriptProjectSettings getProjectSettings() {
 		return projectSettings;
+	}
+
+	private boolean canSupport(CommandNames command) {
+		Boolean support = serverCapabilities.get(command);
+		if (support == null) {
+			support = command.canSupport(getProjectSettings().getTsserverVersion());
+			serverCapabilities.put(command, support);
+		}
+		return support;
 	}
 }

@@ -8,7 +8,7 @@ import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
 import ts.TypeScriptException;
 import ts.client.Location;
-import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.cmd.ITypeScriptLinterHandler;
 import ts.cmd.Severity;
 import ts.cmd.tslint.TslintHelper;
@@ -19,7 +19,7 @@ import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 
 public class TypeScriptReporterCollector extends NodejsProcessAdapter
-		implements ITypeScriptGeterrCollector, ITypeScriptLinterHandler, INodejsProcessListener {
+		implements ITypeScriptDiagnosticsCollector, ITypeScriptLinterHandler, INodejsProcessListener {
 
 	private static final String CHAR_END = "charEnd";
 	private static final String CHAR_START = "charStart";

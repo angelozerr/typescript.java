@@ -17,7 +17,7 @@ import java.util.Map;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
-import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 
 /**
  * Geterr request; value of command field is "geterr". Wait for delay
@@ -28,7 +28,7 @@ import ts.client.geterr.ITypeScriptGeterrCollector;
  * practice for an editor is to send a file list containing each file that is
  * currently visible, in most-recently-used order.
  */
-public class GeterrRequest extends Request<JsonArray, ITypeScriptGeterrCollector> {
+public class GeterrRequest extends Request<JsonArray, ITypeScriptDiagnosticsCollector> {
 
 	private final static int EVENT_INIT = 0;
 	private final static int EVENT_SYNTAX_DIAG = 4;
@@ -39,7 +39,7 @@ public class GeterrRequest extends Request<JsonArray, ITypeScriptGeterrCollector
 	private final JsonArray result;
 	private int delay;
 
-	public GeterrRequest(String[] files, int delay, ITypeScriptGeterrCollector collector) {
+	public GeterrRequest(String[] files, int delay, ITypeScriptDiagnosticsCollector collector) {
 		super(CommandNames.Geterr, new GeterrRequestArgs(files, delay), null);
 		this.stateFiles = createStateFiles(files);
 		this.delay = delay;
@@ -103,6 +103,6 @@ public class GeterrRequest extends Request<JsonArray, ITypeScriptGeterrCollector
 
 	@Override
 	public void collect(JsonObject response) {
-		
+
 	}
 }

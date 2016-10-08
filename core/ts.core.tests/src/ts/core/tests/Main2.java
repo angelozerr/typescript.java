@@ -7,7 +7,7 @@ import ts.TypeScriptException;
 import ts.client.completions.ICompletionEntry;
 import ts.client.completions.ICompletionInfo;
 import ts.client.definition.DefinitionsInfo;
-import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.diagnostics.ITypeScriptGeterrCollector;
 import ts.utils.FileUtils;
 
 public class Main2 {

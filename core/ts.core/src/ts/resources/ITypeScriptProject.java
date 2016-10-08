@@ -13,7 +13,7 @@ package ts.resources;
 import ts.TypeScriptException;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
-import ts.client.geterr.ITypeScriptGeterrCollector;
+import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
 import ts.cmd.tsc.ITypeScriptCompiler;
@@ -49,7 +49,16 @@ public interface ITypeScriptProject {
 
 	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TypeScriptException;
 
-	void geterr(ITypeScriptFile tsFile, int delay, ITypeScriptGeterrCollector collector) throws TypeScriptException;
+	void geterr(ITypeScriptFile tsFile, int delay, ITypeScriptDiagnosticsCollector collector)
+			throws TypeScriptException;
+
+	void semanticDiagnosticsSync(ITypeScriptFile tsFile, Boolean includeLinePosition,
+			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
+
+	void syntacticDiagnosticsSync(ITypeScriptFile tsFile, Boolean includeLinePosition,
+			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
+
+	void diagnostics(ITypeScriptFile tsFile, ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
 
 	ITypeScriptFile getOpenedFile(String fileName);
 

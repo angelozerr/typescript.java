@@ -98,4 +98,5 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	IIDETypeScriptCompiler getCompiler() throws TypeScriptException;
 
 	IIDETypeScriptLint getTslint() throws TypeScriptException;
+
 }
