@@ -140,6 +140,15 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 */
 	void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException;
 
+	/**
+	 * Call implementation from the tsserver.
+	 * 
+	 * @param position
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
+	void implementation(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
+
 	void addNavbarListener(INavbarListener listener);
 
 	void removeNavbarListener(INavbarListener listener);

@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 import ts.client.IPositionProvider;
 import ts.client.Location;
 import ts.client.navbar.ITypeScriptNavBarCollector;

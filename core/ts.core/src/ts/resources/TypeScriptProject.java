@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
@@ -28,7 +29,6 @@ import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tsc.TypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
 import ts.cmd.tslint.TypeScriptLint;
-import ts.internal.client.protocol.CommandNames;
 
 /**
  * TypeScript project implementation.
@@ -83,16 +83,10 @@ public class TypeScriptProject implements ITypeScriptProject {
 	}
 
 	void closeFile(ITypeScriptFile tsFile) throws TypeScriptException {
-		closeFile(tsFile, true);
-	}
-
-	void closeFile(ITypeScriptFile tsFile, boolean updateCache) throws TypeScriptException {
 		String name = tsFile.getName();
 		getClient().closeFile(name);
 		((AbstractTypeScriptFile) tsFile).setOpened(false);
-		if (updateCache) {
-			this.openedFiles.remove(name);
-		}
+		this.openedFiles.remove(name);
 	}
 
 	@Override
@@ -271,14 +265,14 @@ public class TypeScriptProject implements ITypeScriptProject {
 			if (!isServerDisposed()) {
 				if (hasClient()) {
 					// close opened files
-					for (ITypeScriptFile openedFile : openedFiles.values()) {
+					List<ITypeScriptFile> files = new ArrayList<ITypeScriptFile>(openedFiles.values());
+					for (ITypeScriptFile openedFile : files) {
 						try {
-							closeFile(openedFile, false);
+							openedFile.close();
 						} catch (TypeScriptException e) {
 							e.printStackTrace();
 						}
 					}
-					openedFiles.clear();
 					client.dispose();
 					client = null;
 				}
@@ -355,7 +349,8 @@ public class TypeScriptProject implements ITypeScriptProject {
 		return projectSettings;
 	}
 
-	private boolean canSupport(CommandNames command) {
+	@Override
+	public boolean canSupport(CommandNames command) {
 		Boolean support = serverCapabilities.get(command);
 		if (support == null) {
 			support = command.canSupport(getProjectSettings().getTsserverVersion());

@@ -50,6 +50,7 @@ import ts.internal.client.protocol.ConfigureRequestArguments;
 import ts.internal.client.protocol.DefinitionRequest;
 import ts.internal.client.protocol.FormatRequest;
 import ts.internal.client.protocol.GeterrRequest;
+import ts.internal.client.protocol.ImplementationRequest;
 import ts.internal.client.protocol.NavBarRequest;
 import ts.internal.client.protocol.OccurrencesRequest;
 import ts.internal.client.protocol.OpenRequest;
@@ -317,6 +318,15 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException {
 		SyntacticDiagnosticsSyncRequest request = new SyntacticDiagnosticsSyncRequest(fileName, includeLinePosition,
 				collector);
+		execute(request);
+	}
+
+	// ---------------- Since 2.0.5
+
+	@Override
+	public void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+			throws TypeScriptException {
+		ImplementationRequest request = new ImplementationRequest(fileName, line, offset, collector);
 		execute(request);
 	}
 

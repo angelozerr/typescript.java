@@ -30,10 +30,14 @@ import ts.eclipse.ide.jsdt.ui.actions.TypeScriptActionConstants;
 public class TypeScriptEditorActionContributor extends BasicTextEditorActionContributor {
 
 	private RetargetTextEditorAction fShowOutline;
+	private RetargetTextEditorAction openImplementation;
 
 	public TypeScriptEditorActionContributor() {
 		fShowOutline = new RetargetTextEditorAction(JSDTTypeScriptUIMessages.getResourceBundle(), "ShowOutline."); //$NON-NLS-1$
 		fShowOutline.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
+		openImplementation = new RetargetTextEditorAction(JSDTTypeScriptUIMessages.getResourceBundle(),
+				"OpenImplementation."); //$NON-NLS-1$
+		openImplementation.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.OPEN_IMPLEMENTATION);
 	}
 
 	public void setActiveEditor(IEditorPart part) {
@@ -61,6 +65,7 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 				getAction(textEditor, "RemoveBlockComment")); //$NON-NLS-1$
 
 		fShowOutline.setAction(getAction(textEditor, ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE));
+		openImplementation.setAction(getAction(textEditor, ITypeScriptEditorActionDefinitionIds.OPEN_IMPLEMENTATION));
 
 		if (part instanceof TypeScriptEditor) {
 			TypeScriptEditor tsEditor = (TypeScriptEditor) part;

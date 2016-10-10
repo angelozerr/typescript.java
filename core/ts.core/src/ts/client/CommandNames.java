@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.internal.client.protocol;
+package ts.client;
 
 /**
  * Command names of tsserver.
@@ -21,7 +21,8 @@ public enum CommandNames {
 					"definition"), SignatureHelp("signatureHelp"), QuickInfo("quickinfo"), Geterr("geterr"), Format(
 							"format"), References("references"), Occurrences("occurrences"), Configure(
 									"configure"), SemanticDiagnosticsSync("semanticDiagnosticsSync",
-											"2.0.3"), SyntacticDiagnosticsSync("syntacticDiagnosticsSync", "2.0.3");
+											"2.0.3"), SyntacticDiagnosticsSync("syntacticDiagnosticsSync",
+													"2.0.3"), Implementation("implementation", "2.0.6");
 
 	private final String name;
 	private final String sinceVersion;

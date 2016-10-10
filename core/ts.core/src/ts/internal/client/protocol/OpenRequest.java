@@ -13,6 +13,7 @@ package ts.internal.client.protocol;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 
 /**
  * Open request; value of command field is "open". Notify the server that the

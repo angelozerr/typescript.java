@@ -258,6 +258,11 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(action,
 		// IJavaHelpContextIds.SHOW_OUTLINE_ACTION);
 
+		action = new TextOperationAction(JSDTTypeScriptUIMessages.getResourceBundle(), "OpenImplementation.", this, //$NON-NLS-1$
+				TypeScriptSourceViewer.OPEN_IMPLEMENTATION, true);
+		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.OPEN_IMPLEMENTATION);
+		setAction(ITypeScriptEditorActionDefinitionIds.OPEN_IMPLEMENTATION, action);
+
 	}
 
 	@Override
@@ -279,8 +284,8 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		// Quick views
 		IAction action = getAction(ITypeScriptEditorActionDefinitionIds.SHOW_OUTLINE);
 		menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, action);
-		// action= getAction(IJavaEditorActionDefinitionIds.OPEN_HIERARCHY);
-		// menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, action);
+		action = getAction(ITypeScriptEditorActionDefinitionIds.OPEN_IMPLEMENTATION);
+		menu.appendToGroup(IContextMenuConstants.GROUP_OPEN, action);
 
 	}
 
@@ -328,12 +333,6 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	 * @see AbstractTextEditor#handlePreferenceStoreChanged(PropertyChangeEvent)
 	 */
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
-
-		ITypeScriptFile tsFile = null;
-		try {
-			tsFile = getTypeScriptFile();
-		} catch (Exception e) {
-		}
 		String property = event.getProperty();
 		try {
 

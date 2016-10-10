@@ -5,6 +5,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 
 /**

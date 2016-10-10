@@ -17,6 +17,7 @@ import java.util.Map;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
+import ts.client.CommandNames;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 
 /**

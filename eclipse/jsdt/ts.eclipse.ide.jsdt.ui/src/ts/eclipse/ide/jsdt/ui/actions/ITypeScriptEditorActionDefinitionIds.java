@@ -79,6 +79,14 @@ public interface ITypeScriptEditorActionDefinitionIds extends ITextEditorActionD
 	public static final String SHOW_OUTLINE = "ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline"; //$NON-NLS-1$
 
 	/**
+	 * Action definition ID of the navigate -> Show Implementation action (value
+	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.open.implementation"</code>).
+	 * 
+	 * 
+	 */
+	public static final String OPEN_IMPLEMENTATION = "ts.eclipse.ide.jsdt.ui.edit.text.java.open.implementation"; //$NON-NLS-1$
+	
+	/**
 	 * Action definition ID of the refactor -> rename element action
 	 * (value <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"</code>).
 	 */

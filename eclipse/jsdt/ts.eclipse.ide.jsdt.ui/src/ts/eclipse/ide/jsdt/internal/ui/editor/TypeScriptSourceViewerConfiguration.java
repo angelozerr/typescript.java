@@ -54,6 +54,7 @@ import ts.eclipse.ide.jsdt.internal.ui.text.TypeScriptCodeScanner;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.IJSXPartitions;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.JSXScanner;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
+import ts.eclipse.ide.ui.implementation.TypeScriptImplementationDialog;
 import ts.eclipse.ide.ui.outline.TypeScriptElementProvider;
 import ts.eclipse.ide.ui.outline.TypeScriptQuickOutlineDialog;
 import ts.eclipse.ide.ui.utils.EditorUtils;
@@ -377,5 +378,59 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 		if (jsxScanner.affectsBehavior(event)) {
 			jsxScanner.adaptToPreferenceChange(event);
 		}
+	}
+
+	/**
+	 * Returns the hierarchy presenter which will determine and shown type
+	 * hierarchy information requested for the current cursor position.
+	 *
+	 * @param sourceViewer
+	 *            the source viewer to be configured by this configuration
+	 * @param doCodeResolve
+	 *            a boolean which specifies whether code resolve should be used
+	 *            to compute the JavaScript element
+	 * @return an information presenter
+	 *
+	 */
+	public IInformationPresenter getImplementationPresenter(final ISourceViewer sourceViewer) {
+		InformationPresenter presenter = new InformationPresenter(
+				getImplementationPresenterControlCreator(sourceViewer));
+		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		presenter.setAnchor(AbstractInformationControlManager.ANCHOR_GLOBAL);
+		IInformationProvider provider = new TypeScriptElementProvider(getEditor());
+		presenter.setInformationProvider(provider, IDocument.DEFAULT_CONTENT_TYPE);
+		presenter.setInformationProvider(provider, IJavaScriptPartitions.JAVA_DOC);
+		presenter.setInformationProvider(provider, IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT);
+		presenter.setInformationProvider(provider, IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL);
+		presenter.setInformationProvider(provider, IJavaScriptPartitions.JAVA_SINGLE_LINE_COMMENT);
+		presenter.setInformationProvider(provider, IJavaScriptPartitions.JAVA_STRING);
+		presenter.setInformationProvider(provider, IJavaScriptPartitions.JAVA_CHARACTER);
+		presenter.setSizeConstraints(50, 20, true, false);
+		return presenter;
+	}
+
+	/**
+	 * Returns the implementation presenter control creator. The creator is a
+	 * factory creating implementation presenter controls for the given source
+	 * viewer.
+	 *
+	 * @param sourceViewer
+	 *            the source viewer to be configured by this configuration
+	 * @param commandId
+	 *            the ID of the command that opens this control
+	 * @return an information control creator
+	 *
+	 */
+	private IInformationControlCreator getImplementationPresenterControlCreator(final ISourceViewer sourceViewer) {
+		return new IInformationControlCreator() {
+			public IInformationControl createInformationControl(final Shell parent) {
+				try {
+					int shellStyle = SWT.RESIZE;
+					return new TypeScriptImplementationDialog(parent, shellStyle, getTypeScriptFile());
+				} catch (Exception e) {
+					return null;
+				}
+			}
+		};
 	}
 }

@@ -11,6 +11,7 @@
 package ts.resources;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
@@ -92,4 +93,14 @@ public interface ITypeScriptProject {
 
 	void disposeTslint();
 
+	/**
+	 * Returns true if the given tsserver command can be supported by the
+	 * TypeScript version configured for the project and false otherwise.
+	 * 
+	 * @param command
+	 * @return true if the given tsserver command can be supported by the
+	 *         TypeScript version configured for the project and false
+	 *         otherwise.
+	 */
+	boolean canSupport(CommandNames command);
 }

@@ -14,6 +14,7 @@ import com.eclipsesource.json.JsonObject;
 
 import ts.TypeScriptException;
 import ts.TypeScriptNoContentAvailableException;
+import ts.client.CommandNames;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.ITypeScriptCollector;
 

@@ -85,11 +85,16 @@ public interface ITypeScriptServiceClient {
 
 	void configure(ConfigureRequestArguments arguments) throws TypeScriptException;
 
-	// @Since("2.0.3")
+	// Since 2.0.3
+
 	void semanticDiagnosticsSync(String file, Boolean includeLinePosition, ITypeScriptDiagnosticsCollector collector)
 			throws TypeScriptException;
 
 	void syntacticDiagnosticsSync(String file, Boolean includeLinePosition, ITypeScriptDiagnosticsCollector collector)
 			throws TypeScriptException;
 
+	// Since 2.0.5
+
+	void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+			throws TypeScriptException;
 }

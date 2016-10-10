@@ -22,7 +22,6 @@ import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.FormatOptions;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
-import ts.client.navbar.NavigationBarItem;
 import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.ITypeScriptOccurrencesCollector;
 import ts.client.references.ITypeScriptReferencesCollector;
@@ -181,6 +180,16 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		client.navbar(this.getName(), this, collector);
+	}
+
+	@Override
+	public void implementation(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		Location location = this.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
+		client.implementation(this.getName(), line, offset, collector);
 	}
 
 	private class TypeScriptNavBarCollector implements ITypeScriptNavBarCollector, ITypeScriptAsynchCollector {

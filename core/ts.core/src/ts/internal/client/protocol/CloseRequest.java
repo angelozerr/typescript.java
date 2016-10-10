@@ -13,6 +13,7 @@ package ts.internal.client.protocol;
 import com.eclipsesource.json.JsonObject;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 
 /**
  * Close request.

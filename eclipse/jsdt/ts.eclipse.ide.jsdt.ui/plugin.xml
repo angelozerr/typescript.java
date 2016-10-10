@@ -433,7 +433,12 @@
             categoryId="org.eclipse.ui.category.navigate"
             id="ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline">
       </command>
-                  
+	  <command
+            name="%ActionDefinition.open.implementation.name"
+            description="%ActionDefinition.open.implementation.description"
+            categoryId="org.eclipse.ui.category.navigate"
+            id="ts.eclipse.ide.jsdt.ui.edit.text.java.open.implementation">
+      </command>                  
 	</extension>
 	
    <extension
@@ -511,6 +516,11 @@
             contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
             commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.show.outline"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            sequence="M1+T"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.open.implementation"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>            
 <!-- refactoring -->
       <key
             sequence="M2+M3+T"

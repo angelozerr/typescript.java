@@ -10,6 +10,7 @@
  */
 package ts.internal.client.protocol;
 
+import ts.client.CommandNames;
 import ts.client.ITypeScriptCollector;
 
 /**

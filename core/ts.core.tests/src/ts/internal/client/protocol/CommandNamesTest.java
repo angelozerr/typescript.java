@@ -3,6 +3,8 @@ package ts.internal.client.protocol;
 import org.junit.Assert;
 import org.junit.Test;
 
+import ts.client.CommandNames;
+
 
 public class CommandNamesTest {
 

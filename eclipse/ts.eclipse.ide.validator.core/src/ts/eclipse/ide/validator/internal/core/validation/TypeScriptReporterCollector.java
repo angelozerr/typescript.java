@@ -99,7 +99,6 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 	}
 
 	private int getSeverity(Severity severity) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

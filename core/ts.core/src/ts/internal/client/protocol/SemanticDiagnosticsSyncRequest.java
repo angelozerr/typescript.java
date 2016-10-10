@@ -5,6 +5,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 
 /**
@@ -30,11 +31,20 @@ public class SemanticDiagnosticsSyncRequest extends FileRequest<ITypeScriptDiagn
 		String text = null;
 		JsonObject start = null;
 		JsonObject end = null;
-		for (JsonValue value : body) {
-			diagnostic = value.asObject();
+		JsonValue value = null;
+		for (JsonValue item : body) {
+			diagnostic = item.asObject();
 			text = diagnostic.getString("text", null);
-			start = diagnostic.get("start").asObject();
-			end = diagnostic.get("end").asObject();
+			value = diagnostic.get("startLocation");
+			if (value == null) {
+				value = diagnostic.get("start");
+			}
+			start = value.asObject();
+			value = diagnostic.get("endLocation");
+			if (value == null) {
+				value = diagnostic.get("end");
+			}
+			end = value.asObject();
 			getCollector().addDiagnostic(null, fileName, text, start.getInt("line", -1), start.getInt("offset", -1),
 					end.getInt("line", -1), end.getInt("offset", -1));
 		}
