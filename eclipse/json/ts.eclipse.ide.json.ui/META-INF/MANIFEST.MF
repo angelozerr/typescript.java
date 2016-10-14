@@ -28,4 +28,5 @@ Require-Bundle: org.eclipse.core.runtime,
  ts.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: ts.eclipse.ide.json.ui
+Export-Package: ts.eclipse.ide.json.ui,
+ ts.eclipse.ide.json.ui.actions

@@ -23,8 +23,6 @@ import ts.eclipse.ide.json.ui.AbstractFormEditor;
  * <li>Output page.</li>
  * <li>Source page.</li>
  * </ul>
- * 
- * @author azerr
  *
  */
 public class TsconfigEditor extends AbstractFormEditor {

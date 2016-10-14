@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.ui.launch;
 
 import org.eclipse.core.resources.IContainer;
@@ -14,6 +24,10 @@ import org.eclipse.debug.ui.DebugUITools;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.launch.TypeScriptCompilerLaunchConstants;
 
+/**
+ * tsc launch helper.
+ *
+ */
 public class TypeScriptCompilerLaunchHelper {
 
 	public static void launch(IFile tsconfigFile) {
@@ -37,8 +51,6 @@ public class TypeScriptCompilerLaunchHelper {
 
 			if (existingConfiguraion != null) {
 				ILaunchConfigurationWorkingCopy wc = existingConfiguraion.getWorkingCopy();
-				// Updating task in the existing launch
-				// wc.setAttribute(GulpConstants.COMMAND, task.getName());
 				existingConfiguraion = wc.doSave();
 				DebugUITools.launch(existingConfiguraion, mode);
 				// Creating Launch Configuration from scratch
@@ -75,8 +87,6 @@ public class TypeScriptCompilerLaunchHelper {
 			for (ILaunchConfiguration conf : configurations) {
 				String buildFileAttribute = conf.getAttribute(attribute, (String) null);
 				String buildFilePath = container.getLocation().toOSString();
-				// Launch Configuration per build file (i.e. Gruntfile.js /
-				// gulpfile.js)
 				if (buildFilePath.equals(buildFileAttribute)) {
 					return conf;
 				}
