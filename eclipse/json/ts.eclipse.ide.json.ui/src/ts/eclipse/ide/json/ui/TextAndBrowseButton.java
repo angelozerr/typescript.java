@@ -1,4 +1,4 @@
-package ts.eclipse.ide.json.ui.internal;
+package ts.eclipse.ide.json.ui;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.resources.IFile;

@@ -8,7 +8,7 @@
  *  Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package ts.eclipse.ide.json.ui.internal;
+package ts.eclipse.ide.json.ui;
 
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;

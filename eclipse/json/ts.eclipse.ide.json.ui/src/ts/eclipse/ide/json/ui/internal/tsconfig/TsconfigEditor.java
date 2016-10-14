@@ -12,7 +12,7 @@ package ts.eclipse.ide.json.ui.internal.tsconfig;
 
 import org.eclipse.ui.PartInitException;
 
-import ts.eclipse.ide.json.ui.internal.AbstractFormEditor;
+import ts.eclipse.ide.json.ui.AbstractFormEditor;
 
 /**
  * tsconfig.json editor composed with multiple page:

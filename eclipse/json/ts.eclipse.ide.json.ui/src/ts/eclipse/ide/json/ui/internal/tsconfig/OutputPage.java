@@ -21,8 +21,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
-import ts.eclipse.ide.json.ui.internal.AbstractFormPage;
-import ts.eclipse.ide.json.ui.internal.FormLayoutFactory;
+import ts.eclipse.ide.json.ui.AbstractFormPage;
+import ts.eclipse.ide.json.ui.FormLayoutFactory;
 
 /**
  * Output page for tsconfig.json editor.

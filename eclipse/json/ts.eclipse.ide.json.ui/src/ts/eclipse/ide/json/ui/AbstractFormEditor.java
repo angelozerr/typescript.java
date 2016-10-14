@@ -1,4 +1,4 @@
-package ts.eclipse.ide.json.ui.internal;
+package ts.eclipse.ide.json.ui;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -60,8 +60,8 @@ import org.eclipse.wst.json.core.databinding.JSONProperties;
 
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
-import ts.eclipse.ide.json.ui.internal.AbstractFormPage;
-import ts.eclipse.ide.json.ui.internal.FormLayoutFactory;
+import ts.eclipse.ide.json.ui.AbstractFormPage;
+import ts.eclipse.ide.json.ui.FormLayoutFactory;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.utils.DialogUtils;
 import ts.eclipse.ide.ui.utils.EditorUtils;
