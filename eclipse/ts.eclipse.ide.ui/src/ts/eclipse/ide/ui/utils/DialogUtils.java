@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -32,13 +33,17 @@ import ts.eclipse.ide.internal.ui.dialogs.OpenResourceDialog;
 import ts.eclipse.ide.internal.ui.dialogs.OpenTypeScriptResourceDialog;
 import ts.utils.StringUtils;
 
+/***
+ * Dialog utilities to open resources.
+ * 
+ */
 public class DialogUtils {
 
 	private DialogUtils() {
 	}
 
-	public static IResource openResourceDialog(IProject project, Shell shell) {
-		OpenResourceDialog dialog = new OpenResourceDialog(shell, false, project, IResource.FILE | IResource.FOLDER);
+	public static IResource openResourceDialog(IProject project, Shell shell, int typesMask) {
+		OpenResourceDialog dialog = new OpenResourceDialog(shell, false, project, typesMask);
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
@@ -49,8 +54,12 @@ public class DialogUtils {
 		return null;
 	}
 
+	public static IResource openResourceDialog(IProject project, Shell shell) {
+		return openResourceDialog(project, shell, IResource.FILE | IResource.FOLDER);
+	}
+
 	public static Object[] openResourcesDialog(IProject project, Shell shell) {
-		OpenResourceDialog dialog = new OpenResourceDialog(shell, false, project, IResource.FILE | IResource.FOLDER);
+		OpenResourceDialog dialog = new OpenResourceDialog(shell, true, project, IResource.FILE | IResource.FOLDER);
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
@@ -67,9 +76,21 @@ public class DialogUtils {
 		return dialog.getResult();
 	}
 
+	public static IProject openProjectDialog(String initialProject, Shell shell) {
+		SelectionDialog dialog = createFolderDialog(initialProject, null, true, false, shell);
+		if (dialog.open() != Window.OK) {
+			return null;
+		}
+		Object[] results = dialog.getResult();
+		if (results != null && results.length > 0) {
+			return (IProject) results[0];
+		}
+		return null;
+	}
+
 	public static IResource openFolderDialog(String initialFolder, IProject project, boolean showAllProjects,
 			Shell shell) {
-		SelectionDialog dialog = createFolderDialog(initialFolder, project, showAllProjects, shell);
+		SelectionDialog dialog = createFolderDialog(initialFolder, project, showAllProjects, true, shell);
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
@@ -81,13 +102,15 @@ public class DialogUtils {
 	}
 
 	private static SelectionDialog createFolderDialog(String initialFolder, final IProject project,
-			final boolean showAllProjects, Shell shell) {
+			final boolean showAllProjects, final boolean showFolder, Shell shell) {
 
 		ILabelProvider lp = new WorkbenchLabelProvider();
 		ITreeContentProvider cp = new WorkbenchContentProvider();
 		FolderSelectionDialog dialog = new FolderSelectionDialog(shell, lp, cp);
 		// dialog.setTitle(TypeScriptUIMessages.TernModuleOptionsPanel_selectPathDialogTitle);
-		IFolder folder = StringUtils.isEmpty(initialFolder) ? null : project.getFolder(initialFolder);
+		IFolder folder = StringUtils.isEmpty(initialFolder) ? null
+				: (project != null ? project.getFolder(initialFolder)
+						: ResourcesPlugin.getWorkspace().getRoot().getFolder(new Path(initialFolder)));
 		if (folder != null && folder.exists()) {
 			dialog.setInitialSelection(folder);
 		}
@@ -103,7 +126,7 @@ public class DialogUtils {
 					return (p.equals(project));
 				} else if (element instanceof IContainer) {
 					IContainer container = (IContainer) element;
-					if (container.getType() == IResource.FOLDER) {
+					if (showFolder && container.getType() == IResource.FOLDER) {
 						return true;
 					}
 					return false;
