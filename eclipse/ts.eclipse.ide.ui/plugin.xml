@@ -430,7 +430,23 @@
   		 </contextualLaunch>
     	</shortcut>
     </extension>
-    
+	  
+	<extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+     <launchConfigurationTypeImage
+        icon="icons/full/obj16/ts.png"
+        configTypeID="ts.eclipse.ide.core.tscLaunchConfigurationType"
+        id="ts.eclipse.ide.core.tscLaunchConfigurationTypeImage">
+     </launchConfigurationTypeImage>
+    </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+    <launchConfigurationTabGroup
+        type="ts.eclipse.ide.core.tscLaunchConfigurationType"
+        class="ts.eclipse.ide.internal.ui.launch.TypeScriptCompilerLaunchTabGroup"
+        id="ts.eclipse.ide.tsc.tabgroup">
+    </launchConfigurationTabGroup>
+  </extension>
+  
     <extension point="org.eclipse.core.runtime.adapters">	
 		<factory
 		    class="ts.eclipse.ide.internal.ui.TypeScriptUIAdapterFactory"             
@@ -438,5 +454,5 @@
             <adapter type="org.eclipse.debug.ui.actions.ILaunchable" />
 		</factory>		
 	</extension>
-	    
+	  
 </plugin>        

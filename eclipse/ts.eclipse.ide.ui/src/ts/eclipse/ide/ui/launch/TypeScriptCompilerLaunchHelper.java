@@ -13,6 +13,7 @@ package ts.eclipse.ide.ui.launch;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -30,6 +31,11 @@ import ts.eclipse.ide.core.launch.TypeScriptCompilerLaunchConstants;
  */
 public class TypeScriptCompilerLaunchHelper {
 
+	public static String getBuildPath(IResource resource) {
+		return new StringBuilder("${workspace_loc:/").append(resource.getProject().getName()).append("/")
+				.append(resource.getProjectRelativePath()).append("}").toString();
+	}
+
 	public static void launch(IFile tsconfigFile) {
 		launch(tsconfigFile, ILaunchManager.RUN_MODE);
 	}
@@ -46,8 +52,7 @@ public class TypeScriptCompilerLaunchHelper {
 			ILaunchConfiguration[] configurations = DebugPlugin.getDefault().getLaunchManager()
 					.getLaunchConfigurations(tscLaunchConfigurationType);
 
-			ILaunchConfiguration existingConfiguraion = chooseLaunchConfiguration(configurations, buildPath,
-					TypeScriptCompilerLaunchConstants.BUILD_PATH);
+			ILaunchConfiguration existingConfiguraion = chooseLaunchConfiguration(configurations, buildPath);
 
 			if (existingConfiguraion != null) {
 				ILaunchConfigurationWorkingCopy wc = existingConfiguraion.getWorkingCopy();
@@ -58,9 +63,7 @@ public class TypeScriptCompilerLaunchHelper {
 				IProject project = buildPath.getProject();
 				ILaunchConfigurationWorkingCopy newConfiguration = createEmptyLaunchConfiguration(
 						project.getName() + " [" + buildPath.getProjectRelativePath().toString() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-				newConfiguration.setAttribute(TypeScriptCompilerLaunchConstants.BUILD_PATH,
-						buildPath.getLocation().toOSString());
-				newConfiguration.setAttribute(TypeScriptCompilerLaunchConstants.PROJECT, project.getName());
+				newConfiguration.setAttribute(TypeScriptCompilerLaunchConstants.BUILD_PATH, getBuildPath(buildPath));
 				newConfiguration.doSave();
 				DebugUITools.launch(newConfiguration, mode);
 			}
@@ -82,11 +85,12 @@ public class TypeScriptCompilerLaunchHelper {
 	}
 
 	private static ILaunchConfiguration chooseLaunchConfiguration(ILaunchConfiguration[] configurations,
-			IContainer container, String attribute) {
+			IContainer container) {
+		String buildFilePath = getBuildPath(container);
 		try {
 			for (ILaunchConfiguration conf : configurations) {
-				String buildFileAttribute = conf.getAttribute(attribute, (String) null);
-				String buildFilePath = container.getLocation().toOSString();
+				String buildFileAttribute = conf.getAttribute(TypeScriptCompilerLaunchConstants.BUILD_PATH,
+						(String) null);
 				if (buildFilePath.equals(buildFileAttribute)) {
 					return conf;
 				}

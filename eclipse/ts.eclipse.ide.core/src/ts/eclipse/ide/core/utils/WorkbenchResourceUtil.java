@@ -83,6 +83,13 @@ public class WorkbenchResourceUtil {
 			return null;
 		}
 		IPath containerPath = new Path(path);
+		return findContainerFromWorkspace(containerPath);
+	}
+
+	public static IContainer findContainerFromWorkspace(IPath containerPath) {
+		if (containerPath == null) {
+			return null;
+		}
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IContainer container = root.getContainerForLocation(containerPath);
 		if (container.exists()) {

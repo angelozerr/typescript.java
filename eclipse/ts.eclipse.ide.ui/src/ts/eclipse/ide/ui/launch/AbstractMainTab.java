@@ -109,11 +109,14 @@ public abstract class AbstractMainTab extends AbstractLaunchConfigurationTab {
 		mainComposite.setLayout(layout);
 		mainComposite.setLayoutData(gridData);
 
-		createWorkDirectoryComponent(mainComposite);
-		createCustomComponent(mainComposite);
+		createBodyComponents(mainComposite);
 		createVerticalSpacer(mainComposite, 1);
 
 		Dialog.applyDialogFont(parent);
+	}
+
+	protected void createBodyComponents(Composite parent) {
+		createWorkDirectoryComponent(parent);
 	}
 
 	/**
@@ -166,10 +169,6 @@ public abstract class AbstractMainTab extends AbstractLaunchConfigurationTab {
 		variablesWorkingDirectoryButton.addSelectionListener(fListener);
 		addControlAccessibleListener(variablesWorkingDirectoryButton,
 				group.getText() + " " + variablesWorkingDirectoryButton.getText()); //$NON-NLS-1$
-	}
-
-	protected void createCustomComponent(Composite mainComposite) {
-
 	}
 
 	// protected void handleProjectButtonSelected() {

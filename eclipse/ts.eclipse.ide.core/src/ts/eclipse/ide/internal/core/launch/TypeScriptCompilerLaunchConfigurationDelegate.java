@@ -14,9 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.externaltools.internal.launchConfigurations.ExternalToolsCoreUtil;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -29,7 +32,6 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import ts.TypeScriptException;
 import ts.cmd.tsc.CompilerOptions;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.launch.TypeScriptCompilerLaunchConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
@@ -44,7 +46,7 @@ public class TypeScriptCompilerLaunchConfigurationDelegate extends LaunchConfigu
 	@Override
 	public void launch(ILaunchConfiguration configuration, String arg1, ILaunch launch, IProgressMonitor monitor)
 			throws CoreException {
-		String buildPath = configuration.getAttribute(TypeScriptCompilerLaunchConstants.BUILD_PATH, (String) null);
+		IPath buildPath = ExternalToolsCoreUtil.getWorkingDirectory(configuration);
 
 		if (monitor.isCanceled()) {
 			return;
@@ -67,7 +69,7 @@ public class TypeScriptCompilerLaunchConfigurationDelegate extends LaunchConfigu
 
 			if (p != null) {
 				monitor.beginTask("tsc...", -1);
-				process = DebugPlugin.newProcess(launch, p, buildPath, processAttributes);
+				process = DebugPlugin.newProcess(launch, p, buildPath.toString(), processAttributes);
 			}
 
 			TscStreamListener reporter = new TscStreamListener(container);
