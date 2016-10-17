@@ -29,7 +29,8 @@ public class TypeScriptUIMessages extends NLS {
 	public static String Browse_FileSystem_button;
 	public static String Browse_Workspace_button;
 	public static String Button_newFolder;
-	
+	public static String Variables_button;
+
 	// Errors
 	public static String TypeScriptUIPlugin_internal_error;
 
@@ -123,6 +124,13 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptContentOutlinePage_ToggleLinkingAction_label;
 	public static String TypeScriptContentOutlinePage_ToggleLinkingAction_description;
 	public static String TypeScriptContentOutlinePage_ToggleLinkingAction_tooltip;
+
+	// UI Launch
+	public static String Launch_MainTab_title;
+	public static String Launch_MainTab_workingDir;
+	public static String Launch_MainTab_select_workingDir;
+	public static String Launch_MainTab_workingDir_does_not_exist_or_is_invalid;
+	public static String Launch_MainTab_Not_a_directory;
 
 	public static ResourceBundle getResourceBundle() {
 		try {

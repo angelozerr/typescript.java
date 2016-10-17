@@ -23,7 +23,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms,
  org.eclipse.core.filesystem,
  org.eclipse.search,
- org.eclipse.debug.ui
+ org.eclipse.debug.ui,
+ org.eclipse.core.variables,
+ org.eclipse.core.externaltools
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.ui.TypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
