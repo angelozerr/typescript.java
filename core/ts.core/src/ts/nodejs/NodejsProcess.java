@@ -12,6 +12,7 @@ import java.util.List;
 import ts.TypeScriptException;
 import ts.internal.client.protocol.Request;
 import ts.utils.FileUtils;
+import ts.utils.IOUtils;
 
 public class NodejsProcess extends AbstractNodejsProcess {
 
@@ -238,5 +239,29 @@ public class NodejsProcess extends AbstractNodejsProcess {
 	public void sendRequest(Request request) throws TypeScriptException {
 		out.println(request); // add \n for "readline" used by tsserver
 		out.flush();
+	}
+
+	/**
+	 * Returns the nodejs version and null otherwise.
+	 * 
+	 * @param nodejsFile
+	 * @return
+	 */
+	public static String getNodeVersion(File nodejsFile) {
+		if (nodejsFile != null) {
+			BufferedReader reader = null;
+			try {
+				String command = FileUtils.getPath(nodejsFile) + " --version";
+				Process p = Runtime.getRuntime().exec(command);
+				reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				return reader.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				IOUtils.closeQuietly(reader);
+			}
+			return nodejsFile.getName();
+		}
+		return null;
 	}
 }

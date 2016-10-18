@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -46,10 +45,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -121,7 +116,7 @@ public class FilesPage extends AbstractFormPage {
 		@Override
 		public Image decorateImage(Image image, Object object) {
 			if (image == null) {
-				return null;//PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_ERROR);
+				return null;// PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_ERROR);
 			}
 			if (isGlobPattern(object)) {
 				return null;
@@ -340,14 +335,6 @@ public class FilesPage extends AbstractFormPage {
 				EditorUtils.openInEditor(tsFile, true);
 			}
 		}
-	}
-
-	private IFile getTsconfigFile() {
-		IEditorInput input = getEditorInput();
-		if (input instanceof IFileEditorInput) {
-			return ((IFileEditorInput) input).getFile();
-		}
-		return null;
 	}
 
 	private void createExcludeSection(Composite parent) {
@@ -621,6 +608,10 @@ public class FilesPage extends AbstractFormPage {
 		}
 		return tsconfigFile.getParent().findMember(new Path(file));
 
+	}
+
+	private IFile getTsconfigFile() {
+		return getEditor().getFile();
 	}
 
 }

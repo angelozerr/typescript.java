@@ -35,6 +35,7 @@ public class TsconfigEditorMessages extends NLS {
 
 	public static String OverviewPage_CompilerSection_title;
 	public static String OverviewPage_CompilerSection_desc;
+	public static String OverviewPage_typeScript_node_versions;
 	public static String OverviewPage_typeScriptBuilder_label;
 	public static String OverviewPage_compileOnSave_label;
 	public static String OverviewPage_buildOnSave_label;

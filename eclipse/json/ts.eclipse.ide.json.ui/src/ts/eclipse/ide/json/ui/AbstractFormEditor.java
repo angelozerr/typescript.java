@@ -3,8 +3,11 @@ package ts.eclipse.ide.json.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -81,5 +84,17 @@ public abstract class AbstractFormEditor extends FormEditor {
 		return index;
 	}
 
+	@Override
+	public String getPartName() {
+		return jsonEditor.getPartName();
+	}
+
+	public IFile getFile() {
+		IEditorInput input = getEditorInput();
+		if (input instanceof IFileEditorInput) {
+			return ((IFileEditorInput) input).getFile();
+		}
+		return null;
+	}
 	protected abstract void doAddPages() throws PartInitException;
 }

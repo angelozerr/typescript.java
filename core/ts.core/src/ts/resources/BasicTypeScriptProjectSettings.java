@@ -17,6 +17,7 @@ import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.format.FormatOptions;
 import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.internal.repository.TypeScriptRepository;
+import ts.nodejs.NodejsProcess;
 import ts.repository.ITypeScriptRepository;
 import ts.repository.TypeScriptRepositoryException;
 
@@ -52,6 +53,12 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	@Override
 	public File getNodejsInstallPath() {
 		return nodejsInstallPath;
+	}
+
+	@Override
+	public String getNodeVersion() {
+		File nodejsFile = getNodejsInstallPath();
+		return NodejsProcess.getNodeVersion(nodejsFile);
 	}
 
 	@Override

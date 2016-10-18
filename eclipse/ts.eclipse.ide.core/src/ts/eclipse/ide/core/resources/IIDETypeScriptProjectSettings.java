@@ -36,5 +36,4 @@ public interface IIDETypeScriptProjectSettings extends ITypeScriptProjectSetting
 	 */
 	boolean isTraceOnConsole();
 
-
 }

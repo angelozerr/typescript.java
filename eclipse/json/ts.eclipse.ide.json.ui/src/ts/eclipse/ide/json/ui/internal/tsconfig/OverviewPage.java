@@ -10,24 +10,28 @@
  */
 package ts.eclipse.ide.json.ui.internal.tsconfig;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.json.jsonpath.JSONPath;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.IManagedForm;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.json.ui.AbstractFormPage;
 import ts.eclipse.ide.json.ui.FormLayoutFactory;
@@ -37,6 +41,10 @@ import ts.eclipse.ide.json.ui.FormLayoutFactory;
  *
  */
 public class OverviewPage extends AbstractFormPage {
+
+	private static final String TYPESCRIPT_LINK_ID = "typescript";
+	private static final String NODEJS_PREFERENCE_PAGE_ID = "ts.eclipse.ide.ui.property.NodejsPreferencePage";
+	private static final String TYPESCRIPT_PREFERENCE_PAGE_ID = "ts.eclipse.ide.ui.property.CompilerPreferencePage";
 
 	private static final String ID = "overview";
 	private Button compileOnSave;
@@ -108,22 +116,39 @@ public class OverviewPage extends AbstractFormPage {
 		section.setLayoutData(data);
 		Composite body = createBody(section);
 
-		IEditorInput input = getEditorInput();
-		final IProject project = (input instanceof IFileEditorInput) ? ((IFileEditorInput) input).getFile().getProject()
-				: null;
-		boolean hasTypeScriptBuilder = project != null ? TypeScriptResourceUtil.hasTypeScriptBuilder(project) : false;
+		final IIDETypeScriptProject tsProject = getTypeScriptProject();
+		if (tsProject != null) {
+			// TypeScript version + node.js
+			FormText formText = toolkit.createFormText(body, true);
+			formText.setWhitespaceNormalized(true);
+			formText.setText(NLS.bind(TsconfigEditorMessages.OverviewPage_typeScript_node_versions,
+					tsProject.getProjectSettings().getTscVersion(), tsProject.getProjectSettings().getNodeVersion()),
+					true, false);
+			formText.addHyperlinkListener(new HyperlinkAdapter() {
+				public void linkActivated(HyperlinkEvent e) {
+					String pageId = TYPESCRIPT_LINK_ID.equals(e.getHref()) ? TYPESCRIPT_PREFERENCE_PAGE_ID
+							: NODEJS_PREFERENCE_PAGE_ID;
+					PreferencesUtil.createPropertyDialogOn(getSite().getShell(), tsProject.getProject(), pageId,
+							new String[] { pageId }, null).open();
+				}
+			});
+		}
+		// TypeScript Builder
+		boolean hasTypeScriptBuilder = tsProject != null
+				? TypeScriptResourceUtil.hasTypeScriptBuilder(tsProject.getProject()) : false;
 
 		Button typescriptBuilderCheckbox = getToolkit().createButton(body,
 				TsconfigEditorMessages.OverviewPage_typeScriptBuilder_label, SWT.CHECK);
 		typescriptBuilderCheckbox.setSelection(hasTypeScriptBuilder);
-		typescriptBuilderCheckbox.setEnabled(project != null);
+		typescriptBuilderCheckbox.setEnabled(tsProject != null);
 		typescriptBuilderCheckbox.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Button checkbox = (Button) e.getSource();
 				if (checkbox.getSelection()) {
 					try {
-						TypeScriptResourceUtil.addTypeScriptBuilder(project);
+						TypeScriptResourceUtil.addTypeScriptBuilder(tsProject.getProject());
 						updateCompileBuildOnSaveEnable(true);
 					} catch (CoreException ex) {
 						ErrorDialog.openError(checkbox.getShell(), TsconfigEditorMessages.TypeScriptBuilder_Error_title,
@@ -131,7 +156,7 @@ public class OverviewPage extends AbstractFormPage {
 					}
 				} else {
 					try {
-						TypeScriptResourceUtil.removeTypeScriptBuilder(project);
+						TypeScriptResourceUtil.removeTypeScriptBuilder(tsProject.getProject());
 						updateCompileBuildOnSaveEnable(false);
 					} catch (CoreException ex) {
 						ErrorDialog.openError(checkbox.getShell(), TsconfigEditorMessages.TypeScriptBuilder_Error_title,
@@ -144,8 +169,10 @@ public class OverviewPage extends AbstractFormPage {
 		// Compile/Build on save
 		Composite compileBuildOnSaveBody = toolkit.createComposite(body);
 		compileBuildOnSaveBody.setLayout(new GridLayout());
-		compileOnSave = createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_compileOnSave_label,
-				new JSONPath("compileOnSave"), true);
+		compileOnSave =
+
+				createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_compileOnSave_label,
+						new JSONPath("compileOnSave"), true);
 		buildOnSave = createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_buildOnSave_label,
 				new JSONPath("buildOnSave"));
 		updateCompileBuildOnSaveEnable(hasTypeScriptBuilder);
@@ -217,4 +244,20 @@ public class OverviewPage extends AbstractFormPage {
 		return body;
 	}
 
+	private IIDETypeScriptProject getTypeScriptProject() {
+		IFile tsconfigFile = getTsconfigFile();
+		if (tsconfigFile == null) {
+			return null;
+		}
+		try {
+			return TypeScriptResourceUtil.getTypeScriptProject(tsconfigFile.getProject());
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private IFile getTsconfigFile() {
+		return getEditor().getFile();
+	}
 }

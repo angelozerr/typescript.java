@@ -27,6 +27,7 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPath;
+import ts.nodejs.NodejsProcess;
 import ts.repository.ITypeScriptRepository;
 import ts.resources.SynchStrategy;
 import ts.utils.StringUtils;
@@ -81,6 +82,12 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
+	public String getNodeVersion() {
+		File nodejsFile = getNodejsInstallPath();
+		return NodejsProcess.getNodeVersion(nodejsFile);
+	}
+
+	@Override
 	public SynchStrategy getSynchStrategy() {
 		return SynchStrategy.CHANGE;
 	}
@@ -116,8 +123,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		File resolvedPath = resolvePath(path);
 		File tscFile = resolvedPath != null ? IDETypeScriptRepositoryManager.getTscFile(resolvedPath) : null;
 		return tscFile != null
-				? IDETypeScriptRepositoryManager.getPackageJsonVersion(tscFile.getParentFile().getParentFile())
-				: null;
+				? IDETypeScriptRepositoryManager.getPackageJsonVersion(tscFile.getParentFile().getParentFile()) : null;
 	}
 
 	@Override

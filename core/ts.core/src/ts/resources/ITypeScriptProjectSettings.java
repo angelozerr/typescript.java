@@ -37,6 +37,8 @@ public interface ITypeScriptProjectSettings {
 	 */
 	File getNodejsInstallPath() throws TypeScriptException;
 
+	String getNodeVersion();
+
 	/**
 	 * Returns the typescript/bin/tsc file to execute.
 	 * 
