@@ -35,21 +35,8 @@ public class TypeScriptNavigatorLabelProvider implements ICommonLabelProvider {
 	public String getText(Object element) {
 		if (element instanceof ITypeScriptProject) {
 			ITypeScriptProject tsProject = ((ITypeScriptProject) element);
-			String tscVersion = tsProject.getProjectSettings().getTscVersion();
-			String tsserverVersion = tsProject.getProjectSettings().getTsserverVersion();
-			if (tscVersion == null) {
-				if (tsserverVersion == null) {
-					return NLS.bind(TypeScriptUIMessages.TypeScriptResources, "?");
-				} else {
-					return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tsserverVersion);
-				}
-			} else if (tsserverVersion == null) {
-				return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tscVersion);
-			}
-			if (tscVersion.equals(tsserverVersion)) {
-				return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tscVersion);
-			}
-			return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tscVersion + "|" + tsserverVersion);
+			String tsVersion = tsProject.getProjectSettings().getTypeScriptVersion();
+			return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tsVersion);
 		} else if (element instanceof ITypeScriptRootContainer) {
 			IContainer container = ((ITypeScriptRootContainer) element).getContainer();
 			return TypeScriptResourceUtil.getBuildPathLabel(container);

@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Control;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
+import ts.eclipse.ide.core.resources.TypeScriptElementChangedListenerAdapater;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -36,8 +36,8 @@ import ts.resources.ITypeScriptProject;
  * as children.
  *
  */
-public class TypeScriptNavigatorContentProvider
-		implements ITreeContentProvider/* , ITreePathContentProvider */, ITypeScriptElementChangedListener {
+public class TypeScriptNavigatorContentProvider extends TypeScriptElementChangedListenerAdapater
+		implements ITreeContentProvider {
 
 	public static final Object[] NO_CHILDREN = new Object[0];
 
@@ -124,6 +124,25 @@ public class TypeScriptNavigatorContentProvider
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = viewer;
+	}
+
+	@Override
+	public void typeScriptVersionChanged(IIDETypeScriptProject tsProject, String oldVersion, String newVersion) {
+		// Update TypeScript Resources label with the well TypeScript version.
+		updateTypeScriptResourcesLabel(tsProject);
+	}
+
+	private void updateTypeScriptResourcesLabel(IIDETypeScriptProject tsProject) {
+		// he widget may have been destroyed
+		// by the time this is run. Check for this and do nothing if so.
+		Control ctrl = viewer.getControl();
+		if (ctrl == null || ctrl.isDisposed()) {
+			return;
+		}
+		if (viewer instanceof AbstractTreeViewer) {
+			AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
+			treeViewer.refresh(tsProject, true);
+		}
 	}
 
 	@Override
@@ -230,7 +249,6 @@ public class TypeScriptNavigatorContentProvider
 		for (Runnable runnable : runnables) {
 			runnable.run();
 		}
-
 	}
 
 	@Override

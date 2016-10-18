@@ -89,7 +89,7 @@ public class TypeScriptMainPropertyPage extends PropertyPage implements IWorkben
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					if (COMPILE_LINK.equals(e.text)) {
-						openProjectProperties(project, CompilerPreferencePage.PROP_ID);
+						openProjectProperties(project, TypeScriptRuntimePreferencePage.PROP_ID);
 					} else {
 						openProjectProperties(project, ValidationPreferencePage.PROP_ID);
 					}

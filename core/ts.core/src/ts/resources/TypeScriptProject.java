@@ -353,7 +353,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 	public boolean canSupport(CommandNames command) {
 		Boolean support = serverCapabilities.get(command);
 		if (support == null) {
-			support = command.canSupport(getProjectSettings().getTsserverVersion());
+			support = command.canSupport(getProjectSettings().getTypeScriptVersion());
 			serverCapabilities.put(command, support);
 		}
 		return support;

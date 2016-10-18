@@ -18,23 +18,23 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import ts.eclipse.ide.ui.preferences.PropertyAndPreferencePage;
 
 /**
- * tsc preferences page
+ * TypeScript Runtime preferences page
  *
  */
-public class CompilerPreferencePage extends PropertyAndPreferencePage {
+public class TypeScriptRuntimePreferencePage extends PropertyAndPreferencePage {
 
-	public static final String PREF_ID = "ts.eclipse.ide.ui.preference.CompilerPreferencePage"; //$NON-NLS-1$
-	public static final String PROP_ID = "ts.eclipse.ide.ui.property.CompilerPreferencePage"; //$NON-NLS-1$
+	public static final String PREF_ID = "ts.eclipse.ide.ui.preference.TypeScriptRuntimePreferencePage"; //$NON-NLS-1$
+	public static final String PROP_ID = "ts.eclipse.ide.ui.property.TypeScriptRuntimePreferencePage"; //$NON-NLS-1$
 
-	private CompilerConfigurationBlock configurationBlock;
+	private TypeScriptRuntimeConfigurationBlock configurationBlock;
 
-	public CompilerPreferencePage() {
+	public TypeScriptRuntimePreferencePage() {
 	}
 
 	@Override
 	public void createControl(Composite parent) {
 		IWorkbenchPreferenceContainer container = (IWorkbenchPreferenceContainer) getContainer();
-		configurationBlock = new CompilerConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
+		configurationBlock = new TypeScriptRuntimeConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
 		super.createControl(parent);
 	}
 

@@ -113,15 +113,12 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 	}
 
 	private void initializeTscPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
-		node.put(TypeScriptCorePreferenceConstants.TSC_EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
-		node.putBoolean(TypeScriptCorePreferenceConstants.TSC_USE_EMBEDDED_TYPESCRIPT, true);
-		node.put(TypeScriptCorePreferenceConstants.TSC_INSTALLED_TYPESCRIPT_PATH, "");
+		node.put(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
+		node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, true);
+		node.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH, "");
 	}
 
 	private void initializeTsserverPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
-		node.put(TypeScriptCorePreferenceConstants.TSSERVER_EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
-		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_USE_EMBEDDED_TYPESCRIPT, true);
-		node.put(TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH, "");
 		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE, false);
 	}
 

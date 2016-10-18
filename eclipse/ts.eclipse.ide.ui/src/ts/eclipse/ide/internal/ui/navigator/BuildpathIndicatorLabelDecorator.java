@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
+import ts.eclipse.ide.core.resources.TypeScriptElementChangedListenerAdapater;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -37,7 +38,7 @@ import ts.eclipse.ide.ui.TypeScriptUIImageResource;
  */
 public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecorator {
 
-	private class DecoratorElementChangeListener implements ITypeScriptElementChangedListener {
+	private class DecoratorElementChangeListener extends TypeScriptElementChangedListenerAdapater {
 
 		@Override
 		public void buildPathChanged(IIDETypeScriptProject tsProject, ITypeScriptBuildPath newBuildPath,

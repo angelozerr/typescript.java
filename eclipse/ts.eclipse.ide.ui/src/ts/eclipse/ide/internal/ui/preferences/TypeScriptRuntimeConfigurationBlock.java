@@ -19,23 +19,23 @@ import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.IStatusChangeListener;
 
 /**
- * Server configuration block.
+ * Compiler configuration block.
  *
  */
-public class ServerConfigurationBlock extends AbstractTypeScriptRepositoryConfigurationBlock {
+public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepositoryConfigurationBlock {
 
 	private static final String[] DEFAULT_PATHS = new String[] { "${project_loc:node_modules/typescript}" };
-	
-	private static final Key PREF_TSSERVER_USE_EMBEDDED_TYPESCRIPT = getTypeScriptCoreKey(
-			TypeScriptCorePreferenceConstants.TSSERVER_USE_EMBEDDED_TYPESCRIPT);
-	private static final Key PREF_TSSERVER_TYPESCRIPT_EMBEDDED = getTypeScriptCoreKey(
-			TypeScriptCorePreferenceConstants.TSSERVER_EMBEDDED_TYPESCRIPT_ID);
-	private static final Key PREF_TSSERVER_TYPESCRIPT_PATH = getTypeScriptCoreKey(
-			TypeScriptCorePreferenceConstants.TSSERVER_INSTALLED_TYPESCRIPT_PATH);
+
+	private static final Key PREF_USE_EMBEDDED_TYPESCRIPT = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT);
+	private static final Key PREF_TYPESCRIPT_EMBEDDED = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID);
+	private static final Key PREF_TYPESCRIPT_PATH = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH);
 	private static final Key PREF_TSSERVER_TRACE_ON_CONSOLE = getTypeScriptCoreKey(
 			TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE);
 
-	public ServerConfigurationBlock(IStatusChangeListener context, IProject project,
+	public TypeScriptRuntimeConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {
 		super(context, project, getKeys(), container);
 	}
@@ -43,44 +43,43 @@ public class ServerConfigurationBlock extends AbstractTypeScriptRepositoryConfig
 	@Override
 	protected void createBody(Composite parent) {
 		super.createBody(parent);
-
-		super.addCheckBox(parent, TypeScriptUIMessages.ServerConfigurationBlock_traceOnConsole_label,
+		super.addCheckBox(parent, TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_traceOnConsole_label,
 				PREF_TSSERVER_TRACE_ON_CONSOLE, new String[] { "true", "false" }, 0);
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] { PREF_TSSERVER_USE_EMBEDDED_TYPESCRIPT, PREF_TSSERVER_TYPESCRIPT_EMBEDDED,
-				PREF_TSSERVER_TYPESCRIPT_PATH, PREF_TSSERVER_TRACE_ON_CONSOLE };
+		return new Key[] { PREF_USE_EMBEDDED_TYPESCRIPT, PREF_TYPESCRIPT_EMBEDDED, PREF_TYPESCRIPT_PATH,
+				PREF_TSSERVER_TRACE_ON_CONSOLE };
 	}
 
 	@Override
 	protected String getTypeScriptGroupLabel() {
-		return TypeScriptUIMessages.ServerConfigurationBlock_typescript_group_label;
+		return TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_typescript_group_label;
 	}
 
 	@Override
 	protected String getEmbeddedCheckboxLabel() {
-		return TypeScriptUIMessages.ServerConfigurationBlock_embedded_checkbox_label;
+		return TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_embedded_checkbox_label;
 	}
 
 	@Override
 	protected String getInstalledCheckboxLabel() {
-		return TypeScriptUIMessages.ServerConfigurationBlock_installed_checkbox_label;
+		return TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_installed_checkbox_label;
 	}
 
 	@Override
 	protected Key getUseEmbeddedTypescriptKey() {
-		return PREF_TSSERVER_USE_EMBEDDED_TYPESCRIPT;
+		return PREF_USE_EMBEDDED_TYPESCRIPT;
 	}
 
 	@Override
 	protected Key getEmbeddedTypescriptKey() {
-		return PREF_TSSERVER_TYPESCRIPT_EMBEDDED;
+		return PREF_TYPESCRIPT_EMBEDDED;
 	}
 
 	@Override
 	protected Key getInstalledTypescriptPathKey() {
-		return PREF_TSSERVER_TYPESCRIPT_PATH;
+		return PREF_TYPESCRIPT_PATH;
 	}
 
 	@Override

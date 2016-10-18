@@ -28,21 +28,15 @@ public class TypeScriptCorePreferenceConstants {
 
 	// tsserver
 
-	public static final String TSSERVER_USE_EMBEDDED_TYPESCRIPT = "tsserverUseEmbeddedTypeScript"; //$NON-NLS-1$
-
-	public static final String TSSERVER_EMBEDDED_TYPESCRIPT_ID = "tsserverEmbeddedTypeScriptid"; //$NON-NLS-1$
-
-	public static final String TSSERVER_INSTALLED_TYPESCRIPT_PATH = "tsserverInstalledTypeScriptPath"; //$NON-NLS-1$
-
 	public static final String TSSERVER_TRACE_ON_CONSOLE = "tsserverTraceOnConsole"; //$NON-NLS-1$
 
 	// tsc
 
-	public static final String TSC_USE_EMBEDDED_TYPESCRIPT = "tscUseEmbeddedTypeScript"; //$NON-NLS-1$
+	public static final String USE_EMBEDDED_TYPESCRIPT = "useEmbeddedTypeScript"; //$NON-NLS-1$
 
-	public static final String TSC_EMBEDDED_TYPESCRIPT_ID = "tscEmbeddedTypeScriptId"; //$NON-NLS-1$
+	public static final String EMBEDDED_TYPESCRIPT_ID = "embeddedTypeScriptId"; //$NON-NLS-1$
 
-	public static final String TSC_INSTALLED_TYPESCRIPT_PATH = "tscInstalledTypeScriptPath"; //$NON-NLS-1$
+	public static final String INSTALLED_TYPESCRIPT_PATH = "installedTypeScriptPath"; //$NON-NLS-1$
 
 	// tslint
 

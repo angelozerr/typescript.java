@@ -64,11 +64,14 @@ public class TypeScriptUIMessages extends NLS {
 	public static String NodejsConfigurationBlock_embedded_checkbox_label;
 	public static String NodejsConfigurationBlock_installed_checkbox_label;
 	public static String NodejsConfigurationBlock_nodePath_label;
+
+	// TypeScript Runtime
+	public static String TypeScriptRuntimeConfigurationBlock_typescript_group_label;
+	public static String TypeScriptRuntimeConfigurationBlock_embedded_checkbox_label;
+	public static String TypeScriptRuntimeConfigurationBlock_installed_checkbox_label;
+
 	// tsserver
-	public static String ServerConfigurationBlock_typescript_group_label;
-	public static String ServerConfigurationBlock_embedded_checkbox_label;
-	public static String ServerConfigurationBlock_installed_checkbox_label;
-	public static String ServerConfigurationBlock_traceOnConsole_label;
+	public static String TypeScriptRuntimeConfigurationBlock_traceOnConsole_label;
 
 	// Formatter
 	public static String FormatterConfigurationBlock_editorOptions_group_label;
@@ -86,11 +89,6 @@ public class TypeScriptUIMessages extends NLS {
 	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets;
 	public static String FormatterConfigurationBlock_formatOptions_placeOpenBraceOnNewLineForFunctions;
 	public static String FormatterConfigurationBlock_formatOptions_placeOpenBraceOnNewLineForControlBlocks;
-
-	// tsc
-	public static String CompilerConfigurationBlock_typescript_group_label;
-	public static String CompilerConfigurationBlock_embedded_checkbox_label;
-	public static String CompilerConfigurationBlock_installed_checkbox_label;
 
 	public static String ValidationConfigurationBlock_tslintjson_group_label;
 	public static String ValidationConfigurationBlock_tslintjson_strategy_DisableTslint;

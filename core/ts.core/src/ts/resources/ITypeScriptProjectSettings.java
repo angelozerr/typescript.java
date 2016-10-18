@@ -37,6 +37,11 @@ public interface ITypeScriptProjectSettings {
 	 */
 	File getNodejsInstallPath() throws TypeScriptException;
 
+	/**
+	 * Returns the nodejs version.
+	 * 
+	 * @return the nodejs version.
+	 */
 	String getNodeVersion();
 
 	/**
@@ -47,11 +52,11 @@ public interface ITypeScriptProjectSettings {
 	File getTscFile() throws TypeScriptException;
 
 	/**
-	 * Returns the version of tsc and null otherwise.
+	 * Returns the version of the TypeScript runtime and null otherwise.
 	 * 
-	 * @return the version of tsc and null otherwise.
+	 * @return the version of TypeScript runtime and null otherwise.
 	 */
-	String getTscVersion();
+	String getTypeScriptVersion();
 
 	/**
 	 * Returns the typescript/bin/tsserver file to execute.
@@ -60,13 +65,6 @@ public interface ITypeScriptProjectSettings {
 	 * @throws TypeScriptException
 	 */
 	File getTsserverFile() throws TypeScriptException;
-
-	/**
-	 * Returns the version of tsserver and null otherwise.
-	 * 
-	 * @return the version of tsserver and null otherwise.
-	 */
-	String getTsserverVersion();
 
 	/**
 	 * Returns the tslint/bin/tslint file to execute.

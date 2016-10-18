@@ -31,7 +31,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.json.ui.AbstractFormPage;
 import ts.eclipse.ide.json.ui.FormLayoutFactory;
@@ -40,15 +43,16 @@ import ts.eclipse.ide.json.ui.FormLayoutFactory;
  * Overview page for tsconfig.json editor.
  *
  */
-public class OverviewPage extends AbstractFormPage {
+public class OverviewPage extends AbstractFormPage implements ITypeScriptElementChangedListener {
 
 	private static final String TYPESCRIPT_LINK_ID = "typescript";
 	private static final String NODEJS_PREFERENCE_PAGE_ID = "ts.eclipse.ide.ui.property.NodejsPreferencePage";
-	private static final String TYPESCRIPT_PREFERENCE_PAGE_ID = "ts.eclipse.ide.ui.property.CompilerPreferencePage";
+	private static final String TYPESCRIPT_PREFERENCE_PAGE_ID = "ts.eclipse.ide.ui.property.TypeScriptRuntimePreferencePage";
 
 	private static final String ID = "overview";
 	private Button compileOnSave;
 	private Button buildOnSave;
+	private FormText formText;
 
 	public OverviewPage(TsconfigEditor editor) {
 		super(editor, ID, TsconfigEditorMessages.OverviewPage_title);
@@ -119,11 +123,9 @@ public class OverviewPage extends AbstractFormPage {
 		final IIDETypeScriptProject tsProject = getTypeScriptProject();
 		if (tsProject != null) {
 			// TypeScript version + node.js
-			FormText formText = toolkit.createFormText(body, true);
+			formText = toolkit.createFormText(body, true);
 			formText.setWhitespaceNormalized(true);
-			formText.setText(NLS.bind(TsconfigEditorMessages.OverviewPage_typeScript_node_versions,
-					tsProject.getProjectSettings().getTscVersion(), tsProject.getProjectSettings().getNodeVersion()),
-					true, false);
+			updateTypeScriptNodejsVersion(tsProject);
 			formText.addHyperlinkListener(new HyperlinkAdapter() {
 				public void linkActivated(HyperlinkEvent e) {
 					String pageId = TYPESCRIPT_LINK_ID.equals(e.getHref()) ? TYPESCRIPT_PREFERENCE_PAGE_ID
@@ -169,13 +171,17 @@ public class OverviewPage extends AbstractFormPage {
 		// Compile/Build on save
 		Composite compileBuildOnSaveBody = toolkit.createComposite(body);
 		compileBuildOnSaveBody.setLayout(new GridLayout());
-		compileOnSave =
-
-				createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_compileOnSave_label,
-						new JSONPath("compileOnSave"), true);
+		compileOnSave = createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_compileOnSave_label,
+				new JSONPath("compileOnSave"), true);
 		buildOnSave = createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_buildOnSave_label,
 				new JSONPath("buildOnSave"));
 		updateCompileBuildOnSaveEnable(hasTypeScriptBuilder);
+	}
+
+	private void updateTypeScriptNodejsVersion(final IIDETypeScriptProject tsProject) {
+		formText.setText(NLS.bind(TsconfigEditorMessages.OverviewPage_typeScript_node_versions,
+				tsProject.getProjectSettings().getTypeScriptVersion(), tsProject.getProjectSettings().getNodeVersion()), true,
+				false);
 	}
 
 	private void updateCompileBuildOnSaveEnable(boolean hasTypeScriptBuilder) {
@@ -250,7 +256,9 @@ public class OverviewPage extends AbstractFormPage {
 			return null;
 		}
 		try {
-			return TypeScriptResourceUtil.getTypeScriptProject(tsconfigFile.getProject());
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(tsconfigFile.getProject());
+			TypeScriptCorePlugin.getDefault().addTypeScriptElementChangedListener(this);
+			return tsProject;
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -259,5 +267,26 @@ public class OverviewPage extends AbstractFormPage {
 
 	private IFile getTsconfigFile() {
 		return getEditor().getFile();
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		TypeScriptCorePlugin.getDefault().removeTypeScriptElementChangedListener(this);
+	}
+
+	@Override
+	public void typeScriptVersionChanged(IIDETypeScriptProject tsProject, String oldVersion, String newVersion) {
+		updateTypeScriptNodejsVersion(tsProject);
+	}
+
+	@Override
+	public void nodejsVersionChanged(IIDETypeScriptProject tsProject, String oldVersion, String newVersion) {
+		updateTypeScriptNodejsVersion(tsProject);
+	}
+
+	@Override
+	public void buildPathChanged(IIDETypeScriptProject tsProject, ITypeScriptBuildPath newBuildPath,
+			ITypeScriptBuildPath oldBuildPath) {
 	}
 }

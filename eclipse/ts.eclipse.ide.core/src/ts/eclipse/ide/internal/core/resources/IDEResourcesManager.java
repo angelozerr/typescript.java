@@ -187,10 +187,9 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	public boolean isTsxOrJsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
 		ext = ext != null ? ext.toLowerCase() : null;
-		return ext != null && (FileUtils.TSX_EXTENSION.equals(ext)
-				|| FileUtils.JSX_EXTENSION.equals(ext));
+		return ext != null && (FileUtils.TSX_EXTENSION.equals(ext) || FileUtils.JSX_EXTENSION.equals(ext));
 	}
-	
+
 	public boolean isJsOrJsMapFile(Object fileObject) {
 		if (fileObject instanceof IFile) {
 			return FileUtils.isJsOrJsMapFile(((IFile) fileObject).getName());
@@ -237,6 +236,22 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		synchronized (listeners) {
 			for (ITypeScriptElementChangedListener listener : listeners) {
 				listener.buildPathChanged(tsProject, oldBuildPath, newBuildPath);
+			}
+		}
+	}
+
+	public void fireTypeScriptVersionChanged(IIDETypeScriptProject tsProject, String oldVersion, String newVersion) {
+		synchronized (listeners) {
+			for (ITypeScriptElementChangedListener listener : listeners) {
+				listener.typeScriptVersionChanged(tsProject, oldVersion, newVersion);
+			}
+		}
+	}
+
+	public void nodejsVersionChanged(IIDETypeScriptProject tsProject, String oldVersion, String newVersion) {
+		synchronized (listeners) {
+			for (ITypeScriptElementChangedListener listener : listeners) {
+				listener.nodejsVersionChanged(tsProject, oldVersion, newVersion);
 			}
 		}
 	}

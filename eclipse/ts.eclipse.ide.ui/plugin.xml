@@ -204,17 +204,11 @@
             category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
       </page>
 	  <page
-            name="%CompilerPreferencePage.name"        
-            class="ts.eclipse.ide.internal.ui.preferences.CompilerPreferencePage"
-            id="ts.eclipse.ide.ui.preference.CompilerPreferencePage"
+            name="%TypeScriptRuntimePreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.TypeScriptRuntimePreferencePage"
+            id="ts.eclipse.ide.ui.preference.TypeScriptRuntimePreferencePage"
             category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
       </page>      
-	  <page
-            name="%ServerPreferencePage.name"        
-            class="ts.eclipse.ide.internal.ui.preferences.ServerPreferencePage"
-            id="ts.eclipse.ide.ui.preference.ServerPreferencePage"
-            category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
-      </page>
 	  <page
             name="%ValidationPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.ValidationPreferencePage"
@@ -260,20 +254,9 @@
          </enabledWhen>
       </page>
 	  <page
-            name="%CompilerPreferencePage.name"        
-            class="ts.eclipse.ide.internal.ui.preferences.CompilerPreferencePage"
-            id="ts.eclipse.ide.ui.property.CompilerPreferencePage"
-            category="ts.eclipse.ide.ui.property.TypeScriptMainPropertyPage">
-         <enabledWhen>
-		     <adapt type="org.eclipse.core.resources.IProject">
-		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
-		     </adapt>         
-         </enabledWhen>
-      </page>
-	  <page
-            name="%ServerPreferencePage.name"        
-            class="ts.eclipse.ide.internal.ui.preferences.ServerPreferencePage"
-            id="ts.eclipse.ide.ui.property.ServerPreferencePage"
+            name="%TypeScriptRuntimePreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.TypeScriptRuntimePreferencePage"
+            id="ts.eclipse.ide.ui.property.TypeScriptRuntimePreferencePage"
             category="ts.eclipse.ide.ui.property.TypeScriptMainPropertyPage">
          <enabledWhen>
 		     <adapt type="org.eclipse.core.resources.IProject">

@@ -116,12 +116,7 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	}
 
 	@Override
-	public String getTscVersion() {
-		return repository.getTypesScriptVersion();
-	}
-
-	@Override
-	public String getTsserverVersion() {
+	public String getTypeScriptVersion() {
 		return repository.getTypesScriptVersion();
 	}
 }
