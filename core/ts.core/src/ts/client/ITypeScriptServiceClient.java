@@ -94,9 +94,12 @@ public interface ITypeScriptServiceClient {
 	void syntacticDiagnosticsSync(String file, Boolean includeLinePosition, ITypeScriptDiagnosticsCollector collector)
 			throws TypeScriptException;
 
-	// Since 2.0.5
+	// Since 2.0.6
 
 	void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+			throws TypeScriptException;
+
+	void navtree(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
 			throws TypeScriptException;
 
 	// Since 2.1.0

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ts.TypeScriptException;
+import ts.client.CommandNames;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
@@ -180,7 +181,13 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	public void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
-		client.navbar(this.getName(), this, collector);
+		if (tsProject.canSupport(CommandNames.NavTree)) {
+			// when TypeScript 2.0.6 is consummed, use "navtree" to fill the Outline
+			// see https://github.com/Microsoft/TypeScript/pull/11532#issuecomment-254804923
+			client.navtree(this.getName(), this, collector);
+		} else {
+			client.navbar(this.getName(), this, collector);
+		}
 	}
 
 	@Override

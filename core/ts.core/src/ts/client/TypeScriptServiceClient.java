@@ -54,6 +54,7 @@ import ts.internal.client.protocol.FormatRequest;
 import ts.internal.client.protocol.GeterrRequest;
 import ts.internal.client.protocol.ImplementationRequest;
 import ts.internal.client.protocol.NavBarRequest;
+import ts.internal.client.protocol.NavTreeRequest;
 import ts.internal.client.protocol.OccurrencesRequest;
 import ts.internal.client.protocol.OpenRequest;
 import ts.internal.client.protocol.QuickInfoRequest;
@@ -323,12 +324,19 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		execute(request);
 	}
 
-	// ---------------- Since 2.0.5
+	// ---------------- Since 2.0.6
 
 	@Override
 	public void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
 			throws TypeScriptException {
 		ImplementationRequest request = new ImplementationRequest(fileName, line, offset, collector);
+		execute(request);
+	}
+
+	@Override
+	public void navtree(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
+			throws TypeScriptException {
+		NavTreeRequest request = new NavTreeRequest(fileName, positionProvider, collector);
 		execute(request);
 	}
 

@@ -28,7 +28,8 @@ public class TypeScriptOutlineContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getChildren(Object element) {
 		if (element instanceof NavigationBarItem) {
-			return ((NavigationBarItem) element).getChildItems().toArray();
+			NavigationBarItem item = (NavigationBarItem) element;
+			return item.hasChildItems() ? item.getChildItems().toArray() : null;
 		}
 		return null;
 	}

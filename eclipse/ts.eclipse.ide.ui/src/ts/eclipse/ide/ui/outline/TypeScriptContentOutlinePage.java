@@ -225,6 +225,9 @@ public class TypeScriptContentOutlinePage extends Page
 
 	private NavigationBarItem findBestMatch(NavigationBarItem navbar, int offset, NavigationBarItem bestItem,
 			int bestSpanLength) throws TypeScriptException {
+		if (!navbar.hasChildItems()) {
+			return bestItem;
+		}
 		for (NavigationBarItem navigateToItem : navbar.getChildItems()) {
 			List<TextSpan> spans = navigateToItem.getSpans();
 

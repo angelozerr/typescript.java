@@ -686,9 +686,11 @@ public abstract class AbstractInformationControl extends PopupDialog
 			// keep the parent around - even if it does not pass the filter
 			// itself
 			Object[] children = ((ITreeContentProvider) viewer.getContentProvider()).getChildren(element);
-			for (int i = 0; i < children.length; i++) {
-				if (select(viewer, element, children[i])) {
-					return true;
+			if (children != null) {
+				for (int i = 0; i < children.length; i++) {
+					if (select(viewer, element, children[i])) {
+						return true;
+					}
 				}
 			}
 			// Element does not pass the filter
