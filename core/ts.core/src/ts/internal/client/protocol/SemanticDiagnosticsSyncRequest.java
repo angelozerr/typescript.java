@@ -35,6 +35,9 @@ public class SemanticDiagnosticsSyncRequest extends FileRequest<ITypeScriptDiagn
 		for (JsonValue item : body) {
 			diagnostic = item.asObject();
 			text = diagnostic.getString("text", null);
+			if(text == null) {
+				text = diagnostic.getString("message", null);
+			}
 			value = diagnostic.get("startLocation");
 			if (value == null) {
 				value = diagnostic.get("start");

@@ -31,11 +31,23 @@ public class SyntacticDiagnosticsSyncRequest extends FileRequest<ITypeScriptDiag
 		String text = null;
 		JsonObject start = null;
 		JsonObject end = null;
-		for (JsonValue value : body) {
-			diagnostic = value.asObject();
+		JsonValue value = null;
+		for (JsonValue item : body) {
+			diagnostic = item.asObject();
 			text = diagnostic.getString("text", null);
-			start = diagnostic.get("start").asObject();
-			end = diagnostic.get("end").asObject();
+			if (text == null) {
+				text = diagnostic.getString("message", null);
+			}
+			value = diagnostic.get("startLocation");
+			if (value == null) {
+				value = diagnostic.get("start");
+			}
+			start = value.asObject();
+			value = diagnostic.get("endLocation");
+			if (value == null) {
+				value = diagnostic.get("end");
+			}
+			end = value.asObject();
 			getCollector().addDiagnostic(null, fileName, text, start.getInt("line", -1), start.getInt("offset", -1),
 					end.getInt("line", -1), end.getInt("offset", -1));
 		}
