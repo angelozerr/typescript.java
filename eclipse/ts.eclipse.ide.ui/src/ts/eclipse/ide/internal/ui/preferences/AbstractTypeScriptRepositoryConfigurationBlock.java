@@ -10,6 +10,9 @@
  */
 package ts.eclipse.ide.internal.ui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.ControlEnableState;
 import org.eclipse.swt.SWT;
@@ -111,15 +114,18 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 
 		// Create combo of embedded node.js
 		ITypeScriptRepository[] respositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
-		String[] values = new String[respositories.length];
-		String[] labels = new String[respositories.length];
-		int i = 0;
+		List<String> values = new ArrayList<String>();
+		List<String> labels = new ArrayList<String>();
+		String label = null;
 		for (ITypeScriptRepository repository : respositories) {
-			values[i] = repository.getName();
-			labels[i] = getRepositoryLabel(repository);
-			i++;
+			label = getRepositoryLabel(repository);
+			if (label != null) {
+				values.add(repository.getName());
+				labels.add(label);
+			}
 		}
-		embeddedComboBox = newComboControl(parent, getEmbeddedTypescriptKey(), values, labels);
+		embeddedComboBox = newComboControl(parent, getEmbeddedTypescriptKey(),
+				values.toArray(new String[values.size()]), labels.toArray(new String[labels.size()]));
 		embeddedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
@@ -138,8 +144,8 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 			}
 		});
 
-		installedComboBox = newComboControl(parent, getInstalledTypescriptPathKey(), getDefaultPaths(), getDefaultPaths(),
-				false);
+		installedComboBox = newComboControl(parent, getInstalledTypescriptPathKey(), getDefaultPaths(),
+				getDefaultPaths(), false);
 		installedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Create Browse buttons.
