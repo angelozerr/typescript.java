@@ -11,6 +11,7 @@
 package ts.client;
 
 import ts.TypeScriptException;
+import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
@@ -97,4 +98,8 @@ public interface ITypeScriptServiceClient {
 
 	void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
 			throws TypeScriptException;
+
+	// Since 2.1.0
+	void getCodeFixes(String fileName, IPositionProvider positionProvider, int startLine, int startOffset, int endLine,
+			int endOffset, ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException;
 }

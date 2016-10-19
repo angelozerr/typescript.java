@@ -17,6 +17,7 @@ import ts.TypeScriptException;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
+import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.FormatOptions;
@@ -190,6 +191,20 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		int line = location.getLine();
 		int offset = location.getOffset();
 		client.implementation(this.getName(), line, offset, collector);
+	}
+
+	@Override
+	public void getCodeFixes(int startPosition, int endPosition, ITypeScriptGetCodeFixesCollector collector)
+			throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		Location startLocation = this.getLocation(startPosition);
+		int startLine = startLocation.getLine();
+		int startOffset = startLocation.getOffset();
+		Location endLocation = this.getLocation(endPosition);
+		int endLine = endLocation.getLine();
+		int endOffset = endLocation.getOffset();
+		client.getCodeFixes(this.getName(), this, startLine, startOffset, endLine, endOffset, collector);
 	}
 
 	private class TypeScriptNavBarCollector implements ITypeScriptNavBarCollector, ITypeScriptAsynchCollector {

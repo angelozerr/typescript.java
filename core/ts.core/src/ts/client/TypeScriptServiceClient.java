@@ -27,6 +27,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import ts.TypeScriptException;
+import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
@@ -43,6 +44,7 @@ import ts.internal.client.ICallbackItem;
 import ts.internal.client.RequestItem;
 import ts.internal.client.protocol.ChangeRequest;
 import ts.internal.client.protocol.CloseRequest;
+import ts.internal.client.protocol.CodeFixRequest;
 import ts.internal.client.protocol.CompletionDetailsRequest;
 import ts.internal.client.protocol.CompletionsRequest;
 import ts.internal.client.protocol.ConfigureRequest;
@@ -327,6 +329,16 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
 			throws TypeScriptException {
 		ImplementationRequest request = new ImplementationRequest(fileName, line, offset, collector);
+		execute(request);
+	}
+
+	// ---------------- Since 2.1.0
+
+	@Override
+	public void getCodeFixes(String fileName, IPositionProvider positionProvider, int startLine, int startOffset,
+			int endLine, int endOffset, ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException {
+		CodeFixRequest request = new CodeFixRequest(fileName, positionProvider, startLine, startOffset, endLine,
+				endOffset, collector);
 		execute(request);
 	}
 

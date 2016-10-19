@@ -12,6 +12,7 @@ package ts.resources;
 
 import ts.TypeScriptException;
 import ts.client.IPositionProvider;
+import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
 import ts.client.format.FormatOptions;
@@ -148,6 +149,17 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 * @throws TypeScriptException
 	 */
 	void implementation(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
+
+	/**
+	 * Get code fixes.
+	 * 
+	 * @param startPosition
+	 * @param endPosition
+	 * @param collector
+	 * @throws TypeScriptException
+	 */
+	void getCodeFixes(int startPosition, int endPosition, ITypeScriptGetCodeFixesCollector collector)
+			throws TypeScriptException;
 
 	void addNavbarListener(INavbarListener listener);
 

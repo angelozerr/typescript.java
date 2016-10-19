@@ -22,7 +22,8 @@ public enum CommandNames {
 							"format"), References("references"), Occurrences("occurrences"), Configure(
 									"configure"), SemanticDiagnosticsSync("semanticDiagnosticsSync",
 											"2.0.3"), SyntacticDiagnosticsSync("syntacticDiagnosticsSync",
-													"2.0.3"), Implementation("implementation", "2.0.6");
+													"2.0.3"), Implementation("implementation",
+															"2.0.6"), GetCodeFixes("2.1.0");
 
 	private final String name;
 	private final String sinceVersion;
