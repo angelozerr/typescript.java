@@ -345,8 +345,12 @@
       					<test property="org.eclipse.core.resources.contentTypeId" value="ts.eclipse.ide.core.tsxSource" args="useFilenameOnly"/>
       				</and>
 				</or>
-			</triggerPoints>				
+			</triggerPoints>
+			<commonSorter
+					class="ts.eclipse.ide.internal.ui.viewers.TypeScriptElementSorter"
+					id="ts.eclipse.ide.ui.viewers.TypeScriptElementSorter"/>				
 		  </navigatorContent>
+		  
           <!-- Hide/Show *.js, *.js.map file if ts file exists -->
 	      <commonFilter  
             id="ts.eclipse.ide.ui.filters.HideCompiledTypeScriptResource"
@@ -354,7 +358,7 @@
             description="%filters.HideCompiledTypeScriptResource.description"
             activeByDefault="false"
             class="ts.eclipse.ide.internal.ui.viewers.TypeScriptFilter" >
-      	  </commonFilter>
+      	  </commonFilter>      	  
    </extension>	
 	
 	<extension
