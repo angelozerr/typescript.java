@@ -18,7 +18,6 @@ public class CodeFixRequest extends SimpleRequest<ITypeScriptGetCodeFixesCollect
 
 	@Override
 	public void collect(JsonObject response) throws TypeScriptException {
-		// TODO Auto-generated method stub
-
+		System.err.println(response);
 	}
 }

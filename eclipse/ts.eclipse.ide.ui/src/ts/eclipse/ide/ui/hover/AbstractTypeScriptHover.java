@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.ui.hover;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
@@ -19,7 +20,9 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.ui.IEditorPart;
 
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.JavaWordFinder;
+import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.eclipse.jface.text.html.TypeScriptBrowserInformationControlInput;
 
 public abstract class AbstractTypeScriptHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2,
@@ -61,6 +64,15 @@ public abstract class AbstractTypeScriptHover implements ITextHover, ITextHoverE
 		if (fPresenterControlCreator == null)
 			fPresenterControlCreator = new IDEPresenterControlCreator(this);
 		return fPresenterControlCreator;
+	}
+
+	protected IFile getFile(ITextViewer textViewer) {
+		IEditorPart editor = getEditor();
+		if (editor != null) {
+			return EditorUtils.getFile(editor);
+		}
+
+		return TypeScriptResourceUtil.getFile(textViewer.getDocument());
 	}
 
 }

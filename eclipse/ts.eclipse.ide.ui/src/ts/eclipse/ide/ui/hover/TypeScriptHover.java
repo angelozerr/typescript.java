@@ -66,13 +66,4 @@ public class TypeScriptHover extends AbstractTypeScriptHover {
 		return null;
 	}
 
-	protected IFile getFile(ITextViewer textViewer) {
-		IEditorPart editor = getEditor();
-		if (editor != null) {
-			return EditorUtils.getFile(editor);
-		}
-
-		return TypeScriptResourceUtil.getFile(textViewer.getDocument());
-	}
-
 }
