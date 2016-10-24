@@ -30,6 +30,9 @@ public class FileUtils {
 	/**
 	 * Configuration file
 	 */
+	public static final String TSCONFIG_START = "tsconfig";
+	public static final String TSCONFIG_END = ".json";
+
 	public static final String TSCONFIG_JSON = "tsconfig.json";
 	public static final String JSCONFIG_JSON = "jsconfig.json";
 
@@ -139,6 +142,13 @@ public class FileUtils {
 			throw new FileNotFoundException("File '" + file + "' does not exist");
 		}
 		return new FileInputStream(file);
+	}
+
+	public static boolean isTsConfigFile(String filename) {
+		if (FileUtils.TSCONFIG_JSON.equals(filename)) {
+			return true;
+		}
+		return filename.startsWith(TSCONFIG_START) && filename.endsWith(TSCONFIG_END);
 	}
 
 }

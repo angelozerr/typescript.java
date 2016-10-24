@@ -13,6 +13,7 @@ package ts.eclipse.ide.internal.ui.navigator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -27,13 +28,13 @@ import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
 import ts.eclipse.ide.core.resources.TypeScriptElementChangedListenerAdapater;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 
 /**
- * Display an overlay icon on the right top for {@link ITypeScriptRootContainer}
+ * Display an overlay icon on the right top for {@link ITsconfigBuildPath}
  *
  */
 public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecorator {
@@ -53,9 +54,9 @@ public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecora
 			if (buildPath == null) {
 				return;
 			}
-			ITypeScriptRootContainer[] containers = buildPath.getRootContainers();
+			ITsconfigBuildPath[] containers = buildPath.getTsconfigBuildPaths();
 			for (int i = 0; i < containers.length; i++) {
-				resources.add(containers[i].getContainer());
+				resources.add(containers[i].getTsconfigFile());
 			}
 		}
 
@@ -132,13 +133,13 @@ public class BuildpathIndicatorLabelDecorator implements ILightweightLabelDecora
 	}
 
 	private ImageDescriptor getOverlay(Object element) {
-		if (element instanceof IResource) {
-			IResource resource = (IResource) element;
+		if (element instanceof IFile) {
+			IFile resource = (IFile) element;
 			IProject project = resource.getProject();
 			if (project != null && TypeScriptResourceUtil.isTypeScriptProject(project)) {
 				try {
 					IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
-					if (tsProject.getTypeScriptBuildPath().isRootContainer(resource)) {
+					if (tsProject.getTypeScriptBuildPath().isInBuildPath(resource)) {
 						return TypeScriptUIImageResource.getImageDescriptor(TypeScriptUIImageResource.DESC_OVR_LIBRARY);
 					}
 				} catch (CoreException e) {

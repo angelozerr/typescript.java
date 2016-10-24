@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Control;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.TypeScriptElementChangedListenerAdapater;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.resources.ITypeScriptProject;
 
@@ -65,9 +65,9 @@ public class TypeScriptNavigatorContentProvider extends TypeScriptElementChanged
 			return children;
 		} else if ((element instanceof IIDETypeScriptProject)) {
 			IIDETypeScriptProject tsProject = (IIDETypeScriptProject) element;
-			return tsProject.getTypeScriptBuildPath().getRootContainers();
-		} else if ((element instanceof ITypeScriptContainer)) {
-			return ((ITypeScriptContainer) element).members();
+			return tsProject.getTypeScriptBuildPath().getTsconfigBuildPaths();
+		} else if ((element instanceof ITsconfigBuildPath)) {
+			return ((ITsconfigBuildPath) element).members();
 		}
 		return null;
 	}
@@ -79,7 +79,7 @@ public class TypeScriptNavigatorContentProvider extends TypeScriptElementChanged
 		case IResource.FILE:
 			return getEmmitedFiles((IFile) resource);
 		}
-		return null; // super.getChildren(resource);
+		return null;
 	}
 
 	private Object[] getTypeScriptResources(IProject project) {
@@ -110,7 +110,7 @@ public class TypeScriptNavigatorContentProvider extends TypeScriptElementChanged
 			return TypeScriptResourceUtil.isTsOrTsxFile(element);
 		} else if (element instanceof ITypeScriptProject) {
 			return true;
-		} else if ((element instanceof ITypeScriptContainer)) {
+		} else if ((element instanceof ITsconfigBuildPath)) {
 			return true;
 		}
 		return false;

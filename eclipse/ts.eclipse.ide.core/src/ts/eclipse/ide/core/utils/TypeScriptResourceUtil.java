@@ -66,7 +66,7 @@ public class TypeScriptResourceUtil {
 	public static boolean isTsxOrJsxFile(Object element) {
 		return IDEResourcesManager.getInstance().isTsxOrJsxFile(element);
 	}
-	
+
 	public static boolean isJsOrJsMapFile(Object element) {
 		return IDEResourcesManager.getInstance().isJsOrJsMapFile(element);
 	}
@@ -308,21 +308,21 @@ public class TypeScriptResourceUtil {
 		return JsonConfigResourcesManager.getInstance().findTsconfig(resource);
 	}
 
-	public static IContainer getBuildPathContainer(Object receiver) {
+	public static IDETsconfigJson getTsconfig(IFile tsconfigFile) throws CoreException {
+		return JsonConfigResourcesManager.getInstance().getTsconfig(tsconfigFile);
+	}
+
+	public static IFile getBuildPathContainer(Object receiver) {
 		if (receiver instanceof IAdaptable) {
 			IResource resource = (IResource) ((IAdaptable) receiver).getAdapter(IResource.class);
 			if (resource != null) {
 				switch (resource.getType()) {
-				case IResource.PROJECT:
-				case IResource.FOLDER:
-					IContainer container = (IContainer) resource;
-					if (container.exists(new Path(FileUtils.TSCONFIG_JSON))) {
-						return container;
-					}
 				case IResource.FILE:
 					if (isTsConfigFile(resource)) {
-						return resource.getParent();
+						return (IFile) resource;
 					}
+				default:
+					return null;
 				}
 			}
 		}
@@ -330,14 +330,11 @@ public class TypeScriptResourceUtil {
 	}
 
 	public static boolean isTsConfigFile(IResource resource) {
-		return resource.getType() == IResource.FILE && FileUtils.TSCONFIG_JSON.equals(resource.getName());
+		return resource.getType() == IResource.FILE && FileUtils.isTsConfigFile(resource.getName());
 	}
 
-	public static String getBuildPathLabel(IContainer container) {
-		if (container.getType() == IResource.PROJECT) {
-			return container.getName();
-		}
-		return new StringBuilder("").append(container.getProjectRelativePath().toString()).toString();
+	public static String getBuildPathLabel(IFile tsconfigFile) {
+		return new StringBuilder("").append(tsconfigFile.getProjectRelativePath().toString()).toString();
 	}
 
 	public static IMarker addTscMarker(IResource resource, String message, int severity, int lineNumber)
@@ -430,4 +427,5 @@ public class TypeScriptResourceUtil {
 
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(location);
 	}
+
 }

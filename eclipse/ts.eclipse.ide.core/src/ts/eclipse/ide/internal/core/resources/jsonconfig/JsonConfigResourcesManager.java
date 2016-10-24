@@ -83,7 +83,7 @@ public class JsonConfigResourcesManager {
 	 * @return the Pojo of the given tsconfig.json file.
 	 * @throws CoreException
 	 */
-	private IDETsconfigJson getTsconfig(IFile tsconfigFile) throws CoreException {
+	public IDETsconfigJson getTsconfig(IFile tsconfigFile) throws CoreException {
 		IDETsconfigJson tsconfig = jsconConfig.get(tsconfigFile);
 		if (tsconfig == null) {
 			return createTsConfig(tsconfigFile);

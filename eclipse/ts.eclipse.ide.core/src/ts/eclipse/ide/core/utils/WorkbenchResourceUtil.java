@@ -63,6 +63,10 @@ public class WorkbenchResourceUtil {
 			return null;
 		}
 		IPath filePath = new Path(path);
+		return findFileFromWorkspace(filePath);
+	}
+
+	public static IFile findFileFromWorkspace(IPath filePath) {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IFile file = root.getFile(filePath);
 		if (file.exists()) {

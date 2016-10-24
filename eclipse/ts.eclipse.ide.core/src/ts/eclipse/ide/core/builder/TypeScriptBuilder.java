@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import ts.TypeScriptException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
@@ -58,9 +58,9 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 
 	private void fullBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
 		ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
-		ITypeScriptRootContainer[] tsContainers = buildPath.getRootContainers();
+		ITsconfigBuildPath[] tsContainers = buildPath.getTsconfigBuildPaths();
 		for (int i = 0; i < tsContainers.length; i++) {
-			ITypeScriptRootContainer tsContainer = tsContainers[i];
+			ITsconfigBuildPath tsContainer = tsContainers[i];
 			try {
 				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 				if (tsconfig == null || tsconfig.isCompileOnSave()) {
@@ -75,8 +75,8 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 	private void incrementalBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
 
 		final ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
-		final Map<ITypeScriptRootContainer, List<IFile>> tsFilesToCompile = new HashMap<ITypeScriptRootContainer, List<IFile>>();
-		final Map<ITypeScriptRootContainer, List<IFile>> tsFilesToDelete = new HashMap<ITypeScriptRootContainer, List<IFile>>();
+		final Map<ITsconfigBuildPath, List<IFile>> tsFilesToCompile = new HashMap<ITsconfigBuildPath, List<IFile>>();
+		final Map<ITsconfigBuildPath, List<IFile>> tsFilesToDelete = new HashMap<ITsconfigBuildPath, List<IFile>>();
 		IResourceDelta delta = getDelta(tsProject.getProject());
 		delta.accept(new IResourceDeltaVisitor() {
 
@@ -114,8 +114,8 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			}
 
 			private void addTsFile(final ITypeScriptBuildPath buildPath,
-					final Map<ITypeScriptRootContainer, List<IFile>> tsFiles, IResource resource) {
-				ITypeScriptRootContainer tsContainer = buildPath.findRootContainer(resource);
+					final Map<ITsconfigBuildPath, List<IFile>> tsFiles, IResource resource) {
+				ITsconfigBuildPath tsContainer = buildPath.findTsconfigBuildPath(resource);
 				if (tsContainer != null) {
 					List<IFile> deltas = tsFiles.get(tsContainer);
 					if (deltas == null) {
@@ -128,8 +128,8 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		});
 
 		// Compile ts files *.ts
-		for (Entry<ITypeScriptRootContainer, List<IFile>> entries : tsFilesToCompile.entrySet()) {
-			ITypeScriptRootContainer tsContainer = entries.getKey();
+		for (Entry<ITsconfigBuildPath, List<IFile>> entries : tsFilesToCompile.entrySet()) {
+			ITsconfigBuildPath tsContainer = entries.getKey();
 			List<IFile> tsFiles = entries.getValue();
 			try {
 				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
@@ -142,8 +142,8 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 			}
 		}
 		// Delete emitted files *.js, *.js.map
-		for (Entry<ITypeScriptRootContainer, List<IFile>> entries : tsFilesToDelete.entrySet()) {
-			ITypeScriptRootContainer tsContainer = entries.getKey();
+		for (Entry<ITsconfigBuildPath, List<IFile>> entries : tsFilesToDelete.entrySet()) {
+			ITsconfigBuildPath tsContainer = entries.getKey();
 			List<IFile> tsFiles = entries.getValue();
 			IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 			for (IFile tsFile : tsFiles) {

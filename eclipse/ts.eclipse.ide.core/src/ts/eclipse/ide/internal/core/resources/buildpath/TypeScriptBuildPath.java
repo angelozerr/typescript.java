@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -29,9 +30,9 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonObject.Member;
 
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPathEntry;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.core.resources.IDETypeScriptProjectSettings;
 import ts.utils.FileUtils;
@@ -44,17 +45,17 @@ import ts.utils.StringUtils;
 public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 
 	private final IProject project;
-	private List<ITypeScriptRootContainer> tsContainers;
+	private List<ITsconfigBuildPath> tsconfigBuildPathList;
 	private final List<ITypeScriptBuildPathEntry> entries;
 
-	private static final ITypeScriptRootContainer[] EMPTY_CONTAINER = new ITypeScriptRootContainer[0];
+	private static final ITsconfigBuildPath[] EMPTY_TSCONFIG_BUILD_PATH = new ITsconfigBuildPath[0];
 
-	private static final Comparator<ITypeScriptRootContainer> CONTAINER_COMPARATOR = new Comparator<ITypeScriptRootContainer>() {
+	private static final Comparator<ITsconfigBuildPath> TSCONFIG_BUILD_PATH_COMPARATOR = new Comparator<ITsconfigBuildPath>() {
 
 		@Override
-		public int compare(ITypeScriptRootContainer o1, ITypeScriptRootContainer o2) {
-			IContainer c1 = o1.getContainer();
-			IContainer c2 = o2.getContainer();
+		public int compare(ITsconfigBuildPath o1, ITsconfigBuildPath o2) {
+			IFile c1 = o1.getTsconfigFile();
+			IFile c2 = o2.getTsconfigFile();
 			return Collator.getInstance().compare(c2.getProjectRelativePath().toString(),
 					c1.getProjectRelativePath().toString());
 		}
@@ -63,38 +64,37 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 	public TypeScriptBuildPath(IProject project) {
 		this.project = project;
 		this.entries = new ArrayList<ITypeScriptBuildPathEntry>();
-		this.tsContainers = null;
+		this.tsconfigBuildPathList = null;
 	}
 
 	@Override
-	public ITypeScriptRootContainer[] getRootContainers() {
-		return getRootContainersList().toArray(EMPTY_CONTAINER);
+	public ITsconfigBuildPath[] getTsconfigBuildPaths() {
+		return getTsconfigBuildPathList().toArray(EMPTY_TSCONFIG_BUILD_PATH);
 	}
 
 	@Override
 	public boolean hasRootContainers() {
-		return getRootContainersList().size() > 0;
+		return getTsconfigBuildPathList().size() > 0;
 	}
 
-	private List<ITypeScriptRootContainer> getRootContainersList() {
-		if (tsContainers == null) {
-			tsContainers = buildContainers(entries, project);
+	private List<ITsconfigBuildPath> getTsconfigBuildPathList() {
+		if (tsconfigBuildPathList == null) {
+			tsconfigBuildPathList = buildTsconfigBuildPathList(entries, project);
 		}
-		return tsContainers;
+		return tsconfigBuildPathList;
 	}
 
-	private List<ITypeScriptRootContainer> buildContainers(List<ITypeScriptBuildPathEntry> entries, IProject project) {
-		List<ITypeScriptRootContainer> containers = new ArrayList<ITypeScriptRootContainer>(entries.size());
+	private List<ITsconfigBuildPath> buildTsconfigBuildPathList(List<ITypeScriptBuildPathEntry> entries,
+			IProject project) {
+		List<ITsconfigBuildPath> containers = new ArrayList<ITsconfigBuildPath>(entries.size());
 		String path = null;
 		for (ITypeScriptBuildPathEntry entry : entries) {
 			path = entry.getPath().toString();
-			if (StringUtils.isEmpty(path)) {
-				containers.add(new TypeScriptRootContainer(project));
-			} else {
-				containers.add(new TypeScriptRootContainer(project.getFolder(path)));
+			if (!StringUtils.isEmpty(path)) {
+				containers.add(new TsconfigBuildPath(project.getFile(path)));
 			}
 		}
-		Collections.sort(containers, CONTAINER_COMPARATOR);
+		Collections.sort(containers, TSCONFIG_BUILD_PATH_COMPARATOR);
 		return containers;
 	}
 
@@ -103,7 +103,8 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		JsonObject object = Json.parse(json).asObject();
 		for (Member member : object) {
 			IPath path = new Path(member.getName());
-			if (project.exists(path.append(FileUtils.TSCONFIG_JSON))) {
+			path = toTsconfigFilePath(path, project);
+			if (project.exists(path)) {
 				TypeScriptBuildPathEntry entry = new TypeScriptBuildPathEntry(path);
 				buildPath.addEntry(entry);
 			}
@@ -111,73 +112,80 @@ public class TypeScriptBuildPath implements ITypeScriptBuildPath {
 		return buildPath;
 	}
 
+	private static IPath toTsconfigFilePath(IPath path, IProject project) {
+		if (path.isEmpty()) {
+			return path.append(FileUtils.TSCONFIG_JSON);
+		}
+		if (project.exists(path)) {
+			IResource resource = project.findMember(path);
+			if (resource.getType() == IResource.FOLDER) {
+				return path.append(FileUtils.TSCONFIG_JSON);
+			}
+		}
+		return path;
+	}
+
 	@Override
 	public void addEntry(ITypeScriptBuildPathEntry entry) {
 		if (!entries.contains(entry)) {
 			entries.add(entry);
-			this.tsContainers = null;
+			this.tsconfigBuildPathList = null;
 		}
 	}
 
 	@Override
-	public void addEntry(IResource resource) {
-		addEntry(createEntry(resource));
+	public void addEntry(IFile tsconfigFile) {
+		addEntry(createEntry(tsconfigFile));
 	}
 
 	@Override
 	public void removeEntry(ITypeScriptBuildPathEntry entry) {
 		entries.remove(entry);
-		this.tsContainers = null;
+		this.tsconfigBuildPathList = null;
 	}
 
 	@Override
-	public void removeEntry(IResource resource) {
-		removeEntry(createEntry(resource));
+	public void removeEntry(IFile tsconfigFile) {
+		removeEntry(createEntry(tsconfigFile));
 	}
 
-	private ITypeScriptBuildPathEntry createEntry(IResource resource) {
-		if (resource.getType() == IResource.FILE) {
-			return new TypeScriptBuildPathEntry(resource.getParent().getProjectRelativePath());
-		}
-		return new TypeScriptBuildPathEntry(resource.getProjectRelativePath());
+	private ITypeScriptBuildPathEntry createEntry(IFile tsconfigFile) {
+		return new TypeScriptBuildPathEntry(tsconfigFile.getProjectRelativePath());
+
 	}
 
 	@Override
 	public boolean isInScope(IResource resource) {
-		return findRootContainer(resource) != null;
+		return findTsconfigBuildPath(resource) != null;
 	}
 
 	@Override
 	public void clear() {
 		entries.clear();
-		this.tsContainers = null;
+		this.tsconfigBuildPathList = null;
 	}
 
 	@Override
-	public boolean isRootContainer(IResource resource) {
-		if (!(resource.getType() == IResource.PROJECT || resource.getType() == IResource.FOLDER)) {
-			return false;
-		}
-		return getRootContainer((IContainer) resource) != null;
+	public boolean isInBuildPath(IFile tsconfigFile) {
+		return getTsconfigBuildPath(tsconfigFile) != null;
 	}
 
 	@Override
-	public ITypeScriptRootContainer findRootContainer(IResource resource) {
-		for (ITypeScriptRootContainer tsContainer : getRootContainersList()) {
-			IContainer container = tsContainer.getContainer();
+	public ITsconfigBuildPath findTsconfigBuildPath(IResource resource) {
+		for (ITsconfigBuildPath tsconfigBuildPath : getTsconfigBuildPathList()) {
+			IContainer container = tsconfigBuildPath.getTsconfigFile().getParent();
 			if (container.getFullPath().isPrefixOf(resource.getFullPath())) {
-				return tsContainer;
+				return tsconfigBuildPath;
 			}
 		}
 		return null;
 	}
 
 	@Override
-	public ITypeScriptRootContainer getRootContainer(IContainer resource) {
-		for (ITypeScriptRootContainer tsContainer : getRootContainersList()) {
-			IContainer container = tsContainer.getContainer();
-			if (container.equals(resource)) {
-				return tsContainer;
+	public ITsconfigBuildPath getTsconfigBuildPath(IFile tsconfigFile) {
+		for (ITsconfigBuildPath tsconfigBuildPath : getTsconfigBuildPathList()) {
+			if (tsconfigBuildPath.getTsconfigFile().equals(tsconfigFile)) {
+				return tsconfigBuildPath;
 			}
 		}
 		return null;

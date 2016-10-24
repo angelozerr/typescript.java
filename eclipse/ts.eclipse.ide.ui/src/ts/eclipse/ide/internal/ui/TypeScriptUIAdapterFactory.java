@@ -3,7 +3,7 @@ package ts.eclipse.ide.internal.ui;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.debug.ui.actions.ILaunchable;
 
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 
 public class TypeScriptUIAdapterFactory implements IAdapterFactory {
 
@@ -11,8 +11,8 @@ public class TypeScriptUIAdapterFactory implements IAdapterFactory {
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType.equals(ILaunchable.class)) {
-			if (adaptableObject instanceof ITypeScriptRootContainer) {
-				return ((ITypeScriptRootContainer) adaptableObject);
+			if (adaptableObject instanceof ITsconfigBuildPath) {
+				return ((ITsconfigBuildPath) adaptableObject);
 			}
 		}
 		return null;

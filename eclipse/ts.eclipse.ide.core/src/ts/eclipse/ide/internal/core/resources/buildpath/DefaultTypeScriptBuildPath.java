@@ -19,8 +19,8 @@ public class DefaultTypeScriptBuildPath extends TypeScriptBuildPath {
 
 	public DefaultTypeScriptBuildPath() {
 		super(null);
-		addEntry(new TypeScriptBuildPathEntry("/"));
-		addEntry(new TypeScriptBuildPathEntry("/src"));
+		addEntry(new TypeScriptBuildPathEntry("/tsconfig.json"));
+		addEntry(new TypeScriptBuildPathEntry("/src/tsconfig.json"));
 	}
 
 }

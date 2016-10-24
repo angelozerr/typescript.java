@@ -10,7 +10,6 @@
  */
 package ts.eclipse.ide.ui.launch;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -41,10 +40,6 @@ public class TypeScriptCompilerLaunchHelper {
 	}
 
 	public static void launch(IFile tsconfigFile, String mode) {
-		launch(tsconfigFile.getParent(), mode);
-	}
-
-	public static void launch(IContainer buildPath, String mode) {
 		ILaunchConfigurationType tscLaunchConfigurationType = DebugPlugin.getDefault().getLaunchManager()
 				.getLaunchConfigurationType(TypeScriptCompilerLaunchConstants.LAUNCH_CONFIGURATION_ID);
 		try {
@@ -52,18 +47,18 @@ public class TypeScriptCompilerLaunchHelper {
 			ILaunchConfiguration[] configurations = DebugPlugin.getDefault().getLaunchManager()
 					.getLaunchConfigurations(tscLaunchConfigurationType);
 
-			ILaunchConfiguration existingConfiguraion = chooseLaunchConfiguration(configurations, buildPath);
+			ILaunchConfiguration existingConfiguraion = chooseLaunchConfiguration(configurations, tsconfigFile);
 
 			if (existingConfiguraion != null) {
 				ILaunchConfigurationWorkingCopy wc = existingConfiguraion.getWorkingCopy();
 				existingConfiguraion = wc.doSave();
 				DebugUITools.launch(existingConfiguraion, mode);
 				// Creating Launch Configuration from scratch
-			} else if (buildPath != null) {
-				IProject project = buildPath.getProject();
+			} else {
+				IProject project = tsconfigFile.getProject();
 				ILaunchConfigurationWorkingCopy newConfiguration = createEmptyLaunchConfiguration(
-						project.getName() + " [" + buildPath.getProjectRelativePath().toString() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-				newConfiguration.setAttribute(TypeScriptCompilerLaunchConstants.BUILD_PATH, getBuildPath(buildPath));
+						project.getName() + " [" + tsconfigFile.getProjectRelativePath().toString() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+				newConfiguration.setAttribute(TypeScriptCompilerLaunchConstants.BUILD_PATH, getBuildPath(tsconfigFile));
 				newConfiguration.doSave();
 				DebugUITools.launch(newConfiguration, mode);
 			}
@@ -85,8 +80,8 @@ public class TypeScriptCompilerLaunchHelper {
 	}
 
 	private static ILaunchConfiguration chooseLaunchConfiguration(ILaunchConfiguration[] configurations,
-			IContainer container) {
-		String buildFilePath = getBuildPath(container);
+			IFile tsconfigFile) {
+		String buildFilePath = getBuildPath(tsconfigFile);
 		try {
 			for (ILaunchConfiguration conf : configurations) {
 				String buildFileAttribute = conf.getAttribute(TypeScriptCompilerLaunchConstants.BUILD_PATH,

@@ -11,14 +11,14 @@
 package ts.eclipse.ide.internal.core;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 
 /**
@@ -92,11 +92,13 @@ public class TypeScriptNatureTester extends PropertyTester {
 						try {
 							IIDETypeScriptProject tsProject = TypeScriptResourceUtil
 									.getTypeScriptProject(resource.getProject());
-							return !tsProject.getTypeScriptBuildPath().isRootContainer(resource.getParent());
+							return !tsProject.getTypeScriptBuildPath().isInBuildPath((IFile) resource);
 
 						} catch (CoreException e) {
 						}
 					}
+				default:
+					return false;
 				}
 			}
 		}
@@ -104,13 +106,13 @@ public class TypeScriptNatureTester extends PropertyTester {
 	}
 
 	private boolean testCanRemoveToBuildPath(Object receiver) {
-		IContainer container = TypeScriptResourceUtil.getBuildPathContainer(receiver);
-		if (container == null) {
+		IFile tsconfigFile = TypeScriptResourceUtil.getBuildPathContainer(receiver);
+		if (tsconfigFile == null) {
 			return false;
 		}
 		try {
-			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(container.getProject());
-			return tsProject.getTypeScriptBuildPath().isRootContainer(container);
+			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(tsconfigFile.getProject());
+			return tsProject.getTypeScriptBuildPath().isInBuildPath(tsconfigFile);
 
 		} catch (CoreException e) {
 		}
@@ -118,11 +120,11 @@ public class TypeScriptNatureTester extends PropertyTester {
 	}
 
 	private boolean testCanRunCompile(Object receiver) {
-		if (receiver instanceof ITypeScriptRootContainer) {
+		if (receiver instanceof ITsconfigBuildPath) {
 			return true;
 		}
-		IContainer container = TypeScriptResourceUtil.getBuildPathContainer(receiver);
-		if (container != null) {
+		IFile tsconfigFile = TypeScriptResourceUtil.getBuildPathContainer(receiver);
+		if (tsconfigFile != null) {
 			return true;
 		}
 		return false;

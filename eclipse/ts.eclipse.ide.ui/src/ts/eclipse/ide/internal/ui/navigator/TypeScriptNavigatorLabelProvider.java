@@ -1,6 +1,6 @@
 package ts.eclipse.ide.internal.ui.navigator;
 
-import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -9,8 +9,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.ICommonLabelProvider;
 
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptContainer;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
@@ -24,9 +23,9 @@ public class TypeScriptNavigatorLabelProvider implements ICommonLabelProvider {
 	public Image getImage(Object element) {
 		if (element instanceof ITypeScriptProject) {
 			return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_TYPESCRIPT_RESOURCES);
-		} else if (element instanceof ITypeScriptContainer) {
-			IContainer container = ((ITypeScriptContainer) element).getContainer();
-			return INSTANCE.getImage(container);
+		} else if (element instanceof ITsconfigBuildPath) {
+			IFile file = ((ITsconfigBuildPath) element).getTsconfigFile();
+			return INSTANCE.getImage(file);
 		}
 		return null;
 	}
@@ -37,12 +36,9 @@ public class TypeScriptNavigatorLabelProvider implements ICommonLabelProvider {
 			ITypeScriptProject tsProject = ((ITypeScriptProject) element);
 			String tsVersion = tsProject.getProjectSettings().getTypeScriptVersion();
 			return NLS.bind(TypeScriptUIMessages.TypeScriptResources, tsVersion);
-		} else if (element instanceof ITypeScriptRootContainer) {
-			IContainer container = ((ITypeScriptRootContainer) element).getContainer();
-			return TypeScriptResourceUtil.getBuildPathLabel(container);
-		} else if (element instanceof ITypeScriptContainer) {
-			IContainer container = ((ITypeScriptContainer) element).getContainer();
-			return INSTANCE.getText(container);
+		} else if (element instanceof ITsconfigBuildPath) {
+			IFile file = ((ITsconfigBuildPath) element).getTsconfigFile();
+			return TypeScriptResourceUtil.getBuildPathLabel(file);
 		}
 		return null;
 	}

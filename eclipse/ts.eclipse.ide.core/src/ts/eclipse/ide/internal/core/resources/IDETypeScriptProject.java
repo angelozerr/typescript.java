@@ -32,7 +32,7 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
@@ -244,7 +244,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 				return false;
 			}
 			// Use project preferences, which defines include/exclude path
-			ITypeScriptRootContainer tsContainer = getTypeScriptBuildPath().findRootContainer(resource);
+			ITsconfigBuildPath tsContainer = getTypeScriptBuildPath().findTsconfigBuildPath(resource);
 			if (tsContainer == null) {
 				return false;
 			}
@@ -271,7 +271,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean isJsFileIsInScope(IFile file, ITypeScriptRootContainer tsContainer) throws CoreException {
+	private boolean isJsFileIsInScope(IFile file, ITsconfigBuildPath tsContainer) throws CoreException {
 		if (TypeScriptResourceUtil.isEmittedFile(file)) {
 			// the js file is an emitted file
 			return false;
@@ -301,7 +301,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 *         otherwise.
 	 * @throws CoreException
 	 */
-	private boolean isTsFileIsInScope(IFile file, ITypeScriptRootContainer tsContainer) throws CoreException {
+	private boolean isTsFileIsInScope(IFile file, ITsconfigBuildPath tsContainer) throws CoreException {
 		IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 		if (tsconfig != null) {
 			return tsconfig.isInScope(file);

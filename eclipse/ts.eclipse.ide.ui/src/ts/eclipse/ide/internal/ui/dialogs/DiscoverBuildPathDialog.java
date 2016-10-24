@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -82,7 +83,7 @@ public class DiscoverBuildPathDialog extends ListSelectionDialog {
 
 		@Override
 		public String getText(Object element) {
-			return TypeScriptResourceUtil.getBuildPathLabel((IContainer) element);
+			return TypeScriptResourceUtil.getBuildPathLabel((IFile) element);
 		}
 
 	}
@@ -103,7 +104,7 @@ public class DiscoverBuildPathDialog extends ListSelectionDialog {
 			}
 
 			try {
-				final TsconfigJsonResourcesCollector collector = new TsconfigJsonResourcesCollector(false);
+				final TsconfigJsonResourcesCollector collector = new TsconfigJsonResourcesCollector(true);
 				container.accept(collector, IResource.NONE);
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {

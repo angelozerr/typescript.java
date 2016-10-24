@@ -9,6 +9,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -19,8 +20,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptRootContainer;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.dialogs.DiscoverBuildPathDialog;
 import ts.resources.ITypeScriptProject;
@@ -39,20 +40,20 @@ public abstract class AbstractTypeScriptBuildPathHandler extends AbstractHandler
 		if (selection != null && selection instanceof IStructuredSelection) {
 			Map<ITypeScriptProject, ITypeScriptBuildPath> buildPaths = new HashMap<ITypeScriptProject, ITypeScriptBuildPath>();
 			for (Object receiver : ((IStructuredSelection) selection).toList()) {
-				IContainer container = TypeScriptResourceUtil.getBuildPathContainer(receiver);
+				IFile tsconfigFile = TypeScriptResourceUtil.getBuildPathContainer(receiver);
 				IIDETypeScriptProject tsProject = null;
-				if (container != null) {
+				if (tsconfigFile != null) {
 					// The selected container contains a tsconfig.json file in
 					// the root
 					try {
-						tsProject = TypeScriptResourceUtil.getTypeScriptProject(container.getProject());
+						tsProject = TypeScriptResourceUtil.getTypeScriptProject(tsconfigFile.getProject());
 						ITypeScriptBuildPath buildPath = getBuildPath(tsProject, buildPaths);
 						if (add) {
 							// Add the container to the build path
-							buildPath.addEntry(container);
+							buildPath.addEntry(tsconfigFile);
 						} else {
 							// Remove the existing container from the build path
-							buildPath.removeEntry(container);
+							buildPath.removeEntry(tsconfigFile);
 						}
 					} catch (CoreException e) {
 
@@ -73,14 +74,14 @@ public abstract class AbstractTypeScriptBuildPathHandler extends AbstractHandler
 					Shell parentShell = HandlerUtil.getActiveShell(event);
 					DiscoverBuildPathDialog dialog = new DiscoverBuildPathDialog(parentShell, selectedContainer);
 					dialog.setInitialElementSelections(
-							getContainers(tsProject.getTypeScriptBuildPath().getRootContainers()));
+							getTsconfigFiles(tsProject.getTypeScriptBuildPath().getTsconfigBuildPaths()));
 					if (dialog.open() == Window.OK) {
 						List<IResource> resources = dialog.getCheckedElements();
 						if (resources != null) {
 							ITypeScriptBuildPath buildPath = getBuildPath(tsProject, buildPaths);
 							buildPath.clear();
 							for (IResource resource : resources) {
-								buildPath.addEntry(resource);
+								buildPath.addEntry((IFile) resource);
 							}
 						}
 					}
@@ -95,12 +96,12 @@ public abstract class AbstractTypeScriptBuildPathHandler extends AbstractHandler
 		return null;
 	}
 
-	private List<IResource> getContainers(ITypeScriptRootContainer[] rootContainers) {
-		List<IResource> containers = new ArrayList<IResource>();
+	private List<IFile> getTsconfigFiles(ITsconfigBuildPath[] rootContainers) {
+		List<IFile> files = new ArrayList<IFile>();
 		for (int i = 0; i < rootContainers.length; i++) {
-			containers.add(rootContainers[i].getContainer());
+			files.add(rootContainers[i].getTsconfigFile());
 		}
-		return containers;
+		return files;
 	}
 
 	private IContainer getSelectedContainer(Object receiver) {

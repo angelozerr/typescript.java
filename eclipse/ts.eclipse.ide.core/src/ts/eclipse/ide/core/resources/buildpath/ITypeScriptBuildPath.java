@@ -10,7 +10,7 @@
  */
 package ts.eclipse.ide.core.resources.buildpath;
 
-import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 
 /**
@@ -24,7 +24,7 @@ public interface ITypeScriptBuildPath {
 	 * 
 	 * @return list of folders root of the project which hosts "tsconfig.json".
 	 */
-	ITypeScriptRootContainer[] getRootContainers();
+	ITsconfigBuildPath[] getTsconfigBuildPaths();
 
 	/**
 	 * Returns true if the given resource is in the scope of the build path and
@@ -36,22 +36,22 @@ public interface ITypeScriptBuildPath {
 	 */
 	boolean isInScope(IResource resource);
 
-	ITypeScriptRootContainer findRootContainer(IResource resource);
+	ITsconfigBuildPath findTsconfigBuildPath(IResource resource);
+
+	void addEntry(IFile tsconfigFile);
 
 	void addEntry(ITypeScriptBuildPathEntry entry);
 
-	void addEntry(IResource resource);
+	void removeEntry(IFile tsconfigFile);
 
 	void removeEntry(ITypeScriptBuildPathEntry entry);
 
-	void removeEntry(IResource resource);
+	boolean isInBuildPath(IFile tsconfigFile);
 
-	boolean isRootContainer(IResource resource);
+	ITsconfigBuildPath getTsconfigBuildPath(IFile tsconfigFile);
 
-	ITypeScriptRootContainer getRootContainer(IContainer resource);
-	
 	ITypeScriptBuildPath copy();
-	
+
 	void clear();
 
 	void save();

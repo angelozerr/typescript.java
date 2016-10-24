@@ -11,7 +11,7 @@ public abstract class AbstractTsconfigJsonCollector implements IResourceProxyVis
 
 	@Override
 	public boolean visit(IResourceProxy proxy) throws CoreException {
-		if (FileUtils.TSCONFIG_JSON.equals(proxy.getName())) {
+		if (FileUtils.isTsConfigFile(proxy.getName())) {
 			collect(proxy.requestResource());
 		}
 		return true;
