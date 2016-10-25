@@ -60,8 +60,8 @@ public class NavTreeRequest extends FileRequest<ITypeScriptNavBarCollector> {
 
 		NavTreeResponse a = gson.fromJson(response.toString(), NavTreeResponse.class);
 		List<NavigationBarItem> items = new ArrayList<NavigationBarItem>();
+		items.add(a.getBody());
 		NavigationBarItemRoot root = new NavigationBarItemRoot(items);
-		root.getChildItems().add(a.getBody());
 		getCollector().setNavBar(root);
 	}
 

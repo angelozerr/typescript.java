@@ -75,6 +75,6 @@ public class NavigationBarItem implements INavigationBarItem {
 	}
 
 	public NavigationBarItem getParent() {
-		return parent != null ? parent : this;
+		return parent;
 	}
 }
