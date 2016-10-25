@@ -11,6 +11,8 @@
 package ts.eclipse.ide.ui.hover;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
@@ -18,18 +20,17 @@ import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.editors.text.EditorsUI;
 
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.JavaWordFinder;
 import ts.eclipse.ide.ui.utils.EditorUtils;
-import ts.eclipse.jface.text.html.TypeScriptBrowserInformationControlInput;
 
-public abstract class AbstractTypeScriptHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2,
-		IInformationProviderExtension2, ITypeScriptHoverInfoProvider {
+public abstract class AbstractTypeScriptHover
+		implements ITextHover, ITextHoverExtension, ITextHoverExtension2, IInformationProviderExtension2 {
 
-	private IInformationControlCreator fHoverControlCreator;
-	private IInformationControlCreator fPresenterControlCreator;
 	private IEditorPart editor;
 
 	public IEditorPart getEditor() {
@@ -41,10 +42,8 @@ public abstract class AbstractTypeScriptHover implements ITextHover, ITextHoverE
 	}
 
 	@Override
-	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
-		TypeScriptBrowserInformationControlInput info = (TypeScriptBrowserInformationControlInput) getHoverInfo2(
-				textViewer, hoverRegion);
-		return info != null ? info.getHtml() : null;
+	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
+		return getHoverInfo(textViewer, hoverRegion);
 	}
 
 	@Override
@@ -54,16 +53,22 @@ public abstract class AbstractTypeScriptHover implements ITextHover, ITextHoverE
 
 	@Override
 	public IInformationControlCreator getHoverControlCreator() {
-		if (fHoverControlCreator == null)
-			fHoverControlCreator = new IDEHoverControlCreator(getInformationPresenterControlCreator(), this);
-		return fHoverControlCreator;
+		return new IInformationControlCreator() {
+			@Override
+			public IInformationControl createInformationControl(Shell parent) {
+				return new DefaultInformationControl(parent, EditorsUI.getTooltipAffordanceString());
+			}
+		};
 	}
 
 	@Override
 	public IInformationControlCreator getInformationPresenterControlCreator() {
-		if (fPresenterControlCreator == null)
-			fPresenterControlCreator = new IDEPresenterControlCreator(this);
-		return fPresenterControlCreator;
+		return new IInformationControlCreator() {
+			@Override
+			public IInformationControl createInformationControl(Shell shell) {
+				return new DefaultInformationControl(shell, true);
+			}
+		};
 	}
 
 	protected IFile getFile(ITextViewer textViewer) {
@@ -71,7 +76,6 @@ public abstract class AbstractTypeScriptHover implements ITextHover, ITextHoverE
 		if (editor != null) {
 			return EditorUtils.getFile(editor);
 		}
-
 		return TypeScriptResourceUtil.getFile(textViewer.getDocument());
 	}
 

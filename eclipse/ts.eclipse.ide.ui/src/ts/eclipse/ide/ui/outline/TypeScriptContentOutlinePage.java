@@ -235,7 +235,7 @@ public class TypeScriptContentOutlinePage extends Page
 				if (span.contains(offset)) {
 					// the best item is the one with the smallest span which
 					// contains the offset
-					if (bestItem == null || (span.getLength() < bestSpanLength)) {
+					if (bestItem == null || (span.getLength() <= bestSpanLength)) {
 						bestItem = navigateToItem;
 						bestSpanLength = span.getLength();
 					}
