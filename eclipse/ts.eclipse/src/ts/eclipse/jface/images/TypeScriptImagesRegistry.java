@@ -32,6 +32,7 @@ public class TypeScriptImagesRegistry {
 	public static final String IMG_KEYWORD = "ts.eclipse.jface.IMG_KEYWORD";
 	public static final String IMG_PACKAGE = "ts.eclipse.jface.IMG_PACKAGE";
 	public static final String IMG_SCRIPT = "ts.eclipse.jface.IMG_SCRIPT";
+	public static final String IMG_FOLDER = "ts.eclipse.jface.IMG_FOLDER";
 	public static final String IMG_CLASS = "ts.eclipse.jface.IMG_CLASS";
 	public static final String IMG_ALIAS = "ts.eclipse.jface.IMG_ALIAS";
 	public static final String IMG_INTERFACE = "ts.eclipse.jface.IMG_INTERFACE";
@@ -53,7 +54,9 @@ public class TypeScriptImagesRegistry {
 		registerImageDescriptor(IMG_PACKAGE,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "package_obj.gif"));
 		registerImageDescriptor(IMG_SCRIPT,
-				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "script_obj.png"));
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "script_obj.gif"));
+		registerImageDescriptor(IMG_FOLDER,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "fldr_obj.png"));		
 		registerImageDescriptor(IMG_CLASS,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "class_obj.gif"));
 		registerImageDescriptor(IMG_ALIAS,
@@ -156,6 +159,9 @@ public class TypeScriptImagesRegistry {
 			break;
 		case SCRIPT:
 			imageKey = IMG_SCRIPT;
+			break;
+		case DIRECTORY:
+			imageKey = IMG_FOLDER;
 			break;			
 		case ENUM:
 			imageKey = getKey(parts, IMG_ENUM_DEFAULT, IMG_ENUM_PRIVATE, null);

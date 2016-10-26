@@ -11,30 +11,12 @@
 package ts;
 
 /**
- * TypeScript mode kind.
+ * TypeScript model kind.
  *
  */
 public enum TypeScriptKind {
 
-	ALIAS,
-	LET,
-	/** Primitive type. */
-	PRIMITIVE_TYPE, /** Keyword. */
-	KEYWORD, /** Class. */
-	CLASS, /** Interface. */
-	INTERFACE, /** Module. */
-	MODULE, /** Property. */
-	SCRIPT, /** Script. */
-	PROPERTY, /** Method. */
-	METHOD, /** Constructor. */
-	CONSTRUCTOR, /** Function. */
-	FUNCTION, /** Variable. */
-	VAR, /** Enumeration. */
-	ENUM, /** Private modifier. */
-	PRIVATE, /** Public modifier. */
-	PUBLIC, /** Static modifier. */
-	STATIC, /** Type. */
-	TYPE;
+	ALIAS, PRIMITIVE_TYPE, KEYWORD, CLASS, INTERFACE, MODULE, SCRIPT, DIRECTORY, PROPERTY, METHOD, CONSTRUCTOR, FUNCTION, VAR, LET, ENUM, PRIVATE, PUBLIC, STATIC, TYPE;
 
 	public static TypeScriptKind getKind(String kind) {
 		try {
