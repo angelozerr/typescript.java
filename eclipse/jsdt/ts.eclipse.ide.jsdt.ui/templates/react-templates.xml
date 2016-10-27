@@ -214,11 +214,11 @@ export default ${componentName};</template>
   
 <template name="ptndr" description="%Templates.react.ptndr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptndr" context="React" enabled="true" autoinsert="false">PropTypes.node.isRequired,</template>
 
-<template name="ptel" description="%Templates.react.ptel" id="ts.eclipse.ide.jsdt.ui.templates.react.ptelr" context="React" enabled="true" autoinsert="false">PropTypes.element,</template>
+<template name="ptel" description="%Templates.react.ptel" id="ts.eclipse.ide.jsdt.ui.templates.react.ptel" context="React" enabled="true" autoinsert="false">PropTypes.element,</template>
   
 <template name="ptelr" description="%Templates.react.ptelr" id="ts.eclipse.ide.jsdt.ui.templates.react.ptelr" context="React" enabled="true" autoinsert="false">PropTypes.element.isRequired,</template>
 
-<template name="pti" description="%Templates.react.pti" id="ts.eclipse.ide.jsdt.ui.templates.react.ptir" context="React" enabled="true" autoinsert="false">PropTypes.element,</template>
+<template name="pti" description="%Templates.react.pti" id="ts.eclipse.ide.jsdt.ui.templates.react.pti" context="React" enabled="true" autoinsert="false">PropTypes.element,</template>
   
 <template name="ptir" description="%Templates.react.ptir" id="ts.eclipse.ide.jsdt.ui.templates.react.ptir" context="React" enabled="true" autoinsert="false">PropTypes.element.isRequired,</template>
 
