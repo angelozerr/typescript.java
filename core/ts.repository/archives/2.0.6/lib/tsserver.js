@@ -38527,7 +38527,7 @@ var ts;
 })(ts || (ts = {}));
 var ts;
 (function (ts) {
-    ts.version = "2.0.7";
+    ts.version = "2.0.6";
     var emptyArray = [];
     function findConfigFile(searchPath, fileExists, configName) {
         if (configName === void 0) { configName = "tsconfig.json"; }
@@ -43823,9 +43823,6 @@ var ts;
                 return this.rulesMap;
             };
             RulesProvider.prototype.ensureUpToDate = function (options) {
-                this.ensureUpToDateWorker(ts.toEditorSettings(options));
-            };
-            RulesProvider.prototype.ensureUpToDateWorker = function (options) {
                 if (!this.options || !ts.compareDataObjects(this.options, options)) {
                     var activeRules = this.createActiveRules(options);
                     var rulesMap = formatting.RulesMap.create(activeRules);
@@ -43924,10 +43921,6 @@ var ts;
     var formatting;
     (function (formatting) {
         function formatOnEnter(position, sourceFile, rulesProvider, options) {
-            return formatOnEnterWorker(position, sourceFile, rulesProvider, ts.toEditorSettings(options));
-        }
-        formatting.formatOnEnter = formatOnEnter;
-        function formatOnEnterWorker(position, sourceFile, rulesProvider, options) {
             var line = sourceFile.getLineAndCharacterOfPosition(position).line;
             if (line === 0) {
                 return [];
@@ -43945,47 +43938,31 @@ var ts;
             };
             return formatSpan(span, sourceFile, options, rulesProvider, 2);
         }
-        formatting.formatOnEnterWorker = formatOnEnterWorker;
+        formatting.formatOnEnter = formatOnEnter;
         function formatOnSemicolon(position, sourceFile, rulesProvider, options) {
-            return formatOnSemicolonWorker(position, sourceFile, rulesProvider, ts.toEditorSettings(options));
-        }
-        formatting.formatOnSemicolon = formatOnSemicolon;
-        function formatOnSemicolonWorker(position, sourceFile, rulesProvider, options) {
             return formatOutermostParent(position, 23, sourceFile, options, rulesProvider, 3);
         }
-        formatting.formatOnSemicolonWorker = formatOnSemicolonWorker;
+        formatting.formatOnSemicolon = formatOnSemicolon;
         function formatOnClosingCurly(position, sourceFile, rulesProvider, options) {
-            return formatOnClosingCurlyWorker(position, sourceFile, rulesProvider, ts.toEditorSettings(options));
-        }
-        formatting.formatOnClosingCurly = formatOnClosingCurly;
-        function formatOnClosingCurlyWorker(position, sourceFile, rulesProvider, options) {
             return formatOutermostParent(position, 16, sourceFile, options, rulesProvider, 4);
         }
-        formatting.formatOnClosingCurlyWorker = formatOnClosingCurlyWorker;
+        formatting.formatOnClosingCurly = formatOnClosingCurly;
         function formatDocument(sourceFile, rulesProvider, options) {
-            return formatDocumentWorker(sourceFile, rulesProvider, ts.toEditorSettings(options));
-        }
-        formatting.formatDocument = formatDocument;
-        function formatDocumentWorker(sourceFile, rulesProvider, options) {
             var span = {
                 pos: 0,
                 end: sourceFile.text.length
             };
             return formatSpan(span, sourceFile, options, rulesProvider, 0);
         }
-        formatting.formatDocumentWorker = formatDocumentWorker;
+        formatting.formatDocument = formatDocument;
         function formatSelection(start, end, sourceFile, rulesProvider, options) {
-            return formatSelectionWorker(start, end, sourceFile, rulesProvider, ts.toEditorSettings(options));
-        }
-        formatting.formatSelection = formatSelection;
-        function formatSelectionWorker(start, end, sourceFile, rulesProvider, options) {
             var span = {
                 pos: ts.getLineStartPositionForPosition(start, sourceFile),
                 end: end
             };
             return formatSpan(span, sourceFile, options, rulesProvider, 1);
         }
-        formatting.formatSelectionWorker = formatSelectionWorker;
+        formatting.formatSelection = formatSelection;
         function formatOutermostParent(position, expectedLastToken, sourceFile, options, rulesProvider, requestKind) {
             var parent = findOutermostParent(position, expectedLastToken, sourceFile);
             if (!parent) {
@@ -46911,7 +46888,7 @@ var ts;
             if (!ruleProvider) {
                 ruleProvider = new ts.formatting.RulesProvider();
             }
-            ruleProvider.ensureUpToDateWorker(options);
+            ruleProvider.ensureUpToDate(options);
             return ruleProvider;
         }
         function synchronizeHostData() {
@@ -50880,24 +50857,24 @@ var ts;
         function getFormattingEditsForRange(fileName, start, end, optionsOrSettings) {
             var settings = toEditorSettings(optionsOrSettings);
             var sourceFile = syntaxTreeCache.getCurrentSourceFile(fileName);
-            return ts.formatting.formatSelectionWorker(start, end, sourceFile, getRuleProvider(settings), settings);
+            return ts.formatting.formatSelection(start, end, sourceFile, getRuleProvider(settings), settings);
         }
         function getFormattingEditsForDocument(fileName, optionsOrSettings) {
             var settings = toEditorSettings(optionsOrSettings);
             var sourceFile = syntaxTreeCache.getCurrentSourceFile(fileName);
-            return ts.formatting.formatDocumentWorker(sourceFile, getRuleProvider(settings), settings);
+            return ts.formatting.formatDocument(sourceFile, getRuleProvider(settings), settings);
         }
         function getFormattingEditsAfterKeystroke(fileName, position, key, optionsOrSettings) {
             var settings = toEditorSettings(optionsOrSettings);
             var sourceFile = syntaxTreeCache.getCurrentSourceFile(fileName);
             if (key === "}") {
-                return ts.formatting.formatOnClosingCurlyWorker(position, sourceFile, getRuleProvider(settings), settings);
+                return ts.formatting.formatOnClosingCurly(position, sourceFile, getRuleProvider(settings), settings);
             }
             else if (key === ";") {
-                return ts.formatting.formatOnSemicolonWorker(position, sourceFile, getRuleProvider(settings), settings);
+                return ts.formatting.formatOnSemicolon(position, sourceFile, getRuleProvider(settings), settings);
             }
             else if (key === "\n") {
-                return ts.formatting.formatOnEnterWorker(position, sourceFile, getRuleProvider(settings), settings);
+                return ts.formatting.formatOnEnter(position, sourceFile, getRuleProvider(settings), settings);
             }
             return [];
         }
@@ -56137,6 +56114,374 @@ var ts;
             return LineLeaf;
         }());
         server.LineLeaf = LineLeaf;
+    })(server = ts.server || (ts.server = {}));
+})(ts || (ts = {}));
+var ts;
+(function (ts) {
+    var server;
+    (function (server) {
+        var net = require("net");
+        var childProcess = require("child_process");
+        var os = require("os");
+        function getGlobalTypingsCacheLocation() {
+            var basePath;
+            switch (process.platform) {
+                case "win32":
+                    basePath = process.env.LOCALAPPDATA || process.env.APPDATA || os.homedir();
+                    break;
+                case "linux":
+                    basePath = os.homedir();
+                    break;
+                case "darwin":
+                    basePath = ts.combinePaths(os.homedir(), "Library/Application Support/");
+                    break;
+            }
+            ts.Debug.assert(basePath !== undefined);
+            return ts.combinePaths(ts.normalizeSlashes(basePath), "Microsoft/TypeScript");
+        }
+        var readline = require("readline");
+        var fs = require("fs");
+        var rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            terminal: false
+        });
+        var Logger = (function () {
+            function Logger(logFilename, traceToConsole, level) {
+                this.logFilename = logFilename;
+                this.traceToConsole = traceToConsole;
+                this.level = level;
+                this.fd = -1;
+                this.seq = 0;
+                this.inGroup = false;
+                this.firstInGroup = true;
+            }
+            Logger.padStringRight = function (str, padding) {
+                return (str + padding).slice(0, padding.length);
+            };
+            Logger.prototype.close = function () {
+                if (this.fd >= 0) {
+                    fs.close(this.fd);
+                }
+            };
+            Logger.prototype.getLogFileName = function () {
+                return this.logFilename;
+            };
+            Logger.prototype.perftrc = function (s) {
+                this.msg(s, server.Msg.Perf);
+            };
+            Logger.prototype.info = function (s) {
+                this.msg(s, server.Msg.Info);
+            };
+            Logger.prototype.startGroup = function () {
+                this.inGroup = true;
+                this.firstInGroup = true;
+            };
+            Logger.prototype.endGroup = function () {
+                this.inGroup = false;
+                this.seq++;
+                this.firstInGroup = true;
+            };
+            Logger.prototype.loggingEnabled = function () {
+                return !!this.logFilename || this.traceToConsole;
+            };
+            Logger.prototype.hasLevel = function (level) {
+                return this.loggingEnabled() && this.level >= level;
+            };
+            Logger.prototype.msg = function (s, type) {
+                if (type === void 0) { type = server.Msg.Err; }
+                if (this.fd < 0) {
+                    if (this.logFilename) {
+                        this.fd = fs.openSync(this.logFilename, "w");
+                    }
+                }
+                if (this.fd >= 0 || this.traceToConsole) {
+                    s = s + "\n";
+                    var prefix = Logger.padStringRight(type + " " + this.seq.toString(), "          ");
+                    if (this.firstInGroup) {
+                        s = prefix + s;
+                        this.firstInGroup = false;
+                    }
+                    if (!this.inGroup) {
+                        this.seq++;
+                        this.firstInGroup = true;
+                    }
+                    if (this.fd >= 0) {
+                        var buf = new Buffer(s);
+                        fs.writeSync(this.fd, buf, 0, buf.length, null);
+                    }
+                    if (this.traceToConsole) {
+                        console.warn(s);
+                    }
+                }
+            };
+            return Logger;
+        }());
+        var NodeTypingsInstaller = (function () {
+            function NodeTypingsInstaller(logger, eventPort, globalTypingsCacheLocation, newLine) {
+                var _this = this;
+                this.logger = logger;
+                this.eventPort = eventPort;
+                this.globalTypingsCacheLocation = globalTypingsCacheLocation;
+                this.newLine = newLine;
+                if (eventPort) {
+                    var s_1 = net.connect({ port: eventPort }, function () {
+                        _this.socket = s_1;
+                    });
+                }
+            }
+            NodeTypingsInstaller.prototype.attach = function (projectService) {
+                var _this = this;
+                this.projectService = projectService;
+                if (this.logger.hasLevel(server.LogLevel.requestTime)) {
+                    this.logger.info("Binding...");
+                }
+                var args = ["--globalTypingsCacheLocation", this.globalTypingsCacheLocation];
+                if (this.logger.loggingEnabled() && this.logger.getLogFileName()) {
+                    args.push("--logFile", ts.combinePaths(ts.getDirectoryPath(ts.normalizeSlashes(this.logger.getLogFileName())), "ti-" + process.pid + ".log"));
+                }
+                var execArgv = [];
+                {
+                    for (var _i = 0, _a = process.execArgv; _i < _a.length; _i++) {
+                        var arg = _a[_i];
+                        var match = /^--(debug|inspect)(=(\d+))?$/.exec(arg);
+                        if (match) {
+                            var currentPort = match[3] !== undefined
+                                ? +match[3]
+                                : match[1] === "debug" ? 5858 : 9229;
+                            execArgv.push("--" + match[1] + "=" + (currentPort + 1));
+                            break;
+                        }
+                    }
+                }
+                this.installer = childProcess.fork(ts.combinePaths(__dirname, "typingsInstaller.js"), args, { execArgv: execArgv });
+                this.installer.on("message", function (m) { return _this.handleMessage(m); });
+                process.on("exit", function () {
+                    _this.installer.kill();
+                });
+            };
+            NodeTypingsInstaller.prototype.onProjectClosed = function (p) {
+                this.installer.send({ projectName: p.getProjectName(), kind: "closeProject" });
+            };
+            NodeTypingsInstaller.prototype.enqueueInstallTypingsRequest = function (project, typingOptions) {
+                var request = server.createInstallTypingsRequest(project, typingOptions);
+                if (this.logger.hasLevel(server.LogLevel.verbose)) {
+                    this.logger.info("Sending request: " + JSON.stringify(request));
+                }
+                this.installer.send(request);
+            };
+            NodeTypingsInstaller.prototype.handleMessage = function (response) {
+                if (this.logger.hasLevel(server.LogLevel.verbose)) {
+                    this.logger.info("Received response: " + JSON.stringify(response));
+                }
+                this.projectService.updateTypingsForProject(response);
+                if (response.kind == "set" && this.socket) {
+                    this.socket.write(server.formatMessage({ seq: 0, type: "event", message: response }, this.logger, Buffer.byteLength, this.newLine), "utf8");
+                }
+            };
+            return NodeTypingsInstaller;
+        }());
+        var IOSession = (function (_super) {
+            __extends(IOSession, _super);
+            function IOSession(host, cancellationToken, installerEventPort, canUseEvents, useSingleInferredProject, disableAutomaticTypingAcquisition, globalTypingsCacheLocation, logger) {
+                _super.call(this, host, cancellationToken, useSingleInferredProject, disableAutomaticTypingAcquisition
+                    ? server.nullTypingsInstaller
+                    : new NodeTypingsInstaller(logger, installerEventPort, globalTypingsCacheLocation, host.newLine), Buffer.byteLength, process.hrtime, logger, canUseEvents);
+            }
+            IOSession.prototype.exit = function () {
+                this.logger.info("Exiting...");
+                this.projectService.closeLog();
+                process.exit(0);
+            };
+            IOSession.prototype.listen = function () {
+                var _this = this;
+                rl.on("line", function (input) {
+                    var message = input.trim();
+                    _this.onMessage(message);
+                });
+                rl.on("close", function () {
+                    _this.exit();
+                });
+            };
+            return IOSession;
+        }(server.Session));
+        function parseLoggingEnvironmentString(logEnvStr) {
+            var logEnv = { logToFile: true };
+            var args = logEnvStr.split(" ");
+            for (var i = 0, len = args.length; i < (len - 1); i += 2) {
+                var option = args[i];
+                var value = args[i + 1];
+                if (option && value) {
+                    switch (option) {
+                        case "-file":
+                            logEnv.file = ts.stripQuotes(value);
+                            break;
+                        case "-level":
+                            var level = server.LogLevel[value];
+                            logEnv.detailLevel = typeof level === "number" ? level : server.LogLevel.normal;
+                            break;
+                        case "-traceToConsole":
+                            logEnv.traceToConsole = value.toLowerCase() === "true";
+                            break;
+                        case "-logToFile":
+                            logEnv.logToFile = value.toLowerCase() === "true";
+                            break;
+                    }
+                }
+            }
+            return logEnv;
+        }
+        function createLoggerFromEnv() {
+            var fileName = undefined;
+            var detailLevel = server.LogLevel.normal;
+            var traceToConsole = false;
+            var logEnvStr = process.env["TSS_LOG"];
+            if (logEnvStr) {
+                var logEnv = parseLoggingEnvironmentString(logEnvStr);
+                if (logEnv.logToFile) {
+                    if (logEnv.file) {
+                        fileName = logEnv.file;
+                    }
+                    else {
+                        fileName = __dirname + "/.log" + process.pid.toString();
+                    }
+                }
+                if (logEnv.detailLevel) {
+                    detailLevel = logEnv.detailLevel;
+                }
+                traceToConsole = logEnv.traceToConsole;
+            }
+            return new Logger(fileName, traceToConsole, detailLevel);
+        }
+        function createPollingWatchedFileSet(interval, chunkSize) {
+            if (interval === void 0) { interval = 2500; }
+            if (chunkSize === void 0) { chunkSize = 30; }
+            var watchedFiles = [];
+            var nextFileToCheck = 0;
+            var watchTimer;
+            function getModifiedTime(fileName) {
+                return fs.statSync(fileName).mtime;
+            }
+            function poll(checkedIndex) {
+                var watchedFile = watchedFiles[checkedIndex];
+                if (!watchedFile) {
+                    return;
+                }
+                fs.stat(watchedFile.fileName, function (err, stats) {
+                    if (err) {
+                        watchedFile.callback(watchedFile.fileName);
+                    }
+                    else if (watchedFile.mtime.getTime() !== stats.mtime.getTime()) {
+                        watchedFile.mtime = getModifiedTime(watchedFile.fileName);
+                        watchedFile.callback(watchedFile.fileName, watchedFile.mtime.getTime() === 0);
+                    }
+                });
+            }
+            function startWatchTimer() {
+                watchTimer = setInterval(function () {
+                    var count = 0;
+                    var nextToCheck = nextFileToCheck;
+                    var firstCheck = -1;
+                    while ((count < chunkSize) && (nextToCheck !== firstCheck)) {
+                        poll(nextToCheck);
+                        if (firstCheck < 0) {
+                            firstCheck = nextToCheck;
+                        }
+                        nextToCheck++;
+                        if (nextToCheck === watchedFiles.length) {
+                            nextToCheck = 0;
+                        }
+                        count++;
+                    }
+                    nextFileToCheck = nextToCheck;
+                }, interval);
+            }
+            function addFile(fileName, callback) {
+                var file = {
+                    fileName: fileName,
+                    callback: callback,
+                    mtime: getModifiedTime(fileName)
+                };
+                watchedFiles.push(file);
+                if (watchedFiles.length === 1) {
+                    startWatchTimer();
+                }
+                return file;
+            }
+            function removeFile(file) {
+                watchedFiles = ts.copyListRemovingItem(file, watchedFiles);
+            }
+            return {
+                getModifiedTime: getModifiedTime,
+                poll: poll,
+                startWatchTimer: startWatchTimer,
+                addFile: addFile,
+                removeFile: removeFile
+            };
+        }
+        var pollingWatchedFileSet = createPollingWatchedFileSet();
+        var logger = createLoggerFromEnv();
+        var pending = [];
+        var canWrite = true;
+        function writeMessage(buf) {
+            if (!canWrite) {
+                pending.push(buf);
+            }
+            else {
+                canWrite = false;
+                process.stdout.write(buf, setCanWriteFlagAndWriteMessageIfNecessary);
+            }
+        }
+        function setCanWriteFlagAndWriteMessageIfNecessary() {
+            canWrite = true;
+            if (pending.length) {
+                writeMessage(pending.shift());
+            }
+        }
+        var sys = ts.sys;
+        sys.write = function (s) { return writeMessage(new Buffer(s, "utf8")); };
+        sys.watchFile = function (fileName, callback) {
+            var watchedFile = pollingWatchedFileSet.addFile(fileName, callback);
+            return {
+                close: function () { return pollingWatchedFileSet.removeFile(watchedFile); }
+            };
+        };
+        sys.setTimeout = setTimeout;
+        sys.clearTimeout = clearTimeout;
+        sys.setImmediate = setImmediate;
+        sys.clearImmediate = clearImmediate;
+        if (typeof global !== "undefined" && global.gc) {
+            sys.gc = function () { return global.gc(); };
+        }
+        var cancellationToken;
+        try {
+            var factory = require("./cancellationToken");
+            cancellationToken = factory(sys.args);
+        }
+        catch (e) {
+            cancellationToken = {
+                isCancellationRequested: function () { return false; }
+            };
+        }
+        ;
+        var eventPort;
+        {
+            var index = sys.args.indexOf("--eventPort");
+            if (index >= 0 && index < sys.args.length - 1) {
+                var v = parseInt(sys.args[index + 1]);
+                if (!isNaN(v)) {
+                    eventPort = v;
+                }
+            }
+        }
+        var useSingleInferredProject = sys.args.indexOf("--useSingleInferredProject") >= 0;
+        var disableAutomaticTypingAcquisition = sys.args.indexOf("--disableAutomaticTypingAcquisition") >= 0;
+        var ioSession = new IOSession(sys, cancellationToken, eventPort, eventPort === undefined, useSingleInferredProject, disableAutomaticTypingAcquisition, getGlobalTypingsCacheLocation(), logger);
+        process.on("uncaughtException", function (err) {
+            ioSession.logError(err, "unknown");
+        });
+        process.noAsar = true;
+        ioSession.listen();
     })(server = ts.server || (ts.server = {}));
 })(ts || (ts = {}));
 var debugObjectHost = new Function("return this")();
