@@ -27,7 +27,7 @@ import ts.eclipse.ide.validator.internal.core.Trace;
  * called when project is Build or Validate at hand (with Validate context
  * menu).
  * 
- * This validator is deprectaed since 1.1.0 because:
+ * This validator is deprecatad since 1.1.0 because:
  * 
  * <ul>
  * <li>TypeScriptBuilder which compiles files does the same thing and compile ts
