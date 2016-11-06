@@ -17,7 +17,6 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.utils.StringUtils;
@@ -40,15 +39,19 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 		this.pluginId = pluginId;
 		getProjectPreferences().addPreferenceChangeListener(this);
 		getWorkspacePreferences().addPreferenceChangeListener(this);
-		InstanceScope.INSTANCE.getNode(pluginId).addPreferenceChangeListener(this);
+		getWorkspaceDefaultPreferences().addPreferenceChangeListener(this);
 	}
 
 	public String getStringPreferencesValue(String key, String def) {
 		String value = getProjectPreferencesValue(key, def);
-		if (value == null) {
-			return getStringWorkspacePreferencesValue(key, def);
+		if (value != null) {
+			return value;
 		}
-		return value;
+		value = getStringWorkspacePreferencesValue(key, def);
+		if (value != null) {
+			return value;
+		}
+		return getStringWorkspaceDefaultPreferencesValue(key, def);
 	}
 
 	public String getProjectPreferencesValue(String key, String def) {
@@ -61,12 +64,21 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 		return node != null ? node.get(key, def) : null;
 	}
 
+	public String getStringWorkspaceDefaultPreferencesValue(String key, String def) {
+		IEclipsePreferences node = getWorkspaceDefaultPreferences();
+		return node != null ? node.get(key, def) : null;
+	}
+
 	public Boolean getBooleanPreferencesValue(String key, Boolean def) {
 		Boolean value = getProjectPreferencesValue(key, (Boolean) null);
 		if (value != null) {
 			return value;
 		}
-		return getBooleanWorkspacePreferencesValue(key, def);
+		value = getBooleanWorkspacePreferencesValue(key, (Boolean) null);
+		if (value != null) {
+			return value;
+		}
+		return getBooleanWorkspaceDefaultPreferencesValue(key, def);
 	}
 
 	public Boolean getProjectPreferencesValue(String key, Boolean def) {
@@ -76,6 +88,11 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 
 	public Boolean getBooleanWorkspacePreferencesValue(String key, Boolean def) {
 		IEclipsePreferences node = getWorkspacePreferences();
+		return getBoolean(node, key, def);
+	}
+
+	public Boolean getBooleanWorkspaceDefaultPreferencesValue(String key, Boolean def) {
+		IEclipsePreferences node = getWorkspaceDefaultPreferences();
 		return getBoolean(node, key, def);
 	}
 
@@ -99,7 +116,11 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 		if (value != null) {
 			return value;
 		}
-		return getIntegerWorkspacePreferencesValue(key, def);
+		value = getIntegerWorkspacePreferencesValue(key, (Integer) null);
+		if (value != null) {
+			return value;
+		}
+		return getIntegerWorkspaceDefaultPreferencesValue(key, def);
 	}
 
 	public Integer getProjectPreferencesValue(String key, Integer def) {
@@ -109,6 +130,11 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 
 	public Integer getIntegerWorkspacePreferencesValue(String key, Integer def) {
 		IEclipsePreferences node = getWorkspacePreferences();
+		return getInteger(node, key, def);
+	}
+
+	public Integer getIntegerWorkspaceDefaultPreferencesValue(String key, Integer def) {
+		IEclipsePreferences node = getWorkspaceDefaultPreferences();
 		return getInteger(node, key, def);
 	}
 
@@ -135,10 +161,14 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 		return WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(pluginId);
 	}
 
+	protected IEclipsePreferences getWorkspaceDefaultPreferences() {
+		return WorkspaceTypeScriptSettingsHelper.getWorkspaceDefaultPreferences(pluginId);
+	}
+
 	public void dispose() {
 		getProjectPreferences().removePreferenceChangeListener(this);
 		getWorkspacePreferences().removePreferenceChangeListener(this);
-		InstanceScope.INSTANCE.getNode(pluginId).removePreferenceChangeListener(this);
+		getWorkspaceDefaultPreferences().removePreferenceChangeListener(this);
 	}
 
 	public IProject getProject() {

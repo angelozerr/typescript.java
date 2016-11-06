@@ -37,7 +37,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 	@Override
 	public void initializeDefaultPreferences() {
 		IEclipsePreferences node = WorkspaceTypeScriptSettingsHelper
-				.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID);
+				.getWorkspaceDefaultPreferences(TypeScriptCorePlugin.PLUGIN_ID);
 
 		// initialize properties for direct access of node.js server (start an
 		// internal process)
