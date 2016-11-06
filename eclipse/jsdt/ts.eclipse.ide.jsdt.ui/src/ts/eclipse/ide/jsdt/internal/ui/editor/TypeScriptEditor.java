@@ -76,6 +76,7 @@ import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
 import ts.TypeScriptException;
+import ts.TypeScriptNoContentAvailableException;
 import ts.client.ICancellationToken;
 import ts.client.ITypeScriptAsynchCollector;
 import ts.client.Location;
@@ -705,12 +706,12 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 
 		@Override
 		public void onError(TypeScriptException e) {
-			// if (e instanceof TypeScriptNoContentAvailableException) {
-			// // tsserver throws this error when the tsserver returns nothing
-			// // Ignore this error
-			// } else {
-			Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
-			// }
+			if (e instanceof TypeScriptNoContentAvailableException) {
+				// tsserver throws this error when the tsserver returns nothing
+				// Ignore this error
+			} else {
+				Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
+			}
 		}
 	}
 
