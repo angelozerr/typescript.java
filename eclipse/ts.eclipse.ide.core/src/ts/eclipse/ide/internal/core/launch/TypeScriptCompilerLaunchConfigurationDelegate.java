@@ -68,7 +68,7 @@ public class TypeScriptCompilerLaunchConfigurationDelegate extends LaunchConfigu
 			CompilerOptions options = new CompilerOptions();
 			options.setListFiles(true);
 			List<String> tsconfigArgs = new ArrayList<String>();
-			tsconfigArgs.add("--p");
+			tsconfigArgs.add("-p");
 			tsconfigArgs.add(tsconfigFile.getName());
 			List<String> cmds = tsProject.getCompiler().createCommands(options, tsconfigArgs);
 
