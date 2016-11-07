@@ -25,8 +25,8 @@ import ts.eclipse.ide.core.compiler.IDETypeScriptCompilerMessageHandler;
  */
 public class TscStreamListener extends IDETypeScriptCompilerMessageHandler implements IStreamListener {
 
-	public TscStreamListener(IContainer container) throws CoreException {
-		super(container, true);
+	public TscStreamListener(IContainer container, boolean listEmittedFiles) throws CoreException {
+		super(container, listEmittedFiles, true);
 	}
 
 	@Override

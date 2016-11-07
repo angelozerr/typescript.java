@@ -17,6 +17,7 @@ import ts.client.ITypeScriptServiceClient;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
 
@@ -103,4 +104,15 @@ public interface ITypeScriptProject {
 	 *         otherwise.
 	 */
 	boolean canSupport(CommandNames command);
+
+	/**
+	 * Returns true if the given tsc compiler option can be supported by the
+	 * TypeScript version configured for the project and false otherwise.
+	 * 
+	 * @param option
+	 * @return true if the given tsc compiler option can be supported by the
+	 *         TypeScript version configured for the project and false
+	 *         otherwise.
+	 */
+	boolean canSupport(CompilerOptionCapability option);
 }

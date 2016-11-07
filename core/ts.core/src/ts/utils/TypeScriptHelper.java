@@ -56,8 +56,7 @@ public class TypeScriptHelper {
 				information.append(part.getText());
 				hasParam = true;
 			} else if (hasParam) {
-				if (")".equals(part.getText()))
-				{
+				if (")".equals(part.getText())) {
 					// end of parameters declaration
 					break;
 				} else {

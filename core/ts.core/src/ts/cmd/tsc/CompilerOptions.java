@@ -30,6 +30,7 @@ public class CompilerOptions extends AbstractOptions {
 	private boolean init;
 	private boolean isolatedModules;
 	private String jsx;
+	private boolean listEmittedFiles;
 	private boolean listFiles;
 	private String locale;
 	private String mapRoot;
@@ -87,6 +88,7 @@ public class CompilerOptions extends AbstractOptions {
 		this.setInit(options.isInit());
 		this.setIsolatedModules(options.isIsolatedModules());
 		this.setJsx(options.getJsx());
+		this.setListEmittedFiles(options.isListEmittedFiles());
 		this.setListFiles(options.isListFiles());
 		this.setLocale(options.getLocale());
 		this.setMapRoot(options.getMapRoot());
@@ -443,9 +445,28 @@ public class CompilerOptions extends AbstractOptions {
 	}
 
 	/**
+	 * Print names of generated files part of the compilation.
+	 * 
+	 * @return
+	 */
+	public boolean isListEmittedFiles() {
+		return listEmittedFiles;
+	}
+
+	/**
+	 * Print names of generated files part of the compilation.
+	 * 
+	 * @param listEmittedFiles
+	 */
+	public void setListEmittedFiles(boolean listEmittedFiles) {
+		this.listEmittedFiles = listEmittedFiles;
+	}
+	
+	/**
 	 * Returns Print names of files part of the compilation.
 	 * 
 	 * @return
+	 * 
 	 */
 	public boolean isListFiles() {
 		return listFiles;
@@ -1161,6 +1182,7 @@ public class CompilerOptions extends AbstractOptions {
 		fillOption("--init", isInit(), args);
 		fillOption("--isolatedModules", isIsolatedModules(), args);
 		fillOption("--jsx", getJsx(), args);
+		fillOption("--listEmittedFiles", isListEmittedFiles(), args);
 		fillOption("--listFiles", isListFiles(), args);
 		fillOption("--locale", getLocale(), args);
 		fillOption("--mapRoot", getMapRoot(), args);

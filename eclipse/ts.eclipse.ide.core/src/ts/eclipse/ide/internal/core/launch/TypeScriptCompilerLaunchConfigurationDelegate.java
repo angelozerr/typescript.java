@@ -35,6 +35,7 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
+import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.CompilerOptions;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.launch.TypeScriptCompilerLaunchConstants;
@@ -66,7 +67,14 @@ public class TypeScriptCompilerLaunchConfigurationDelegate extends LaunchConfigu
 		try {
 
 			CompilerOptions options = new CompilerOptions();
-			options.setListFiles(true);
+			// TODO: support listEmittedFiles
+			boolean listEmittedFiles = false; //tsProject.canSupport(CompilerOptionCapability.listEmittedFiles);
+			if (listEmittedFiles) {
+				// typeScript runtime is >= 2.0.0 and support --listEmittedFiles
+				options.setListEmittedFiles(true);
+			} else {
+				options.setListFiles(true);
+			}
 			List<String> tsconfigArgs = new ArrayList<String>();
 			tsconfigArgs.add("-p");
 			tsconfigArgs.add(tsconfigFile.getName());
@@ -83,7 +91,7 @@ public class TypeScriptCompilerLaunchConfigurationDelegate extends LaunchConfigu
 				process = DebugPlugin.newProcess(launch, p, buildPath.toString(), processAttributes);
 			}
 
-			TscStreamListener reporter = new TscStreamListener(container);
+			TscStreamListener reporter = new TscStreamListener(container, listEmittedFiles);
 			process.getStreamsProxy().getOutputStreamMonitor().addListener(reporter);
 
 			if (!reporter.isWatch()) {

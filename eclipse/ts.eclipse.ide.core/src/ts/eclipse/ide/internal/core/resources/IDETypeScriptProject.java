@@ -337,7 +337,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 
 	@Override
 	protected ITypeScriptCompiler createCompiler(File tscFile, File nodejsFile) {
-		return new IDETypeScriptCompiler(tscFile, nodejsFile);
+		return new IDETypeScriptCompiler(tscFile, nodejsFile, this);
 	}
 
 	@Override

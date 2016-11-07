@@ -30,6 +30,8 @@ public class TypeScriptCompilerHelper {
 
 	private static final String COMPILATION_COMPLETE_WATCHING_FOR_FILE_CHANGES = "Compilation complete. Watching for file changes.";
 
+	private static final String TSFILE = "TSFILE:";
+
 	/**
 	 * Process "tsc" message and call the well
 	 * {@link ITypeScriptCompilerMessageHandler} method.
@@ -50,10 +52,13 @@ public class TypeScriptCompilerHelper {
 				line = line.trim(); // remove leading whitespace
 				if (line.endsWith(FileUtils.TS_EXTENSION) || line.endsWith(FileUtils.TSX_EXTENSION)) {
 					// Occurs when tsc is called with --listFiles
-					handler.addFile(line);
+					handler.addFile(line, false);
 				} else if (line.contains(COMPILATION_COMPLETE_WATCHING_FOR_FILE_CHANGES)) {
-					// Occurs when tsc is called with --watch when compilation is finished.
+					// Occurs when tsc is called with --watch when compilation
+					// is finished.
 					handler.onCompilationCompleteWatchingForFileChanges();
+				} else if (line.startsWith(TSFILE)) {
+					handler.addFile(line.substring(TSFILE.length(), line.length()).trim(), true);
 				} else {
 					Matcher m = TSC_ERROR_PATTERN.matcher(line);
 					if (m.matches()) {
@@ -65,13 +70,15 @@ public class TypeScriptCompilerHelper {
 						String severity = m.group(3);
 						String code = m.group(4);
 						String message = m.group(5);
-						handler.addError(file, startLoc, endLoc, StringUtils.isEmpty(severity)
-								? Severity.info : Severity.valueOf(severity), code,
+						handler.addError(file, startLoc, endLoc,
+								StringUtils.isEmpty(severity) ? Severity.info : Severity.valueOf(severity), code,
 								message);
 					}
 				}
 			}
-		} finally {
+		} finally
+
+		{
 			if (scanner != null) {
 				scanner.close();
 			}

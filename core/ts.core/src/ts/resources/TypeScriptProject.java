@@ -25,6 +25,7 @@ import ts.client.TypeScriptServiceClient;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tsc.TypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
@@ -52,6 +53,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 	private ITypeScriptLint tslint;
 
 	private final Map<CommandNames, Boolean> serverCapabilities;
+	private Map<CompilerOptionCapability, Boolean> compilerCapabilities;
 
 	public TypeScriptProject(File projectDir, ITypeScriptProjectSettings projectSettings) {
 		this.projectDir = projectDir;
@@ -60,6 +62,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 		this.data = new HashMap<String, Object>();
 		this.listeners = new ArrayList<ITypeScriptClientListener>();
 		this.serverCapabilities = new HashMap<CommandNames, Boolean>();
+		this.compilerCapabilities = new HashMap<CompilerOptionCapability, Boolean>();
 	}
 
 	protected void setProjectSettings(ITypeScriptProjectSettings projectSettings) {
@@ -286,6 +289,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 		if (compiler != null) {
 			compiler.dispose();
 			compiler = null;
+			compilerCapabilities.clear();
 		}
 	}
 
@@ -355,6 +359,16 @@ public class TypeScriptProject implements ITypeScriptProject {
 		if (support == null) {
 			support = command.canSupport(getProjectSettings().getTypeScriptVersion());
 			serverCapabilities.put(command, support);
+		}
+		return support;
+	}
+	
+	@Override
+	public boolean canSupport(CompilerOptionCapability option) {
+		Boolean support = compilerCapabilities.get(option);
+		if (support == null) {
+			support = option.canSupport(getProjectSettings().getTypeScriptVersion());
+			compilerCapabilities.put(option, support);
 		}
 		return support;
 	}

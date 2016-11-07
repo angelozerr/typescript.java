@@ -22,20 +22,26 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
+import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.CompilerOptions;
 import ts.cmd.tsc.TypeScriptCompiler;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.core.TypeScriptCoreMessages;
+import ts.resources.ITypeScriptProject;
 
 /**
  * Extends {@link TypeScriptCompiler} to use Eclipse {@link IResource}.
  */
 public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETypeScriptCompiler {
 
-	public IDETypeScriptCompiler(File tscFile, File nodejsFile) {
+	private final boolean listEmittedFiles;
+
+	public IDETypeScriptCompiler(File tscFile, File nodejsFile, ITypeScriptProject tsProject) {
 		super(tscFile, nodejsFile);
+		// TODO: support listEmittedFiles
+		this.listEmittedFiles = false; //tsProject.canSupport(CompilerOptionCapability.listEmittedFiles);
 	}
 
 	@Override
@@ -72,7 +78,9 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 						}
 					}
 					// compile the list of ts files.
-					compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFilesToCompile, false);
+					if (!tsFilesToCompile.isEmpty()) {
+						compile(tsconfigFile, tsconfig.getCompilerOptions(), tsFilesToCompile, false);
+					}
 				}
 			} else {
 				// compileOnSave is setted to false in the
@@ -98,9 +106,9 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 	private void compile(IFile tsConfigFile, CompilerOptions tsconfigOptions, List<IFile> tsFiles, boolean buildOnSave)
 			throws TypeScriptException, CoreException {
 		IContainer container = tsConfigFile.getParent();
-		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container,
+		IDETypeScriptCompilerReporter reporter = new IDETypeScriptCompilerReporter(container, listEmittedFiles,
 				!buildOnSave ? tsFiles : null);
-		CompilerOptions options = createOptions(tsconfigOptions, buildOnSave);
+		CompilerOptions options = createOptions(tsconfigOptions, buildOnSave, listEmittedFiles);
 		// compile ts files to *.js, *.js.map files
 		super.execute(container.getLocation().toFile(), options, reporter.getFileNames(), reporter);
 		// refresh *.js, *.js.map which have been generated with tsc.
@@ -125,14 +133,19 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 				tsConfigFile.getProjectRelativePath().toString()), IMarker.SEVERITY_WARNING, 1);
 	}
 
-	private CompilerOptions createOptions(CompilerOptions tsconfigOptions, boolean buildOnSave) {
+	private CompilerOptions createOptions(CompilerOptions tsconfigOptions, boolean buildOnSave,
+			boolean listEmittedFiles) {
 		CompilerOptions options = tsconfigOptions != null ? new CompilerOptions(tsconfigOptions)
 				: new CompilerOptions();
 		if (buildOnSave && tsconfigOptions != null) {
 			// buildOnSave, copy outFile
 			options.setOutFile(tsconfigOptions.getOutFile());
 		}
-		options.setListFiles(true);
+		if (listEmittedFiles) {
+			options.setListEmittedFiles(true);
+		} else {
+			options.setListFiles(true);
+		}
 		options.setWatch(false);
 		return options;
 	}

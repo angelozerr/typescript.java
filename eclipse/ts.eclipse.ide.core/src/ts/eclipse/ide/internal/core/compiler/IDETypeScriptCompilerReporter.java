@@ -34,8 +34,9 @@ public class IDETypeScriptCompilerReporter extends IDETypeScriptCompilerMessageH
 	private INodejsProcess process;
 	private final List<String> tsFileNames;
 
-	public IDETypeScriptCompilerReporter(IContainer container, List<IFile> tsFiles) throws CoreException {
-		super(container, tsFiles == null);
+	public IDETypeScriptCompilerReporter(IContainer container, boolean listEmittedFiles, List<IFile> tsFiles)
+			throws CoreException {
+		super(container, listEmittedFiles, tsFiles == null);
 		if (tsFiles != null) {
 			tsFileNames = new ArrayList<String>();
 			for (IFile tsFile : tsFiles) {

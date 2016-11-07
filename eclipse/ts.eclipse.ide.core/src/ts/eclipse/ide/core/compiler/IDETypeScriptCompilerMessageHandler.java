@@ -43,23 +43,32 @@ import ts.utils.FileUtils;
 public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerMessageHandler {
 
 	private final IContainer container;
+	private final boolean listEmittedFiles;
 	private final IDETsconfigJson tsconfig;
 	private final List<IFile> filesToRefresh;
+	private final List<IFile> emittedFiles;
 
-	public IDETypeScriptCompilerMessageHandler(IContainer container, boolean deleteMarkers) throws CoreException {
+	public IDETypeScriptCompilerMessageHandler(IContainer container, boolean listEmittedFiles, boolean deleteMarkers)
+			throws CoreException {
 		this.container = container;
+		this.listEmittedFiles = listEmittedFiles;
 		this.tsconfig = TypeScriptResourceUtil.findTsconfig(container);
 		this.filesToRefresh = new ArrayList<IFile>();
+		this.emittedFiles = new ArrayList<IFile>();
 		if (deleteMarkers) {
 			TypeScriptResourceUtil.deleteTscMarker(container);
 		}
 	}
 
 	@Override
-	public void addFile(String filePath) {
+	public void addFile(String filePath, boolean emitted) {
 		IFile file = getFile(filePath);
-		if (file != null && !filesToRefresh.contains(file)) {
-			filesToRefresh.add(file);
+		if (file == null) {
+			return;
+		}
+		List<IFile> files = emitted ? emittedFiles : filesToRefresh;
+		if (!files.contains(file)) {
+			files.add(file);
 		}
 	}
 
@@ -91,6 +100,9 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 	 */
 	public void refreshEmittedFiles() throws CoreException {
 		// refresh *.js, *.js.map files
+		for (IFile emittedFile : emittedFiles) {
+			TypeScriptResourceUtil.refreshFile(emittedFile, true);
+		}
 		for (IFile tsFile : getFilesToRefresh()) {
 			try {
 				TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, true, null);
@@ -118,8 +130,8 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 	}
 
 	@Override
-	public void addError(String filename, Location startLoc, Location endLoc, Severity severity,
-			String code, String message) {
+	public void addError(String filename, Location startLoc, Location endLoc, Severity severity, String code,
+			String message) {
 		IFile file = getFile(filename);
 		if (file != null) {
 			try {
@@ -146,5 +158,9 @@ public class IDETypeScriptCompilerMessageHandler implements ITypeScriptCompilerM
 		TsconfigJson tsconfig = getTsconfig();
 		return tsconfig != null && tsconfig.getCompilerOptions() != null
 				&& tsconfig.getCompilerOptions().isWatch() != null && tsconfig.getCompilerOptions().isWatch();
+	}
+
+	public boolean isListEmittedFiles() {
+		return listEmittedFiles;
 	}
 }

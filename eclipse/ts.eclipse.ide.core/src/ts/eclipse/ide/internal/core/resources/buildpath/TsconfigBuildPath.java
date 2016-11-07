@@ -95,10 +95,7 @@ public class TsconfigBuildPath implements ITsconfigBuildPath, IResourceProxyVisi
 
 	@Override
 	public IDETsconfigJson getTsconfig() throws CoreException {
-		if (tsconfig == null) {
-			tsconfig = TypeScriptResourceUtil.getTsconfig(tsconfigFile);
-		}
-		return tsconfig;
+		return TypeScriptResourceUtil.getTsconfig(tsconfigFile);
 	}
 
 }
