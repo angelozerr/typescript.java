@@ -45,6 +45,7 @@ import ts.internal.client.RequestItem;
 import ts.internal.client.protocol.ChangeRequest;
 import ts.internal.client.protocol.CloseRequest;
 import ts.internal.client.protocol.CodeFixRequest;
+import ts.internal.client.protocol.CompileOnSaveEmitFileRequest;
 import ts.internal.client.protocol.CompletionDetailsRequest;
 import ts.internal.client.protocol.CompletionsRequest;
 import ts.internal.client.protocol.ConfigureRequest;
@@ -324,14 +325,15 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		execute(request);
 	}
 
-	// ---------------- Since 2.0.6
+	// ---------------- Since 2.0.5
 
 	@Override
-	public void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
-			throws TypeScriptException {
-		ImplementationRequest request = new ImplementationRequest(fileName, line, offset, collector);
-		execute(request);
+	public void compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException {
+		CompileOnSaveEmitFileRequest request = new CompileOnSaveEmitFileRequest(fileName, forced);
+		execute(request, false, null);
 	}
+
+	// ---------------- Since 2.0.6
 
 	@Override
 	public void navtree(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
@@ -347,6 +349,13 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			int endLine, int endOffset, ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException {
 		CodeFixRequest request = new CodeFixRequest(fileName, positionProvider, startLine, startOffset, endLine,
 				endOffset, collector);
+		execute(request);
+	}
+
+	@Override
+	public void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+			throws TypeScriptException {
+		ImplementationRequest request = new ImplementationRequest(fileName, line, offset, collector);
 		execute(request);
 	}
 

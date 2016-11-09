@@ -18,14 +18,36 @@ import ts.utils.VersionHelper;
  */
 public enum CommandNames {
 
-	Open("open"), Close("close"), Change("change"), NavBar("navbar"), Completions(
-			"completions"), CompletionEntryDetails("completionEntryDetails"), Reload("reload"), Definition(
-					"definition"), SignatureHelp("signatureHelp"), QuickInfo("quickinfo"), Geterr("geterr"), Format(
-							"format"), References("references"), Occurrences("occurrences"), Configure(
-									"configure"), SemanticDiagnosticsSync("semanticDiagnosticsSync",
-											"2.0.3"), SyntacticDiagnosticsSync("syntacticDiagnosticsSync",
-													"2.0.3"), Implementation("implementation", "2.0.6"), NavTree(
-															"navtree", "2.0.6"), GetCodeFixes("getCodeFixes", "2.1.0");
+	Open("open"), 
+	Close("close"), 
+	Change("change"), 
+	NavBar("navbar"), 
+	Completions("completions"), 
+	CompletionEntryDetails("completionEntryDetails"), 
+	Reload("reload"), 
+	Definition("definition"), 
+	SignatureHelp("signatureHelp"), 
+	QuickInfo("quickinfo"), 
+	Geterr("geterr"), 
+	Format("format"), 
+	References("references"), 
+	Occurrences("occurrences"), 
+	Configure("configure"), 
+	
+	// 2.0.3
+	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.3"), 
+	SyntacticDiagnosticsSync("syntacticDiagnosticsSync", "2.0.3"), 
+	
+	// 2.0.5
+	compileOnSaveAffectedFileList("CompileOnSaveAffectedFileList", "2.0.5"),
+	compileOnSaveEmitFile("compileOnSaveEmitFile", "2.0.5"),
+	
+	// 2.0.6
+	NavTree("navtree", "2.0.6"),
+	
+	// 2.1.0
+	Implementation("implementation", "2.1.0"),  
+	GetCodeFixes("getCodeFixes", "2.1.0");
 
 	private final String name;
 	private final String sinceVersion;
