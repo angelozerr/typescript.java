@@ -10,10 +10,18 @@
  */
 package ts.eclipse.ide.ui.hover;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.source.Annotation;
+
+import ts.client.CommandNames;
+import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.resources.ITypeScriptFile;
 
 /**
  * Problem Hover used to display errors when mouse over a JS content which have
@@ -29,6 +37,26 @@ public class ProblemTypeScriptHover extends AbstractAnnotationHover {
 		public ProblemInfo(Annotation annotation, Position position, ITextViewer textViewer) {
 			super(annotation, position, textViewer);
 		}
+
+		@Override
+		public ICompletionProposal[] getCompletionProposals() {
+			IDocument document = viewer.getDocument();
+			IFile file = TypeScriptResourceUtil.getFile(document);
+			try {
+				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
+				if (tsProject.canSupport(CommandNames.GetCodeFixes)) {
+					// Get code fixes with TypeScript 2.1.1
+					ITypeScriptFile tsFile = tsProject.openFile(file, document);
+					tsFile.getCodeFixes(position.getOffset(), position.getOffset() + position.getLength(),
+							new ITypeScriptGetCodeFixesCollector() {
+							});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return NO_PROPOSALS;
+		}
+
 	}
 
 	public ProblemTypeScriptHover() {

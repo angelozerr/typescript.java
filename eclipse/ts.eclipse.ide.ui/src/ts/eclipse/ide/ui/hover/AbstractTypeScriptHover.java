@@ -28,6 +28,10 @@ import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.JavaWordFinder;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
+/**
+ * Abstract class for TypeScript Hover.
+ *
+ */
 public abstract class AbstractTypeScriptHover
 		implements ITextHover, ITextHoverExtension, ITextHoverExtension2, IInformationProviderExtension2 {
 
