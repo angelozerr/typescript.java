@@ -22,6 +22,7 @@ import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
 import ts.client.TypeScriptServiceClient;
+import ts.client.codefixes.ITypeScriptGetSupportedCodeFixesCollector;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
@@ -54,6 +55,8 @@ public class TypeScriptProject implements ITypeScriptProject {
 
 	private final Map<CommandNames, Boolean> serverCapabilities;
 	private Map<CompilerOptionCapability, Boolean> compilerCapabilities;
+
+	private List<String> supportedCodeFixes;
 
 	public TypeScriptProject(File projectDir, ITypeScriptProjectSettings projectSettings) {
 		this.projectDir = projectDir;
@@ -157,6 +160,35 @@ public class TypeScriptProject implements ITypeScriptProject {
 			getClient().semanticDiagnosticsSync(file.getName(), true, collector);
 		} else {
 			getClient().geterr(new String[] { file.getName() }, 0, collector);
+		}
+	}
+
+	@Override
+	public List<String> getSupportedCodeFixes() throws TypeScriptException {
+		if (supportedCodeFixes != null) {
+			return supportedCodeFixes;
+		}
+		if (canSupport(CommandNames.GetSupportedCodeFixes)) {
+			getClient().getSupportedCodeFixes(new ITypeScriptGetSupportedCodeFixesCollector() {
+
+				@Override
+				public void setSupportedCodeFixes(List<String> errorCodes) {
+					supportedCodeFixes = errorCodes;
+				}
+			});
+		} else {
+			supportedCodeFixes = new ArrayList<String>();
+		}
+		return supportedCodeFixes;
+	}
+	
+	@Override
+	public boolean canFix(String errorCode) {
+		try {
+			return getSupportedCodeFixes().contains(errorCode);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			return false;
 		}
 	}
 
@@ -282,6 +314,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 			}
 		}
 		serverCapabilities.clear();
+		supportedCodeFixes = null;
 	}
 
 	@Override
@@ -362,7 +395,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 		}
 		return support;
 	}
-	
+
 	@Override
 	public boolean canSupport(CompilerOptionCapability option) {
 		Boolean support = compilerCapabilities.get(option);

@@ -10,18 +10,25 @@
  */
 package ts.internal.client.protocol;
 
+import com.eclipsesource.json.JsonArray;
+
 public class CodeFixRequestArgs extends FileRequestArgs {
 
-	public CodeFixRequestArgs(String file, int startLine, int startOffset, int endLine, int endOffset) {
+	public CodeFixRequestArgs(String file, int startLine, int startOffset, int endLine, int endOffset,
+			String[] errorCodes) {
 		super(file);
 		super.add("startLine", startLine);
 		super.add("startOffset", startOffset);
 		super.add("endLine", endLine);
 		super.add("endOffset", endOffset);
 
-		// JsonArray errorCodes = new JsonArray();
-		// errorCodes.add(2377);
-		// super.add("errorCodes", errorCodes);
+		if (errorCodes != null) {
+			JsonArray codes = new JsonArray();
+			super.add("errorCodes", codes);
+			for (int i = 0; i < errorCodes.length; i++) {
+				codes.add(errorCodes[i]);
+			}
+		}
 	}
 
 }

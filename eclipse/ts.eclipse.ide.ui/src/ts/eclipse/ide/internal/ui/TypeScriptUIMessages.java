@@ -130,6 +130,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String Launch_MainTab_workingDir_does_not_exist_or_is_invalid;
 	public static String Launch_MainTab_Not_a_directory;
 
+	// Hover
+	public static String AbstractAnnotationHover_message_singleQuickFix;
+	public static String AbstractAnnotationHover_message_multipleQuickFix;
+
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

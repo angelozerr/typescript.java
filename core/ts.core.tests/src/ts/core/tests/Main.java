@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import ts.TypeScriptException;
+import ts.client.CodeEdit;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.TypeScriptServiceClient;
 import ts.client.completions.CompletionInfo;
@@ -13,7 +14,6 @@ import ts.client.completions.ICompletionInfo;
 import ts.client.definition.DefinitionsInfo;
 import ts.client.format.ITypeScriptFormatCollector;
 import ts.client.navbar.ITypeScriptNavBarCollector;
-import ts.client.navbar.NavigationBarItem;
 import ts.client.navbar.NavigationBarItemRoot;
 import ts.utils.FileUtils;
 
@@ -55,21 +55,22 @@ public class Main {
 
 		client.format(fileName, 1, 1, 1, 12, new ITypeScriptFormatCollector() {
 			@Override
-			public void format(int startLine, int startOffset, int endLine, int endOffset, String newText)
-					throws TypeScriptException {
-				System.err.println(newText);
+			public void format(List<CodeEdit> codeEdits) throws TypeScriptException {
+				for (CodeEdit codeEdit : codeEdits) {
+					System.err.println(codeEdit.getNewText());
+				}
 			}
 		});
-		
+
 		client.navbar(fileName, null, new ITypeScriptNavBarCollector() {
-			
+
 			@Override
 			public void setNavBar(NavigationBarItemRoot root) {
 				System.err.println(root);
 			}
 		});
 
-		//client.join();
+		// client.join();
 		client.dispose();
 
 	}

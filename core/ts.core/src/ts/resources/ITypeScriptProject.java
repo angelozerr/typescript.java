@@ -10,10 +10,13 @@
  */
 package ts.resources;
 
+import java.util.List;
+
 import ts.TypeScriptException;
 import ts.client.CommandNames;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
+import ts.client.codefixes.ITypeScriptGetSupportedCodeFixesCollector;
 import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
 import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
@@ -62,6 +65,10 @@ public interface ITypeScriptProject {
 
 	void diagnostics(ITypeScriptFile tsFile, ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
 
+	List<String> getSupportedCodeFixes() throws TypeScriptException;
+	
+	boolean canFix(String errorCode);
+	
 	ITypeScriptFile getOpenedFile(String fileName);
 
 	void dispose() throws TypeScriptException;

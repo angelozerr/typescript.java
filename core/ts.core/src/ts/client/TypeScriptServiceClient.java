@@ -28,6 +28,7 @@ import com.eclipsesource.json.JsonValue;
 
 import ts.TypeScriptException;
 import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
+import ts.client.codefixes.ITypeScriptGetSupportedCodeFixesCollector;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
@@ -52,6 +53,7 @@ import ts.internal.client.protocol.ConfigureRequest;
 import ts.internal.client.protocol.ConfigureRequestArguments;
 import ts.internal.client.protocol.DefinitionRequest;
 import ts.internal.client.protocol.FormatRequest;
+import ts.internal.client.protocol.GetSupportedCodeFixesRequest;
 import ts.internal.client.protocol.GeterrRequest;
 import ts.internal.client.protocol.ImplementationRequest;
 import ts.internal.client.protocol.NavBarRequest;
@@ -267,7 +269,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			start = diagnostic.get("start").asObject();
 			end = diagnostic.get("end").asObject();
 			collector.addDiagnostic(event, file, text, start.getInt("line", -1), start.getInt("offset", -1),
-					end.getInt("line", -1), end.getInt("offset", -1));
+					end.getInt("line", -1), end.getInt("offset", -1), null, -1);
 		}
 	}
 
@@ -345,10 +347,18 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// ---------------- Since 2.1.0
 
 	@Override
+	public void getSupportedCodeFixes(ITypeScriptGetSupportedCodeFixesCollector collector)
+			throws TypeScriptException {
+		GetSupportedCodeFixesRequest request = new GetSupportedCodeFixesRequest(collector);
+		execute(request);
+	}
+
+	@Override
 	public void getCodeFixes(String fileName, IPositionProvider positionProvider, int startLine, int startOffset,
-			int endLine, int endOffset, ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException {
+			int endLine, int endOffset, String[] errorCodes, ITypeScriptGetCodeFixesCollector collector)
+			throws TypeScriptException {
 		CodeFixRequest request = new CodeFixRequest(fileName, positionProvider, startLine, startOffset, endLine,
-				endOffset, collector);
+				endOffset, errorCodes, collector);
 		execute(request);
 	}
 

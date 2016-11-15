@@ -158,8 +158,8 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 * @param collector
 	 * @throws TypeScriptException
 	 */
-	void getCodeFixes(int startPosition, int endPosition, ITypeScriptGetCodeFixesCollector collector)
-			throws TypeScriptException;
+	void getCodeFixes(int startPosition, int endPosition, String[] errorCodes,
+			ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException;
 
 	void addNavbarListener(INavbarListener listener);
 

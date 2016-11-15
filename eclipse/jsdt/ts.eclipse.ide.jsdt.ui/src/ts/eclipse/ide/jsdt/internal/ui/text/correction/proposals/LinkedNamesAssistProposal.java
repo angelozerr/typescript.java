@@ -10,40 +10,24 @@
  *******************************************************************************/
 package ts.eclipse.ide.jsdt.internal.ui.text.correction.proposals;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
-import org.eclipse.jface.viewers.StyledString;
-
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.link.LinkedModeModel;
-import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
 import org.eclipse.jface.text.link.LinkedModeUI.IExitPolicy;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
-
-import org.eclipse.ui.IEditorPart;
-
-import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.wst.jsdt.internal.ui.text.correction.ICommandAccess;
 import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposal;
-
-import ts.eclipse.ide.jsdt.internal.ui.editor.EditorHighlightingSynchronizer;
-import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 
 /**
  * A template proposal.

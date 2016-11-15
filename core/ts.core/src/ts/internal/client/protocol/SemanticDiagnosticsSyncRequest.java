@@ -32,6 +32,8 @@ public class SemanticDiagnosticsSyncRequest extends FileRequest<ITypeScriptDiagn
 		JsonObject start = null;
 		JsonObject end = null;
 		JsonValue value = null;
+		String category = null;
+		int code = -1;
 		for (JsonValue item : body) {
 			diagnostic = item.asObject();
 			text = diagnostic.getString("text", null);
@@ -48,8 +50,10 @@ public class SemanticDiagnosticsSyncRequest extends FileRequest<ITypeScriptDiagn
 				value = diagnostic.get("end");
 			}
 			end = value.asObject();
+			category = diagnostic.getString("category", null);
+			code = diagnostic.getInt("code", -1);
 			getCollector().addDiagnostic(null, fileName, text, start.getInt("line", -1), start.getInt("offset", -1),
-					end.getInt("line", -1), end.getInt("offset", -1));
+					end.getInt("line", -1), end.getInt("offset", -1), category, code);
 		}
 	}
 }

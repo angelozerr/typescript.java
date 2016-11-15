@@ -182,8 +182,10 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		if (tsProject.canSupport(CommandNames.NavTree)) {
-			// when TypeScript 2.0.6 is consummed, use "navtree" to fill the Outline
-			// see https://github.com/Microsoft/TypeScript/pull/11532#issuecomment-254804923
+			// when TypeScript 2.0.6 is consummed, use "navtree" to fill the
+			// Outline
+			// see
+			// https://github.com/Microsoft/TypeScript/pull/11532#issuecomment-254804923
 			client.navtree(this.getName(), this, collector);
 		} else {
 			client.navbar(this.getName(), this, collector);
@@ -201,8 +203,8 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public void getCodeFixes(int startPosition, int endPosition, ITypeScriptGetCodeFixesCollector collector)
-			throws TypeScriptException {
+	public void getCodeFixes(int startPosition, int endPosition, String[] errorCodes,
+			ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location startLocation = this.getLocation(startPosition);
@@ -211,7 +213,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		Location endLocation = this.getLocation(endPosition);
 		int endLine = endLocation.getLine();
 		int endOffset = endLocation.getOffset();
-		client.getCodeFixes(this.getName(), this, startLine, startOffset, endLine, endOffset, collector);
+		client.getCodeFixes(this.getName(), this, startLine, startOffset, endLine, endOffset, errorCodes, collector);
 	}
 
 	private class TypeScriptNavBarCollector implements ITypeScriptNavBarCollector, ITypeScriptAsynchCollector {

@@ -12,6 +12,7 @@ package ts.client;
 
 import ts.TypeScriptException;
 import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
+import ts.client.codefixes.ITypeScriptGetSupportedCodeFixesCollector;
 import ts.client.completions.ITypeScriptCompletionCollector;
 import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
 import ts.client.definition.ITypeScriptDefinitionCollector;
@@ -95,20 +96,22 @@ public interface ITypeScriptServiceClient {
 			throws TypeScriptException;
 
 	// Since 2.0.5
-	
+
 	void compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException;
-	
+
 	// Since 2.0.6
 
 	void navtree(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
 			throws TypeScriptException;
 
 	// Since 2.1.0
-	
+
 	void getCodeFixes(String fileName, IPositionProvider positionProvider, int startLine, int startOffset, int endLine,
-			int endOffset, ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException;
+			int endOffset, String[] errorCodes, ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException;
+
+	void getSupportedCodeFixes(ITypeScriptGetSupportedCodeFixesCollector collector) throws TypeScriptException;
 
 	void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
 			throws TypeScriptException;
-	
+
 }

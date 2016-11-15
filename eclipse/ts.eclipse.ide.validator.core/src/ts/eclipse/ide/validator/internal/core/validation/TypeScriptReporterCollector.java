@@ -38,7 +38,7 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 
 	@Override
 	public void addDiagnostic(String event, String file, String text, int startLine, int startOffset, int endLine,
-			int endOffset) {
+			int endOffset, String category, int code) {
 		try {
 			IResource resource = tsFile.getResource();
 			int start = tsFile.getPosition(startLine, startOffset);
@@ -51,13 +51,13 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 				}
 			}
 			// TODO: severity
-			String severity = null;
-			LocalizedMessage message = new LocalizedMessage(getSeverity(severity), text, resource);
+			LocalizedMessage message = new LocalizedMessage(getSeverity(category), text, resource);
 			message.setOffset(start);
 			message.setLength(end - start);
 			message.setAttribute(CHAR_START, start);
 			message.setAttribute(CHAR_END, end);
 			message.setLineNo(startLine - 1);
+			message.setAttribute("tsCode", code);
 			reporter.addMessage(validator, message);
 		} catch (TypeScriptException e) {
 			Trace.trace(Trace.SEVERE, "Error while reporting error", e);

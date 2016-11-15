@@ -10,9 +10,9 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import ts.TypeScriptException;
 import ts.client.CommandNames;
@@ -29,27 +29,17 @@ import ts.client.format.ITypeScriptFormatCollector;
  */
 public class FormatRequest extends FileLocationRequest<ITypeScriptFormatCollector> {
 
-	public FormatRequest(String fileName, int line, int offset, int endLine, int endOffset, ITypeScriptFormatCollector collector) {
+	public FormatRequest(String fileName, int line, int offset, int endLine, int endOffset,
+			ITypeScriptFormatCollector collector) {
 		super(CommandNames.Format, new FormatRequestArgs(fileName, line, offset, endLine, endOffset));
 		super.setCollector(collector);
 	}
 
 	@Override
 	public void collect(JsonObject response) throws TypeScriptException {
-		ITypeScriptFormatCollector collector = getCollector();
-		JsonObject item = null;
-		String newText = null;
-		JsonObject start = null;
-		JsonObject end = null;
-		JsonArray body = response.get("body").asArray();
-		for (JsonValue b : body) {
-			item = b.asObject();
-			start = item.get("start").asObject();
-			end = item.get("end").asObject();
-			newText = item.getString("newText", null);
-			collector.format(start.getInt("line", -1), start.getInt("offset", -1), end.getInt("line", -1),
-					end.getInt("offset", -1), newText);
-		}
+		Gson gson = new GsonBuilder().create();
+		FormatResponse a = gson.fromJson(response.toString(), FormatResponse.class);
+		getCollector().format(a.getBody());
 	}
 
 }

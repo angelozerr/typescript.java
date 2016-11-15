@@ -43,6 +43,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension2;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
@@ -78,6 +79,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
+import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 /**
@@ -554,9 +556,9 @@ public abstract class AbstractAnnotationHover extends AbstractTypeScriptHover {
 			quickFixLabel.setLayoutData(layoutData);
 			String text;
 			if (proposals.length == 1) {
-				text = "JavaHoverMessages.AbstractAnnotationHover_message_singleQuickFix";
+				text = TypeScriptUIMessages.AbstractAnnotationHover_message_singleQuickFix;
 			} else {
-				text = "Messages.format(JavaHoverMessages.AbstractAnnotationHover_message_multipleQuickFix, new Object[] { String.valueOf(proposals.length) })";
+				text = NLS.bind(TypeScriptUIMessages.AbstractAnnotationHover_message_multipleQuickFix, new Object[] { String.valueOf(proposals.length) });
 			}
 			quickFixLabel.setText(text);
 

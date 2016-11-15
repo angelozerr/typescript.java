@@ -10,15 +10,9 @@ import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.formatter.IFormattingStrategy;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.text.edits.DeleteEdit;
-import org.eclipse.text.edits.InsertEdit;
-import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.PlatformUI;
 
-import ts.TypeScriptException;
-import ts.client.format.ITypeScriptFormatCollector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -43,31 +37,11 @@ public class TypeScriptContentFormatter implements IContentFormatter {
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(resource.getProject());
 			final IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);
-
-			final MultiTextEdit textEdit = new MultiTextEdit();
 			int startPosition = region.getOffset();
 			int endPosition = region.getOffset() + region.getLength() - 1;
-			tsFile.format(startPosition, endPosition, new ITypeScriptFormatCollector() {
-
-				@Override
-				public void format(int startLine, int startOffset, int endLine, int endOffset, String newText)
-						throws TypeScriptException {
-					int start = tsFile.getPosition(startLine, startOffset);
-					int end = tsFile.getPosition(endLine, endOffset);
-					int length = end - start;
-					if (newText.isEmpty()) {
-						if (length > 0) {
-							textEdit.addChild(new DeleteEdit(start, length));
-						}
-					} else {
-						if (length > 0) {
-							textEdit.addChild(new ReplaceEdit(start, length, newText));
-						} else if (length == 0) {
-							textEdit.addChild(new InsertEdit(start, newText));
-						}
-					}
-				}
-			});
+			TypeScriptFormatCollector collector = new TypeScriptFormatCollector(document);
+			tsFile.format(startPosition, endPosition, collector);
+			TextEdit textEdit = collector.getTextEdit();
 			textEdit.apply(document, TextEdit.CREATE_UNDO);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, JSDTTypeScriptUIPlugin.PLUGIN_ID, e.getMessage(), e);

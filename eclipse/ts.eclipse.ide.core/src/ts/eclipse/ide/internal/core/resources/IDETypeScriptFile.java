@@ -20,6 +20,7 @@ import ts.TypeScriptException;
 import ts.client.Location;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.resources.AbstractTypeScriptFile;
 import ts.resources.SynchStrategy;
@@ -114,14 +115,7 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 
 	@Override
 	public int getPosition(int line, int offset) throws TypeScriptException {
-		if (document == null) {
-			return -1;
-		}
-		try {
-			return document.getLineOffset(line - 1) + offset - 1;
-		} catch (BadLocationException e) {
-			throw new TypeScriptException(e);
-		}
+		return DocumentUtils.getPosition(document, line, offset);
 	}
 
 	@Override

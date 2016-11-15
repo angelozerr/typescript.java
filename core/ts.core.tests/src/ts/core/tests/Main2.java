@@ -58,10 +58,9 @@ public class Main2 {
 	private static void validate(File sampleFile, MockTypeScriptProject tsProject, boolean normalize) throws TypeScriptException {
 		MockTypeScriptFile tsFile = tsProject.openFile(sampleFile, normalize);
 		tsFile.getProject().geterr(tsFile, 0, new ITypeScriptGeterrCollector() {
-			
 			@Override
-			public void addDiagnostic(String event, String file, String text, int startLine, int startOffset, int endLine,
-					int endOffset) {
+			public void addDiagnostic(String event, String file, String text, int startLine, int startOffset,
+					int endLine, int endOffset, String category, int code) {			
 				System.err.println(event);
 			}
 		});

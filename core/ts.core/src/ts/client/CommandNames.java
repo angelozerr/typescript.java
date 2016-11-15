@@ -46,7 +46,8 @@ public enum CommandNames {
 	NavTree("navtree", "2.0.6"),
 	
 	// 2.1.0
-	Implementation("implementation", "2.1.0"),  
+	Implementation("implementation", "2.1.0"),
+	GetSupportedCodeFixes("getSupportedCodeFixes", "2.1.0"),
 	GetCodeFixes("getCodeFixes", "2.1.0");
 
 	private final String name;

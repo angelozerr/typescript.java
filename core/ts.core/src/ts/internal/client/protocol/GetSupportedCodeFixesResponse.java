@@ -8,10 +8,21 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.client.navbar;
+package ts.internal.client.protocol;
 
-import ts.client.IKindProvider;
+import java.util.List;
 
-public interface INavigationBarItem extends IKindProvider {
+/**
+ * A response for GetSupportedCodeFixesRequest request.
+ */
+public class GetSupportedCodeFixesResponse {
 
+	/**
+	 * List of error codes supported by the server.
+	 */
+	private List<String> body;
+
+	public List<String> getBody() {
+		return body;
+	}
 }
