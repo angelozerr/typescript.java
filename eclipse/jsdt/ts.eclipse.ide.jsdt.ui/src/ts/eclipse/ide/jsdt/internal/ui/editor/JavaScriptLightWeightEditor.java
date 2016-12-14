@@ -603,4 +603,9 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		if (getSourceViewer() instanceof JavaSourceViewer)
 			((JavaSourceViewer)getSourceViewer()).setPreferenceStore(store);
 	}
+	
+	@Override
+	protected boolean affectsTextPresentation(PropertyChangeEvent event) {
+		return ((JavaScriptSourceViewerConfiguration)getSourceViewerConfiguration()).affectsTextPresentation(event) || super.affectsTextPresentation(event);
+	}
 }

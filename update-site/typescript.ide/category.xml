@@ -15,8 +15,11 @@
    <feature id="ts-nodejs.embed-feature">
       <category name="Embed Node.js"/>
    </feature>
-   <feature id="ts-json-feature" >
+   <feature id="ts-json-feature">
       <category name="JSON Editors"/>
+   </feature>
+   <feature id="tm-feature" >
+      <category name="TypeScript IDE"/>
    </feature>
    <bundle id="minimal-json">
       <category name="TypeScript IDE"/>

@@ -100,6 +100,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String ValidationConfigurationBlock_embedded_checkbox_label;
 	public static String ValidationConfigurationBlock_installed_checkbox_label;
 
+	// TextMate
+	public static String TextMateConfigurationBlock_textmate_group_label;
+	public static String TextMateConfigurationBlock_textmate_SyntaxColoring;
+
 	// Search
 	public static String TypeScriptSearchQuery_label;
 	public static String TypeScriptSearchQuery_result;

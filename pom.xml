@@ -187,6 +187,11 @@
 			<url>http://download.eclipse.org/cbi/updates/license/</url>
 			<layout>p2</layout>
 		</repository>
+        <repository>
+          <id>textmate.java</id>
+          <layout>p2</layout>
+          <url>http://oss.opensagres.fr/textmate/1.0.0-SNAPSHOT/</url>
+        </repository>
 	</repositories>
 	<scm>
 		<url>https://github.com/angelozerr/typescript.java</url>

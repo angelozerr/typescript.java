@@ -18,23 +18,23 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import ts.eclipse.ide.ui.preferences.PropertyAndPreferencePage;
 
 /**
- * TypeScript formatter preferences page
+ * TextMate preferences page
  *
  */
-public class FormatterPreferencePage extends PropertyAndPreferencePage {
+public class TextMatePreferencePage extends PropertyAndPreferencePage {
 
-	public static final String PREF_ID = "ts.eclipse.ide.ui.preference.FormatterPreferencePage"; //$NON-NLS-1$
-	public static final String PROP_ID = "ts.eclipse.ide.ui.property.FormatterPreferencePage"; //$NON-NLS-1$
+	public static final String PREF_ID = "ts.eclipse.ide.ui.preference.TextMatePreferencePage"; //$NON-NLS-1$
+	public static final String PROP_ID = "ts.eclipse.ide.ui.property.TextMatePreferencePage"; //$NON-NLS-1$
 
-	private FormatterConfigurationBlock configurationBlock;
+	private TextMateConfigurationBlock configurationBlock;
 
-	public FormatterPreferencePage() {
+	public TextMatePreferencePage() {
 	}
 
 	@Override
 	public void createControl(Composite parent) {
 		IWorkbenchPreferenceContainer container = (IWorkbenchPreferenceContainer) getContainer();
-		configurationBlock = new FormatterConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
+		configurationBlock = new TextMateConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
 		super.createControl(parent);
 	}
 

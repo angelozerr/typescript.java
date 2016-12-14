@@ -677,4 +677,27 @@
       </include>            
     </extension>
    
+   <extension
+         point="org.eclipse.textmate4e.core.grammars">
+      <grammar
+      		scopeName="source.ts"
+            path="./syntaxes/TypeScript.tmLanguage.json" >
+      </grammar>
+      <grammar
+      		scopeName="source.tsx"
+            path="./syntaxes/TypeScriptReact.tmLanguage.json" >
+      </grammar>
+      <scopeNameContentTypeBinding
+            contentTypeId="ts.eclipse.ide.core.tsSource"
+            scopeName="source.ts">
+      </scopeNameContentTypeBinding>
+      <scopeNameContentTypeBinding
+            contentTypeId="ts.eclipse.ide.core.tsxSource"
+            scopeName="source.tsx">
+      </scopeNameContentTypeBinding>
+      <scopeNameContentTypeBinding
+            contentTypeId="ts.eclipse.ide.core.jsxSource"
+            scopeName="source.tsx">
+      </scopeNameContentTypeBinding>
+   </extension>   
 </plugin>        

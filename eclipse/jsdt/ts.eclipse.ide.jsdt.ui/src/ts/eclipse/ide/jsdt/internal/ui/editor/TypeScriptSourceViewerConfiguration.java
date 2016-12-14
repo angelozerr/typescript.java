@@ -35,6 +35,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.textmate4e.ui.text.TMPresentationReconciler;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 import org.eclipse.wst.jsdt.internal.ui.text.AbstractJavaScanner;
@@ -57,6 +58,7 @@ import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.ui.implementation.TypeScriptImplementationDialog;
 import ts.eclipse.ide.ui.outline.TypeScriptElementProvider;
 import ts.eclipse.ide.ui.outline.TypeScriptQuickOutlineDialog;
+import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
 
@@ -78,11 +80,14 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 	 */
 	private AbstractJavaScanner jsxScanner;
 
+	private IPreferenceStore preferenceStore;
+
 	public TypeScriptSourceViewerConfiguration(IColorManager colorManager, IPreferenceStore preferenceStore,
 			ITextEditor editor, String partitioning) {
 		super(colorManager, preferenceStore, editor, partitioning);
 		fCodeScanner = new TypeScriptCodeScanner(colorManager, preferenceStore);
 		jsxScanner = new JSXScanner(colorManager, preferenceStore);
+		this.preferenceStore = preferenceStore;
 
 	}
 
@@ -335,14 +340,17 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+		if (preferenceStore.getBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING)) {
+			// Advanced Syntax coloration with TextMate
+			return new TMPresentationReconciler();
+		}
+		// Use classic Eclipse ITokenScaner.
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getJSXScanner());
 		reconciler.setDamager(dr, IJSXPartitions.JSX);
 		reconciler.setRepairer(dr, IJSXPartitions.JSX);
 
 		return reconciler;
-
 	}
 
 	/**
@@ -366,7 +374,8 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 
 	public boolean affectsTextPresentation(final PropertyChangeEvent event) {
 		return super.affectsTextPresentation(event) || fCodeScanner.affectsBehavior(event)
-				|| jsxScanner.affectsBehavior(event);
+				|| jsxScanner.affectsBehavior(event)
+				|| TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING.equals(event.getProperty());
 	}
 
 	@Override

@@ -226,7 +226,13 @@
             class="ts.eclipse.ide.internal.ui.preferences.FormatterPreferencePage"
             id="ts.eclipse.ide.ui.preference.FormatterPreferencePage"
             category="ts.eclipse.ide.ui.preference.EditorPreferencePage">
-      </page>            
+      </page>
+	  <page
+            name="%TextMatePreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.TextMatePreferencePage"
+            id="ts.eclipse.ide.ui.preference.TextMatePreferencePage"
+            category="ts.eclipse.ide.ui.preference.EditorPreferencePage">
+      </page>                  
    </extension>
          		
   <!-- Property Pages -->          		
@@ -296,7 +302,18 @@
 		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
 		     </adapt>         
          </enabledWhen>
-      </page>                              
+      </page>
+	  <page
+            name="%TextMatePreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.TextMatePreferencePage"
+            id="ts.eclipse.ide.ui.property.TextMatePreferencePage"
+            category="ts.eclipse.ide.ui.property.EditorPreferencePage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
+		     </adapt>         
+         </enabledWhen>
+      </page>                                    
    </extension>
 	            
 	<!-- Search -->
@@ -440,6 +457,13 @@
             adaptableType="ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath">
             <adapter type="org.eclipse.debug.ui.actions.ILaunchable" />
 		</factory>		
+	</extension>
+	  
+	<!-- Preferences initialization -->
+	<extension
+		point="org.eclipse.core.runtime.preferences">
+		<initializer
+			class="ts.eclipse.ide.internal.ui.preferences.TypeScriptUIPreferenceInitializer" />
 	</extension>
 	  
 </plugin>        
