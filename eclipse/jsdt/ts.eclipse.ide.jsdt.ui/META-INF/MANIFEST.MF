@@ -34,7 +34,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.forms,
  org.eclipse.ltk.core.refactoring,
  org.eclipse.ltk.ui.refactoring,
- org.eclipse.textmate4e.ui
+ org.eclipse.tm4e.ui
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"

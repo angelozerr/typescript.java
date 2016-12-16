@@ -678,7 +678,7 @@
     </extension>
    
    <extension
-         point="org.eclipse.textmate4e.core.grammars">
+         point="org.eclipse.tm4e.core.grammars">
       <grammar
       		scopeName="source.ts"
             path="./syntaxes/TypeScript.tmLanguage.json" >
