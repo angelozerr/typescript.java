@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
 import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
@@ -56,14 +57,18 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 				for (int i = 0; i < oldRepostoryBaseDirs.length; i++) {
 					oldRepostoryBaseDir = oldRepostoryBaseDirs[i];
 					if (oldRepostoryBaseDir.isDirectory()) {
-						TypeScriptCorePlugin.getTypeScriptRepositoryManager().createRepository(oldRepostoryBaseDir);
+						try {
+							TypeScriptCorePlugin.getTypeScriptRepositoryManager().createRepository(oldRepostoryBaseDir);
+						} catch (Exception e) {
+							Trace.trace(Trace.SEVERE, "Error while getting an archived TypeScript repository", e);
+						}
 					}
 				}
 
 			}
 
 			// Initialize tsc preferences
-			initializeTscPreferences(node, defaultRepository);
+			initializeTypeScriptRuntimePreferences(node, defaultRepository);
 			// Initialize tsserver preferences
 			initializeTsserverPreferences(node, defaultRepository);
 			// Initialize tslint preferences
@@ -82,6 +87,11 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 		// initialize editor+formation options
 		initializeEditorFormatOptions(node);
+
+		// Fix embedded TypeScript id preference
+		// See https://github.com/angelozerr/typescript.java/issues/121
+		fixEmbeddedTypeScriptIdPreference(
+				WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID));
 	}
 
 	/**
@@ -112,7 +122,8 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		return false;
 	}
 
-	private void initializeTscPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
+	private void initializeTypeScriptRuntimePreferences(IEclipsePreferences node,
+			ITypeScriptRepository defaultRepository) {
 		node.put(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
 		node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, true);
 		node.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH, "");
@@ -170,5 +181,26 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS,
 				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS_DEFAULT);
 
+	}
+
+	/**
+	 * Fix the embeddedTypeScriptId preference if needed with default
+	 * embeddedTypeScriptId.
+	 * 
+	 * @param preferences
+	 * @see https://github.com/angelozerr/typescript.java/issues/121
+	 */
+	public static void fixEmbeddedTypeScriptIdPreference(IEclipsePreferences preferences) {
+		String embeddedTypeScriptId = preferences.get(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID, null);
+		if (embeddedTypeScriptId != null
+				&& TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepository(embeddedTypeScriptId) == null) {
+			preferences.put(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID,
+					TypeScriptCorePlugin.getTypeScriptRepositoryManager().getDefaultRepository().getName());
+			try {
+				preferences.flush();
+			} catch (BackingStoreException e) {
+				Trace.trace(Trace.SEVERE, "Error while fixing embeddedTypeScriptId preference", e);
+			}
+		}
 	}
 }

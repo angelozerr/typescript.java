@@ -26,6 +26,7 @@ import ts.eclipse.ide.core.resources.AbstractTypeScriptSettings;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.internal.core.preferences.TypeScriptCorePreferenceInitializer;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPath;
 import ts.nodejs.NodejsProcess;
@@ -48,6 +49,9 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	public IDETypeScriptProjectSettings(IDETypeScriptProject tsProject) {
 		super(tsProject.getProject(), TypeScriptCorePlugin.PLUGIN_ID);
 		this.tsProject = tsProject;
+		// Fix embedded TypeScript id preference
+		// See https://github.com/angelozerr/typescript.java/issues/121
+		TypeScriptCorePreferenceInitializer.fixEmbeddedTypeScriptIdPreference(getProjectPreferences());
 	}
 
 	/**
