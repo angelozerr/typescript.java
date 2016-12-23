@@ -20,6 +20,7 @@ import ts.TypeScriptNoContentAvailableException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
 import ts.eclipse.jface.text.html.TypeScriptBrowserInformationControlInput;
 import ts.resources.ITypeScriptFile;
 import ts.utils.StringUtils;
@@ -52,7 +53,9 @@ public class TypeScriptHover extends AbstractTypeScriptHover implements ITypeScr
 				int position = hoverRegion.getOffset();
 				ITypeScriptFile tsFile = tsProject.openFile(scriptFile, textViewer.getDocument());
 
-				HTMLTypeScriptQuickInfoCollector collector = new HTMLTypeScriptQuickInfoCollector();
+				HTMLTypeScriptQuickInfoCollector collector = new HTMLTypeScriptQuickInfoCollector(
+						TypeScriptUIPlugin.getDefault().getPreferenceStore().getBoolean(
+								TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING) ? scriptFile : null);
 				tsProject.quickInfo(tsFile, position, collector);
 
 				String text = collector.getInfo();

@@ -5,12 +5,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.internal.text.html.HTMLPrinter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.tm4e.markdown.TMHTMLRenderer;
+import org.eclipse.tm4e.markdown.marked.HTMLRenderer;
+import org.eclipse.tm4e.markdown.marked.IRenderer;
+import org.eclipse.tm4e.markdown.marked.Marked;
+import org.eclipse.tm4e.ui.TMUIPlugin;
+import org.eclipse.tm4e.ui.themes.ITheme;
 import org.osgi.framework.Bundle;
 
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
@@ -37,21 +44,32 @@ public class HTMLTypeScriptPrinter {
 		HTMLTypeScriptPrinter.colorInfoForeground = colorInfoForeground;
 	}
 
-	public static String getQuickInfo(String kind, String kindModifiers, String displayString, String documentation) {
+	public static String getQuickInfo(String kind, String kindModifiers, String displayString, String documentation,
+			IFile tsFile) {
 		StringBuffer info = new StringBuffer();
 		ImageDescriptor descriptor = null; // TypeScriptImagesRegistry.getTypeScriptImageDescriptor(kind,
 											// kindModifiers, null);
 		startPage(info, null, descriptor);
 		if (!StringUtils.isEmpty(displayString)) {
-			info.append("<pre class=\"displayString\">");
-			info.append(displayString);
-			info.append("</pre>");
+			if (tsFile == null) {
+				info.append("<pre class=\"displayString\">");
+				info.append(displayString);
+				info.append("</pre>");
+			} else {
+				IRenderer renderer = createMarkdownRenderer(tsFile);
+				info.append(Marked.parse("```ts\n" + displayString + "```", renderer));
+			}
 		}
 		if (!StringUtils.isEmpty(documentation)) {
-			HTMLPrinter.addParagraph(info, documentation);
+			IRenderer renderer = createMarkdownRenderer(tsFile);
+			info.append(Marked.parse(documentation, renderer));
 		}
 		endPage(info);
 		return info.toString();
+	}
+
+	private static IRenderer createMarkdownRenderer(IFile file) {
+		return file != null ? new TMHTMLRenderer(file.getFileExtension()) : new HTMLRenderer();
 	}
 
 	public static String getError(String message) {
@@ -66,8 +84,9 @@ public class HTMLTypeScriptPrinter {
 	}
 
 	public static void endPage(StringBuffer buffer) {
+		ITheme theme = TMUIPlugin.getThemeManager().getDefaultTheme();
 		HTMLPrinter.insertPageProlog(buffer, 0, colorInfoForeground, colorInfoBackround,
-				HTMLTypeScriptPrinter.getStyleSheet());
+				HTMLTypeScriptPrinter.getStyleSheet() + theme.toCSSStyleSheet());
 		HTMLPrinter.addPageEpilog(buffer);
 	}
 
@@ -171,7 +190,8 @@ public class HTMLTypeScriptPrinter {
 																									// $NON-NLS-1$
 																									// $NON-NLS-1$
 																									// $NON-NLS-1$
-																									//$NON-NLS-1$ //$NON-NLS-3$
+																									// $NON-NLS-1$
+																									// //$NON-NLS-3$
 			buf.append("<span ").append(tooltip).append("style=\"").append(imageStyle). //$NON-NLS-1$ //$NON-NLS-2$
 					append("filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='").append(imageSrcPath) //$NON-NLS-1$
 					.append("')\"></span>\n"); //$NON-NLS-1$
