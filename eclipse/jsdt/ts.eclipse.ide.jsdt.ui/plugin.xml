@@ -676,9 +676,20 @@
       		translations="$nl$/templates/react-templates.properties">
       </include>            
     </extension>
-   
+
+<!-- =========================================================================== -->
+<!-- TextMate                                                                    -->
+<!-- =========================================================================== -->   
    <extension
          point="org.eclipse.tm4e.core.grammars">
+      <grammar
+      		scopeName="source.js"
+            path="./syntaxes/JavaScript.tmLanguage.json" >
+      </grammar>
+      <grammar
+      		scopeName="source.js.regexp"
+            path="./syntaxes/Regular Expressions (JavaScript).tmLanguage" >
+      </grammar>
       <grammar
       		scopeName="source.ts"
             path="./syntaxes/TypeScript.tmLanguage.json" >
@@ -688,16 +699,20 @@
             path="./syntaxes/TypeScriptReact.tmLanguage.json" >
       </grammar>
       <scopeNameContentTypeBinding
+            contentTypeId="org.eclipse.wst.jsdt.core.jsSource"
+            scopeName="source.js">
+      </scopeNameContentTypeBinding>
+      <scopeNameContentTypeBinding
+            contentTypeId="ts.eclipse.ide.core.jsxSource"
+            scopeName="source.js">
+      </scopeNameContentTypeBinding>      
+      <scopeNameContentTypeBinding
             contentTypeId="ts.eclipse.ide.core.tsSource"
             scopeName="source.ts">
       </scopeNameContentTypeBinding>
       <scopeNameContentTypeBinding
             contentTypeId="ts.eclipse.ide.core.tsxSource"
             scopeName="source.tsx">
-      </scopeNameContentTypeBinding>
-      <scopeNameContentTypeBinding
-            contentTypeId="ts.eclipse.ide.core.jsxSource"
-            scopeName="source.tsx">
-      </scopeNameContentTypeBinding>
+      </scopeNameContentTypeBinding>           
    </extension>   
 </plugin>        
