@@ -1,27 +1,39 @@
+/**
+ *  Copyright (c) 2015-2017 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.List;
 
-import ts.TypeScriptException;
+import com.google.gson.JsonObject;
+
 import ts.client.CommandNames;
-import ts.client.IPositionProvider;
-import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
+import ts.client.codefixes.CodeAction;
 
-public class CodeFixRequest extends SimpleRequest<ITypeScriptGetCodeFixesCollector> {
+/**
+ * Configure request; value of command field is "configure". Specifies host
+ * information, such as host type, tab size, and indent size.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ */
+public class CodeFixRequest extends Request<CodeFixRequestArgs> {
 
-	public CodeFixRequest(String fileName, IPositionProvider positionProvider, int startLine, int startOffset,
-			int endLine, int endOffset, String[] errorCodes, ITypeScriptGetCodeFixesCollector collector) {
-		super(CommandNames.GetCodeFixes,
-				new CodeFixRequestArgs(fileName, startLine, startOffset, endLine, endOffset, errorCodes), null);
-		super.setCollector(collector);
+	public CodeFixRequest(String file, int startLine, int startOffset, int endLine, int endOffset,
+			List<Integer> errorCodes) {
+		super(CommandNames.GetCodeFixes.getName(),
+				new CodeFixRequestArgs(file, startLine, startOffset, endLine, endOffset, errorCodes));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		Gson gson = new GsonBuilder().create();
-		CodeFixResponse a = gson.fromJson(response.toString(), CodeFixResponse.class);
-		getCollector().fix(a.getBody());
+	public Response<List<CodeAction>> parseResponse(JsonObject json) {
+		return GsonHelper.DEFAULT_GSON.fromJson(json, GetCodeFixesResponse.class);
 	}
+
 }

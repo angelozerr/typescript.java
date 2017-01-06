@@ -14,7 +14,7 @@ import java.io.File;
 
 import ts.TypeScriptException;
 import ts.client.completions.ICompletionEntryMatcher;
-import ts.client.format.FormatOptions;
+import ts.client.format.FormatCodeSettings;
 import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.internal.repository.TypeScriptRepository;
 import ts.nodejs.NodejsProcess;
@@ -111,7 +111,7 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	}
 
 	@Override
-	public FormatOptions getFormatOptions() {
+	public FormatCodeSettings getFormatOptions() {
 		return null;
 	}
 

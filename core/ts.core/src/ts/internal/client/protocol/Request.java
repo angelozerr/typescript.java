@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,90 +10,50 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
-import ts.TypeScriptException;
-import ts.client.CommandNames;
-import ts.client.ITypeScriptAsynchCollector;
-import ts.client.ITypeScriptCollector;
-import ts.client.TypeScriptTimeoutException;
 import ts.internal.SequenceHelper;
-import ts.internal.client.ICallbackItem;
 
-public abstract class Request<T, C extends ITypeScriptCollector> extends Message implements ICallbackItem<T> {
+/**
+ * Client-initiated request message
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
+ */
+public abstract class Request<T> extends Message {
 
-	private static final long TIMEOUT = 10000L * 1000000L; // wait 10 second
-															// before timeout.
+	/**
+	 * The command to execute
+	 */
+	private final String command;
 
-	private long startTime;
+	/**
+	 * Object containing arguments for the command
+	 */
+	private final T arguments;
 
-	private C collector;
-
-	public Request(CommandNames command, JsonObject args, Integer seq) {
-		this(command.getName(), args, seq);
+	public Request(String command, T arguments) {
+		this(command, arguments, null);
 	}
 
-	public Request(String command, JsonObject args, Integer seq) {
-		super(seq != null ? seq : SequenceHelper.getRequestSeq(), "request");
-		super.add("command", command);
-		if (args != null) {
-			super.add("arguments", args);
-		}
-	}
-
-	public void setCollector(C collector) {
-		this.collector = collector;
-	}
-
-	public C getCollector() {
-		return collector;
+	public Request(String command, T arguments, Integer seq) {
+		super(MessageType.request, seq != null ? seq : SequenceHelper.getRequestSeq());
+		this.command = command;
+		this.arguments = arguments;
 	}
 
 	public String getCommand() {
-		return super.getString("command", null);
+		return command;
 	}
 
-	public JsonObject getArguments() {
-		return super.get("arguments").asObject();
+	public T getArguments() {
+		return arguments;
 	}
 
-	@Override
-	public final T call() throws Exception {
-		if (isAsynch()) {
-			return null;
-		}
-		this.startTime = System.nanoTime();
-		while (!isCompleted()) {
-			synchronized (this) {
-				// wait for 200ms otherwise if we don't set ms, if completion is
-				// executed several times
-				// quickly (do Ctrl+Space every time), the Thread could be
-				// blocked? Why?
-				this.wait(5);
-			}
-			if ((System.nanoTime() - startTime) > TIMEOUT) {
-				throw new TypeScriptTimeoutException(this, TIMEOUT);
-			}
-		}
-		return getResult();
+	public abstract <R> Response<R> parseResponse(JsonObject json);
+
+	protected Gson getGson() {
+		return GsonHelper.DEFAULT_GSON;
 	}
-
-	public long getStartTime() {
-		return startTime;
-	}
-
-	public boolean isAsynch() {
-		return collector != null && (collector instanceof ITypeScriptAsynchCollector);
-	}
-	
-	@Override
-	public void error(Throwable e) {
-		
-	}
-
-	protected abstract boolean isCompleted();
-
-	protected abstract T getResult() throws Exception;
-
-	public abstract void collect(JsonObject response) throws TypeScriptException;
 }

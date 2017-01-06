@@ -12,23 +12,26 @@ package ts.resources;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import ts.TypeScriptException;
+import ts.client.CodeEdit;
 import ts.client.CommandNames;
-import ts.client.ITypeScriptAsynchCollector;
+import ts.client.FileSpan;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
-import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
-import ts.client.completions.ITypeScriptCompletionCollector;
-import ts.client.definition.ITypeScriptDefinitionCollector;
-import ts.client.format.FormatOptions;
-import ts.client.format.ITypeScriptFormatCollector;
-import ts.client.navbar.ITypeScriptNavBarCollector;
+import ts.client.codefixes.CodeAction;
+import ts.client.completions.CompletionEntry;
+import ts.client.completions.ICompletionEntryFactory;
+import ts.client.configure.ConfigureRequestArguments;
+import ts.client.diagnostics.DiagnosticEvent;
+import ts.client.diagnostics.DiagnosticEventBody;
+import ts.client.format.FormatCodeSettings;
 import ts.client.navbar.NavigationBarItemRoot;
-import ts.client.occurrences.ITypeScriptOccurrencesCollector;
-import ts.client.references.ITypeScriptReferencesCollector;
+import ts.client.occurrences.OccurrencesResponseItem;
+import ts.client.quickinfo.QuickInfo;
+import ts.client.references.ReferencesResponseBody;
 import ts.internal.LocationReader;
-import ts.internal.client.protocol.ConfigureRequestArguments;
 
 /**
  * Abstract TypeScript file.
@@ -43,14 +46,12 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 
 	private final List<INavbarListener> listeners;
 	private NavigationBarItemRoot navbar;
-	private TypeScriptNavBarCollector navBarCollector;
-	private FormatOptions formatOptions;
+	private FormatCodeSettings formatOptions;
 	private boolean configureAlreadyDone;
 
 	public AbstractTypeScriptFile(ITypeScriptProject tsProject) {
 		this.tsProject = tsProject;
 		this.listeners = new ArrayList<INavbarListener>();
-		this.navBarCollector = new TypeScriptNavBarCollector();
 		this.setDirty(false);
 		this.configureAlreadyDone = false;
 	}
@@ -107,104 +108,139 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public void completions(int position, ITypeScriptCompletionCollector collector) throws TypeScriptException {
+	public CompletableFuture<List<CompletionEntry>> completions(int position, ICompletionEntryFactory factory)
+			throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
 		int line = location.getLine();
 		int offset = location.getOffset();
 		String prefix = null;
-		client.completions(this.getName(), line, offset, prefix, collector);
+		return client.completions(this.getName(), line, offset, factory);
 	}
 
 	@Override
-	public void definition(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException {
+	public CompletableFuture<List<FileSpan>> definition(int position) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
 		int line = location.getLine();
 		int offset = location.getOffset();
-		client.definition(this.getName(), line, offset, collector);
+		return client.definition(this.getName(), line, offset);
 	}
 
 	@Override
-	public void format(int startPosition, int endPosition, ITypeScriptFormatCollector collector)
-			throws TypeScriptException {
+	public CompletableFuture<QuickInfo> quickInfo(int position) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
-		this.ensureFormatOptions(client);
-		Location start = this.getLocation(startPosition);
-		Location end = this.getLocation(endPosition);
-		client.format(this.getName(), start.getLine(), start.getOffset(), end.getLine(), end.getOffset(), collector);
+		Location location = this.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
+		return client.quickInfo(this.getName(), line, offset);
+	}
+	
+	@Override
+	public CompletableFuture<List<DiagnosticEvent>> geterr() throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		return client.geterr(new String[] {getName()}, 0);
 	}
 
-	private void ensureFormatOptions(ITypeScriptServiceClient client) throws TypeScriptException {
-		FormatOptions oldFormatOptions = formatOptions;
-		FormatOptions newFormatOptions = getFormatOptions();
+	@Override
+	public CompletableFuture<List<CodeEdit>> format(int startPosition, int endPosition) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		this.ensureFormatCodeSettings(client);
+		Location start = this.getLocation(startPosition);
+		Location end = this.getLocation(endPosition);
+		return client.format(this.getName(), start.getLine(), start.getOffset(), end.getLine(), end.getOffset());
+	}
+
+	private void ensureFormatCodeSettings(ITypeScriptServiceClient client) throws TypeScriptException {
+		FormatCodeSettings oldFormatOptions = formatOptions;
+		FormatCodeSettings newFormatOptions = getFormatOptions();
 		if (!configureAlreadyDone || !newFormatOptions.equals(oldFormatOptions)) {
 			configureAlreadyDone = true;
-			client.configure(new ConfigureRequestArguments(newFormatOptions, getName()));
+			client.configure(new ConfigureRequestArguments().setFile(getName()).setFormatOptions(formatOptions));
 		}
 	}
 
 	@Override
-	public FormatOptions getFormatOptions() {
+	public CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(Boolean includeLinePosition)
+			throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		return client.semanticDiagnosticsSync(getName(), includeLinePosition);
+	}
+
+	@Override
+	public CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(Boolean includeLinePosition)
+			throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		return client.syntacticDiagnosticsSync(getName(), includeLinePosition);
+	}
+
+	// @Override
+	// public CompletableFuture<DiagnosticEventBody> diagnostics(Boolean
+	// includeLinePosition) throws TypeScriptException {
+	// this.synch();
+	// ITypeScriptServiceClient client = tsProject.getClient();
+	// if (tsProject.canSupport(CommandNames.SemanticDiagnosticsSync)) {
+	// // TypeScript >=2.0.3, uses syntactic/semantic command names which
+	// // seems having better performance.
+	// return client.syntacticDiagnosticsSync(getName(), includeLinePosition)
+	// .thenApply(client.semanticDiagnosticsSync(getName(),
+	// includeLinePosition));
+	// } else {
+	// // FIXME
+	// // client.geterr(new String[] { file.getName() }, 0, collector);
+	// }
+	// }
+
+	@Override
+	public FormatCodeSettings getFormatOptions() {
 		formatOptions = tsProject.getProjectSettings().getFormatOptions();
 		return formatOptions;
 	}
 
-	public void setFormatOptions(FormatOptions formatOptions) {
+	public void setFormatOptions(FormatCodeSettings formatOptions) {
 		this.formatOptions = formatOptions;
 	}
 
 	@Override
-	public void references(int position, ITypeScriptReferencesCollector collector) throws TypeScriptException {
+	public CompletableFuture<ReferencesResponseBody> references(int position) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
 		int line = location.getLine();
 		int offset = location.getOffset();
-		client.references(this.getName(), line, offset, collector);
+		return client.references(this.getName(), line, offset);
 	}
 
 	@Override
-	public void occurrences(int position, ITypeScriptOccurrencesCollector collector) throws TypeScriptException {
+	public CompletableFuture<List<OccurrencesResponseItem>> occurrences(int position) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
 		int line = location.getLine();
 		int offset = location.getOffset();
-		client.occurrences(this.getName(), line, offset, collector);
+		return client.occurrences(this.getName(), line, offset);
 	}
 
 	@Override
-	public void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException {
-		this.synch();
-		ITypeScriptServiceClient client = tsProject.getClient();
-		if (tsProject.canSupport(CommandNames.NavTree)) {
-			// when TypeScript 2.0.6 is consummed, use "navtree" to fill the
-			// Outline
-			// see
-			// https://github.com/Microsoft/TypeScript/pull/11532#issuecomment-254804923
-			client.navtree(this.getName(), this, collector);
-		} else {
-			client.navbar(this.getName(), this, collector);
-		}
-	}
-
-	@Override
-	public void implementation(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException {
+	public CompletableFuture<List<FileSpan>> implementation(int position) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
 		int line = location.getLine();
 		int offset = location.getOffset();
-		client.implementation(this.getName(), line, offset, collector);
+		return client.implementation(this.getName(), line, offset);
 	}
 
 	@Override
-	public void getCodeFixes(int startPosition, int endPosition, String[] errorCodes,
-			ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException {
+	public CompletableFuture<List<CodeAction>> getCodeFixes(int startPosition, int endPosition,
+			List<Integer> errorCodes) throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location startLocation = this.getLocation(startPosition);
@@ -213,31 +249,14 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		Location endLocation = this.getLocation(endPosition);
 		int endLine = endLocation.getLine();
 		int endOffset = endLocation.getOffset();
-		client.getCodeFixes(this.getName(), this, startLine, startOffset, endLine, endOffset, errorCodes, collector);
+		return client.getCodeFixes(this.getName(), this, startLine, startOffset, endLine, endOffset, errorCodes);
 	}
 
-	private class TypeScriptNavBarCollector implements ITypeScriptNavBarCollector, ITypeScriptAsynchCollector {
-
-		@Override
-		public void setNavBar(NavigationBarItemRoot navbar) {
-			AbstractTypeScriptFile.this.navbar = navbar;
-			fireNavBarListeners(navbar);
-		}
-
-		@Override
-		public void startCollect() {
-
-		}
-
-		@Override
-		public void endCollect() {
-
-		}
-
-		@Override
-		public void onError(TypeScriptException e) {
-
-		}
+	@Override
+	public void compileOnSaveEmitFile(Boolean forced) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		// FIXME client.compileOnSaveEmitFile(getName(), forced);
 	}
 
 	@Override
@@ -249,8 +268,6 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		}
 		if (navbar != null) {
 			listener.navBarChanged(navbar);
-		} else {
-			fireNavBarListenersIfNeeded();
 		}
 	}
 
@@ -258,17 +275,6 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		synchronized (listeners) {
 			for (INavbarListener listener : listeners) {
 				listener.navBarChanged(navbar);
-			}
-		}
-	}
-
-	protected void fireNavBarListenersIfNeeded() {
-		if (!listeners.isEmpty()) {
-			try {
-				navbar(navBarCollector);
-			} catch (TypeScriptException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 	}
@@ -281,16 +287,33 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
+	public void refreshNavBar() throws TypeScriptException {
+		if (listeners.isEmpty()) {
+			return;
+		}
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		if (tsProject.canSupport(CommandNames.NavTree)) {
+			// when TypeScript 2.0.6 is consummed, use "navtree" to fill the
+			// Outline
+			// see
+			// https://github.com/Microsoft/TypeScript/pull/11532#issuecomment-254804923
+			client.navtree(this.getName(), this).thenAccept(item -> {
+				AbstractTypeScriptFile.this.navbar = new NavigationBarItemRoot(item);
+				fireNavBarListeners(navbar);
+			});
+		} else {
+			client.navbar(this.getName(), this).thenAccept(item -> {
+				AbstractTypeScriptFile.this.navbar = new NavigationBarItemRoot(item);
+				fireNavBarListeners(navbar);
+			});
+		}
+	}
+
+	@Override
 	public NavigationBarItemRoot getNavBar() {
 		return navbar;
 	}
-
-	// @Override
-	// public List<NavigationBarItem> getNavBar() throws TypeScriptException {
-	// TypeScriptNavBarCollector c = new TypeScriptNavBarCollector();
-	// navbar(c);
-	// return c.getNavBar();
-	// }
 
 	@Override
 	public synchronized void synch() throws TypeScriptException {

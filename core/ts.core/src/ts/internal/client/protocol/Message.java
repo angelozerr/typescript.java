@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,26 +10,38 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
-
 /**
  * A TypeScript Server message
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
-public class Message extends JsonObject {
+public class Message {
 
-	private static final String SEQ_FIELD = "seq";
-	private static final String TYPE_FIELD = "type";
+	/**
+	 * Sequence number of the message
+	 */
+	private int seq;
 
-	public Message(int seq, String type) {
-		super.add(SEQ_FIELD, seq);
-		super.add(TYPE_FIELD, type);
+	/**
+	 * One of "request", "response", or "event"
+	 */
+	private String type;
+
+	public Message() {
 	}
 
-	public int getSeq() {
-		return getInt(SEQ_FIELD, -1);
+	public Message(MessageType type, int seq) {
+		this.type = type.name();
+		this.seq = seq;
 	}
 
 	public String getType() {
-		return getString(TYPE_FIELD, null);
+		return type;
 	}
+
+	public int getSeq() {
+		return seq;
+	}
+
 }

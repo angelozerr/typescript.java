@@ -5,7 +5,7 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-SymbolicName: ts.eclipse.ide.server.nodejs.embed.macosx.cocoa.x86_64;singleton:=true
 Bundle-Version: 1.2.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: ts.eclipse.ide.server.nodejs.core
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir

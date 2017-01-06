@@ -12,8 +12,13 @@ import org.eclipse.text.edits.TextEdit;
 
 import ts.TypeScriptException;
 import ts.client.CodeEdit;
+import ts.client.Location;
 
 public class DocumentUtils {
+
+	public static int getPosition(IDocument document, Location location) throws TypeScriptException {
+		return getPosition(document, location.getLine(), location.getOffset());
+	}
 
 	public static int getPosition(IDocument document, int line, int offset) throws TypeScriptException {
 		if (document == null) {

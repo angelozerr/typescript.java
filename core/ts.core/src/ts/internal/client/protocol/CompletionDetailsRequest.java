@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,55 +10,32 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
+import java.util.List;
 
-import ts.TypeScriptException;
+import com.google.gson.JsonObject;
+
 import ts.client.CommandNames;
-import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
-import ts.utils.JsonHelper;
+import ts.client.completions.CompletionEntryDetails;
 
 /**
  * Completion entry details request; value of command field is
  * "completionEntryDetails". Given a file location (file, line, col) and an
  * array of completion entry names return more detailed information for each
  * completion entry.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
-public class CompletionDetailsRequest extends FileLocationRequest<ITypeScriptCompletionEntryDetailsCollector> {
+public class CompletionDetailsRequest extends FileLocationRequest<CompletionDetailsRequestArgs> {
 
-	public CompletionDetailsRequest(String fileName, int line, int offset, String[] entryNames,
-			ITypeScriptCompletionEntryDetailsCollector collector) {
-		super(CommandNames.CompletionEntryDetails,
-				new CompletionDetailsRequestArgs(fileName, line, offset, entryNames));
-		super.setCollector(collector);
+	public CompletionDetailsRequest(String file, int line, int offset, String prefix, String[] entryNames) {
+		super(CommandNames.CompletionEntryDetails.getName(),
+				new CompletionDetailsRequestArgs(file, line, offset, prefix, entryNames));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		ITypeScriptCompletionEntryDetailsCollector collector = super.getCollector();
-		JsonArray body = response.get("body").asArray();
-		if (body != null && body.size() > 0) {
-			JsonObject obj = body.get(0).asObject();
-			collector.setEntryDetails(obj.getString("name", ""), obj.getString("kind", ""),
-					obj.getString("kindModifiers", ""));
-			// displayParts
-			JsonArray displayParts = JsonHelper.getArray(obj, "displayParts");
-			JsonObject o = null;
-			if (displayParts != null) {
-				for (JsonValue part : displayParts) {
-					o = part.asObject();
-					collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
-				}
-			}
-			// documentation
-			JsonArray documentation = JsonHelper.getArray(obj, "documentation");
-			if (documentation != null) {
-				for (JsonValue part : documentation) {
-					o = part.asObject();
-					collector.addDisplayPart(o.getString("text", ""), o.getString("kind", ""));
-				}
-			}
-		}
+	public Response<List<CompletionEntryDetails>> parseResponse(JsonObject json) {
+		return GsonHelper.DEFAULT_GSON.fromJson(json, CompletionDetailsResponse.class);
 	}
+
 }

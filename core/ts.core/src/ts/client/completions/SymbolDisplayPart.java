@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -11,19 +11,23 @@
 package ts.client.completions;
 
 /**
- * TypeScript symbol display part.
+ * Part of a symbol description.
  * 
  */
 public class SymbolDisplayPart {
 
 	private static final String PARAMETER_NAME_KIND = "parameterName";
-	private final String text;
-	private final String kind;
 
-	public SymbolDisplayPart(String text, String kind) {
-		this.text = text;
-		this.kind = kind;
-	}
+	/**
+	 * Text of an item describing the symbol.
+	 */
+	private String text;
+
+	/**
+	 * The symbol's kind (such as 'className' or 'parameterName' or plain
+	 * 'text').
+	 */
+	private String kind;
 
 	public String getText() {
 		return text;
@@ -32,7 +36,7 @@ public class SymbolDisplayPart {
 	public String getKind() {
 		return kind;
 	}
-	
+
 	public boolean isParameterName() {
 		return PARAMETER_NAME_KIND.equals(kind);
 	}

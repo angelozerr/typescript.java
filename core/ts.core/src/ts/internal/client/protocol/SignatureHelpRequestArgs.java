@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -13,13 +13,12 @@ package ts.internal.client.protocol;
 /**
  * Arguments of a signature help request.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
 public class SignatureHelpRequestArgs extends FileLocationRequestArgs {
 
-	public SignatureHelpRequestArgs(String fileName, int line, int offset) {
-		super(fileName, line, offset);
+	public SignatureHelpRequestArgs(String file, int line, int offset) {
+		super(file, line, offset);
 	}
 
 }

@@ -43,10 +43,10 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.internal.ide.StringMatcher;
 
+import ts.client.FileSpan;
 import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
-import ts.eclipse.ide.ui.implementation.FileSpan;
 import ts.eclipse.ide.ui.outline.TypeScriptOutlineContentProvider;
 import ts.eclipse.ide.ui.outline.TypeScriptOutlineLabelProvider;
 import ts.eclipse.ide.ui.utils.EditorUtils;
@@ -310,13 +310,11 @@ public abstract class AbstractInformationControl extends PopupDialog
 			if (file == null) {
 				File fs = WorkbenchResourceUtil.findFileFormFileSystem(filemane);
 				if (isFileExists(fs)) {
-					EditorUtils.openInEditor(fs, span.getStartLine(), span.getStartOffset(), span.getEndLine(),
-							span.getEndOffset(), true);
+					EditorUtils.openInEditor(fs, span);
 				}
 			} else {
 				if (isFileExists(file)) {
-					EditorUtils.openInEditor(file, span.getStartLine(), span.getStartOffset(), span.getEndLine(),
-							span.getEndOffset(), true);
+					EditorUtils.openInEditor(file, span);
 				}
 			}
 		}

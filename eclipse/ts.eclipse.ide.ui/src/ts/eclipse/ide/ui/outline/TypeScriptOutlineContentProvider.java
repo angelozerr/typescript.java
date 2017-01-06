@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 import ts.client.navbar.NavigationBarItem;
 import ts.client.navbar.NavigationBarItemRoot;
-import ts.client.navbar.TextSpan;
+import ts.client.navbar.NavigationTextSpan;
 
 /**
  * TypeScript outline content provider.
@@ -53,8 +53,8 @@ public class TypeScriptOutlineContentProvider implements ITreeContentProvider {
 		if (element instanceof NavigationBarItem) {
 			return ((NavigationBarItem) element).getParent();
 		}
-		if (element instanceof TextSpan) {
-			return ((TextSpan) element).getParent();
+		if (element instanceof NavigationTextSpan) {
+			return ((NavigationTextSpan) element).getParent();
 		}
 		return null;
 	}

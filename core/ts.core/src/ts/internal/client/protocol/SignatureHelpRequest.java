@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,28 +10,26 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
+import com.google.gson.JsonObject;
 
-import ts.TypeScriptException;
 import ts.client.CommandNames;
-import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.client.signaturehelp.SignatureHelpItems;
 
 /**
  * Signature help request; value of command field is "signatureHelp". Given a
  * file location (file, line, col), return the signature help.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class SignatureHelpRequest extends FileLocationRequest<ITypeScriptSignatureHelpCollector> {
+public class SignatureHelpRequest extends FileLocationRequest<SignatureHelpRequestArgs> {
 
-	public SignatureHelpRequest(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector) {
-		super(CommandNames.SignatureHelp, new SignatureHelpRequestArgs(fileName, line, offset));
-		super.setCollector(collector);
+	public SignatureHelpRequest(String file, int line, int offset) {
+		super(CommandNames.SignatureHelp.getName(), new SignatureHelpRequestArgs(file, line, offset));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		// None response
+	public Response<SignatureHelpItems> parseResponse(JsonObject json) {
+		return GsonHelper.DEFAULT_GSON.fromJson(json, SignatureHelpResponse.class);
 	}
+
 }

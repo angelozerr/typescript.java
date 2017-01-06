@@ -14,7 +14,7 @@ import java.io.File;
 
 import ts.TypeScriptException;
 import ts.client.completions.ICompletionEntryMatcher;
-import ts.client.format.FormatOptions;
+import ts.client.format.FormatCodeSettings;
 import ts.cmd.tslint.TslintSettingsStrategy;
 
 /**
@@ -92,6 +92,6 @@ public interface ITypeScriptProjectSettings {
 	 */
 	void dispose();
 
-	FormatOptions getFormatOptions();
+	FormatCodeSettings getFormatOptions();
 
 }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-
 package ts.eclipse.jface.text.contentassist;
 
 import org.eclipse.jface.text.IDocument;
@@ -27,10 +26,9 @@ import ts.client.completions.ICompletionEntryMatcher;
 public class TypeScriptCompletionProposalWithExtension7 extends TypeScriptCompletionProposal
 		implements ICompletionProposalExtension7 {
 
-	public TypeScriptCompletionProposalWithExtension7(String name, String kind, String kindModifiers, String sortText,
-			int position, String prefix, String fileName, int line, int offset, ICompletionEntryMatcher matcher,
-			ITypeScriptServiceClient client) {
-		super(name, kind, kindModifiers, sortText, position, prefix, fileName, line, offset, matcher, client);
+	public TypeScriptCompletionProposalWithExtension7(ICompletionEntryMatcher matcher, String fileName, int line,
+			int offset, ITypeScriptServiceClient client, int position, String prefix) {
+		super(matcher, fileName, line, offset, client, position, prefix);
 	}
 
 	@Override

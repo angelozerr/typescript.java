@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -13,26 +13,26 @@ package ts.internal.client.protocol;
 /**
  * Arguments for change request message.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
 public class ChangeRequestArgs extends FormatRequestArgs {
 
 	/**
-	 * 
-	 * @param fileName
-	 * @param line
-	 * @param offset
-	 * @param endLine
-	 * @param endOffset
-	 * @param insertString
-	 *            Optional string to insert at location (file, line, offset).
+	 * Optional string to insert at location (file, line, offset).
 	 */
-	public ChangeRequestArgs(String fileName, int line, int offset, int endLine, int endOffset, String insertString) {
-		super(fileName, line, offset, endLine, endOffset);
-		if (insertString != null) {
-			super.add("insertString", insertString);
-		}
+	private final String insertString;
+
+	public ChangeRequestArgs(String file, int position, int endPosition, String insertString) {
+		super(file, position, endPosition);
+		this.insertString = insertString;
 	}
 
+	public ChangeRequestArgs(String file, int line, int offset, int endLine, int endOffset, String insertString) {
+		super(file, line, offset, endLine, endOffset);
+		this.insertString = insertString;
+	}
+
+	public String getInsertString() {
+		return insertString;
+	}
 }

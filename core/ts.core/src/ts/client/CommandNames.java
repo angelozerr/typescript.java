@@ -28,11 +28,14 @@ public enum CommandNames {
 	Definition("definition"), 
 	SignatureHelp("signatureHelp"), 
 	QuickInfo("quickinfo"), 
-	Geterr("geterr"), 
+	Geterr("geterr"),
+	GeterrForProject("geterrForProject"),
 	Format("format"), 
 	References("references"), 
 	Occurrences("occurrences"), 
-	Configure("configure"), 
+	Configure("configure"),
+	ProjectInfo("projectInfo"),
+	Rename("rename"),
 	
 	// 2.0.3
 	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.3"), 

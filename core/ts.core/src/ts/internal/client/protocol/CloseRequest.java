@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,25 +10,28 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
+import com.google.gson.JsonObject;
 
-import ts.TypeScriptException;
 import ts.client.CommandNames;
 
 /**
- * Close request.
+ * Close request; value of command field is "close". Notify the server that the
+ * client has closed a previously open file. If file is still referenced by open
+ * files, the server will resume monitoring the filesystem for changes to file.
+ * Server does not currently send a response to a close request.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class CloseRequest extends SimpleRequest {
+public class CloseRequest extends FileRequest<FileRequestArgs> {
 
 	public CloseRequest(String fileName) {
-		super(CommandNames.Close, new FileRequestArgs(fileName), null);
+		super(CommandNames.Close.getName(), new FileRequestArgs(fileName, null));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		// None response
+	public Response<?> parseResponse(JsonObject json) {
+		// This request doesn't return response.
+		return null;
 	}
+
 }

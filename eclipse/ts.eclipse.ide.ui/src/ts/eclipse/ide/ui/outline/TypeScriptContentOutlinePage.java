@@ -37,7 +37,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import ts.TypeScriptException;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.navbar.NavigationBarItemRoot;
-import ts.client.navbar.TextSpan;
+import ts.client.navbar.NavigationTextSpan;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -130,9 +130,14 @@ public class TypeScriptContentOutlinePage extends Page
 					fOutlineViewer.setInput(navbar);
 					if (firstRefresh) {
 						// first time, expand all the tree
-						if (navbar.getChildItems().size() < 500) {
-							fOutlineViewer.expandAll();
+						if (navbar.isNavTree()) {
+							fOutlineViewer.expandToLevel(2);
 						}
+//						List<NavigationBarItem> childItems = navbar.isNavTree()
+//								? navbar.getChildItems().get(0).getChildItems() : navbar.getChildItems();
+//						if (childItems.size() < 500) {
+//							fOutlineViewer.expandAll();
+//						}
 					} else {
 						// second time, keep the last expansion of the tree
 						fOutlineViewer.setExpandedTreePaths(newExpandedTreePaths.toArray(new TreePath[0]));
@@ -229,9 +234,9 @@ public class TypeScriptContentOutlinePage extends Page
 			return bestItem;
 		}
 		for (NavigationBarItem navigateToItem : navbar.getChildItems()) {
-			List<TextSpan> spans = navigateToItem.getSpans();
+			List<NavigationTextSpan> spans = navigateToItem.getSpans();
 
-			for (TextSpan span : spans) {
+			for (NavigationTextSpan span : spans) {
 				if (span.contains(offset)) {
 					// the best item is the one with the smallest span which
 					// contains the offset

@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -14,15 +14,9 @@ import java.util.List;
 
 /**
  * A response for GetSupportedCodeFixesRequest request.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class GetSupportedCodeFixesResponse {
+public class GetSupportedCodeFixesResponse extends Response<List<String>> {
 
-	/**
-	 * List of error codes supported by the server.
-	 */
-	private List<String> body;
-
-	public List<String> getBody() {
-		return body;
-	}
 }

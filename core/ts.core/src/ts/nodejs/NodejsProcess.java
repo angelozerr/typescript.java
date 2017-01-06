@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2017 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.nodejs;
 
 import java.io.BufferedReader;
@@ -6,18 +16,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
 import ts.TypeScriptException;
-import ts.internal.client.protocol.Request;
 import ts.utils.FileUtils;
 import ts.utils.IOUtils;
 
+/**
+ * Node.js process.
+ *
+ */
 public class NodejsProcess extends AbstractNodejsProcess {
-
-	// tsserver works with UTF_8 enconding.
-	private static final String UTF_8 = "UTF-8";
 
 	private final File tsFile;
 
@@ -38,10 +49,13 @@ public class NodejsProcess extends AbstractNodejsProcess {
 
 	private PrintStream out;
 
+	private final Object outputLock;
+
 	public NodejsProcess(File projectDir, File tsFile, File nodejsFile, INodejsLaunchConfiguration configuration,
 			String fileType) throws TypeScriptException {
 		super(nodejsFile, projectDir, configuration);
 		this.tsFile = checkFile(tsFile, fileType);
+		this.outputLock = new Object();
 	}
 
 	/**
@@ -75,7 +89,8 @@ public class NodejsProcess extends AbstractNodejsProcess {
 			try {
 				try {
 					notifyStartProcess(0);
-					BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8));
+					BufferedReader r = new BufferedReader(
+							new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
 					String line = null;
 					while ((line = r.readLine()) != null && process != null) {
 						notifyMessage(line);
@@ -125,7 +140,7 @@ public class NodejsProcess extends AbstractNodejsProcess {
 			builder.directory(getProjectDir());
 
 			this.process = builder.start();
-			this.out = new PrintStream(process.getOutputStream(), false, UTF_8);
+			this.out = new PrintStream(process.getOutputStream(), false, StandardCharsets.UTF_8.name());
 
 			errThread = new Thread(new StdErr());
 			errThread.setDaemon(true);
@@ -236,9 +251,11 @@ public class NodejsProcess extends AbstractNodejsProcess {
 	}
 
 	@Override
-	public void sendRequest(Request request) throws TypeScriptException {
-		out.println(request); // add \n for "readline" used by tsserver
-		out.flush();
+	public void sendRequest(String request) throws TypeScriptException {
+		synchronized (outputLock) {
+			out.println(request); // add \n for "readline" used by tsserver
+			out.flush();
+		}
 	}
 
 	/**

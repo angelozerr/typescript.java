@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,24 +10,25 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
+import com.google.gson.JsonObject;
 
-import ts.TypeScriptException;
 import ts.client.CommandNames;
 
 /**
  * Request to recompile the file. All generated outputs (.js, .d.ts or .js.map
  * files) is written on disk.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class CompileOnSaveEmitFileRequest extends FileRequest {
+public class CompileOnSaveEmitFileRequest extends Request<CompileOnSaveEmitFileRequestArgs> {
 
-	public CompileOnSaveEmitFileRequest(String fileName, Boolean forced) {
-		super(CommandNames.compileOnSaveEmitFile, new CompileOnSaveEmitFileRequestArgs(fileName, forced), null);
+	public CompileOnSaveEmitFileRequest(String file, Boolean forced) {
+		super(CommandNames.compileOnSaveEmitFile.getName(), new CompileOnSaveEmitFileRequestArgs(file, forced));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-
+	public Response<?> parseResponse(JsonObject json) {
+		return null;
 	}
 
 }

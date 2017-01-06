@@ -23,7 +23,6 @@ import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
-import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.eclipse.ide.validator.core.validation.TypeScriptValidationHelper;
 import ts.eclipse.ide.validator.internal.ui.Trace;
 
@@ -60,7 +59,7 @@ public class TypeScriptSourceValidator implements IValidator, ISourceValidator {
 		try {
 			IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(file.getProject());
 			IIDETypeScriptFile tsFile = tsProject.openFile(file, document);
-			TypeScriptValidationHelper.validate(tsFile, reporter, this);			
+			TypeScriptValidationHelper.validate(tsFile, reporter, this);
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while TypeScript validation.", e);
 		}

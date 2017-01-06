@@ -10,16 +10,15 @@
  */
 package ts.client;
 
-import com.eclipsesource.json.JsonObject;
-
+import ts.internal.client.protocol.Response;
 import ts.internal.client.protocol.Request;
 
 public interface IInterceptor {
 
-	void handleRequest(Request request, ITypeScriptServiceClient client, String methodName);
+	void handleRequest(Request<?> request, String json, ITypeScriptServiceClient client);
 
-	void handleResponse(JsonObject response, ITypeScriptServiceClient client,
-			String methodName, long ellapsedTime);
+	void handleResponse(Response<?> response, String json,
+			long ellapsedTime, TypeScriptServiceClient typeScriptServiceClient);
 
 	void handleError(Throwable error, ITypeScriptServiceClient client, String methodName,
 			long ellapsedTime);

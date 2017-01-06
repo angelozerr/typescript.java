@@ -20,6 +20,7 @@ import org.eclipse.tm4e.ui.TMUIPlugin;
 import org.eclipse.tm4e.ui.themes.ITheme;
 import org.osgi.framework.Bundle;
 
+import ts.client.quickinfo.QuickInfo;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -44,8 +45,13 @@ public class HTMLTypeScriptPrinter {
 		HTMLTypeScriptPrinter.colorInfoForeground = colorInfoForeground;
 	}
 
-	public static String getQuickInfo(String kind, String kindModifiers, String displayString, String documentation,
+	public static String getQuickInfo(QuickInfo quickInfo,
 			IFile tsFile) {
+		String kind = quickInfo.getKind();
+		String kindModifiers = quickInfo.getKindModifiers();
+		String displayString = quickInfo.getDisplayString();
+		String documentation = quickInfo.getDocumentation();
+		
 		StringBuffer info = new StringBuffer();
 		ImageDescriptor descriptor = null; // TypeScriptImagesRegistry.getTypeScriptImageDescriptor(kind,
 											// kindModifiers, null);

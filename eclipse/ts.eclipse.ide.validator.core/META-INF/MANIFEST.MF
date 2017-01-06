@@ -5,7 +5,7 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-SymbolicName: ts.eclipse.ide.validator.core;singleton:=true
 Bundle-Version: 1.2.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  ts.core,
@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.validation,
  ts.eclipse.ide.core
 Export-Package: ts.eclipse.ide.validator.core,
- ts.eclipse.ide.validator.core.validation
+ ts.eclipse.ide.validator.core.validation,
+ ts.eclipse.ide.validator.internal.core.validation
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.validator.core.TypeScriptValidationCorePlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"

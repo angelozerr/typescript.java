@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -11,26 +11,60 @@
 package ts.internal.client.protocol;
 
 /**
- * Instances of this interface specify a location in a source file: (file, line,
- * character offset), where line and character offset are 1-based.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
 public class FileLocationRequestArgs extends FileRequestArgs {
 
 	/**
-	 * 
-	 * @param fileName
-	 * @param line
-	 *            The line number for the request (1-based).
-	 * @param offset
-	 *            The character offset (on the line) for the request (1-based).
+	 * The line number for the request (1-based).
 	 */
-	public FileLocationRequestArgs(String fileName, int line, int offset) {
-		super(fileName);
-		super.add("line", line);
-		super.add("offset", offset);
+	private final Integer line;
+
+	/**
+	 * The character offset (on the line) for the request (1-based).
+	 */
+	private final Integer offset;
+
+	/**
+	 * Position (can be specified instead of line/offset pair)
+	 */
+	private final Integer position;
+
+	public FileLocationRequestArgs(String file, int line, int offset) {
+		this(file, line, offset, null);
+	}
+
+	public FileLocationRequestArgs(String file, int line, int offset, String projectName) {
+		this(file, line, offset, null, projectName);
+	}
+
+	public FileLocationRequestArgs(String file, int position) {
+		this(file, position, null);
+	}
+
+	public FileLocationRequestArgs(String file, int position, String projectName) {
+		this(file, null, null, position, projectName);
+	}
+
+	private FileLocationRequestArgs(String file, Integer line, Integer offset, Integer position, String projectName) {
+		super(file, projectName);
+		this.line = line;
+		this.offset = offset;
+		this.position = position;
+	}
+
+	public Integer getLine() {
+		return line;
+	}
+
+	public Integer getOffset() {
+		return offset;
+	}
+
+	public Integer getPosition() {
+		return position;
 	}
 
 }

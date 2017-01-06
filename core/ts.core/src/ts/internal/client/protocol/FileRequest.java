@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,23 +10,19 @@
  */
 package ts.internal.client.protocol;
 
-import ts.client.CommandNames;
-import ts.client.ITypeScriptCollector;
-
 /**
- * Request whose sole parameter is a file name.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
-public abstract class FileRequest<C extends ITypeScriptCollector> extends SimpleRequest<C> {
+public abstract class FileRequest<T extends FileRequestArgs> extends Request<T> {
 
-	public FileRequest(CommandNames command, FileRequestArgs args, Integer seq) {
-		super(command, args, seq);
+	public FileRequest(String command, T arguments, Integer seq) {
+		super(command, arguments, seq);
 	}
 
-	public FileRequest(String command, FileRequestArgs args, Integer seq) {
-		super(command, args, seq);
+	public FileRequest(String command, T arguments) {
+		super(command, arguments);
 	}
 
 }

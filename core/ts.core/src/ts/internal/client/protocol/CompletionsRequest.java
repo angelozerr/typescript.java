@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,50 +10,52 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
+import java.lang.reflect.Type;
+import java.util.List;
 
-import ts.TypeScriptException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
+import com.google.gson.JsonObject;
+
 import ts.client.CommandNames;
 import ts.client.ITypeScriptServiceClient;
-import ts.client.completions.ITypeScriptCompletionCollector;
+import ts.client.completions.CompletionEntry;
+import ts.client.completions.ICompletionEntryFactory;
+import ts.client.completions.ICompletionEntryMatcherProvider;
 
 /**
- * Completions request; value of command field is "completions". Given a file
- * location (file, line, col) and a prefix (which may be the empty string),
- * return the possible completions that begin with prefix.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
-public class CompletionsRequest extends FileLocationRequest<ITypeScriptCompletionCollector> {
+public class CompletionsRequest extends FileLocationRequest<CompletionsRequestArgs> {
 
-	private final String fileName;
-	private final int line;
-	private final int offset;
-	private final ITypeScriptServiceClient client;
+	private final transient ICompletionEntryMatcherProvider matcherProvider;
+	private final transient ITypeScriptServiceClient client;
+	private final transient ICompletionEntryFactory factory;
 
-	public CompletionsRequest(String fileName, int line, int offset, String prefix,
-			ITypeScriptCompletionCollector collector, ITypeScriptServiceClient client) {
-		super(CommandNames.Completions, new CompletionsRequestArgs(fileName, line, offset, prefix));
-		super.setCollector(collector);
-		this.fileName = fileName;
-		this.line = line;
-		this.offset = offset;
+	public CompletionsRequest(String fileName, int line, int offset, ICompletionEntryMatcherProvider matcherProvider,
+			ITypeScriptServiceClient client, ICompletionEntryFactory factory) {
+		super(CommandNames.Completions.getName(), new CompletionsRequestArgs(fileName, line, offset, null));
+		this.matcherProvider = matcherProvider;
 		this.client = client;
+		this.factory = factory;
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		ITypeScriptCompletionCollector collector = super.getCollector();
-		JsonArray items = response.get("body").asArray();
-		JsonObject obj = null;
-		for (JsonValue item : items) {
-			obj = (JsonObject) item;
-			collector.addCompletionEntry(obj.getString("name", ""), obj.getString("kind", ""),
-					obj.getString("kindModifiers", ""), obj.getString("sortText", ""), fileName, line, offset, client);
-		}
+	public Response<List<CompletionEntry>> parseResponse(JsonObject json) {
+		String fileName = super.getArguments().getFile();
+		int line = super.getArguments().getLine();
+		int offset = super.getArguments().getOffset();
+		Gson gson = new GsonBuilder()
+				.registerTypeAdapter(CompletionEntry.class, new InstanceCreator<CompletionEntry>() {
+					@Override
+					public CompletionEntry createInstance(Type type) {
+						return factory.create(matcherProvider.getMatcher(), fileName, line, offset, client);
+					}
+				}).create();
+		return gson.fromJson(json, CompletionsResponse.class);
 	}
 
 }

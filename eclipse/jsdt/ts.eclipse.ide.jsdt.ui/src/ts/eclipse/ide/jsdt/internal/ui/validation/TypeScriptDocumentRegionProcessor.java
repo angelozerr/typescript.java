@@ -11,6 +11,7 @@
 package ts.eclipse.ide.jsdt.internal.ui.validation;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
@@ -19,6 +20,9 @@ import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.wst.sse.ui.internal.reconcile.DocumentRegionProcessor;
 import org.eclipse.wst.sse.ui.internal.reconcile.validator.ValidatorStrategy;
 
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
+import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptFoldingStrategy;
 import ts.eclipse.ide.ui.folding.IndentFoldingStrategy;
@@ -33,11 +37,13 @@ import ts.utils.FileUtils;
  */
 public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 
+	private final IResource resource;
 	private final String contentType;
 	private IndentFoldingStrategy foldingStrategy;
 
 	public TypeScriptDocumentRegionProcessor(IResource resource) {
 		this.contentType = getContentType(resource);
+		this.resource = resource;
 	}
 
 	@Override
@@ -133,5 +139,23 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 			}
 		}
 		super.setEntireDocumentDirty(document);
+	}
+	
+	@Override
+	protected void endProcessing() {		
+		super.endProcessing();
+		// Refresh navigation bar/tree used for outline
+		if (resource != null) {
+			try {
+				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(resource.getProject());
+				if (tsProject != null) {
+					IIDETypeScriptFile tsFile = tsProject.getOpenedFile(resource);
+					tsFile.refreshNavBar();					
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
 	}
 }

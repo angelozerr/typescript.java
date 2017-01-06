@@ -14,6 +14,8 @@ package ts.eclipse.ide.jsdt.internal.ui.editor.contentassist;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -27,7 +29,6 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.ide.jsdt.ui.editor.contentassist.TypeScriptContentAssistInvocationContext;
-import ts.eclipse.jface.text.contentassist.CompletionProposalCollector;
 import ts.resources.ITypeScriptFile;
 
 /**
@@ -60,15 +61,11 @@ public class TypeScriptCompletionProposalComputer
 						IDocument document = context.getDocument();
 						ITypeScriptFile tsFile = tsProject.openFile(resource, document);
 						CharSequence prefix = context.computeIdentifierPrefix();
-						
-						// tsserver completion
-						CompletionProposalCollector collector = new JSDTCompletionProposalCollector(position,
-								prefix != null ? prefix.toString() : null,
-								tsProject.getProjectSettings().getCompletionEntryMatcher());
-						tsFile.completions(position, collector);
-						// auto import completion
-						// coll
-						return collector.getProposals();
+
+						String p = prefix != null ? prefix.toString() : "";
+						return tsFile.completions(position, new JSDTCompletionProposalFactory(position, p))
+								.get(5000, TimeUnit.MILLISECONDS).stream().filter(entry -> entry.updatePrefix(p))
+								.collect(Collectors.toList());
 					}
 				}
 			} catch (Exception e) {

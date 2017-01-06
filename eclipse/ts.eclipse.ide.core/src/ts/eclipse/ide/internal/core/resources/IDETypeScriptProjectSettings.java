@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 import ts.client.completions.ICompletionEntryMatcher;
-import ts.client.format.FormatOptions;
+import ts.client.format.FormatCodeSettings;
 import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
@@ -44,7 +44,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	private SaveProjectPreferencesJob savePreferencesJob;
 	private boolean updatingBuildPath;
 	private TslintSettingsStrategy tslintStrategy;
-	private FormatOptions formatOptions;
+	private FormatCodeSettings formatOptions;
 
 	public IDETypeScriptProjectSettings(IDETypeScriptProject tsProject) {
 		super(tsProject.getProject(), TypeScriptCorePlugin.PLUGIN_ID);
@@ -303,11 +303,11 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
-	public FormatOptions getFormatOptions() {
+	public FormatCodeSettings getFormatOptions() {
 		if (formatOptions != null) {
 			return formatOptions;
 		}
-		formatOptions = new FormatOptions();
+		formatOptions = new FormatCodeSettings();
 		// Editor options
 		formatOptions.setConvertTabsToSpaces(super.getBooleanPreferencesValue(
 				TypeScriptCorePreferenceConstants.EDITOR_OPTIONS_CONVERT_TABS_TO_SPACES,

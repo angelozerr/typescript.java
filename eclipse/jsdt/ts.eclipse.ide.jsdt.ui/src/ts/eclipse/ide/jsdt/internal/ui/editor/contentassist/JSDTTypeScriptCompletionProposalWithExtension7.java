@@ -11,10 +11,9 @@ import ts.eclipse.jface.text.contentassist.TypeScriptCompletionProposalWithExten
 public class JSDTTypeScriptCompletionProposalWithExtension7 extends TypeScriptCompletionProposalWithExtension7
 		implements IJavaCompletionProposal {
 
-	public JSDTTypeScriptCompletionProposalWithExtension7(String name, String kind, String kindModifiers,
-			String sortText, int position, String prefix, String fileName, int line, int offset,
-			ICompletionEntryMatcher matcher, ITypeScriptServiceClient client) {
-		super(name, kind, kindModifiers, sortText, position, prefix, fileName, line, offset, matcher, client);
+	public JSDTTypeScriptCompletionProposalWithExtension7(ICompletionEntryMatcher matcher, String fileName, int line,
+			int offset, ITypeScriptServiceClient client, int position, String prefix) {
+		super(matcher, fileName, line, offset, client, position, prefix);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,10 +10,10 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
+import com.google.gson.JsonObject;
 
-import ts.TypeScriptException;
 import ts.client.CommandNames;
+import ts.client.ScriptKindName;
 
 /**
  * Open request; value of command field is "open". Notify the server that the
@@ -22,17 +22,18 @@ import ts.client.CommandNames;
  * the change and/or reload messages) when the file changes. Server does not
  * currently send a response to an open request.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ * 
  */
-public class OpenRequest extends SimpleRequest {
+public class OpenRequest extends Request<OpenRequestArgs> {
 
-	public OpenRequest(String file, String fileContent) {
-		super(CommandNames.Open, new OpenRequestArgs(file, fileContent), null);
+	public OpenRequest(String file, String projectName, String fileContent, ScriptKindName scriptKindName) {
+		super(CommandNames.Open.getName(), new OpenRequestArgs(file, projectName, fileContent, scriptKindName));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		// None response
+	public Response<?> parseResponse(JsonObject json) {
+		// This request doesn't return response.
+		return null;
 	}
 }

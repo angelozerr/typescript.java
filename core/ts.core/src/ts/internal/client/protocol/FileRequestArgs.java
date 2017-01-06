@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,20 +10,34 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
-
 /**
  * Arguments for FileRequest messages.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
-public class FileRequestArgs extends JsonObject {
+public class FileRequestArgs {
 
 	/**
-	 * 
-	 * @param file
-	 *            The file for the request (absolute pathname required).
+	 * The file for the request (absolute pathname required).
 	 */
-	public FileRequestArgs(String file) {
-		super.add("file", file);
+	private final String file;
+
+	/**
+	 * Optional name of project that contains file
+	 */
+	private final String projectFileName;
+
+	public FileRequestArgs(String file, String projectFileName) {
+		this.file = file;
+		this.projectFileName = projectFileName;
 	}
 
+	public String getFile() {
+		return file;
+	}
+
+	public String getProjectFileName() {
+		return projectFileName;
+	}
 }

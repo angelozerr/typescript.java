@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,15 +10,13 @@
  */
 package ts.internal.client.protocol;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
+import com.google.gson.JsonObject;
 
 import ts.client.CommandNames;
-import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
+import ts.client.diagnostics.DiagnosticEvent;
 
 /**
  * Geterr request; value of command field is "geterr". Wait for delay
@@ -28,82 +26,43 @@ import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
  * Repeat with a smaller delay for each subsequent file on the files list. Best
  * practice for an editor is to send a file list containing each file that is
  * currently visible, in most-recently-used order.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class GeterrRequest extends Request<JsonArray, ITypeScriptDiagnosticsCollector> {
+public class GeterrRequest extends Request<GeterrRequestArgs> implements IRequestEventable<DiagnosticEvent> {
 
-	private final static int EVENT_INIT = 0;
-	private final static int EVENT_SYNTAX_DIAG = 4;
-	private final static int EVENT_SEMANTIC_DIAG = 16;
-	private final static int EVENT_FINAL = 20;
+	private final transient List<DiagnosticEvent> events;
 
-	private final Map<String, Integer> stateFiles;
-	private final JsonArray result;
-	private int delay;
-
-	public GeterrRequest(String[] files, int delay, ITypeScriptDiagnosticsCollector collector) {
-		super(CommandNames.Geterr, new GeterrRequestArgs(files, delay), null);
-		this.stateFiles = createStateFiles(files);
-		this.delay = delay;
-		this.result = new JsonArray();
-	}
-
-	private Map<String, Integer> createStateFiles(String[] files) {
-		Map<String, Integer> map = new HashMap<String, Integer>();
-		for (int i = 0; i < files.length; i++) {
-			map.put(files[i], EVENT_INIT);
-		}
-		return map;
-	}
-
-	public Collection<String> getFiles() {
-		return stateFiles.keySet();
-	}
-
-	public int getDelay() {
-		return delay;
-	}
-
-	public void dispose(String file) {
-		synchronized (stateFiles) {
-			stateFiles.remove(file);
-		}
-		synchronized (this) {
-			this.notifyAll();
-		}
+	public GeterrRequest(String[] files, int delay) {
+		super(CommandNames.Geterr.getName(), new GeterrRequestArgs(files, delay));
+		this.events = new ArrayList<>();
 	}
 
 	@Override
-	public boolean complete(JsonObject response) {
-		result.add(response);
+	public Response<?> parseResponse(JsonObject json) {
+		return null;
+	}
 
-		String event = response.getString("event", null);
-		JsonObject body = response.get("body").asObject();
-		String file = body.getString("file", null);
-		Integer mask = stateFiles.get(file);
-		mask = mask.intValue() | ("syntaxDiag".equals(event) ? EVENT_SYNTAX_DIAG : EVENT_SEMANTIC_DIAG);
-		if (mask == EVENT_FINAL) {
-			dispose(file);
-			return true;
-		} else {
-			synchronized (stateFiles) {
-				stateFiles.put(file, mask);
-			}
-			return false;
+	@Override
+	public List<String> getKeys() {
+		String[] files = super.getArguments().getFiles();
+		List<String> keys = new ArrayList<>(files.length * 2);
+		for (String file : files) {
+			keys.add("syntaxDiag_" + file);
+			keys.add("semanticDiag_" + file);
 		}
+		return keys;
 	}
 
 	@Override
-	protected boolean isCompleted() {
-		return stateFiles.isEmpty();
+	public boolean accept(DiagnosticEvent event) {
+		events.add(event);
+		return events.size() > 1;
 	}
 
 	@Override
-	protected JsonArray getResult() throws Exception {
-		return result;
+	public List<DiagnosticEvent> getEvents() {
+		return events;
 	}
 
-	@Override
-	public void collect(JsonObject response) {
-
-	}
 }

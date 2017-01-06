@@ -21,28 +21,39 @@ import ts.client.completions.ICompletionEntryMatcher;
  */
 public class TypeScriptContentProposal extends CompletionEntry implements IContentProposal {
 
-	private final String content;
-	private final String description;
+	private final String prefix;
+	private String content;
+	private String description;
 
-	public TypeScriptContentProposal(String name, String kind, String kindModifiers, String sortText, String prefix,
-			String fileName, int line, int offset, ICompletionEntryMatcher matcher, ITypeScriptServiceClient client) {
-		super(name, kind, kindModifiers, sortText, fileName, line, offset, matcher, client);
-		this.content = name.substring(prefix.length(), name.length());
-		this.description = null;
+	public TypeScriptContentProposal(ICompletionEntryMatcher matcher, String fileName, int line, int offset,
+			ITypeScriptServiceClient client, String prefix) {
+		super(matcher, fileName, line, offset, client);
+		this.prefix = prefix;
 	}
 
 	@Override
 	public String getContent() {
+		initIfNeeded();
 		return content;
+	}
+
+	private void initIfNeeded() {
+		if (content == null) {
+			String name = super.getName();
+			this.content = prefix != null ? name.substring(prefix.length(), name.length()) : name;
+			this.description = null;
+		}
 	}
 
 	@Override
 	public int getCursorPosition() {
+		initIfNeeded();
 		return content.length();
 	}
 
 	@Override
 	public String getDescription() {
+		initIfNeeded();
 		return description;
 	}
 

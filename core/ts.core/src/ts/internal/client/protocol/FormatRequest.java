@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,13 +10,12 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.List;
 
-import ts.TypeScriptException;
+import com.google.gson.JsonObject;
+
+import ts.client.CodeEdit;
 import ts.client.CommandNames;
-import ts.client.format.ITypeScriptFormatCollector;
 
 /**
  * Format request; value of command field is "format". Return response giving
@@ -24,22 +23,19 @@ import ts.client.format.ITypeScriptFormatCollector;
  * order. Applying the edit instructions in reverse to file will result in
  * correctly reformatted text.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
-public class FormatRequest extends FileLocationRequest<ITypeScriptFormatCollector> {
+public class FormatRequest extends AbstractFormatRequest<FormatRequestArgs> {
 
-	public FormatRequest(String fileName, int line, int offset, int endLine, int endOffset,
-			ITypeScriptFormatCollector collector) {
-		super(CommandNames.Format, new FormatRequestArgs(fileName, line, offset, endLine, endOffset));
-		super.setCollector(collector);
+	public FormatRequest(String file, int line, int offset, int endLine, int endOffset) {
+		super(CommandNames.Format.getName(), new FormatRequestArgs(file, line, offset, endLine, endOffset));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		Gson gson = new GsonBuilder().create();
-		FormatResponse a = gson.fromJson(response.toString(), FormatResponse.class);
-		getCollector().format(a.getBody());
+	public Response<List<CodeEdit>> parseResponse(JsonObject json) {
+		return GsonHelper.DEFAULT_GSON.fromJson(json, FormatResponse.class);
 	}
+	
 
 }

@@ -15,17 +15,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import ts.TypeScriptException;
 import ts.client.CommandNames;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
-import ts.client.Location;
 import ts.client.TypeScriptServiceClient;
-import ts.client.codefixes.ITypeScriptGetSupportedCodeFixesCollector;
-import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
-import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
-import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.client.completions.ICompletionEntryMatcher;
+import ts.client.completions.ICompletionEntryMatcherProvider;
+import ts.client.diagnostics.DiagnosticEvent;
+import ts.client.projectinfo.ProjectInfo;
 import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tsc.TypeScriptCompiler;
@@ -36,7 +39,7 @@ import ts.cmd.tslint.TypeScriptLint;
  * TypeScript project implementation.
  *
  */
-public class TypeScriptProject implements ITypeScriptProject {
+public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMatcherProvider {
 
 	private final File projectDir;
 	private ITypeScriptProjectSettings projectSettings;
@@ -58,6 +61,8 @@ public class TypeScriptProject implements ITypeScriptProject {
 
 	private List<String> supportedCodeFixes;
 
+	private ProjectInfo projectInfo;
+
 	public TypeScriptProject(File projectDir, ITypeScriptProjectSettings projectSettings) {
 		this.projectDir = projectDir;
 		this.projectSettings = projectSettings;
@@ -66,6 +71,7 @@ public class TypeScriptProject implements ITypeScriptProject {
 		this.listeners = new ArrayList<ITypeScriptClientListener>();
 		this.serverCapabilities = new HashMap<CommandNames, Boolean>();
 		this.compilerCapabilities = new HashMap<CompilerOptionCapability, Boolean>();
+		this.projectInfo = null;
 	}
 
 	protected void setProjectSettings(ITypeScriptProjectSettings projectSettings) {
@@ -96,96 +102,26 @@ public class TypeScriptProject implements ITypeScriptProject {
 	}
 
 	@Override
-	public void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
-			throws TypeScriptException {
-		ITypeScriptServiceClient client = getClient();
-		file.synch();
-		Location location = file.getLocation(position);
-		int line = location.getLine();
-		int offset = location.getOffset();
-		client.signatureHelp(file.getName(), line, offset, collector);
-	}
-
-	@Override
-	public void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
-			throws TypeScriptException {
-		ITypeScriptServiceClient client = getClient();
-		file.synch();
-		Location location = file.getLocation(position);
-		int line = location.getLine();
-		int offset = location.getOffset();
-		client.quickInfo(file.getName(), line, offset, collector);
-	}
-
-	@Override
-	public void changeFile(ITypeScriptFile file, int start, int end, String newText) throws TypeScriptException {
-		Location loc = file.getLocation(start);
-		int line = loc.getLine();
-		int offset = loc.getOffset();
-		Location endLoc = file.getLocation(end);
-		int endLine = endLoc.getLine();
-		int endOffset = endLoc.getOffset();
-		getClient().changeFile(file.getName(), line, offset, endLine, endOffset, newText);
-	}
-
-	@Override
-	public void geterr(ITypeScriptFile file, int delay, ITypeScriptDiagnosticsCollector collector)
-			throws TypeScriptException {
-		file.synch();
-		getClient().geterr(new String[] { file.getName() }, delay, collector);
-	}
-
-	@Override
-	public void semanticDiagnosticsSync(ITypeScriptFile file, Boolean includeLinePosition,
-			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException {
-		file.synch();
-		getClient().semanticDiagnosticsSync(file.getName(), includeLinePosition, collector);
-	}
-
-	@Override
-	public void syntacticDiagnosticsSync(ITypeScriptFile file, Boolean includeLinePosition,
-			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException {
-		file.synch();
-		getClient().syntacticDiagnosticsSync(file.getName(), includeLinePosition, collector);
-	}
-
-	@Override
-	public void diagnostics(ITypeScriptFile file, ITypeScriptDiagnosticsCollector collector)
-			throws TypeScriptException {
-		file.synch();
-		if (canSupport(CommandNames.SemanticDiagnosticsSync)) {
-			// TypeScript >=2.0.3, uses syntactic/semantic command names which
-			// seems having better performance.
-			getClient().syntacticDiagnosticsSync(file.getName(), true, collector);
-			getClient().semanticDiagnosticsSync(file.getName(), true, collector);
-		} else {
-			getClient().geterr(new String[] { file.getName() }, 0, collector);
-		}
-	}
-
-	@Override
 	public List<String> getSupportedCodeFixes() throws TypeScriptException {
 		if (supportedCodeFixes != null) {
 			return supportedCodeFixes;
 		}
 		if (canSupport(CommandNames.GetSupportedCodeFixes)) {
-			getClient().getSupportedCodeFixes(new ITypeScriptGetSupportedCodeFixesCollector() {
-
-				@Override
-				public void setSupportedCodeFixes(List<String> errorCodes) {
-					supportedCodeFixes = errorCodes;
-				}
-			});
+			try {
+				supportedCodeFixes = getClient().getSupportedCodeFixes().get(5000, TimeUnit.MILLISECONDS);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			supportedCodeFixes = new ArrayList<String>();
 		}
 		return supportedCodeFixes;
 	}
-	
+
 	@Override
-	public boolean canFix(String errorCode) {
+	public boolean canFix(Integer errorCode) {
 		try {
-			return getSupportedCodeFixes().contains(errorCode);
+			return getSupportedCodeFixes().contains(String.valueOf(errorCode));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return false;
@@ -237,7 +173,9 @@ public class TypeScriptProject implements ITypeScriptProject {
 	protected ITypeScriptServiceClient createServiceClient(File projectDir) throws TypeScriptException {
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File tsserverFile = getProjectSettings().getTsserverFile();
-		return new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
+		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
+		client.setCompletionEntryMatcherProvider(this);
+		return client;
 	}
 
 	/**
@@ -404,5 +342,32 @@ public class TypeScriptProject implements ITypeScriptProject {
 			compilerCapabilities.put(option, support);
 		}
 		return support;
+	}
+
+	@Override
+	public ICompletionEntryMatcher getMatcher() {
+		return getProjectSettings().getCompletionEntryMatcher();
+	}
+
+	@Override
+	public CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay)
+			throws TypeScriptException {
+		/*if (projectInfo == null) {
+			CompletableFuture.allOf(getClient().projectInfo(file, null, true), geterrForProjectRequest(file, delay));
+			CompletableFuture<ProjectInfo> projectInfoFuture = getClient().projectInfo(file, null, true);
+			return projectInfoFuture.
+					thenAccept(projectInfo -> return geterrForProjectRequest(file, delay));
+		} else {*/
+		
+		try {
+			ProjectInfo projectInfo = getClient().projectInfo(file, null, true).get(5000, TimeUnit.MILLISECONDS);
+			return getClient().geterrForProject(file, delay, projectInfo);
+		} catch (Exception e) {
+			if (e instanceof TypeScriptException) {
+				throw (TypeScriptException) e;
+			}
+			throw new TypeScriptException(e);
+		}
+		
 	}
 }

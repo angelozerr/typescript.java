@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,98 +10,95 @@
  */
 package ts.client.completions;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import ts.TypeScriptException;
 import ts.TypeScriptKind;
+import ts.client.IKindProvider;
 import ts.client.ITypeScriptServiceClient;
+import ts.client.TextSpan;
 import ts.internal.matcher.LCSS;
 import ts.utils.StringUtils;
 
-public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionEntryDetailsCollector {
+/**
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
+ */
+public class CompletionEntry implements IKindProvider {
 
 	// Negative value ensures subsequence matches have a lower relevance than
 	// standard JDT or template proposals
 	private static final int SUBWORDS_RANGE_START = -9000;
-
 	private static final int minPrefixLengthForTypes = 1;
 
-	private final String name;
-	private final String kind;
-	private final String kindModifiers;
-	private final String sortText;
+	/**
+	 * The symbol's name.
+	 */
+	private String name;
+	/**
+	 * The symbol's kind (such as 'className' or 'parameterName').
+	 */
+	private String kind;
+	/**
+	 * Optional modifiers for the kind (such as 'public').
+	 */
+	private String kindModifiers;
+	/**
+	 * A string that is used for comparing completion items so that they can be
+	 * ordered. This is often the same as the name but may be different in
+	 * certain circumstances.
+	 */
+	private String sortText;
+	/**
+	 * An optional span that indicates the text to be replaced by this
+	 * completion item. If present, this span should be used instead of the
+	 * default one.
+	 */
+	private TextSpan replacementSpan;
+
+	private Boolean isFunction;
+
+	private int relevance;
 
 	private final String fileName;
 	private final int line;
 	private final int offset;
-	private CompletionEntryDetails entryDetails;
-	private final ICompletionEntryMatcher matcher;
-	private int relevance;
-	private final ITypeScriptServiceClient client;
 
-	private Boolean isFunction;
+	private final transient ICompletionEntryMatcher matcher;
+	
+	private final transient ITypeScriptServiceClient client;
 
-	public CompletionEntry(String name, String kind, String kindModifiers, String sortText, String fileName, int line,
-			int offset, ICompletionEntryMatcher matcher, ITypeScriptServiceClient client) {
-		this.name = name;
-		this.kind = kind;
-		this.kindModifiers = kindModifiers;
-		this.sortText = sortText;
+	private List<CompletionEntryDetails> entryDetails;
+
+	public CompletionEntry(ICompletionEntryMatcher matcher, String fileName, int line, int offset,
+			ITypeScriptServiceClient client) {
+		this.matcher = matcher;
 		this.fileName = fileName;
 		this.line = line;
 		this.offset = offset;
-		this.matcher = matcher;
 		this.client = client;
 	}
 
-	@Override
 	public String getName() {
 		return name;
 	}
 
-	@Override
 	public String getKind() {
 		return kind;
 	}
 
-	@Override
 	public String getKindModifiers() {
 		return kindModifiers;
 	}
 
-	@Override
 	public String getSortText() {
 		return sortText;
 	}
 
-	public ICompletionEntryDetails getEntryDetails() throws TypeScriptException {
-		if (entryDetails != null) {
-			return entryDetails;
-		}
-		client.completionEntryDetails(fileName, line, offset, new String[] { name }, this);
-		return this.entryDetails;
-	}
-
-	@Override
-	public void setEntryDetails(String name, String kind, String kindModifiers) {
-		entryDetails = new CompletionEntryDetails(name, kind, kindModifiers);
-	}
-
-	@Override
-	public void addDisplayPart(String text, String kind) {
-		entryDetails.addDisplayPart(text, kind);
-	}
-
-	@Override
-	public void addDocumentation(String text, String kind) {
-		entryDetails.addDocumentation(text, kind);
-	}
-
-	public ICompletionEntryMatcher getMatcher() {
-		return matcher;
-	}
-
-	@Override
-	public int getRelevance() {
-		return relevance;
+	public TextSpan getReplacementSpan() {
+		return replacementSpan;
 	}
 
 	public boolean isFunction() {
@@ -113,7 +110,10 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 		return isFunction;
 	}
 
-	@Override
+	public int getRelevance() {
+		return relevance;
+	}
+
 	public boolean updatePrefix(String prefix) {
 		Integer relevanceBoost = null;
 		int[] bestSequence = null;
@@ -137,7 +137,6 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 					int score = LCSS.scoreSubsequence(bestSequence);
 					relevanceBoost = SUBWORDS_RANGE_START + score;
 				}
-
 			}
 		}
 		if (relevanceBoost != null) {
@@ -150,4 +149,22 @@ public class CompletionEntry implements ICompletionEntry, ITypeScriptCompletionE
 	private boolean startsWithIgnoreCase(String prefix, String name) {
 		return prefix.toUpperCase().startsWith(name.toUpperCase());
 	}
+
+	public ICompletionEntryMatcher getMatcher() {
+		return matcher;
+	}
+
+	public List<CompletionEntryDetails> getEntryDetails() throws TypeScriptException {
+		if (entryDetails != null) {
+			return entryDetails;
+		}
+		try {
+			this.entryDetails = client.completionEntryDetails(fileName, line, offset, new String[] { name }, this)
+					.get(5000, TimeUnit.MILLISECONDS);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return this.entryDetails;
+	}
+
 }

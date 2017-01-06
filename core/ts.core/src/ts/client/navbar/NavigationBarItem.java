@@ -12,16 +12,29 @@ package ts.client.navbar;
 
 import java.util.List;
 
+import ts.client.IKindProvider;
+
 /**
  * Navigation bar item.
  *
  */
-public class NavigationBarItem implements INavigationBarItem {
+public class NavigationBarItem implements IKindProvider {
 
+	/**
+	 * The item's display text.
+	 */
 	private String text;
+
+	/**
+	 * The symbol's kind (such as 'className' or 'parameterName').
+	 */
 	private String kind;
+
+	/**
+	 * Optional modifiers for the kind (such as 'public').
+	 */
 	private String kindModifiers;
-	private List<TextSpan> spans;
+	private List<NavigationTextSpan> spans;
 	private List<NavigationBarItem> childItems;
 	private boolean parentAlreadyUpdated;
 	NavigationBarItem parent;
@@ -44,12 +57,12 @@ public class NavigationBarItem implements INavigationBarItem {
 		this.text = text;
 	}
 
-	public void setSpans(List<TextSpan> spans) {
+	public void setSpans(List<NavigationTextSpan> spans) {
 		this.spans = spans;
 		this.parentAlreadyUpdated = false;
 	}
 
-	public List<TextSpan> getSpans() {
+	public List<NavigationTextSpan> getSpans() {
 		updateParentIfNeeded();
 		return spans;
 	}
@@ -71,7 +84,7 @@ public class NavigationBarItem implements INavigationBarItem {
 				}
 			}
 			if (spans != null) {
-				for (TextSpan span : spans) {
+				for (NavigationTextSpan span : spans) {
 					span.parent = this;
 				}
 			}

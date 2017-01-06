@@ -26,6 +26,7 @@ public interface ICompletionEntryMatcher {
 		}
 
 	};
+	
 	public static ICompletionEntryMatcher START_WITH_MATCHER = new ICompletionEntryMatcher() {
 
 		@Override

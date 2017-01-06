@@ -16,11 +16,15 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
-import ts.TypeScriptException;
+import ts.client.ITypeScriptServiceClient;
+import ts.client.completions.CompletionEntry;
+import ts.client.completions.ICompletionEntryFactory;
+import ts.client.completions.ICompletionEntryMatcher;
 import ts.resources.ITypeScriptFile;
 import ts.resources.ITypeScriptProject;
 import ts.utils.TypeScriptHelper;
@@ -30,6 +34,8 @@ import ts.utils.TypeScriptHelper;
  * completion entries.
  */
 public class TypeScriptContentProposalProvider implements IContentProposalProvider {
+
+	private static final IContentProposal[] EMPTY_PROPOSAL = new IContentProposal[0];
 
 	private final String fileName;
 	private final ITypeScriptProject tsProject;
@@ -42,15 +48,20 @@ public class TypeScriptContentProposalProvider implements IContentProposalProvid
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
 		ITypeScriptFile tsFile = tsProject.getOpenedFile(fileName);
-		String prefix = TypeScriptHelper.getPrefix(contents, position);
-		ContentProposalCollector collector = new ContentProposalCollector(prefix,
-				tsProject.getProjectSettings().getCompletionEntryMatcher());
+		final String prefix = TypeScriptHelper.getPrefix(contents, position);
 		try {
-			tsFile.completions(position, collector);
-		} catch (TypeScriptException e) {
+			return tsFile.completions(position, new ICompletionEntryFactory() {
+
+				@Override
+				public CompletionEntry create(ICompletionEntryMatcher matcher, String fileName, int line, int offset,
+						ITypeScriptServiceClient client) {
+					return new TypeScriptContentProposal(matcher, fileName, line, offset, client, prefix);
+				}
+			}).get(5000, TimeUnit.MILLISECONDS).toArray(EMPTY_PROPOSAL);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return collector.getProposals().toArray(ContentProposalCollector.EMPTY_PROPOSAL);
+		return EMPTY_PROPOSAL;
 	}
 
 	public static List<Integer> readLines(final String input) {

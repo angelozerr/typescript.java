@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import ts.TypeScriptException;
 import ts.client.CommandNames;
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
@@ -34,6 +35,22 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 
 	public static final String ID = "ts.eclipse.ide.core.typeScriptBuilder";
 
+//	private static final ITypeScriptDiagnosticsCollector DIAGNOSTICS_COLLECTOR = new ITypeScriptDiagnosticsCollector() {
+//
+//		@Override
+//		public void addDiagnostic(String event, String filename, String text, int startLine, int startOffset,
+//				int endLine, int endOffset, String category, int code) {
+//			try {
+//				IFile f = WorkbenchResourceUtil.findFileFromWorkspace(filename);
+//				if (f != null && f.exists()) {
+//					TypeScriptResourceUtil.addTscMarker(f, text, IMarker.SEVERITY_ERROR, startLine);
+//				}
+//			} catch (CoreException e) {
+//				TypeScriptCorePlugin.logError(e);
+//			}
+//		}
+//	};
+
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args, final IProgressMonitor monitor)
 			throws CoreException {
@@ -43,17 +60,15 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		}
 
 		IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
-		// incremental or full build
-		switch (kind) {
-		case IncrementalProjectBuilder.AUTO_BUILD:
-		case IncrementalProjectBuilder.INCREMENTAL_BUILD:
-			this.incrementalBuild(tsProject, monitor);
-			break;
-		case IncrementalProjectBuilder.FULL_BUILD:
-			// TODO: how it works? Start several tsc for each TypeScript Root
-			// container?
-			// this.fullBuild(tsProject, monitor);
-			break;
+		if (kind == FULL_BUILD) {
+			fullBuild(tsProject, monitor);
+		} else {
+			IResourceDelta delta = getDelta(getProject());
+			if (delta == null) {
+				fullBuild(tsProject, monitor);
+			} else {
+				incrementalBuild(tsProject, delta, monitor);
+			}
 		}
 		return null;
 	}
@@ -63,23 +78,22 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		ITsconfigBuildPath[] tsContainers = buildPath.getTsconfigBuildPaths();
 		for (int i = 0; i < tsContainers.length; i++) {
 			ITsconfigBuildPath tsContainer = tsContainers[i];
-			try {
-				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
-				if (tsconfig == null || tsconfig.isCompileOnSave()) {
-					tsProject.getCompiler().compile(tsconfig, null);
-				}
-			} catch (TypeScriptException e) {
-				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
-			}
+			/*
+			 * try { IDETsconfigJson tsconfig = tsContainer.getTsconfig(); if
+			 * (tsconfig == null || tsconfig.isCompileOnSave()) {
+			 * tsProject.getCompiler().compile(tsconfig, null); } } catch
+			 * (TypeScriptException e) { Trace.trace(Trace.SEVERE,
+			 * "Error while tsc compilation", e); }
+			 */
 		}
 	}
 
-	private void incrementalBuild(IIDETypeScriptProject tsProject, IProgressMonitor monitor) throws CoreException {
+	private void incrementalBuild(IIDETypeScriptProject tsProject, IResourceDelta delta, IProgressMonitor monitor)
+			throws CoreException {
 
 		final ITypeScriptBuildPath buildPath = tsProject.getTypeScriptBuildPath();
 		final Map<ITsconfigBuildPath, List<IFile>> tsFilesToCompile = new HashMap<ITsconfigBuildPath, List<IFile>>();
 		final Map<ITsconfigBuildPath, List<IFile>> tsFilesToDelete = new HashMap<ITsconfigBuildPath, List<IFile>>();
-		IResourceDelta delta = getDelta(tsProject.getProject());
 		delta.accept(new IResourceDeltaVisitor() {
 
 			@Override
@@ -130,13 +144,28 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		});
 
 		// Compile ts files *.ts
-		if (tsProject.canSupport(CommandNames.compileOnSaveEmitFile)) {
-			// TypeScript >=2.0.5: compile is done with tsserver
-			compileWithTsserver(tsProject, tsFilesToCompile);
-		} else {
-			// TypeScript < 2.0.5: compile is done with tsc which is not very
-			// performant.
-			compileWithTsc(tsProject, tsFilesToCompile);
+		for (Entry<ITsconfigBuildPath, List<IFile>> entries : tsFilesToCompile.entrySet()) {
+			ITsconfigBuildPath tsContainer = entries.getKey();
+			List<IFile> tsFiles = entries.getValue();
+			try {
+				// compile ts files
+				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
+				if (!tsconfig.isBuildOnSave() && tsconfig.isCompileOnSave()
+						&& tsProject.canSupport(CommandNames.compileOnSaveEmitFile)) {
+					// TypeScript >=2.0.5: compile is done with tsserver
+					//compileWithTsserver(tsProject, tsFiles, tsconfig);
+					compileWithTsc(tsProject, tsFiles, tsconfig);
+				} else {
+					// TypeScript < 2.0.5: compile is done with tsc which is not
+					// very
+					// performant.
+					compileWithTsc(tsProject, tsFiles, tsconfig);
+				}
+				// validate ts files with tslint
+				tsProject.getTslint().lint(tsconfig, tsFiles, tsProject.getProjectSettings());
+			} catch (TypeScriptException e) {
+				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
+			}
 		}
 
 		// Delete emitted files *.js, *.js.map
@@ -152,64 +181,64 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 	}
 
 	/**
-	 * Compile the given ts files with tsserver by consumming
-	 * "compileOnSaveEmitFile" command.
-	 * 
-	 * @param tsProject
-	 * @param tsFilesToCompile
-	 * @throws CoreException
-	 */
-	private void compileWithTsserver(IIDETypeScriptProject tsProject,
-			final Map<ITsconfigBuildPath, List<IFile>> tsFilesToCompile) {
-		for (Entry<ITsconfigBuildPath, List<IFile>> entries : tsFilesToCompile.entrySet()) {
-			try {
-				ITsconfigBuildPath tsContainer = entries.getKey();
-				List<IFile> tsFiles = entries.getValue();
-				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
-				if (tsconfig.isCompileOnSave()) {
-					// tsconfig.json defines compileOnSave
-					// loop for each ts files to compile
-					for (IFile tsFile : tsFiles) {
-						try {
-							// compile the current ts file with
-							// "compileOnSaveEmitFile"
-							tsProject.getClient().compileOnSaveEmitFile(WorkbenchResourceUtil.getFileName(tsFile),
-									null);
-							// TODO: Refresh UI
-							TypeScriptResourceUtil.refreshAndCollectEmittedFiles(tsFile, tsconfig, true, null);
-							//tsconfig.getTsconfigFile().getParent().refreshLocal(IResource.DEPTH_INFINITE, null);
-						} catch (TypeScriptException e) {
-							Trace.trace(Trace.SEVERE, "Error while tsserver compilation", e);
-						}
-					}
-				}
-			} catch (Exception e) {
-				Trace.trace(Trace.SEVERE, "Error while tsserver compilation", e);
-			}
-		}
-	}
-
-	/**
 	 * Compile the given ts files with tsc.
 	 * 
 	 * @param tsProject
-	 * @param tsFilesToCompile
+	 * @param tsFiles
+	 * @param tsconfig
+	 * @throws TypeScriptException
 	 * @throws CoreException
 	 */
-	private void compileWithTsc(IIDETypeScriptProject tsProject,
-			final Map<ITsconfigBuildPath, List<IFile>> tsFilesToCompile) throws CoreException {
-		for (Entry<ITsconfigBuildPath, List<IFile>> entries : tsFilesToCompile.entrySet()) {
-			ITsconfigBuildPath tsContainer = entries.getKey();
-			List<IFile> tsFiles = entries.getValue();
+	public void compileWithTsc(IIDETypeScriptProject tsProject, List<IFile> tsFiles, IDETsconfigJson tsconfig)
+			throws TypeScriptException, CoreException {
+		tsProject.getCompiler().compile(tsconfig, tsFiles);
+	}
+
+	/**
+	 * Compile the given ts files with tsserver by consumming
+	 * "compileOnSaveEmitFile" tsserver command.
+	 * 
+	 * @param tsProject
+	 * @param tsFiles
+	 * @param tsconfig
+	 * @throws CoreException
+	 */
+	private void compileWithTsserver(IIDETypeScriptProject tsProject, List<IFile> tsFiles, IDETsconfigJson tsconfig)
+			throws CoreException {
+		for (final IFile file : tsFiles) {
 			try {
-				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
-				// compile ts files
-				tsProject.getCompiler().compile(tsconfig, tsFiles);
-				// validate ts files with tslint
-				tsProject.getTslint().lint(tsconfig, tsFiles, tsProject.getProjectSettings());
+				IIDETypeScriptFile tsFile = tsProject.getOpenedFile(file);
+				// delete marker for the given ts file
+				TypeScriptResourceUtil.deleteTscMarker(file);
+				// compile the current ts file with "compileOnSaveEmitFile"
+				tsFile.compileOnSaveEmitFile(null);
+				// Refresh of js file, map file cannot work.
+				// See
+				TypeScriptResourceUtil.refreshAndCollectEmittedFiles(file, tsconfig, true, null);
 			} catch (TypeScriptException e) {
-				Trace.trace(Trace.SEVERE, "Error while tsc compilation", e);
+				Trace.trace(Trace.SEVERE, "Error while tsserver compilation", e);
 			}
 		}
+		
+		try {
+			tsProject.geterrForProject(WorkbenchResourceUtil.getFileName(tsFiles.get(0)), 0).thenAccept(events -> {
+				System.err.println(events);
+			});
+		} catch (TypeScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			tsProject.geterrForProject(WorkbenchResourceUtil.getFileName(tsFiles.get(0)), 0);
+		} catch (TypeScriptException e) {
+			Trace.trace(Trace.SEVERE, "Error while tsserver compilation", e);
+		}
+//		try {
+//			tsProject.getClient().projectInfo("", WorkbenchResourceUtil.getFileName(tsconfig.getTsconfigFile()), true);
+//		} catch (TypeScriptException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 }

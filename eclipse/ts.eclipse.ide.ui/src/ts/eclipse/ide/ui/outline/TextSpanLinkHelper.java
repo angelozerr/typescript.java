@@ -8,27 +8,27 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.navigator.ILinkHelper;
 
 import ts.client.navbar.NavigationBarItem;
-import ts.client.navbar.TextSpan;
+import ts.client.navbar.NavigationTextSpan;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 
 public class TextSpanLinkHelper implements ILinkHelper {
 
 	@Override
 	public void activateEditor(IWorkbenchPage page, IStructuredSelection selection) {
-		TextSpan span = getSpan(selection);
+		NavigationTextSpan span = getSpan(selection);
 		if (span != null) {
 			IFile file = null;
 			EditorUtils.openInEditor(file, span);
 		}
 	}
 
-	private TextSpan getSpan(IStructuredSelection selection) {
+	private NavigationTextSpan getSpan(IStructuredSelection selection) {
 		if (selection.isEmpty()) {
 			return null;
 		}
 		Object element = selection.getFirstElement();
-		if (element instanceof TextSpan) {
-			return (TextSpan) element;
+		if (element instanceof NavigationTextSpan) {
+			return (NavigationTextSpan) element;
 		}
 		if (element instanceof NavigationBarItem) {
 			NavigationBarItem item = (NavigationBarItem) element;

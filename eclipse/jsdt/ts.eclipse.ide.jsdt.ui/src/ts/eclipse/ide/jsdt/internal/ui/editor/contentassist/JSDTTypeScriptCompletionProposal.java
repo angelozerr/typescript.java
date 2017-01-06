@@ -10,10 +10,9 @@ import ts.eclipse.jface.text.contentassist.TypeScriptCompletionProposal;
 
 public class JSDTTypeScriptCompletionProposal extends TypeScriptCompletionProposal implements IJavaCompletionProposal {
 
-	public JSDTTypeScriptCompletionProposal(String name, String kind, String kindModifiers, String sortText,
-			int position, String prefix, String fileName, int line, int offset, ICompletionEntryMatcher matcher,
-			ITypeScriptServiceClient client) {
-		super(name, kind, kindModifiers, sortText, position, prefix, fileName, line, offset, matcher, client);
+	public JSDTTypeScriptCompletionProposal(ICompletionEntryMatcher matcher, String fileName, int line, int offset,
+			ITypeScriptServiceClient client, int position, String prefix) {
+		super(matcher, fileName, line, offset, client, position, prefix);
 	}
 
 	@Override

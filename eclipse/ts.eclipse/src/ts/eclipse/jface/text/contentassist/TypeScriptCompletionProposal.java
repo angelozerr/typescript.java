@@ -1,14 +1,3 @@
-/**
- *  Copyright (c) 2015-2016 Angelo ZERR.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  Contributors:
- *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- */
-
 package ts.eclipse.jface.text.contentassist;
 
 import java.util.List;
@@ -22,7 +11,6 @@ import org.eclipse.jface.text.IPositionUpdater;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
-//import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -51,24 +39,18 @@ import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.CompletionEntry;
-import ts.client.completions.ICompletionEntryDetails;
+import ts.client.completions.CompletionEntryDetails;
 import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.SymbolDisplayPart;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
-import ts.eclipse.jface.text.HoverControlCreator;
 import ts.utils.StringUtils;
 import ts.utils.TypeScriptHelper;
 
-/**
- * {@link ICompletionProposal} implementation with TypeScript completion entry.
- */
 public class TypeScriptCompletionProposal extends CompletionEntry
 		implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2,
 		ICompletionProposalExtension3, ICompletionProposalExtension6 {
 
-	public static final String TAB = "\t";
-	public static final String SPACE = " ";
-
+	private static final String SPACE = " ";
 	private static final String RPAREN = ")";
 	private static final String LPAREN = "(";
 	private static final String COMMA = ",";
@@ -88,12 +70,22 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	private Arguments arguments;
 	private ITextViewer fTextViewer;
-	private HoverControlCreator tsControlCreator;
 
-	public TypeScriptCompletionProposal(String name, String kind, String kindModifiers, String sortText, int position,
-			String prefix, String fileName, int line, int offset, ICompletionEntryMatcher matcher,
-			ITypeScriptServiceClient client) {
-		super(name, kind, kindModifiers, sortText, fileName, line, offset, matcher, client);
+	private int position;
+	private String prefix;
+
+	public TypeScriptCompletionProposal(ICompletionEntryMatcher matcher, String fileName, int line, int offset,
+			ITypeScriptServiceClient client, int position, String prefix) {
+		super(matcher, fileName, line, offset, client);
+		this.position = position;
+		this.prefix = prefix;
+	}
+
+	private void initIfNeeded() {
+		if (fReplacementString != null) {
+			return;
+		}
+		String name = super.getName();
 		fReplacementString = name;
 		this.cursorPosition = name.length();
 		this.replacementOffset = position - prefix.length();
@@ -108,6 +100,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public void apply(IDocument document) {
+		initIfNeeded();
 		CompletionProposal proposal = new CompletionProposal(getReplacementString(), getReplacementOffset(),
 				getReplacementLength(), getCursorPosition(), getImage(), getDisplayString(), getContextInformation(),
 				getAdditionalProposalInfo());
@@ -116,6 +109,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public void apply(IDocument document, char trigger, int offset) {
+		initIfNeeded();
 		// compute replacement string
 		String replacement = computeReplacementString(document, offset);
 		setReplacementString(replacement);
@@ -191,8 +185,8 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 		try {
 			if (super.isFunction()) {
-				ICompletionEntryDetails entryDetails = super.getEntryDetails();
-				if (entryDetails != null) {
+				List<CompletionEntryDetails> entryDetails = super.getEntryDetails();
+				if (entryDetails != null && entryDetails.size() > 0) {
 					// It's a function
 					// compute replacement string
 
@@ -202,8 +196,8 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 					StringBuilder replacement = new StringBuilder(super.getName());
 					replacement.append(LPAREN);
 					setCursorPosition(replacement.length());
-					computeReplacementString(entryDetails.getDisplayParts(), replacement, arguments, indentation, 1,
-							true);
+					computeReplacementString(entryDetails.get(0).getDisplayParts(), replacement, arguments, indentation,
+							1, true);
 					replacement.append(RPAREN);
 					return replacement.toString();
 				}
@@ -316,7 +310,9 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		}
 	}
 
+	@Override
 	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
+		initIfNeeded();
 		IDocument document = viewer.getDocument();
 		if (fTextViewer == null) {
 			fTextViewer = viewer;
@@ -367,20 +363,22 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public String getAdditionalProposalInfo() {
+		initIfNeeded();
 		try {
-			ICompletionEntryDetails details = getEntryDetails();
-			if (details == null) {
+			List<CompletionEntryDetails> details = super.getEntryDetails();
+			if (details == null || details.size() < 1) {
 				return null;
 			}
-			String html = TypeScriptHelper.text(details.getDocumentation());
+			CompletionEntryDetails firstDetails = details.get(0);
+			String html = TypeScriptHelper.text(firstDetails.getDocumentation());
 			if (StringUtils.isEmpty(html)) {
-				html = TypeScriptHelper.text(details.getDisplayParts());
+				html = TypeScriptHelper.text(firstDetails.getDisplayParts());
 			}
 			return html;
 		} catch (TypeScriptException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return "";
 	}
 
 	@Override
@@ -396,12 +394,13 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	private IContextInformation createContextInformation() {
 		try {
 			String information = null;
-			ICompletionEntryDetails entryDetails = super.getEntryDetails();
-			if (entryDetails == null) {
+			List<CompletionEntryDetails> entryDetails = super.getEntryDetails();
+			if (entryDetails == null || entryDetails.size()  < 1) {
 				return null;
 			}
 			if (isFunction()) {
-				information = TypeScriptHelper.extractFunctionParameters(entryDetails.getDisplayParts());
+				information =
+				TypeScriptHelper.extractFunctionParameters(entryDetails.get(0).getDisplayParts());
 			}
 			return information != null ? new ContextInformation("", information) : null;
 		} catch (TypeScriptException e) {
@@ -411,6 +410,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public int getContextInformationPosition() {
+		initIfNeeded();
 		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=110355
 		// return getCursorPosition();
 		if (getContextInformation() == null)
@@ -420,6 +420,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public String getDisplayString() {
+		initIfNeeded();
 		if (fDisplayString != null) {
 			return fDisplayString.getString();
 		}
@@ -433,6 +434,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public Point getSelection(IDocument document) {
+		initIfNeeded();
 		// CompletionProposal proposal = new
 		// CompletionProposal(getReplacementString(), getReplacementOffset(),
 		// getReplacementLength(), getCursorPosition(), getImage(),
@@ -476,6 +478,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public int getPrefixCompletionStart(IDocument document, int completionOffset) {
+		initIfNeeded();
 		return replacementOffset;
 	}
 
@@ -496,6 +499,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public boolean validate(IDocument document, int offset, DocumentEvent event) {
+		initIfNeeded();
 		if (offset < replacementOffset) {
 			return false;
 		}
@@ -572,6 +576,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public StyledString getStyledDisplayString() {
+		initIfNeeded();
 		return fDisplayString;
 	}
 
@@ -682,4 +687,5 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	private String getCategory() {
 		return "TypeScriptCompletionProposal_" + toString(); //$NON-NLS-1$
 	}
+
 }

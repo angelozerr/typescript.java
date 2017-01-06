@@ -20,8 +20,9 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import ts.client.TextSpan;
 import ts.client.navbar.NavigationBarItem;
-import ts.client.navbar.TextSpan;
+import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 public class EditorUtils {
@@ -81,8 +82,8 @@ public class EditorUtils {
 				}
 				if (textEditor != null) {
 					IDocument document = textEditor.getDocumentProvider().getDocument(editor.getEditorInput());
-					int start = document.getLineOffset(startLine - 1) + startOffset - 1;
-					int end = document.getLineOffset(endLine - 1) + endOffset - 1;
+					int start = DocumentUtils.getPosition(document, startLine, startOffset);
+					int end = DocumentUtils.getPosition(document, endLine, endOffset);
 					int length = end - start;
 					textEditor.selectAndReveal(start, length);
 					page.activate(editor);
@@ -165,6 +166,12 @@ public class EditorUtils {
 	public static void openInEditor(IFile file, TextSpan span) {
 		openInEditor(file, span.getStart().getLine(), span.getStart().getOffset(), span.getEnd().getLine(),
 				span.getEnd().getOffset(), true);
+	}
+
+	public static void openInEditor(File file, TextSpan span) {
+		openInEditor(file, span.getStart().getLine(), span.getStart().getOffset(), span.getEnd().getLine(),
+				span.getEnd().getOffset(), true);
+
 	}
 
 }

@@ -8,7 +8,6 @@ import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
 import ts.TypeScriptException;
 import ts.client.Location;
-import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
 import ts.cmd.ITypeScriptLinterHandler;
 import ts.cmd.Severity;
 import ts.cmd.tslint.TslintHelper;
@@ -19,7 +18,7 @@ import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 
 public class TypeScriptReporterCollector extends NodejsProcessAdapter
-		implements ITypeScriptDiagnosticsCollector, ITypeScriptLinterHandler, INodejsProcessListener {
+		implements ITypeScriptLinterHandler, INodejsProcessListener {
 
 	private static final String CHAR_END = "charEnd";
 	private static final String CHAR_START = "charStart";
@@ -36,10 +35,11 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 		this.validator = validator;
 	}
 
-	@Override
 	public void addDiagnostic(String event, String file, String text, int startLine, int startOffset, int endLine,
-			int endOffset, String category, int code) {
+			int endOffset, String category, Integer code) {
 		try {
+			IIDETypeScriptFile tsFile = file != null ? (IIDETypeScriptFile) this.tsFile.getProject().getOpenedFile(file)
+					: this.tsFile;
 			IResource resource = tsFile.getResource();
 			int start = tsFile.getPosition(startLine, startOffset);
 			int end = tsFile.getPosition(endLine, endOffset);
@@ -50,22 +50,23 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 					start = start - 1;
 				}
 			}
-			// TODO: severity
 			LocalizedMessage message = new LocalizedMessage(getSeverity(category), text, resource);
 			message.setOffset(start);
 			message.setLength(end - start);
 			message.setAttribute(CHAR_START, start);
 			message.setAttribute(CHAR_END, end);
 			message.setLineNo(startLine - 1);
-			message.setAttribute("tsCode", code);
+			if (code != null) {
+				message.setAttribute("tsCode", code);
+			}
 			reporter.addMessage(validator, message);
 		} catch (TypeScriptException e) {
 			Trace.trace(Trace.SEVERE, "Error while reporting error", e);
 		}
 	}
 
-	private int getSeverity(String severity) {
-		return WARNING_SEVERITY.equals(severity) ? IMessage.NORMAL_SEVERITY : IMessage.HIGH_SEVERITY;
+	private int getSeverity(String category) {
+		return WARNING_SEVERITY.equals(category) ? IMessage.NORMAL_SEVERITY : IMessage.HIGH_SEVERITY;
 	}
 
 	@Override

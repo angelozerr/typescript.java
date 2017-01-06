@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import ts.client.completions.ICompletionEntry;
+import ts.client.completions.CompletionEntry;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 
 /**
@@ -40,8 +40,8 @@ public class TypeScriptLabelProvider extends LabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof ICompletionEntry) {
-			ICompletionEntry item = ((ICompletionEntry) element);
+		if (element instanceof CompletionEntry) {
+			CompletionEntry item = ((CompletionEntry) element);
 			return TypeScriptImagesRegistry.getImage(item);
 		}
 		return super.getImage(element);

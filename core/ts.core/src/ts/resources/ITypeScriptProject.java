@@ -11,15 +11,13 @@
 package ts.resources;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import ts.TypeScriptException;
 import ts.client.CommandNames;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
-import ts.client.codefixes.ITypeScriptGetSupportedCodeFixesCollector;
-import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
-import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
-import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
+import ts.client.diagnostics.DiagnosticEvent;
 import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
@@ -46,29 +44,10 @@ public interface ITypeScriptProject {
 	 */
 	ITypeScriptCompiler getCompiler() throws TypeScriptException;
 
-	void signatureHelp(ITypeScriptFile file, int position, ITypeScriptSignatureHelpCollector collector)
-			throws TypeScriptException;
-
-	void quickInfo(ITypeScriptFile file, int position, ITypeScriptQuickInfoCollector collector)
-			throws TypeScriptException;
-
-	void changeFile(ITypeScriptFile tsFile, int start, int end, String newText) throws TypeScriptException;
-
-	void geterr(ITypeScriptFile tsFile, int delay, ITypeScriptDiagnosticsCollector collector)
-			throws TypeScriptException;
-
-	void semanticDiagnosticsSync(ITypeScriptFile tsFile, Boolean includeLinePosition,
-			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
-
-	void syntacticDiagnosticsSync(ITypeScriptFile tsFile, Boolean includeLinePosition,
-			ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
-
-	void diagnostics(ITypeScriptFile tsFile, ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
-
 	List<String> getSupportedCodeFixes() throws TypeScriptException;
-	
-	boolean canFix(String errorCode);
-	
+
+	boolean canFix(Integer errorCode);
+
 	ITypeScriptFile getOpenedFile(String fileName);
 
 	void dispose() throws TypeScriptException;
@@ -122,4 +101,6 @@ public interface ITypeScriptProject {
 	 *         otherwise.
 	 */
 	boolean canSupport(CompilerOptionCapability option);
+
+	CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay) throws TypeScriptException;
 }

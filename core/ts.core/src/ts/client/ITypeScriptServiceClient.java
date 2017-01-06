@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,20 +10,23 @@
  */
 package ts.client;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import ts.TypeScriptException;
-import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
-import ts.client.codefixes.ITypeScriptGetSupportedCodeFixesCollector;
-import ts.client.completions.ITypeScriptCompletionCollector;
-import ts.client.completions.ITypeScriptCompletionEntryDetailsCollector;
-import ts.client.definition.ITypeScriptDefinitionCollector;
-import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
-import ts.client.format.ITypeScriptFormatCollector;
-import ts.client.navbar.ITypeScriptNavBarCollector;
-import ts.client.occurrences.ITypeScriptOccurrencesCollector;
-import ts.client.quickinfo.ITypeScriptQuickInfoCollector;
-import ts.client.references.ITypeScriptReferencesCollector;
-import ts.client.signaturehelp.ITypeScriptSignatureHelpCollector;
-import ts.internal.client.protocol.ConfigureRequestArguments;
+import ts.client.codefixes.CodeAction;
+import ts.client.completions.CompletionEntry;
+import ts.client.completions.CompletionEntryDetails;
+import ts.client.completions.ICompletionEntryFactory;
+import ts.client.configure.ConfigureRequestArguments;
+import ts.client.diagnostics.DiagnosticEvent;
+import ts.client.diagnostics.DiagnosticEventBody;
+import ts.client.navbar.NavigationBarItem;
+import ts.client.occurrences.OccurrencesResponseItem;
+import ts.client.projectinfo.ProjectInfo;
+import ts.client.quickinfo.QuickInfo;
+import ts.client.references.ReferencesResponseBody;
+import ts.client.signaturehelp.SignatureHelpItems;
 
 /**
  * TypeScript client API which communicates with tsserver.
@@ -33,45 +36,225 @@ import ts.internal.client.protocol.ConfigureRequestArguments;
  */
 public interface ITypeScriptServiceClient {
 
-	void openFile(String fileName, String contents) throws TypeScriptException;
+	/**
+	 * Open the given file name.
+	 * 
+	 * @param fileName
+	 * @param content
+	 * @throws TypeScriptException
+	 */
+	void openFile(String fileName, String content) throws TypeScriptException;
 
+	/**
+	 * Open the given file name.
+	 * 
+	 * @param fileName
+	 * @param content
+	 * @param scriptKindName
+	 * @throws TypeScriptException
+	 */
+	void openFile(String fileName, String content, ScriptKindName scriptKindName) throws TypeScriptException;
+
+	/**
+	 * Close the given file name.
+	 * 
+	 * @param fileName
+	 * @param content
+	 * @throws TypeScriptException
+	 */
 	void closeFile(String fileName) throws TypeScriptException;
+
+	/**
+	 * Change file content at the given positions.
+	 * 
+	 * @param fileName
+	 * @param position
+	 * @param endPosition
+	 * @param insertString
+	 * @throws TypeScriptException
+	 */
+	// void changeFile(String fileName, int position, int endPosition, String
+	// insertString) throws TypeScriptException;
+
+	/**
+	 * Change file content at the given lines/offsets.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @param endLine
+	 * @param endOffset
+	 * @param insertString
+	 * @throws TypeScriptException
+	 */
+	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String insertString)
+			throws TypeScriptException;
 
 	void updateFile(String fileName, String newText) throws TypeScriptException;
 
-	void completions(String fileName, int line, int offset, String prefix, ITypeScriptCompletionCollector collector)
+	/**
+	 * Completion for the given fileName at the given position.
+	 * 
+	 * @param fileName
+	 * @param position
+	 * @return completion for the given fileName at the given position.
+	 * @throws TypeScriptException
+	 */
+	// CompletableFuture<List<CompletionEntry>> completions(String fileName, int
+	// position) throws TypeScriptException;
+
+	/**
+	 * Completion for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @return completion for the given fileName at the given line/offset
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<List<CompletionEntry>> completions(String fileName, int line, int offset)
 			throws TypeScriptException;
 
-	void completionEntryDetails(String fileName, int line, int offset, String[] entryNames,
-			ITypeScriptCompletionEntryDetailsCollector collector) throws TypeScriptException;
+	CompletableFuture<List<CompletionEntry>> completions(String name, int line, int offset,
+			ICompletionEntryFactory instanceCreator) throws TypeScriptException;
 
-	void definition(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
+	CompletableFuture<List<CompletionEntryDetails>> completionEntryDetails(String fileName, int line, int offset,
+			String[] entryNames, CompletionEntry completionEntry) throws TypeScriptException;
+
+	/**
+	 * Definition for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<List<FileSpan>> definition(String fileName, int line, int offset) throws TypeScriptException;
+
+	/**
+	 * Signature help for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<SignatureHelpItems> signatureHelp(String fileName, int line, int offset)
 			throws TypeScriptException;
 
-	void signatureHelp(String fileName, int line, int offset, ITypeScriptSignatureHelpCollector collector)
+	/**
+	 * Quick info for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<QuickInfo> quickInfo(String fileName, int line, int offset) throws TypeScriptException;
+
+	CompletableFuture<List<DiagnosticEvent>> geterr(String[] files, int delay) throws TypeScriptException;
+
+	CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay, ProjectInfo projectInfo)
 			throws TypeScriptException;
 
-	void quickInfo(String fileName, int line, int offset, ITypeScriptQuickInfoCollector collector)
+	/**
+	 * Format for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @param endLine
+	 * @param endOffset
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<List<CodeEdit>> format(String fileName, int line, int offset, int endLine, int endOffset)
 			throws TypeScriptException;
 
-	void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String newText)
+	/**
+	 * Find references for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<ReferencesResponseBody> references(String fileName, int line, int offset)
 			throws TypeScriptException;
 
-	void geterr(String[] files, int delay, ITypeScriptDiagnosticsCollector collector) throws TypeScriptException;
-
-	void format(String fileName, int line, int offset, int endLine, int endOffset, ITypeScriptFormatCollector collector)
+	/**
+	 * Find occurrences for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset)
 			throws TypeScriptException;
 
-	void references(String fileName, int line, int offset, ITypeScriptReferencesCollector collector)
+	CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider)
 			throws TypeScriptException;
 
-	void occurrences(String fileName, int line, int offset, ITypeScriptOccurrencesCollector collector)
+	void configure(ConfigureRequestArguments arguments) throws TypeScriptException;
+
+	CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList)
 			throws TypeScriptException;
 
-	void navbar(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
+	// Since 2.0.3
+
+	/**
+	 * Execute semantic diagnostics for the given file.
+	 * 
+	 * @param includeLinePosition
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(String file, Boolean includeLinePosition)
 			throws TypeScriptException;
 
-	void join() throws InterruptedException;
+	/**
+	 * Execute syntactic diagnostics for the given file.
+	 * 
+	 * @param includeLinePosition
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(String file, Boolean includeLinePosition)
+			throws TypeScriptException;
+
+	// Since 2.0.5
+
+	void compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException;
+
+	// Since 2.0.6
+
+	CompletableFuture<NavigationBarItem> navtree(String fileName, IPositionProvider positionProvider)
+			throws TypeScriptException;
+
+	// Since 2.1.0
+
+	CompletableFuture<List<CodeAction>> getCodeFixes(String fileName, IPositionProvider positionProvider, int startLine,
+			int startOffset, int endLine, int endOffset, List<Integer> errorCodes) throws TypeScriptException;
+
+	CompletableFuture<List<String>> getSupportedCodeFixes() throws TypeScriptException;
+
+	//
+	/**
+	 * Definition for the given fileName at the given line/offset.
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param offset
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<List<FileSpan>> implementation(String fileName, int line, int offset) throws TypeScriptException;
 
 	void addClientListener(ITypeScriptClientListener listener);
 
@@ -81,37 +264,10 @@ public interface ITypeScriptServiceClient {
 
 	void removeInterceptor(IInterceptor interceptor);
 
-	void dispose();
+	void join() throws InterruptedException;
 
 	boolean isDisposed();
 
-	void configure(ConfigureRequestArguments arguments) throws TypeScriptException;
-
-	// Since 2.0.3
-
-	void semanticDiagnosticsSync(String file, Boolean includeLinePosition, ITypeScriptDiagnosticsCollector collector)
-			throws TypeScriptException;
-
-	void syntacticDiagnosticsSync(String file, Boolean includeLinePosition, ITypeScriptDiagnosticsCollector collector)
-			throws TypeScriptException;
-
-	// Since 2.0.5
-
-	void compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException;
-
-	// Since 2.0.6
-
-	void navtree(String fileName, IPositionProvider positionProvider, ITypeScriptNavBarCollector collector)
-			throws TypeScriptException;
-
-	// Since 2.1.0
-
-	void getCodeFixes(String fileName, IPositionProvider positionProvider, int startLine, int startOffset, int endLine,
-			int endOffset, String[] errorCodes, ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException;
-
-	void getSupportedCodeFixes(ITypeScriptGetSupportedCodeFixesCollector collector) throws TypeScriptException;
-
-	void implementation(String fileName, int line, int offset, ITypeScriptDefinitionCollector collector)
-			throws TypeScriptException;
+	void dispose();
 
 }

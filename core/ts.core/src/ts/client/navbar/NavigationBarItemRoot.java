@@ -10,6 +10,7 @@
  */
 package ts.client.navbar;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -18,8 +19,20 @@ import java.util.List;
  */
 public class NavigationBarItemRoot extends NavigationBarItem {
 
+	private boolean navtree;
+
+	public NavigationBarItemRoot(NavigationBarItem item) {
+		this(Arrays.asList(item));
+		this.navtree = true;
+	}
+
 	public NavigationBarItemRoot(List<NavigationBarItem> items) {
 		setChildItems(items);
+		this.navtree = false;
+	}
+
+	public boolean isNavTree() {
+		return navtree;
 	}
 
 }

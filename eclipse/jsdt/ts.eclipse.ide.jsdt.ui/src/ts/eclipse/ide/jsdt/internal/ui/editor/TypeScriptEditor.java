@@ -75,16 +75,13 @@ import org.eclipse.wst.jsdt.internal.ui.javaeditor.ToggleCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
-import ts.TypeScriptException;
-import ts.TypeScriptNoContentAvailableException;
-import ts.client.ICancellationToken;
-import ts.client.ITypeScriptAsynchCollector;
 import ts.client.Location;
 import ts.client.navbar.NavigationBarItem;
-import ts.client.occurrences.ITypeScriptOccurrencesCollector;
+import ts.client.occurrences.OccurrencesResponseItem;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
+import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
@@ -654,13 +651,11 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		}
 	}
 
-	class OccurrencesCollector
-			implements ITypeScriptOccurrencesCollector, ITypeScriptAsynchCollector, ICancellationToken {
+	class OccurrencesCollector {
 
 		private IDocument document;
 		private List<Position> positions;
 		private ITextSelection selection;
-		private boolean canceled;
 
 		public OccurrencesCollector() {
 			this.positions = new ArrayList<Position>();
@@ -670,48 +665,32 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			this.document = document;
 		}
 
-		@Override
+		// @Override
 		public void startCollect() {
 			this.positions.clear();
 		}
 
-		@Override
+		// @Override
 		public void endCollect() {
 			fOccurrencesFinderJob = new OccurrencesFinderJob(document, positions.toArray(new Position[0]), selection);
 			fOccurrencesFinderJob.run(new NullProgressMonitor());
 		}
 
-		@Override
-		public void addOccurrence(String file, int startLine, int startOffset, int endLine, int endOffset,
-				boolean isWriteAccess) throws TypeScriptException {
+		public void addOccurrence(OccurrencesResponseItem occurrence) {
 			try {
-				int start = document.getLineOffset(startLine - 1) + startOffset - 1;
-				int end = document.getLineOffset(endLine - 1) + endOffset - 1;
+				int start = DocumentUtils.getPosition(document, occurrence.getStart());
+				int end = DocumentUtils.getPosition(document, occurrence.getEnd());
 				int offset = start;
 				int length = end - start;
 				positions.add(new Position(offset, length));
-			} catch (BadLocationException e) {
-				Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
+			} catch (Exception e) {
+				// Trace.trace(Trace.SEVERE, "Error while getting TypeScript
+				// occurrences.", e);
 			}
 		}
 
 		public void setSelection(ITextSelection selection) {
 			this.selection = selection;
-		}
-
-		@Override
-		public boolean isCancellationRequested() {
-			return canceled;
-		}
-
-		@Override
-		public void onError(TypeScriptException e) {
-			if (e instanceof TypeScriptNoContentAvailableException) {
-				// tsserver throws this error when the tsserver returns nothing
-				// Ignore this error
-			} else {
-				Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
-			}
 		}
 	}
 
@@ -746,8 +725,17 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			ITypeScriptFile tsFile = getTypeScriptFile(document);
 			if (tsFile != null) {
 				occurrencesCollector.setSelection(selection);
-				tsFile.occurrences(selection.getOffset(), occurrencesCollector);
+
+				tsFile.occurrences(selection.getOffset()).thenAccept(occurrences -> {
+					occurrencesCollector.startCollect();
+
+					for (OccurrencesResponseItem occurrence : occurrences) {
+						occurrencesCollector.addOccurrence(occurrence);
+					}
+					occurrencesCollector.endCollect();
+				});
 			}
+
 		} catch (Exception e) {
 			Trace.trace(Trace.SEVERE, "Error while getting TypeScript occurrences.", e);
 		}

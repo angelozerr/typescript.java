@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,26 +10,29 @@
  */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonObject;
+import com.google.gson.JsonObject;
 
-import ts.TypeScriptException;
 import ts.client.CommandNames;
+import ts.internal.FileTempHelper;
 
 /**
  * Reload request message; value of command field is "reload". Reload contents
  * of file with name given by the 'file' argument from temporary file with name
  * given by the 'tmpfile' argument. The two names can be identical.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class ReloadRequest extends FileRequest {
+public class ReloadRequest extends FileRequest<ReloadRequestArgs> {
 
 	public ReloadRequest(String fileName, String tmpfile, int seq) {
-		super(CommandNames.Reload, new ReloadRequestArgs(fileName, tmpfile), seq);
+		super(CommandNames.Reload.getName(), new ReloadRequestArgs(fileName, null, tmpfile), seq);
 	}
+
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		// None response
+	public Response<?> parseResponse(JsonObject json) {
+		int requestSeq = json.get("request_seq").getAsInt();
+		FileTempHelper.freeTempFile(requestSeq);
+		return GsonHelper.DEFAULT_GSON.fromJson(json, Response.class);
 	}
+
 }

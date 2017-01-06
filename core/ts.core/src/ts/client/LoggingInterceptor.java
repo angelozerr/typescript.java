@@ -10,9 +10,8 @@
  */
 package ts.client;
 
-import com.eclipsesource.json.JsonObject;
-
 import ts.internal.client.protocol.Request;
+import ts.internal.client.protocol.Response;
 
 public class LoggingInterceptor implements IInterceptor {
 
@@ -23,29 +22,25 @@ public class LoggingInterceptor implements IInterceptor {
 	}
 
 	@Override
-	public void handleRequest(Request request, ITypeScriptServiceClient server,
-			String methodName) {
+	public void handleRequest(Request<?> request, String json, ITypeScriptServiceClient client) {
 		outPrintln("-----------------------------------");
-		outPrintln("TypeScript request#" + methodName + ": ");
-		outPrintln(request.toString());
+		outPrintln("TypeScript request#" + request.getCommand() + ": ");
+		outPrintln(json);
 	}
 
 	@Override
-	public void handleResponse(JsonObject response, ITypeScriptServiceClient server,
-			String methodName, long ellapsedTime) {
+	public void handleResponse(Response<?> response, String json, long ellapsedTime,
+			TypeScriptServiceClient typeScriptServiceClient) {
 		outPrintln("");
-		outPrintln("TypeScript response#" + methodName + " with " + ellapsedTime
-				+ "ms: ");
-		outPrintln(response.toString());
+		outPrintln("TypeScript response#" + response.getCommand() + " with " + ellapsedTime + "ms: ");
+		outPrintln(json);
 		outPrintln("-----------------------------------");
 	}
 
 	@Override
-	public void handleError(Throwable error, ITypeScriptServiceClient server,
-			String methodName, long ellapsedTime) {
+	public void handleError(Throwable error, ITypeScriptServiceClient server, String methodName, long ellapsedTime) {
 		errPrintln("");
-		errPrintln("TypeScript error#" + methodName + " with " + ellapsedTime
-				+ "ms: ");
+		errPrintln("TypeScript error#" + methodName + " with " + ellapsedTime + "ms: ");
 		printStackTrace(error);
 		errPrintln("-----------------------------------");
 	}
@@ -62,6 +57,4 @@ public class LoggingInterceptor implements IInterceptor {
 		error.printStackTrace(System.err);
 	}
 
-	
-	
 }

@@ -1,59 +1,37 @@
+/**
+ *  Copyright (c) 2015-2017 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.internal.client.protocol;
 
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
+import java.util.List;
 
-import ts.TypeScriptException;
+import com.google.gson.JsonObject;
+
 import ts.client.CommandNames;
-import ts.client.diagnostics.ITypeScriptDiagnosticsCollector;
+import ts.client.diagnostics.Diagnostic;
 
 /**
  * Synchronous request for syntactic diagnostics of one file.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class SyntacticDiagnosticsSyncRequest extends FileRequest<ITypeScriptDiagnosticsCollector> {
+public class SyntacticDiagnosticsSyncRequest extends FileRequest<SyntacticDiagnosticsSyncRequestArgs> {
 
-	private final String fileName;
-
-	public SyntacticDiagnosticsSyncRequest(String fileName, Boolean includeLinePosition,
-			ITypeScriptDiagnosticsCollector collector) {
+	public SyntacticDiagnosticsSyncRequest(String file, Boolean includeLinePosition) {
 		super(CommandNames.SyntacticDiagnosticsSync.getName(),
-				new SyntacticDiagnosticsSyncRequestArgs(fileName, includeLinePosition), null);
-		super.setCollector(collector);
-		this.fileName = fileName;
+				new SyntacticDiagnosticsSyncRequestArgs(file, includeLinePosition));
 	}
 
 	@Override
-	public void collect(JsonObject response) throws TypeScriptException {
-		JsonArray body = response.get("body").asArray();
-
-		JsonObject diagnostic = null;
-		String text = null;
-		JsonObject start = null;
-		JsonObject end = null;
-		JsonValue value = null;
-		String category = null;
-		int code = -1;
-		for (JsonValue item : body) {
-			diagnostic = item.asObject();
-			text = diagnostic.getString("text", null);
-			if (text == null) {
-				text = diagnostic.getString("message", null);
-			}
-			value = diagnostic.get("startLocation");
-			if (value == null) {
-				value = diagnostic.get("start");
-			}
-			start = value.asObject();
-			value = diagnostic.get("endLocation");
-			if (value == null) {
-				value = diagnostic.get("end");
-			}
-			end = value.asObject();
-			category = diagnostic.getString("category", null);
-			code = diagnostic.getInt("code", -1);
-			getCollector().addDiagnostic(null, fileName, text, start.getInt("line", -1), start.getInt("offset", -1),
-					end.getInt("line", -1), end.getInt("offset", -1), category, code);
-		}
+	public Response<List<Diagnostic>> parseResponse(JsonObject json) {
+		return GsonHelper.DEFAULT_GSON.fromJson(json, SyntacticDiagnosticsSyncResponse.class);
 	}
+
 }

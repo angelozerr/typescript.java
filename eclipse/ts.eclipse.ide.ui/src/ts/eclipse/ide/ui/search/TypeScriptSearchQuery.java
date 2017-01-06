@@ -1,5 +1,7 @@
 package ts.eclipse.ide.ui.search;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -12,8 +14,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
 
-import ts.TypeScriptException;
-import ts.client.references.ITypeScriptReferencesCollector;
+import ts.client.references.ReferencesResponseBody;
+import ts.client.references.ReferencesResponseItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -21,7 +23,6 @@ import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.search.LineElement;
 import ts.eclipse.ide.internal.ui.search.TypeScriptMatch;
-import ts.eclipse.ide.ui.utils.EditorUtils;
 
 public class TypeScriptSearchQuery implements ISearchQuery {
 
@@ -82,40 +83,11 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 				}
 				if (tsFile != null) {
 					// Find references
-					tsFile.references(offset, new ITypeScriptReferencesCollector() {
-						@Override
-						public void ref(String filename, int startLine, int startLineOffset, int endLine,
-								int endLineOffset, String lineText) throws TypeScriptException {
+					ReferencesResponseBody references = tsFile.references(offset).get(20000, TimeUnit.MILLISECONDS);
+					for (ReferencesResponseItem reference : references.getRefs()) {
+						addRef(reference, tsResult);
 
-							IFile tsFile = WorkbenchResourceUtil.findFileFromWorkspace(filename);
-							if (tsFile != null) {
-
-								try {
-									IDocument document = TypeScriptResourceUtil.getDocument(tsFile);
-									int lineNumber = startLine - 1;
-									int lineStartOffset = startLineOffset - 1;
-									int beginOfLineStartOffset = document.getLineOffset(lineNumber);
-									int startOffset = beginOfLineStartOffset + lineStartOffset;
-									int endOffset = document.getLineOffset(endLine - 1) + (endLineOffset - 1);
-									int length = endOffset - startOffset;
-
-									LineElement lineEntry = new LineElement(tsFile, lineNumber, beginOfLineStartOffset,
-											lineText);
-									tsResult.addMatch(new TypeScriptMatch(tsFile, startOffset, length, lineEntry));
-
-								} catch (BadLocationException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-							}
-							// return
-							// WorkbenchResourceUtil.findFileFormFileSystem(filename);
-
-							// tsResult.addMatch(new TypeScriptMatch(filename,
-							// startLine, startOffset, endLine, endOffset,
-							// lineText));
-						}
-					});
+					}
 				}
 			} finally {
 				// close ts file if needed
@@ -135,6 +107,34 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 			// e.printStackTrace();
 		}
 		return Status.OK_STATUS;
+	}
+
+	private void addRef(ReferencesResponseItem reference, TypeScriptSearchResult tsResult) {
+		String filename = reference.getFile();
+		IFile tsFile = WorkbenchResourceUtil.findFileFromWorkspace(filename);
+		if (tsFile != null) {
+			int startLine = reference.getStart().getLine();
+			int startLineOffset = reference.getStart().getOffset();
+			int endLine = reference.getEnd().getLine();
+			int endLineOffset = reference.getEnd().getOffset();
+			String lineText = reference.getLineText();
+			try {
+				IDocument document = TypeScriptResourceUtil.getDocument(tsFile);
+				int lineNumber = startLine - 1;
+				int lineStartOffset = startLineOffset - 1;
+				int beginOfLineStartOffset = document.getLineOffset(lineNumber);
+				int startOffset = beginOfLineStartOffset + lineStartOffset;
+				int endOffset = document.getLineOffset(endLine - 1) + (endLineOffset - 1);
+				int length = endOffset - startOffset;
+
+				LineElement lineEntry = new LineElement(tsFile, lineNumber, beginOfLineStartOffset, lineText);
+				tsResult.addMatch(new TypeScriptMatch(tsFile, startOffset, length, lineEntry));
+
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	public String getResultLabel(int nMatches) {

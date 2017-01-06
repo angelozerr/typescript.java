@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -11,18 +11,25 @@
 package ts.internal.client.protocol;
 
 /**
- * Arguments for completions messages.
  * 
- * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.
- *      d.ts
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
 public class CompletionsRequestArgs extends FileLocationRequestArgs {
 
-	public CompletionsRequestArgs(String fileName, int line, int offset, String prefix) {
-		super(fileName, line, offset);
-		if (prefix != null) {
-			super.add("prefix", prefix);
-		}
+	private final String prefix;
+
+	public CompletionsRequestArgs(String file, int position, String prefix) {
+		super(file, position);
+		this.prefix = prefix;
 	}
 
+	public CompletionsRequestArgs(String file, int line, int offset, String prefix) {
+		super(file, line, offset);
+		this.prefix = prefix;
+	}
+
+	public String getPrefix() {
+		return prefix;
+	}
 }

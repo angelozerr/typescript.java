@@ -10,17 +10,23 @@
  */
 package ts.resources;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import ts.TypeScriptException;
+import ts.client.CodeEdit;
+import ts.client.FileSpan;
 import ts.client.IPositionProvider;
-import ts.client.codefixes.ITypeScriptGetCodeFixesCollector;
-import ts.client.completions.ITypeScriptCompletionCollector;
-import ts.client.definition.ITypeScriptDefinitionCollector;
-import ts.client.format.FormatOptions;
-import ts.client.format.ITypeScriptFormatCollector;
-import ts.client.navbar.ITypeScriptNavBarCollector;
+import ts.client.codefixes.CodeAction;
+import ts.client.completions.CompletionEntry;
+import ts.client.completions.ICompletionEntryFactory;
+import ts.client.diagnostics.DiagnosticEvent;
+import ts.client.diagnostics.DiagnosticEventBody;
+import ts.client.format.FormatCodeSettings;
 import ts.client.navbar.NavigationBarItemRoot;
-import ts.client.occurrences.ITypeScriptOccurrencesCollector;
-import ts.client.references.ITypeScriptReferencesCollector;
+import ts.client.occurrences.OccurrencesResponseItem;
+import ts.client.quickinfo.QuickInfo;
+import ts.client.references.ReferencesResponseBody;
 
 /**
  * TypeScript file API.
@@ -91,64 +97,98 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 * Call completions from the tsserver.
 	 * 
 	 * @param position
-	 * @param collector
+	 * @param instanceCreator
 	 * @throws TypeScriptException
 	 */
-	void completions(int position, ITypeScriptCompletionCollector collector) throws TypeScriptException;
+	CompletableFuture<List<CompletionEntry>> completions(int position, ICompletionEntryFactory factory)
+			throws TypeScriptException;
 
 	/**
 	 * Call definition from the tsserver.
 	 * 
 	 * @param position
-	 * @param collector
 	 * @throws TypeScriptException
 	 */
-	void definition(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
+	CompletableFuture<List<FileSpan>> definition(int position) throws TypeScriptException;
 
+	/**
+	 * Call quickInfo from the tsserver.
+	 * 
+	 * @param position
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<QuickInfo> quickInfo(int position) throws TypeScriptException;
+
+	/**
+	 * Call getErr from the tsserver.
+	 * 
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<List<DiagnosticEvent>> geterr() throws TypeScriptException;
+	
 	/**
 	 * Format the file content according start/end position.
 	 * 
 	 * @param startPosition
 	 * @param endPosition
-	 * @param collector
 	 * @throws TypeScriptException
 	 */
-	void format(int startPosition, int endPosition, ITypeScriptFormatCollector collector) throws TypeScriptException;
+	CompletableFuture<List<CodeEdit>> format(int startPosition, int endPosition) throws TypeScriptException;
+
+	/**
+	 * Execute semantic diagnostics.
+	 * 
+	 * @param includeLinePosition
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(Boolean includeLinePosition)
+			throws TypeScriptException;
+
+	/**
+	 * Execute syntactic diagnostics.
+	 * 
+	 * @param includeLinePosition
+	 * @return
+	 * @throws TypeScriptException
+	 */
+	CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(Boolean includeLinePosition)
+			throws TypeScriptException;
+
+	// /**
+	// * Execute semantic and syntactic both diagnostics.
+	// *
+	// * @param includeLinePosition
+	// * @return
+	// * @throws TypeScriptException
+	// */
+	// CompletableFuture<DiagnosticEventBody> diagnostics(Boolean
+	// includeLinePosition) throws TypeScriptException;
 
 	/**
 	 * Find references of the given position.
 	 * 
 	 * @param position
-	 * @param collector
 	 * @throws TypeScriptException
 	 */
-	void references(int position, ITypeScriptReferencesCollector collector) throws TypeScriptException;
+	public CompletableFuture<ReferencesResponseBody> references(int position) throws TypeScriptException;
 
 	/**
 	 * Find occurrences of the given position.
 	 * 
 	 * @param position
-	 * @param collector
 	 * @throws TypeScriptException
 	 */
-	void occurrences(int position, ITypeScriptOccurrencesCollector collector) throws TypeScriptException;
-
-	/**
-	 * Nav bar for the file.
-	 * 
-	 * @param collector
-	 * @throws TypeScriptException
-	 */
-	void navbar(ITypeScriptNavBarCollector collector) throws TypeScriptException;
+	public CompletableFuture<List<OccurrencesResponseItem>> occurrences(int position) throws TypeScriptException;
 
 	/**
 	 * Call implementation from the tsserver.
 	 * 
 	 * @param position
-	 * @param collector
 	 * @throws TypeScriptException
 	 */
-	void implementation(int position, ITypeScriptDefinitionCollector collector) throws TypeScriptException;
+	CompletableFuture<List<FileSpan>> implementation(int position) throws TypeScriptException;
 
 	/**
 	 * Get code fixes.
@@ -158,16 +198,31 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 * @param collector
 	 * @throws TypeScriptException
 	 */
-	void getCodeFixes(int startPosition, int endPosition, String[] errorCodes,
-			ITypeScriptGetCodeFixesCollector collector) throws TypeScriptException;
+	CompletableFuture<List<CodeAction>> getCodeFixes(int startPosition, int endPosition, List<Integer> errorCodes)
+			throws TypeScriptException;
+
+	/**
+	 * Returns the navigation bar root.
+	 * 
+	 * @return the navigation bar root.
+	 */
+	NavigationBarItemRoot getNavBar();
+
+	/**
+	 * Refresh the navigation bar root.
+	 * 
+	 * @throws TypeScriptException
+	 */
+	void refreshNavBar() throws TypeScriptException;
+
+	void compileOnSaveEmitFile(Boolean forced) throws TypeScriptException;
 
 	void addNavbarListener(INavbarListener listener);
 
 	void removeNavbarListener(INavbarListener listener);
 
-	NavigationBarItemRoot getNavBar();
+	FormatCodeSettings getFormatOptions();
 
-	FormatOptions getFormatOptions();
+	void setFormatOptions(FormatCodeSettings formatOptions);
 
-	void setFormatOptions(FormatOptions formatOptions);
 }
