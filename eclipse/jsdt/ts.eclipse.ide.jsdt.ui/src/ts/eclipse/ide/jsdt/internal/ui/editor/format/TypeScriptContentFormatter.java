@@ -45,8 +45,7 @@ public class TypeScriptContentFormatter implements IContentFormatter {
 					@Override
 					public void run() {
 						try {
-							TextEdit textEdit = DocumentUtils.toTextEdit(codeEdits, document);
-							textEdit.apply(document, TextEdit.CREATE_UNDO);
+							DocumentUtils.applyEdits(document, codeEdits);
 						} catch (Exception e) {
 							IStatus status = new Status(IStatus.ERROR, JSDTTypeScriptUIPlugin.PLUGIN_ID, e.getMessage(),
 									e);

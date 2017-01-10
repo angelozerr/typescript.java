@@ -15,11 +15,11 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.text.edits.TextEdit;
 
 import ts.client.codefixes.CodeAction;
 import ts.client.codefixes.FileCodeEdits;
 import ts.eclipse.ide.core.utils.DocumentUtils;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 /**
  * TypeScript {@link CodeAction} completion proposal.
@@ -42,11 +42,11 @@ public class CodeActionCompletionProposal implements ICompletionProposal {
 
 	private void apply(FileCodeEdits codeEdits, IDocument document) {
 		String fileName = codeEdits.getFileName();
+		// TODO: support code edit for the given file name.
 		try {
-			TextEdit textEdit = DocumentUtils.toTextEdit(codeEdits.getTextChanges(), document);
-			textEdit.apply(document, TextEdit.CREATE_UNDO);
+			DocumentUtils.applyEdits(document, codeEdits.getTextChanges());
 		} catch (Exception e) {
-			e.printStackTrace();
+			TypeScriptUIPlugin.log(e);
 		}
 	}
 

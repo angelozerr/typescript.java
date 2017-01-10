@@ -6,9 +6,12 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.undo.DocumentUndoManagerRegistry;
+import org.eclipse.text.undo.IDocumentUndoManager;
 
 import ts.TypeScriptException;
 import ts.client.CodeEdit;
@@ -31,13 +34,40 @@ public class DocumentUtils {
 		}
 	}
 
-	public static TextEdit toTextEdit(CodeEdit codeEdit, IDocument document) throws TypeScriptException {
-		MultiTextEdit textEdit = new MultiTextEdit();
-		toTextEdit(codeEdit, document, textEdit);
-		return textEdit;
+	/**
+	 * Method will apply all edits to document as single modification. Needs to
+	 * be executed in UI thread.
+	 * 
+	 * @param document
+	 *            document to modify
+	 * @param edits
+	 *            list of TypeScript {@link CodeEdit}.
+	 * @throws TypeScriptException
+	 * @throws BadLocationException
+	 * @throws MalformedTreeException
+	 */
+	public static void applyEdits(IDocument document, List<CodeEdit> codeEdits)
+			throws TypeScriptException, MalformedTreeException, BadLocationException {
+		if (document == null || codeEdits.isEmpty()) {
+			return;
+		}
+
+		IDocumentUndoManager manager = DocumentUndoManagerRegistry.getDocumentUndoManager(document);
+		if (manager != null) {
+			manager.beginCompoundChange();
+		}
+
+		try {
+			TextEdit edit = toTextEdit(codeEdits, document);
+			edit.apply(document);
+		} finally {
+			if (manager != null) {
+				manager.endCompoundChange();
+			}
+		}
 	}
 
-	public static TextEdit toTextEdit(List<CodeEdit> codeEdits, IDocument document) throws TypeScriptException {
+	private static TextEdit toTextEdit(List<CodeEdit> codeEdits, IDocument document) throws TypeScriptException {
 		MultiTextEdit textEdit = new MultiTextEdit();
 		for (CodeEdit codeEdit : codeEdits) {
 			toTextEdit(codeEdit, document, textEdit);
