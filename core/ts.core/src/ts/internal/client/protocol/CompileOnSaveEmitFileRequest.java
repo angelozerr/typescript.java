@@ -23,12 +23,12 @@ import ts.client.CommandNames;
 public class CompileOnSaveEmitFileRequest extends Request<CompileOnSaveEmitFileRequestArgs> {
 
 	public CompileOnSaveEmitFileRequest(String file, Boolean forced) {
-		super(CommandNames.compileOnSaveEmitFile.getName(), new CompileOnSaveEmitFileRequestArgs(file, forced));
+		super(CommandNames.CompileOnSaveEmitFile.getName(), new CompileOnSaveEmitFileRequestArgs(file, forced));
 	}
 
 	@Override
-	public Response<?> parseResponse(JsonObject json) {
-		return null;
+	public Response<Boolean> parseResponse(JsonObject json) {
+		return GsonHelper.DEFAULT_GSON.fromJson(json, CompileOnSaveEmitFileResponse.class);
 	}
 
 }

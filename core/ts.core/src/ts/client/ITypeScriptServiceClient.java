@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 import ts.TypeScriptException;
 import ts.client.codefixes.CodeAction;
+import ts.client.compileonsave.CompileOnSaveAffectedFileListSingleProject;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.CompletionEntryDetails;
 import ts.client.completions.ICompletionEntryFactory;
@@ -230,7 +231,10 @@ public interface ITypeScriptServiceClient {
 
 	// Since 2.0.5
 
-	void compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException;
+	CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException;
+
+	CompletableFuture<List<CompileOnSaveAffectedFileListSingleProject>> compileOnSaveAffectedFileList(String fileName)
+			throws TypeScriptException;
 
 	// Since 2.0.6
 

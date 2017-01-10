@@ -42,8 +42,8 @@ public enum CommandNames {
 	SyntacticDiagnosticsSync("syntacticDiagnosticsSync", "2.0.3"), 
 	
 	// 2.0.5
-	compileOnSaveAffectedFileList("CompileOnSaveAffectedFileList", "2.0.5"),
-	compileOnSaveEmitFile("compileOnSaveEmitFile", "2.0.5"),
+	CompileOnSaveAffectedFileList("compileOnSaveAffectedFileList", "2.0.5"),
+	CompileOnSaveEmitFile("compileOnSaveEmitFile", "2.0.5"),
 	
 	// 2.0.6
 	NavTree("navtree", "2.0.6"),

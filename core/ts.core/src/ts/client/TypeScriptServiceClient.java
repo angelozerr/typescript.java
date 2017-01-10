@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import ts.TypeScriptException;
 import ts.TypeScriptNoContentAvailableException;
 import ts.client.codefixes.CodeAction;
+import ts.client.compileonsave.CompileOnSaveAffectedFileListSingleProject;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.CompletionEntryDetails;
 import ts.client.completions.ICompletionEntryFactory;
@@ -45,6 +46,7 @@ import ts.internal.SequenceHelper;
 import ts.internal.client.protocol.ChangeRequest;
 import ts.internal.client.protocol.CloseRequest;
 import ts.internal.client.protocol.CodeFixRequest;
+import ts.internal.client.protocol.CompileOnSaveAffectedFileListRequest;
 import ts.internal.client.protocol.CompileOnSaveEmitFileRequest;
 import ts.internal.client.protocol.CompletionDetailsRequest;
 import ts.internal.client.protocol.CompletionsRequest;
@@ -379,8 +381,14 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// Since 2.0.5
 
 	@Override
-	public void compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException {
-		execute(new CompileOnSaveEmitFileRequest(fileName, forced), false);
+	public CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException {
+		return execute(new CompileOnSaveEmitFileRequest(fileName, forced), true);
+	}
+	
+	@Override
+	public CompletableFuture<List<CompileOnSaveAffectedFileListSingleProject>> compileOnSaveAffectedFileList(String fileName)
+			throws TypeScriptException {
+		return execute(new CompileOnSaveAffectedFileListRequest(fileName), true);
 	}
 
 	// Since 2.0.6
