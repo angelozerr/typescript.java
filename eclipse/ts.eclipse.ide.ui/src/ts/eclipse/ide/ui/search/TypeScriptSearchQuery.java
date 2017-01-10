@@ -86,7 +86,6 @@ public class TypeScriptSearchQuery implements ISearchQuery {
 					ReferencesResponseBody references = tsFile.references(offset).get(20000, TimeUnit.MILLISECONDS);
 					for (ReferencesResponseItem reference : references.getRefs()) {
 						addRef(reference, tsResult);
-
 					}
 				}
 			} finally {

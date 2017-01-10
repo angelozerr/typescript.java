@@ -1,3 +1,13 @@
+/**
+ *  Copyright (c) 2015-2017 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package ts.eclipse.ide.ui.implementation;
 
 import java.util.ArrayList;
@@ -14,6 +24,10 @@ import ts.eclipse.ide.internal.ui.text.AbstractInformationControl;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.resources.ITypeScriptFile;
 
+/**
+ * Popiup dialog which shows implementation for a given text selection.
+ *
+ */
 public class TypeScriptImplementationDialog extends AbstractInformationControl {
 
 	public TypeScriptImplementationDialog(Shell parent, int shellStyle, ITypeScriptFile tsFile) {
@@ -27,12 +41,11 @@ public class TypeScriptImplementationDialog extends AbstractInformationControl {
 			try {
 				final TreeViewer treeViewer = getTreeViewer();
 				tsFile.implementation(selection.getOffset()).thenAccept(spans -> {
-					if (treeViewer != null) {
+					if (treeViewer != null && spans != null && spans.size() > 0) {
 						treeViewer.getTree().getDisplay().asyncExec(new Runnable() {
 
 							@Override
 							public void run() {
-								System.err.println("refresh");
 								treeViewer.setInput(spans);
 							}
 						});

@@ -138,6 +138,9 @@ public class TypeScriptUIMessages extends NLS {
 	public static String AbstractAnnotationHover_message_singleQuickFix;
 	public static String AbstractAnnotationHover_message_multipleQuickFix;
 
+	// Implementation
+	public static String TypeScriptImplementationLabelProvider_text;
+
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)
