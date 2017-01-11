@@ -126,6 +126,11 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 					IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT);
 			assistant.setContentAssistProcessor(multiLineProcessor, IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT);
 
+			ContentAssistProcessor templateLiteralProcessor = new TypeScriptCompletionProcessor(getEditor(), assistant,
+					IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL);
+			assistant.setContentAssistProcessor(templateLiteralProcessor,
+					IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL);
+
 			ContentAssistProcessor jsxProcessor = new TypeScriptCompletionProcessor(getEditor(), assistant,
 					IJSXPartitions.JSX);
 			assistant.setContentAssistProcessor(jsxProcessor, IJSXPartitions.JSX);
