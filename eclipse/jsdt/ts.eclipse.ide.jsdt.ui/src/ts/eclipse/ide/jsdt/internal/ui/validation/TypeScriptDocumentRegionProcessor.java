@@ -11,7 +11,6 @@
 package ts.eclipse.ide.jsdt.internal.ui.validation;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
@@ -140,9 +139,9 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 		}
 		super.setEntireDocumentDirty(document);
 	}
-	
+
 	@Override
-	protected void endProcessing() {		
+	protected void endProcessing() {
 		super.endProcessing();
 		// Refresh navigation bar/tree used for outline
 		if (resource != null) {
@@ -150,12 +149,14 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(resource.getProject());
 				if (tsProject != null) {
 					IIDETypeScriptFile tsFile = tsProject.getOpenedFile(resource);
-					tsFile.refreshNavBar();					
+					if (tsFile != null) {
+						tsFile.refreshNavBar();
+					}
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}			
+			}
 		}
 	}
 }
