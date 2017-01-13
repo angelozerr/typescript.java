@@ -40,6 +40,10 @@ public class ProblemTypeScriptHover extends AbstractAnnotationHover {
 
 	protected static class ProblemInfo extends AnnotationInfo {
 
+		private static final Class<?>[] EMPTY_CLASS = new Class[0];
+		private static final Object[] EMPTY_OBJECT = new Object[0];
+		private static final String GET_ATTRIBUTES_METHOD_NAME = "getAttributes";
+		
 		private static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
 
 		public ProblemInfo(Annotation annotation, Position position, ITextViewer textViewer) {
@@ -77,8 +81,10 @@ public class ProblemTypeScriptHover extends AbstractAnnotationHover {
 		private List<Integer> createErrorCodes(ITypeScriptProject tsProject) {
 			List<Integer> errorCodes = null;
 			try {
-				Method getAttributesMethod = annotation.getClass().getMethod("getAttributes", new Class[0]);
-				Map getAttributes = (Map) getAttributesMethod.invoke(annotation, new Object[0]);
+				// Try to retrieve the TypeScript error code from the SSE
+				// TemporaryAnnotation.
+				Method getAttributesMethod = annotation.getClass().getMethod(GET_ATTRIBUTES_METHOD_NAME, EMPTY_CLASS);
+				Map getAttributes = (Map) getAttributesMethod.invoke(annotation, EMPTY_OBJECT);
 				Integer tsCode = (Integer) getAttributes.get("tsCode");
 				if (tsCode != null) {
 					Integer errorCode = tsCode;
@@ -89,11 +95,14 @@ public class ProblemTypeScriptHover extends AbstractAnnotationHover {
 						errorCodes.add(errorCode);
 					}
 				}
+			} catch (NoSuchMethodException e) {
+				// The annotation is not a
+				// org.eclipse.wst.sse.ui.internal.reconcile.TemporaryAnnotation
+				// ignore the error.
 			} catch (Throwable e) {
 				TypeScriptUIPlugin.log("Error while getting TypeScript error code", e);
 			}
 			return errorCodes;
-
 		}
 	}
 
