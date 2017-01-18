@@ -151,7 +151,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 				// compile ts files
 				IDETsconfigJson tsconfig = tsContainer.getTsconfig();
 				if (!tsconfig.isBuildOnSave() && tsconfig.isCompileOnSave()
-						&& tsProject.canSupport(CommandNames.compileOnSaveEmitFile)) {
+						&& tsProject.canSupport(CommandNames.CompileOnSaveEmitFile)) {
 					// TypeScript >=2.0.5: compile is done with tsserver
 					//compileWithTsserver(tsProject, tsFiles, tsconfig);
 					compileWithTsc(tsProject, tsFiles, tsconfig);
@@ -204,7 +204,7 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 	 * @throws CoreException
 	 */
 	private void compileWithTsserver(IIDETypeScriptProject tsProject, List<IFile> tsFiles, IDETsconfigJson tsconfig)
-			throws CoreException {
+			throws CoreException {		
 		for (final IFile file : tsFiles) {
 			try {
 				IIDETypeScriptFile tsFile = tsProject.getOpenedFile(file);
