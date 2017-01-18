@@ -14,6 +14,7 @@ package ts.eclipse.ide.jsdt.internal.ui.editor.contentassist;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import org.eclipse.wst.jsdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.wst.jsdt.ui.text.java.JavaContentAssistInvocationContext;
 
+import ts.TypeScriptNoContentAvailableException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
@@ -68,6 +70,12 @@ public class TypeScriptCompletionProposalComputer
 								.collect(Collectors.toList());
 					}
 				}
+			} catch (ExecutionException e) {
+				if (e.getCause() instanceof TypeScriptNoContentAvailableException) {
+					// Ignore "No content available" error.
+					return Collections.EMPTY_LIST;
+				}
+				Trace.trace(Trace.SEVERE, "Error while TypeScript completion", e);
 			} catch (Exception e) {
 				Trace.trace(Trace.SEVERE, "Error while TypeScript completion", e);
 			}
