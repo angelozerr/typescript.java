@@ -72,10 +72,10 @@
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  Provides a way to programmatically specify the install location of a Node.js within the system. This allows extenders to compute install locations that are not in the extending bundle. Extenders must implement &lt;i&gt;tern.eclipse.ide.server.nodejs.core.INodejsInstallProvider&lt;/i&gt; interface.
+                  Provides a way to programmatically specify the install location of a Node.js within the system. This allows extenders to compute install locations that are not in the extending bundle. Extenders must implement &lt;i&gt;ts.eclipse.ide.core.nodejs.INodejsInstallProvider&lt;/i&gt; interface.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":tern.eclipse.ide.server.nodejs.core.INodejsInstallProvider"/>
+                  <meta.attribute kind="java" basedOn=":ts.eclipse.ide.core.nodejs.INodejsInstallProvider"/>
                </appinfo>
             </annotation>
          </attribute>
