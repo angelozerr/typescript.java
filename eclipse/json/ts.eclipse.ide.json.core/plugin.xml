@@ -41,7 +41,7 @@
          			description="JSON schema for the TypeScript compiler's configuration file"
          			fileMatch="tsconfig.json"
          			url="http://json.schemastore.org/tsconfig"
-         			uri="schemastore/tsconfig-neon" />
+         			uri="schemastore/tsconfig" />
          	<schema name="jsconfig.json"
          			description="JSON schema for the JavaScript configuration file"
          			fileMatch="jsconfig.json"
@@ -51,7 +51,7 @@
          			description="JSON schema for the TSLint configuration files"
          			fileMatch="tslint.json"
          			url="http://json.schemastore.org/tslint"
-         			uri="schemastore/tslint-neon" />
+         			uri="schemastore/tslint" />
 			<schema name="typings.json"
          			description="JSON schema for the typings configuration files"
          			fileMatch="typings.json"
