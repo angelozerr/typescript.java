@@ -16,10 +16,10 @@
 
 	<extension point="ts.eclipse.ide.core.nodeJSInstalls" >
 		<install 
-			id="node-v4.2.4-win32-x86"
-			name="%nodeJSInstall_v4.2.4.name"
-			path="/node-v4.2.4-win32-x86/node.exe" 
-			zip="/node-v4.2.4-win32-x86.zip" />
+			id="node-v6.9.4-win-x86"
+			name="%nodeJSInstall_v6.9.4.name"
+			path="/node-v6.9.4-win-x86/node.exe" 
+			zip="/node-v6.9.4-win-x86.zip" />
 	 </extension>
 	  
 </plugin>        

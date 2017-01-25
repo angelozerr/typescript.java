@@ -51,7 +51,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		this.tsProject = tsProject;
 		// Fix embedded TypeScript id preference
 		// See https://github.com/angelozerr/typescript.java/issues/121
-		TypeScriptCorePreferenceInitializer.fixEmbeddedTypeScriptIdPreference(getProjectPreferences());
+		TypeScriptCorePreferenceInitializer.fixEmbeddedPreference(getProjectPreferences());
 	}
 
 	/**
@@ -157,15 +157,19 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		if (isFormatPreferencesChanged(event)) {
 			this.formatOptions = null;
 		} else if (isNodejsPreferencesChanged(event)) {
-			getTypeScriptProject().disposeServer();
-			getTypeScriptProject().disposeCompiler();
 			IIDETypeScriptProject tsProject = getTypeScriptProject();
-			IDEResourcesManager.getInstance().fireTypeScriptVersionChanged(tsProject, null, getNodeVersion());
+			if (tsProject != null) {
+				tsProject.disposeServer();
+				tsProject.disposeCompiler();
+				IDEResourcesManager.getInstance().fireTypeScriptVersionChanged(tsProject, null, getNodeVersion());
+			}
 		} else if (isTypeScriptRuntimePreferencesChanged(event)) {
-			tsProject.disposeCompiler();
-			tsProject.disposeServer();
 			IIDETypeScriptProject tsProject = getTypeScriptProject();
-			IDEResourcesManager.getInstance().fireTypeScriptVersionChanged(tsProject, null, getTypeScriptVersion());
+			if (tsProject != null) {
+				tsProject.disposeCompiler();
+				tsProject.disposeServer();
+				IDEResourcesManager.getInstance().fireTypeScriptVersionChanged(tsProject, null, getTypeScriptVersion());
+			}
 		} else if (isTypeScriptBuildPathPreferencesChanged(event) && !updatingBuildPath) {
 			getTypeScriptProject().disposeBuildPath();
 		} else if (isTslintPreferencesChanged(event)) {

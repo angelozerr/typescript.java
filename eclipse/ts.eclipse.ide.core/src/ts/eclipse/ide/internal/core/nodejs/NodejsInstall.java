@@ -79,8 +79,10 @@ public class NodejsInstall implements IEmbeddedNodejs {
 						File zipFile = new File(bundleDir, zip);
 		
 						if (zipFile.exists()) {
-							if (zipFile.getName().toLowerCase().endsWith(".zip")) {
-								ZipUtils.extract(zipFile, baseDir);
+							if (ZipUtils.isZipFile(zipFile)) {
+								ZipUtils.extractZip(zipFile, baseDir);
+							} else if (ZipUtils.isTarFile(zipFile)) {
+								ZipUtils.extractTar(zipFile, baseDir);
 							}
 		
 							if(this.path.exists()) {

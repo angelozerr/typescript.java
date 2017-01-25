@@ -67,7 +67,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 			}
 
-			// Initialize tsc preferences
+			// Initialize TypeScript runtime preferences
 			initializeTypeScriptRuntimePreferences(node, defaultRepository);
 			// Initialize tsserver preferences
 			initializeTsserverPreferences(node, defaultRepository);
@@ -90,7 +90,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 		// Fix embedded TypeScript id preference
 		// See https://github.com/angelozerr/typescript.java/issues/121
-		fixEmbeddedTypeScriptIdPreference(
+		fixEmbeddedPreference(
 				WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID));
 	}
 
@@ -184,22 +184,34 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 	}
 
 	/**
-	 * Fix the embeddedTypeScriptId preference if needed with default
-	 * embeddedTypeScriptId.
+	 * Fix the embedded TypeScript runtime ande node.js preference if needed.
 	 * 
 	 * @param preferences
 	 * @see https://github.com/angelozerr/typescript.java/issues/121
 	 */
-	public static void fixEmbeddedTypeScriptIdPreference(IEclipsePreferences preferences) {
+	public static void fixEmbeddedPreference(IEclipsePreferences preferences) {
+		boolean refresh = false;
+		// Fix embedded TypeScript runtime if needed
 		String embeddedTypeScriptId = preferences.get(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID, null);
 		if (embeddedTypeScriptId != null
 				&& TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepository(embeddedTypeScriptId) == null) {
 			preferences.put(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID,
 					TypeScriptCorePlugin.getTypeScriptRepositoryManager().getDefaultRepository().getName());
+			refresh = true;
+		}
+		// Fix embedded node.js if needed
+		String embeddedNode = preferences.get(TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED_ID, null);
+		if (embeddedNode != null
+				&& TypeScriptCorePlugin.getNodejsInstallManager().findNodejsInstall(embeddedNode) == null) {
+			if (useBundledNodeJsEmbedded(preferences)) {
+				refresh = true;
+			}
+		}
+		if (refresh) {
 			try {
 				preferences.flush();
 			} catch (BackingStoreException e) {
-				Trace.trace(Trace.SEVERE, "Error while fixing embeddedTypeScriptId preference", e);
+				Trace.trace(Trace.SEVERE, "Error while fixing embedded TypeScript runtime and node.js preference", e);
 			}
 		}
 	}
