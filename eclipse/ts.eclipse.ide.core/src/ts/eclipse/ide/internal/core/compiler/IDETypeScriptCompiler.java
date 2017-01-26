@@ -17,12 +17,10 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
-import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.CompilerOptions;
 import ts.cmd.tsc.TypeScriptCompiler;
 import ts.eclipse.ide.core.compiler.IIDETypeScriptCompiler;
@@ -53,16 +51,18 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 		} else {
 			if (tsconfig.isCompileOnSave()) {
 				// compileOnSave is activated
-				if (tsconfig.hasOutFile()) {
-					// tsconfig.json defines "compilerOptions/outFile" or
-					// "compilerOptions/out", the ts files cannot be compiled
+				String tsconfigErrorMessage = checkForInvalidCompileOnSave(tsconfig);
+				if (tsconfigErrorMessage != null) {
+					// tsconfig.json uses features incompatible with
+					// compileOnSave,
+					// the ts files cannot be compiled;
 					// add a warning by suggesting to use "buildOnSave"
 					for (IFile tsFile : tsFiles) {
 						// delete existing marker
 						TypeScriptResourceUtil.deleteTscMarker(tsFile);
 						// add warning marker
 						TypeScriptResourceUtil.addTscMarker(tsFile,
-								NLS.bind(TypeScriptCoreMessages.tsconfig_cannot_use_compileOnSave_with_outFile_error,
+								NLS.bind(tsconfigErrorMessage,
 										tsconfig.getTsconfigFile().getProjectRelativePath().toString()),
 								IMarker.SEVERITY_WARNING, 1);
 						// delete emitted files *.js, *.js.map
@@ -101,6 +101,16 @@ public class IDETypeScriptCompiler extends TypeScriptCompiler implements IIDETyp
 				}
 			}
 		}
+	}
+
+	private String checkForInvalidCompileOnSave(IDETsconfigJson tsconfig) {
+		if (tsconfig.hasOutFile()) {
+			return TypeScriptCoreMessages.tsconfig_cannot_use_compileOnSave_with_outFile_error;
+		}
+		if (tsconfig.hasPaths() || tsconfig.hasRootDirs()) {
+			return TypeScriptCoreMessages.tsconfig_cannot_use_compileOnSave_with_path_mapping_error;
+		}
+		return null;
 	}
 
 	private void compile(IFile tsConfigFile, CompilerOptions tsconfigOptions, List<IFile> tsFiles, boolean buildOnSave)

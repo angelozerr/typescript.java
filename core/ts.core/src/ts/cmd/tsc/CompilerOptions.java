@@ -1,6 +1,11 @@
 package ts.cmd.tsc;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import ts.cmd.AbstractOptions;
 
@@ -49,12 +54,14 @@ public class CompilerOptions extends AbstractOptions {
 	private String out;
 	private String outDir;
 	private String outFile;
+	private Map<String, List<String>> paths;
 	private boolean preserveConstEnums;
 	private boolean pretty;
 	private String project;
 	private String reactNamespace;
 	private boolean removeComments;
 	private String rootDir;
+	private List<String> rootDirs;
 	private boolean skipDefaultLibCheck;
 	private boolean sourceMap;
 	private String sourceRoot;
@@ -820,6 +827,49 @@ public class CompilerOptions extends AbstractOptions {
 	}
 
 	/**
+	 * Specify path mapping to be computed relative to baseUrl option.
+	 * 
+	 * @return key patterns to which paths are mapped.
+	 */
+	public Set<String> getPathsKeys() {
+		if (paths == null) {
+			return Collections.emptySet();
+		}
+		return Collections.unmodifiableSet(paths.keySet());
+	}
+
+	/**
+	 * Specify path mapping to be computed relative to baseUrl option.
+	 * 
+	 * @param pathsKey
+	 *            a path key pattern.
+	 * @return paths mapped to the key pattern.
+	 */
+	public List<String> getPathsKeyValues(String pathsKey) {
+		if (paths == null) {
+			return Collections.emptyList();
+		}
+		List<String> values = paths.get(pathsKey);
+		if (values == null) {
+			return Collections.emptyList();
+		}
+		return Collections.unmodifiableList(values);
+	}
+
+	/**
+	 * Specify path mapping to be computed relative to baseUrl option.
+	 * 
+	 * @param paths
+	 */
+	public void setPaths(Map<String, List<String>> paths) {
+		Map<String, List<String>> pathsCopy = new HashMap<>(paths.size());
+		for (Map.Entry<String, List<String>> entry : paths.entrySet()) {
+			pathsCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+		}
+		this.paths = pathsCopy;
+	}
+
+	/**
 	 * Do not erase const enum declarations in generated code. See const enums
 	 * https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#94-constant-enum-declarations
 	 * documentation for more details.
@@ -937,6 +987,27 @@ public class CompilerOptions extends AbstractOptions {
 	 */
 	public void setRootDir(String rootDir) {
 		this.rootDir = rootDir;
+	}
+
+	/**
+	 * Specify list of root directory to be used when resolving modules.
+	 * 
+	 * @return
+	 */
+	public List<String> getRootDirs() {
+		if (rootDirs == null) {
+			return Collections.emptyList();
+		}
+		return Collections.unmodifiableList(rootDirs);
+	}
+
+	/**
+	 * Specify list of root directory to be used when resolving modules.
+	 * 
+	 * @param rootDirs
+	 */
+	public void setRootDirs(List<String> rootDirs) {
+		this.rootDirs = new ArrayList<>(rootDirs);
 	}
 
 	/**
