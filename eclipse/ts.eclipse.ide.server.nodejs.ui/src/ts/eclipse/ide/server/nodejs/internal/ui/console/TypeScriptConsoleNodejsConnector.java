@@ -38,7 +38,7 @@ public class TypeScriptConsoleNodejsConnector implements ITypeScriptConsoleConne
 		nodeServer.removeProcessListener(interceptor);
 	}
 
-	public TypeScriptNodejsInterceptor getInterceptor(IIDETypeScriptProject project) {
+	private TypeScriptNodejsInterceptor getInterceptor(IIDETypeScriptProject project) {
 		String key = TypeScriptNodejsInterceptor.class.getName();
 		TypeScriptNodejsInterceptor interceptor = project.getData(key);
 		if (interceptor == null) {
@@ -46,5 +46,15 @@ public class TypeScriptConsoleNodejsConnector implements ITypeScriptConsoleConne
 			project.setData(key, interceptor);
 		}
 		return interceptor;
+	}
+
+	@Override
+	public void connectToInstallTypesConsole(ITypeScriptServiceClient client) {
+		client.addInstallTypesListener(InstallTypesConsoleListener.INSTANCE);
+	}
+
+	@Override
+	public void disconnectToInstallTypesConsole(ITypeScriptServiceClient client) {
+		client.removeInstallTypesListener(InstallTypesConsoleListener.INSTANCE);
 	}
 }

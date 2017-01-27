@@ -22,6 +22,7 @@ import ts.client.completions.ICompletionEntryFactory;
 import ts.client.configure.ConfigureRequestArguments;
 import ts.client.diagnostics.DiagnosticEvent;
 import ts.client.diagnostics.DiagnosticEventBody;
+import ts.client.installtypes.IInstallTypesListener;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
@@ -263,6 +264,10 @@ public interface ITypeScriptServiceClient {
 	void addClientListener(ITypeScriptClientListener listener);
 
 	void removeClientListener(ITypeScriptClientListener listener);
+
+	void addInstallTypesListener(IInstallTypesListener listener);
+
+	void removeInstallTypesListener(IInstallTypesListener listener);
 
 	void addInterceptor(IInterceptor interceptor);
 

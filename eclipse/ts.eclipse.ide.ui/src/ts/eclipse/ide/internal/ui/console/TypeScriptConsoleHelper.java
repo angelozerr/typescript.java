@@ -16,7 +16,7 @@ import org.eclipse.ui.console.IConsoleManager;
 
 public class TypeScriptConsoleHelper {
 
-	public static void showConsole(TypeScriptConsole console) {
+	public static void showConsole(IConsole console) {
 		if (console != null) {
 			IConsoleManager manager = ConsolePlugin.getDefault().getConsoleManager();
 			IConsole[] existing = manager.getConsoles();
@@ -33,7 +33,7 @@ public class TypeScriptConsoleHelper {
 		}
 	}
 
-	public static void closeConsole(TypeScriptConsole console) {
+	public static void closeConsole(IConsole console) {
 		IConsoleManager manager = ConsolePlugin.getDefault().getConsoleManager();
 		if (console != null) {
 			manager.removeConsoles(new IConsole[] { console });

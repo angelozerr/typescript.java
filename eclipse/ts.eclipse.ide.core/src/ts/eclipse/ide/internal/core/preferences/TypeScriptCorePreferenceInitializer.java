@@ -71,6 +71,8 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 			initializeTypeScriptRuntimePreferences(node, defaultRepository);
 			// Initialize tsserver preferences
 			initializeTsserverPreferences(node, defaultRepository);
+			// Initialize install @types preferences
+			initializeInstallTypesPreferences(node);
 			// Initialize tslint preferences
 			initializeTslintPreferences(node, defaultRepository);
 		} catch (Exception e) {
@@ -131,6 +133,11 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	private void initializeTsserverPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
 		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE, false);
+	}
+
+	private void initializeInstallTypesPreferences(IEclipsePreferences node) {
+		node.putBoolean(TypeScriptCorePreferenceConstants.INSTALL_TYPES_ENABLE_TELEMETRY, false);
+		node.putBoolean(TypeScriptCorePreferenceConstants.INSTALL_TYPES_DISABLE_ATA, false);
 	}
 
 	private void initializeSalsa(IEclipsePreferences node) {

@@ -197,6 +197,12 @@
             id="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage"
             category="org.eclipse.wst.jsdt.ui.preferences.JavaBasePreferencePage">
       </page>
+      <page
+            name="%ATAPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.ATAPreferencePage"
+            id="ts.eclipse.ide.ui.preference.ATAPreferencePage"
+            category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
+      </page>
 	  <page
             name="%NodejsPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.NodejsPreferencePage"
@@ -248,6 +254,17 @@
 		     </adapt>         
          </enabledWhen>
       </page>
+	  <page
+            name="%ATAPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.ATAPreferencePage"
+            id="ts.eclipse.ide.ui.property.ATAPreferencePage"
+            category="ts.eclipse.ide.ui.property.TypeScriptMainPropertyPage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
+		     </adapt>         
+         </enabledWhen>
+      </page>      
 	  <page
             name="%NodejsPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.NodejsPreferencePage"

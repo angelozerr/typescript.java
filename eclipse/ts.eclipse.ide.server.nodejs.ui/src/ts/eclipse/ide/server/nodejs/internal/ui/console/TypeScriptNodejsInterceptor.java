@@ -18,8 +18,6 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
 
-import com.eclipsesource.json.JsonObject;
-
 import ts.client.LoggingInterceptor;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;

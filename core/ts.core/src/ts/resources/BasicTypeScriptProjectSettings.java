@@ -32,6 +32,9 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	private final ITypeScriptRepository repository;
 	private ICompletionEntryMatcher completionEntryMatcher;
 	private TslintSettingsStrategy tslintStrategy;
+	private boolean enableTelemetry;
+
+	private boolean disableAutomaticTypingAcquisition;
 
 	public BasicTypeScriptProjectSettings(File nodejsInstallPath, File typeScriptDir)
 			throws TypeScriptRepositoryException {
@@ -118,5 +121,23 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	@Override
 	public String getTypeScriptVersion() {
 		return repository.getTypesScriptVersion();
+	}
+
+	@Override
+	public boolean isEnableTelemetry() {
+		return enableTelemetry;
+	}
+
+	public void setEnableTelemetry(boolean enableTelemetry) {
+		this.enableTelemetry = enableTelemetry;
+	}
+
+	@Override
+	public boolean isDisableAutomaticTypingAcquisition() {
+		return disableAutomaticTypingAcquisition;
+	}
+
+	public void setDisableAutomaticTypingAcquisition(boolean disableAutomaticTypingAcquisition) {
+		this.disableAutomaticTypingAcquisition = disableAutomaticTypingAcquisition;
 	}
 }

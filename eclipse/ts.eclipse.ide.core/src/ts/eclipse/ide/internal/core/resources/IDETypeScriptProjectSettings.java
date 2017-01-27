@@ -68,6 +68,17 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
+	public boolean isEnableTelemetry() {
+		return super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.INSTALL_TYPES_ENABLE_TELEMETRY,
+				false);
+	}
+
+	@Override
+	public boolean isDisableAutomaticTypingAcquisition() {
+		return super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.INSTALL_TYPES_DISABLE_ATA, false);
+	}
+
+	@Override
 	public IEmbeddedNodejs getEmbeddedNodejs() {
 		String id = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED_ID, null);
 		return TypeScriptCorePlugin.getNodejsInstallManager().findNodejsInstall(id);
@@ -175,6 +186,12 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		} else if (isTslintPreferencesChanged(event)) {
 			this.tslintStrategy = null;
 			getTypeScriptProject().disposeTslint();
+		} else if (isInstallTypesPreferencesChanged(event)) {
+			IIDETypeScriptProject tsProject = getTypeScriptProject();
+			if (tsProject != null) {
+				tsProject.disposeCompiler();
+				tsProject.disposeServer();
+			}
 		}
 	}
 
@@ -221,6 +238,11 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 				|| TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSLINT_EMBEDDED_TYPESCRIPT_ID.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.TSLINT_INSTALLED_TYPESCRIPT_PATH.equals(event.getKey());
+	}
+
+	private boolean isInstallTypesPreferencesChanged(PreferenceChangeEvent event) {
+		return TypeScriptCorePreferenceConstants.INSTALL_TYPES_ENABLE_TELEMETRY.equals(event.getKey()) ||
+				TypeScriptCorePreferenceConstants.INSTALL_TYPES_DISABLE_ATA.equals(event.getKey());
 	}
 
 	private boolean isTypeScriptBuildPathPreferencesChanged(PreferenceChangeEvent event) {

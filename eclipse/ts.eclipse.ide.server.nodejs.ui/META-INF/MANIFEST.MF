@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.ui,
  ts.core,
  ts.eclipse.ide.ui,
  org.eclipse.core.resources,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ com.google.gson
 Bundle-Activator: ts.eclipse.ide.server.nodejs.internal.ui.TypeScriptNodejsUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"

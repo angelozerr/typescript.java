@@ -147,10 +147,10 @@ public class TypeScriptConsoleConnectorManager implements IRegistryChangeListene
 	}
 
 	/**
-	 * Rturns the TypeScript console connector to use for the given TypeScript client.
+	 * Returns the TypeScript console connector to use for the given TypeScript client.
 	 * 
 	 * @param server
-	 * @return
+	 * @return the TypeScript console connector to use for the given TypeScript client.
 	 */
 	public ITypeScriptConsoleConnector getConnector(ITypeScriptServiceClient server) {
 		ITypeScriptConsoleConnector[] connectors = getTypeScriptConsoleConnectors();

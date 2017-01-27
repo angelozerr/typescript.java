@@ -16,9 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import ts.TypeScriptException;
 import ts.client.CommandNames;
@@ -173,7 +171,8 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 	protected ITypeScriptServiceClient createServiceClient(File projectDir) throws TypeScriptException {
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File tsserverFile = getProjectSettings().getTsserverFile();
-		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile);
+		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile,
+				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition());
 		client.setCompletionEntryMatcherProvider(this);
 		return client;
 	}
@@ -352,13 +351,15 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 	@Override
 	public CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay)
 			throws TypeScriptException {
-		/*if (projectInfo == null) {
-			CompletableFuture.allOf(getClient().projectInfo(file, null, true), geterrForProjectRequest(file, delay));
-			CompletableFuture<ProjectInfo> projectInfoFuture = getClient().projectInfo(file, null, true);
-			return projectInfoFuture.
-					thenAccept(projectInfo -> return geterrForProjectRequest(file, delay));
-		} else {*/
-		
+		/*
+		 * if (projectInfo == null) {
+		 * CompletableFuture.allOf(getClient().projectInfo(file, null, true),
+		 * geterrForProjectRequest(file, delay)); CompletableFuture<ProjectInfo>
+		 * projectInfoFuture = getClient().projectInfo(file, null, true); return
+		 * projectInfoFuture. thenAccept(projectInfo -> return
+		 * geterrForProjectRequest(file, delay)); } else {
+		 */
+
 		try {
 			ProjectInfo projectInfo = getClient().projectInfo(file, null, true).get(5000, TimeUnit.MILLISECONDS);
 			return getClient().geterrForProject(file, delay, projectInfo);
@@ -368,6 +369,6 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 			}
 			throw new TypeScriptException(e);
 		}
-		
+
 	}
 }

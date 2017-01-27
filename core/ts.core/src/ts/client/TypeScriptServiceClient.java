@@ -35,6 +35,9 @@ import ts.client.configure.ConfigureRequestArguments;
 import ts.client.diagnostics.Diagnostic;
 import ts.client.diagnostics.DiagnosticEvent;
 import ts.client.diagnostics.DiagnosticEventBody;
+import ts.client.installtypes.BeginInstallTypesEventBody;
+import ts.client.installtypes.EndInstallTypesEventBody;
+import ts.client.installtypes.IInstallTypesListener;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
@@ -78,7 +81,6 @@ import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 import ts.nodejs.NodejsProcessManager;
-import ts.utils.FileUtils;
 
 /**
  * TypeScript service client implementation.
@@ -92,6 +94,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	private INodejsProcess process;
 	private List<INodejsProcessListener> nodeListeners;
 	private final List<ITypeScriptClientListener> listeners;
+	private final List<IInstallTypesListener> installTypesListener;
 	private final ReentrantReadWriteLock stateLock;
 	private boolean dispose;
 
@@ -147,14 +150,26 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
+		this(projectDir, tsserverFile, nodeFile, false, false);
+	}
+
+	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile, boolean enableTelemetry,
+			boolean disableAutomaticTypingAcquisition) throws TypeScriptException {
 		this(NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile,
 				new INodejsLaunchConfiguration() {
 
 					@Override
 					public List<String> createNodeArgs() {
 						List<String> args = new ArrayList<String>();
-						args.add("-p");
-						args.add(FileUtils.getPath(projectDir));
+						// args.add("-p");
+						// args.add(FileUtils.getPath(projectDir));
+						if (enableTelemetry) {
+							args.add("--enableTelemetry");
+						}
+						if (disableAutomaticTypingAcquisition) {
+							args.add("--disableAutomaticTypingAcquisition");
+						}
+						//args.add("--useSingleInferredProject");
 						return args;
 					}
 				}, TSSERVER_FILE_TYPE));
@@ -162,6 +177,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	public TypeScriptServiceClient(INodejsProcess process) {
 		this.listeners = new ArrayList<>();
+		this.installTypesListener = new ArrayList<>();
 		this.stateLock = new ReentrantReadWriteLock();
 		this.dispose = false;
 		this.sentRequestMap = new LinkedHashMap<>();
@@ -212,6 +228,27 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 					if (pendingRequestEventInfo != null) {
 						pendingRequestEventInfo.eventHandler.accept(response);
 					}
+				} else if ("telemetry".equals(event)) {
+					// TelemetryEventBody telemetryData =
+					// GsonHelper.DEFAULT_GSON.fromJson(json,
+					// TelemetryEvent.class)
+					// .getBody();
+					//
+					JsonObject telemetryData = json.get("body").getAsJsonObject();
+					JsonObject payload = telemetryData.has("payload") ? telemetryData.get("payload").getAsJsonObject()
+							: null;
+					if (payload != null) {
+						String telemetryEventName = telemetryData.get("telemetryEventName").getAsString();
+						fireLogTelemetry(telemetryEventName, payload);
+					}
+				} else if ("beginInstallTypes".equals(event)) {
+					BeginInstallTypesEventBody data = GsonHelper.DEFAULT_GSON.fromJson(json,
+							BeginInstallTypesEventBody.class);
+					fireBeginInstallTypes(data);
+				} else if ("endInstallTypes".equals(event)) {
+					EndInstallTypesEventBody data = GsonHelper.DEFAULT_GSON.fromJson(json,
+							EndInstallTypesEventBody.class);
+					fireEndInstallTypes(data);
 				}
 				break;
 			default:
@@ -320,8 +357,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	@Override
-	public CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay,
-			ProjectInfo projectInfo) throws TypeScriptException {
+	public CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay, ProjectInfo projectInfo)
+			throws TypeScriptException {
 		return execute(new GeterrForProjectRequest(file, delay, projectInfo), true);
 	}
 
@@ -381,13 +418,14 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// Since 2.0.5
 
 	@Override
-	public CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException {
+	public CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced)
+			throws TypeScriptException {
 		return execute(new CompileOnSaveEmitFileRequest(fileName, forced), true);
 	}
-	
+
 	@Override
-	public CompletableFuture<List<CompileOnSaveAffectedFileListSingleProject>> compileOnSaveAffectedFileList(String fileName)
-			throws TypeScriptException {
+	public CompletableFuture<List<CompileOnSaveAffectedFileListSingleProject>> compileOnSaveAffectedFileList(
+			String fileName) throws TypeScriptException {
 		return execute(new CompileOnSaveAffectedFileListRequest(fileName), true);
 	}
 
@@ -497,7 +535,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
-	protected void fireStartServer() {
+	private void fireStartServer() {
 		synchronized (listeners) {
 			for (ITypeScriptClientListener listener : listeners) {
 				listener.onStart(this);
@@ -505,10 +543,48 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		}
 	}
 
-	protected void fireEndServer() {
+	private void fireEndServer() {
 		synchronized (listeners) {
 			for (ITypeScriptClientListener listener : listeners) {
 				listener.onStop(this);
+			}
+		}
+	}
+
+	@Override
+	public void addInstallTypesListener(IInstallTypesListener listener) {
+		synchronized (installTypesListener) {
+			installTypesListener.add(listener);
+		}
+	}
+
+	@Override
+	public void removeInstallTypesListener(IInstallTypesListener listener) {
+		synchronized (installTypesListener) {
+			installTypesListener.remove(listener);
+		}
+	}
+
+	private void fireBeginInstallTypes(BeginInstallTypesEventBody body) {
+		synchronized (installTypesListener) {
+			for (IInstallTypesListener listener : installTypesListener) {
+				listener.onBegin(body);
+			}
+		}
+	}
+
+	private void fireEndInstallTypes(EndInstallTypesEventBody body) {
+		synchronized (installTypesListener) {
+			for (IInstallTypesListener listener : installTypesListener) {
+				listener.onEnd(body);
+			}
+		}
+	}
+
+	private void fireLogTelemetry(String telemetryEventName, JsonObject payload) {
+		synchronized (installTypesListener) {
+			for (IInstallTypesListener listener : installTypesListener) {
+				listener.logTelemetry(telemetryEventName, payload);
 			}
 		}
 	}

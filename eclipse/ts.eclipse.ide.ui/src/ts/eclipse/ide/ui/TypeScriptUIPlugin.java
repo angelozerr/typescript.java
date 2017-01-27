@@ -25,6 +25,7 @@ import org.osgi.framework.BundleContext;
 
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
+import ts.eclipse.ide.internal.ui.console.InstallTypesConsole;
 import ts.eclipse.ide.internal.ui.console.TypeScriptConsole;
 import ts.eclipse.ide.internal.ui.console.TypeScriptConsoleHelper;
 import ts.eclipse.ide.ui.console.ITypeScriptConsole;
@@ -109,6 +110,15 @@ public class TypeScriptUIPlugin extends AbstractUIPlugin {
 		return console;
 	}
 
+	public ITypeScriptConsole getInstallTypesConsole() {
+		if (!PlatformUI.isWorkbenchRunning()) {
+			return null;
+		}
+		InstallTypesConsole console = InstallTypesConsole.getConsole();
+		TypeScriptConsoleHelper.showConsole(console);
+		return console;
+	}
+
 	public FormToolkit getDialogsFormToolkit() {
 		if (fDialogsFormToolkit == null) {
 			FormColors colors = new FormColors(Display.getCurrent());
@@ -144,4 +154,5 @@ public class TypeScriptUIPlugin extends AbstractUIPlugin {
 	public static void log(Throwable e) {
 		log(TypeScriptUIMessages.TypeScriptUIPlugin_internal_error, e);
 	}
+
 }

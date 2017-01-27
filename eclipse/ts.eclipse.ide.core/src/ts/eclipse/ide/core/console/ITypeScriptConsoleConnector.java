@@ -14,7 +14,8 @@ import ts.client.ITypeScriptServiceClient;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 
 /**
- * Connector used to connect tern server to the eclipse console.
+ * Connector used to connect TypeScript tsserver, install types to the eclipse
+ * console.
  * 
  */
 public interface ITypeScriptConsoleConnector {
@@ -41,5 +42,9 @@ public interface ITypeScriptConsoleConnector {
 	 * @param ternServer
 	 */
 	void disconnectToConsole(ITypeScriptServiceClient client, IIDETypeScriptProject project);
+
+	void connectToInstallTypesConsole(ITypeScriptServiceClient client);
+
+	void disconnectToInstallTypesConsole(ITypeScriptServiceClient client);
 
 }

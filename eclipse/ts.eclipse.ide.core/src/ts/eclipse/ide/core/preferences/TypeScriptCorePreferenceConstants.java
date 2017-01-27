@@ -30,6 +30,12 @@ public class TypeScriptCorePreferenceConstants {
 
 	public static final String TSSERVER_TRACE_ON_CONSOLE = "tsserverTraceOnConsole"; //$NON-NLS-1$
 
+	// Install @types
+
+	public static final String INSTALL_TYPES_ENABLE_TELEMETRY = "installTypes.enableTelemetry"; //$NON-NLS-1$
+
+	public static final String INSTALL_TYPES_DISABLE_ATA = "installTypes.disableAutomaticTypingAcquisition"; //$NON-NLS-1$
+
 	// tsc
 
 	public static final String USE_EMBEDDED_TYPESCRIPT = "useEmbeddedTypeScript"; //$NON-NLS-1$
@@ -75,43 +81,43 @@ public class TypeScriptCorePreferenceConstants {
 	public static final int EDITOR_OPTIONS_TAB_SIZE_DEFAULT = 4; // $NON-NLS-1$
 
 	// Format Options
-	
+
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER = "insertSpaceAfterCommaDelimiter"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_COMMA_DELIMITER_DEFAULT = true; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS = "insertSpaceAfterSemicolonInForStatements"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_SEMICOLON_IN_FOR_STATEMENTS_DEFAULT = true; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS = "insertSpaceBeforeAndAfterBinaryOperators"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_BEFORE_AND_AFTER_BINARY_OPERATORS_DEFAULT = true; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS = "insertSpaceAfterKeywordsInControlFlowStatements"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_KEYWORDS_IN_CONTROL_FLOW_STATEMENTS_DEFAULT = true; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS = "insertSpaceAfterFunctionKeywordForAnonymousFunctions"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_FUNCTION_KEYWORD_FOR_ANONYMOUS_FUNCTIONS_DEFAULT = false; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS = "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_PARENTHESIS_DEFAULT = true; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS = "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_INSERT_SPACE_AFTER_OPENING_AND_BEFORE_CLOSING_NONEMPTY_BRACKETS_DEFAULT = false; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS = "placeOpenBraceOnNewLineForFunctions"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_FUNCTIONS_DEFAULT = false; // $NON-NLS-1$
-	
+
 	public static final String FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS = "placeOpenBraceOnNewLineForControlBlocks"; // $NON-NLS-1$
 
 	public static final boolean FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS_DEFAULT = false; // $NON-NLS-1$
-	
+
 	private TypeScriptCorePreferenceConstants() {
 	}
 }

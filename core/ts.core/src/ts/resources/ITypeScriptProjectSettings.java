@@ -94,4 +94,12 @@ public interface ITypeScriptProjectSettings {
 
 	FormatCodeSettings getFormatOptions();
 
+	/**
+	 * Returns true if telemetry must be enable and false otherwise.
+	 * 
+	 * @return true if telemetry must be enable and false otherwise.
+	 */
+	boolean isEnableTelemetry();
+
+	boolean isDisableAutomaticTypingAcquisition();
 }

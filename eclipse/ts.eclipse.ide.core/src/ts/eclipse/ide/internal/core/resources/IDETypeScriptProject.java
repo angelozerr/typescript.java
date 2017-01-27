@@ -218,12 +218,22 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 							// console.
 							connector.disconnectToConsole(client, this);
 						}
+						// Enable Install @types console (ATA) ?
+						if (isEnableTelemetry()) {
+							connector.connectToInstallTypesConsole(client);
+						} else {
+							connector.disconnectToInstallTypesConsole(client);
+						}
 					}
 				} catch (TypeScriptException e) {
 					Trace.trace(Trace.SEVERE, "Error while getting TypeScript client", e);
 				}
 			}
 		}
+	}
+
+	private boolean isEnableTelemetry() {
+		return getProjectSettings().isEnableTelemetry();
 	}
 
 	private boolean isTraceOnConsole() {

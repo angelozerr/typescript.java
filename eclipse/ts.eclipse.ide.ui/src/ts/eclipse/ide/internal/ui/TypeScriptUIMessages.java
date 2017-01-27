@@ -59,6 +59,11 @@ public class TypeScriptUIMessages extends NLS {
 	public static String PropertyAndPreferencePage_useworkspacesettings_change;
 	public static String PropertyAndPreferencePage_showprojectspecificsettings_label;
 
+	// ATA
+	public static String ATAConfigurationBlock_description;
+	public static String ATAConfigurationBlock_disableATA_checkbox_label;
+	public static String ATAConfigurationBlock_enableTelemetry_checkbox_label;
+	
 	// nodejs
 	public static String NodejsConfigurationBlock_nodejs_group_label;
 	public static String NodejsConfigurationBlock_embedded_checkbox_label;
