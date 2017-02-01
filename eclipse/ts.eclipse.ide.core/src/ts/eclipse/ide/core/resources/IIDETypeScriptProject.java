@@ -10,8 +10,12 @@
  */
 package ts.eclipse.ide.core.resources;
 
+import java.util.List;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
@@ -98,5 +102,13 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	IIDETypeScriptCompiler getCompiler() throws TypeScriptException;
 
 	IIDETypeScriptLint getTslint() throws TypeScriptException;
+
+	/**
+	 * 
+	 * @param updatedTsFiles
+	 * @param removedTsFiles
+	 * @throws TypeScriptException
+	 */
+	void compileWithTsserver(List<IFile> updatedTsFiles, List<IFile> removedTsFiles, IProgressMonitor monitor) throws TypeScriptException;
 
 }

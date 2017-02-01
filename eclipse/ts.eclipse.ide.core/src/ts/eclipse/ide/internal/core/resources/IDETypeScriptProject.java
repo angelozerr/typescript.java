@@ -12,17 +12,25 @@ package ts.eclipse.ide.internal.core.resources;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
+import ts.client.compileonsave.CompileOnSaveAffectedFileListSingleProject;
+import ts.client.diagnostics.Diagnostic;
+import ts.client.diagnostics.DiagnosticEventBody;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
@@ -31,8 +39,8 @@ import ts.eclipse.ide.core.console.ITypeScriptConsoleConnector;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
-import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.buildpath.ITsconfigBuildPath;
+import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.core.resources.watcher.IFileWatcherListener;
 import ts.eclipse.ide.core.resources.watcher.ProjectWatcherListenerAdapter;
@@ -360,4 +368,110 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		return new IDETypeScriptLint(tslintFile, tslintJsonFile, nodejsFile);
 	}
 
+	// --------------------------------------- Compile with tsserver
+
+	@Override
+	public void compileWithTsserver(List<IFile> updatedTsFiles, List<IFile> removedTsFiles, IProgressMonitor monitor)
+			throws TypeScriptException {
+		try {
+			List<String> tsFilesToCompile = new ArrayList<>();
+			// Collect ts files to compile by using tsserver to retrieve
+			// dependencies files.
+			// It works only if tsconfig.json declares "compileOnSave: true".
+			collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, false);
+			// Compile ts files with tsserver.
+			compileTsFiles(tsFilesToCompile, getClient());
+			if (removedTsFiles.size() > 0) {
+				// ts files was removed, how to get referenced files which must
+				// be recompiled (with errors)?
+			}
+		} catch (TypeScriptException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new TypeScriptException(e);
+		}
+	}
+
+	/**
+	 * Collect ts files to compile from the given ts files list.
+	 * 
+	 * @param tsFiles
+	 * @param client
+	 * @param tsFilesToCompile
+	 * @param exclude
+	 * @throws Exception
+	 */
+	private void collectTsFilesToCompile(List<IFile> tsFiles, ITypeScriptServiceClient client,
+			List<String> tsFilesToCompile, boolean exclude) throws Exception {
+		for (IFile tsFile : tsFiles) {
+			String filename = WorkbenchResourceUtil.getFileName(tsFile);
+			if (!tsFilesToCompile.contains(filename)) {
+				collectTsFilesToCompile(filename, client, tsFilesToCompile, exclude);
+			}
+		}
+	}
+
+	/**
+	 * Collect ts files to compile from the given ts file name.
+	 * 
+	 * @param filename
+	 * @param client
+	 * @param tsFilesToCompile
+	 * @param exclude
+	 * @throws Exception
+	 */
+	private void collectTsFilesToCompile(String filename, ITypeScriptServiceClient client,
+			List<String> tsFilesToCompile, boolean exclude) throws Exception {
+		// call tsserver compileOnSaveAffectedFileList to retrieve file
+		// dependencies of the given filename
+		List<CompileOnSaveAffectedFileListSingleProject> affectedProjects = client
+				.compileOnSaveAffectedFileList(filename).get(5000, TimeUnit.MILLISECONDS);
+		for (CompileOnSaveAffectedFileListSingleProject affectedProject : affectedProjects) {
+			List<String> affectedTsFilenames = affectedProject.getFileNames();
+			for (String affectedFilename : affectedTsFilenames) {
+				if (!tsFilesToCompile.contains(affectedFilename) && !(exclude && filename.equals(affectedFilename))) {
+					tsFilesToCompile.add(affectedFilename);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Compile ts files list with tsserver.
+	 * 
+	 * @param tsFilesToCompile
+	 * @param client
+	 * @throws Exception
+	 */
+	private void compileTsFiles(List<String> tsFilesToCompile, ITypeScriptServiceClient client) throws Exception {
+		for (String filename : tsFilesToCompile) {
+			compileTsFile(filename, client);
+		}
+	}
+
+	/**
+	 * Compile ts file with tsserver.
+	 * 
+	 * @param filename
+	 * @param client
+	 * @throws Exception
+	 */
+	private void compileTsFile(String filename, ITypeScriptServiceClient client) throws Exception {
+		// Compile the given ts filename with tsserver
+		Boolean result = client.compileOnSaveEmitFile(filename, true).get(5000, TimeUnit.MILLISECONDS);
+
+		IFile tsFile = WorkbenchResourceUtil.findFileFromWorkspace(filename);
+		if (tsFile != null) {
+			// Delete TypeScript error marker
+			TypeScriptResourceUtil.deleteTscMarker(tsFile);
+			// Add TypeScript error marker if there error errors.
+			DiagnosticEventBody event = client.semanticDiagnosticsSync(filename, false).get(5000,
+					TimeUnit.MILLISECONDS);
+			List<Diagnostic> diagnostics = event.getDiagnostics();
+			for (Diagnostic diagnostic : diagnostics) {
+				TypeScriptResourceUtil.addTscMarker(tsFile, diagnostic.getText(), IMarker.SEVERITY_ERROR,
+						diagnostic.getStart().getLine());
+			}
+		}
+	}
 }

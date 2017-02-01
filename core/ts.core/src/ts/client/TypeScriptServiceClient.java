@@ -169,7 +169,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 						if (disableAutomaticTypingAcquisition) {
 							args.add("--disableAutomaticTypingAcquisition");
 						}
-						//args.add("--useSingleInferredProject");
+						// args.add("--useSingleInferredProject");
 						return args;
 					}
 				}, TSSERVER_FILE_TYPE));

@@ -47,7 +47,7 @@ public class TsconfigJson {
 	private List<String> defaultExclude;
 
 	public TsconfigJson() {
-		this.compileOnSave = true;
+		this.compileOnSave = false;
 		this.buildOnSave = false;
 	}
 

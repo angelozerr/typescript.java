@@ -172,7 +172,7 @@ public class OverviewPage extends AbstractFormPage implements ITypeScriptElement
 		Composite compileBuildOnSaveBody = toolkit.createComposite(body);
 		compileBuildOnSaveBody.setLayout(new GridLayout());
 		compileOnSave = createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_compileOnSave_label,
-				new JSONPath("compileOnSave"), true);
+				new JSONPath("compileOnSave"));
 		buildOnSave = createCheckbox(compileBuildOnSaveBody, TsconfigEditorMessages.OverviewPage_buildOnSave_label,
 				new JSONPath("buildOnSave"));
 		updateCompileBuildOnSaveEnable(hasTypeScriptBuilder);
