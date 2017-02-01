@@ -31,6 +31,7 @@ Export-Package: ts.eclipse.ide.core,
  ts.eclipse.ide.core.resources,
  ts.eclipse.ide.core.resources.buildpath,
  ts.eclipse.ide.core.resources.jsconfig,
+ ts.eclipse.ide.core.resources.problems,
  ts.eclipse.ide.core.resources.watcher,
  ts.eclipse.ide.core.tslint,
  ts.eclipse.ide.core.utils

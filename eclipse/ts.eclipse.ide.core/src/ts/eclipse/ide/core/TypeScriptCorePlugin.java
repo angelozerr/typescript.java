@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - getter for ProblemManager
  */
 package ts.eclipse.ide.core;
 
@@ -23,10 +24,12 @@ import org.osgi.framework.BundleContext;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.repository.IIDETypeScriptRepositoryManager;
 import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
+import ts.eclipse.ide.core.resources.problems.IProblemManager;
 import ts.eclipse.ide.core.resources.watcher.IResourcesWatcher;
 import ts.eclipse.ide.internal.core.nodejs.NodejsInstallManager;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
+import ts.eclipse.ide.internal.core.resources.problems.ProblemManager;
 import ts.eclipse.ide.internal.core.resources.watcher.ResourcesWatcher;
 import ts.resources.ConfigurableTypeScriptResourcesManager;
 
@@ -124,6 +127,10 @@ public class TypeScriptCorePlugin extends Plugin {
 
 	public static IResourcesWatcher getResourcesWatcher() {
 		return ResourcesWatcher.getInstance();
+	}
+
+	public static IProblemManager getProblemManager() {
+		return ProblemManager.getInstance();
 	}
 
 	public void addTypeScriptElementChangedListener(ITypeScriptElementChangedListener listener) {
