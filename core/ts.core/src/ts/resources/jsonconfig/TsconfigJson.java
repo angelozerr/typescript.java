@@ -142,6 +142,36 @@ public class TsconfigJson {
 	}
 
 	/**
+	 * Returns true if the "compilerOptions" defines "paths" and false
+	 * otherwise.
+	 * 
+	 * @return true if the "compilerOptions" defines "paths" and false
+	 *         otherwise.
+	 */
+	public boolean hasPaths() {
+		CompilerOptions options = getCompilerOptions();
+		if (options == null) {
+			return false;
+		}
+		return !options.getPathsKeys().isEmpty();
+	}
+
+	/**
+	 * Returns true if the "compilerOptions" defines "rootDirs" and false
+	 * otherwise.
+	 * 
+	 * @return true if the "compilerOptions" defines "rootDirs" and false
+	 *         otherwise.
+	 */
+	public boolean hasRootDirs() {
+		CompilerOptions options = getCompilerOptions();
+		if (options == null) {
+			return false;
+		}
+		return !options.getRootDirs().isEmpty();
+	}
+
+	/**
 	 * Returns the defined "exclude" list from the tsconfig.json other exclude
 	 * by default "node_modules" and "bower_components".
 	 * 
