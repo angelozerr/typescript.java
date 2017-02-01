@@ -10,10 +10,6 @@
  */
 package ts.eclipse.ide.internal.core.preferences;
 
-import java.io.File;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
@@ -45,26 +41,10 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		initializeNodejsPreferences(node);
 
 		try {
-			File tsRepositoryBaseDir = FileLocator.getBundleFile(Platform.getBundle("ts.repository"));
 			ITypeScriptRepository defaultRepository = TypeScriptCorePlugin.getTypeScriptRepositoryManager()
-					.createDefaultRepository(tsRepositoryBaseDir);
-
-			// Loop for archives of TypeScript (1.8.10, etc)
-			File archivesDir = new File(tsRepositoryBaseDir, "archives");
-			if (archivesDir.exists()) {
-				File[] oldRepostoryBaseDirs = archivesDir.listFiles();
-				File oldRepostoryBaseDir = null;
-				for (int i = 0; i < oldRepostoryBaseDirs.length; i++) {
-					oldRepostoryBaseDir = oldRepostoryBaseDirs[i];
-					if (oldRepostoryBaseDir.isDirectory()) {
-						try {
-							TypeScriptCorePlugin.getTypeScriptRepositoryManager().createRepository(oldRepostoryBaseDir);
-						} catch (Exception e) {
-							Trace.trace(Trace.SEVERE, "Error while getting an archived TypeScript repository", e);
-						}
-					}
-				}
-
+					.getDefaultRepository();
+			if (defaultRepository == null) {
+				Trace.trace(Trace.WARNING, "No default TypeScript repository is available");
 			}
 
 			// Initialize TypeScript runtime preferences
@@ -126,8 +106,12 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	private void initializeTypeScriptRuntimePreferences(IEclipsePreferences node,
 			ITypeScriptRepository defaultRepository) {
-		node.put(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
-		node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, true);
+		if (defaultRepository != null) {
+			node.put(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
+			node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, true);
+		} else {
+			node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
+		}
 		node.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH, "");
 	}
 
@@ -152,8 +136,12 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 	private void initializeTslintPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
 		node.put(TypeScriptCorePreferenceConstants.TSLINT_STRATEGY, TslintSettingsStrategy.DisableTslint.name());
 		node.put(TypeScriptCorePreferenceConstants.TSLINT_USE_CUSTOM_TSLINTJSON_FILE, "");
-		node.put(TypeScriptCorePreferenceConstants.TSLINT_EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
-		node.putBoolean(TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT, true);
+		if (defaultRepository != null) {
+			node.put(TypeScriptCorePreferenceConstants.TSLINT_EMBEDDED_TYPESCRIPT_ID, defaultRepository.getName());
+			node.putBoolean(TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT, true);
+		} else {
+			node.putBoolean(TypeScriptCorePreferenceConstants.TSLINT_USE_EMBEDDED_TYPESCRIPT, false);
+		}
 		node.put(TypeScriptCorePreferenceConstants.TSLINT_INSTALLED_TYPESCRIPT_PATH, "");
 	}
 
