@@ -1,3 +1,14 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - protected API for setting default
+ */
 package ts.repository;
 
 import java.io.File;
@@ -24,6 +35,10 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 	@Override
 	public ITypeScriptRepository createDefaultRepository(File baseDir) throws TypeScriptRepositoryException {
 		return this.defaultRepository = createRepository(baseDir);
+	}
+
+	protected final void setDefaultRepository(ITypeScriptRepository repository) {
+		this.defaultRepository = repository;
 	}
 
 	@Override
