@@ -67,7 +67,9 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 				IDocument document = textViewer.getDocument();
 				IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);
 				IRegion wordRegion = JavaWordFinder.findWord(document, region.getOffset());
-
+				if (wordRegion == null) {
+					return null;
+				}
 				// Consume tsserver "definition" command and create hyperlink
 				// file span are found.
 				List<FileSpan> spans = tsFile.definition(wordRegion.getOffset()).get(5000, TimeUnit.MILLISECONDS);

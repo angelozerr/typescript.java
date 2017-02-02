@@ -463,11 +463,23 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			return null;
 		}
 		final CompletableFuture<T> result = new CompletableFuture<T>() {
-			/*
-			 * @Override public boolean cancel(boolean mayInterruptIfRunning) {
-			 * sendCancelNotification(id); return
-			 * super.cancel(mayInterruptIfRunning); }
-			 */
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				if (request instanceof IRequestEventable) {
+					List<String> keys = ((IRequestEventable) request).getKeys();
+					synchronized (receivedRequestMap) {
+						for (String key : keys) {
+							receivedRequestMap.remove(key);
+						}
+					}
+				} else {
+					synchronized (sentRequestMap) {
+						sentRequestMap.remove(request.getSeq());
+					}
+				}
+				return super.cancel(mayInterruptIfRunning);
+			}
 		};
 		if (request instanceof IRequestEventable) {
 			Consumer<Event<?>> responseHandler = (event) -> {

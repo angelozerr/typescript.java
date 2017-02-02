@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
@@ -428,6 +429,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	// ---------------------- Occurrences
 
 	private EditorSelectionChangedListener editorSelectionChangedListener;
+	private CompletableFuture<List<OccurrencesResponseItem>> occurrencesFuture;
 
 	/**
 	 * Internal activation listener.
@@ -740,8 +742,11 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			ITypeScriptFile tsFile = getTypeScriptFile(document);
 			if (tsFile != null) {
 				occurrencesCollector.setSelection(selection);
-
-				tsFile.occurrences(selection.getOffset()).thenAccept(occurrences -> {
+				if(occurrencesFuture != null && !occurrencesFuture.isDone()) {					
+					occurrencesFuture.cancel(true);
+				}
+				occurrencesFuture = tsFile.occurrences(selection.getOffset());
+				occurrencesFuture.thenAccept(occurrences -> {
 					occurrencesCollector.startCollect();
 
 					for (OccurrencesResponseItem occurrence : occurrences) {
