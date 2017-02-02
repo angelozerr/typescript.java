@@ -465,13 +465,19 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			// Delete TypeScript error marker
 			TypeScriptResourceUtil.deleteTscMarker(tsFile);
 			// Add TypeScript error marker if there error errors.
-			DiagnosticEventBody event = client.semanticDiagnosticsSync(filename, false).get(5000,
+			DiagnosticEventBody event = client.syntacticDiagnosticsSync(filename, false).get(5000,
 					TimeUnit.MILLISECONDS);
-			List<Diagnostic> diagnostics = event.getDiagnostics();
-			for (Diagnostic diagnostic : diagnostics) {
-				TypeScriptResourceUtil.addTscMarker(tsFile, diagnostic.getText(), IMarker.SEVERITY_ERROR,
-						diagnostic.getStart().getLine());
-			}
+			addMarker(tsFile, event);
+			event = client.semanticDiagnosticsSync(filename, false).get(5000, TimeUnit.MILLISECONDS);
+			addMarker(tsFile, event);
+		}
+	}
+
+	public void addMarker(IFile tsFile, DiagnosticEventBody event) throws CoreException {
+		List<Diagnostic> diagnostics = event.getDiagnostics();
+		for (Diagnostic diagnostic : diagnostics) {
+			TypeScriptResourceUtil.addTscMarker(tsFile, diagnostic.getText(), IMarker.SEVERITY_ERROR,
+					diagnostic.getStart().getLine());
 		}
 	}
 }
