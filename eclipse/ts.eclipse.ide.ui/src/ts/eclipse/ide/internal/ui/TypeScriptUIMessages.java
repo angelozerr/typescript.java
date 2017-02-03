@@ -77,7 +77,7 @@ public class TypeScriptUIMessages extends NLS {
 
 	// tsserver
 	public static String TypeScriptRuntimeConfigurationBlock_traceOnConsole_label;
-
+	public static String TypeScriptRuntimeConfigurationBlock_emulatePlugins_label;
 	// Formatter
 	public static String FormatterConfigurationBlock_editorOptions_group_label;
 	public static String FormatterPreferencePage_editorOptions_tabSize;

@@ -117,6 +117,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	private void initializeTsserverPreferences(IEclipsePreferences node, ITypeScriptRepository defaultRepository) {
 		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE, false);
+		node.putBoolean(TypeScriptCorePreferenceConstants.TSSERVER_EMULATE_PLUGINS, false);
 	}
 
 	private void initializeInstallTypesPreferences(IEclipsePreferences node) {

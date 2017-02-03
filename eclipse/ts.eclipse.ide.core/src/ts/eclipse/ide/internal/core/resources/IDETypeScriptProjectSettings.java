@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
+import ts.TypeScriptException;
 import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.format.FormatCodeSettings;
 import ts.cmd.tslint.TslintSettingsStrategy;
@@ -155,6 +156,17 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return resolvedPath != null ? IDETypeScriptRepositoryManager.getTsserverFile(resolvedPath) : null;
 	}
 
+	@Override
+	public File getTsserverPluginsFile() throws TypeScriptException {
+		if (super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.TSSERVER_EMULATE_PLUGINS, false)) {
+			// Use TypeScript Repository.
+			ITypeScriptRepository repository = TypeScriptCorePlugin.getTypeScriptRepositoryManager()
+					.getDefaultRepository();
+			return (repository != null) ? repository.getTsserverPluginsFile() : null;
+		}
+		return null;
+	}
+
 	private ITypeScriptRepository getRepository(String preferenceName) {
 		String name = super.getStringPreferencesValue(preferenceName, null);
 		if (StringUtils.isEmpty(name)) {
@@ -229,7 +241,8 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		return TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID.equals(event.getKey())
 				|| TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH.equals(event.getKey())
-				|| TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE.equals(event.getKey());
+				|| TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.TSSERVER_EMULATE_PLUGINS.equals(event.getKey());
 	}
 
 	private boolean isTslintPreferencesChanged(PreferenceChangeEvent event) {
@@ -241,8 +254,8 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	private boolean isInstallTypesPreferencesChanged(PreferenceChangeEvent event) {
-		return TypeScriptCorePreferenceConstants.INSTALL_TYPES_ENABLE_TELEMETRY.equals(event.getKey()) ||
-				TypeScriptCorePreferenceConstants.INSTALL_TYPES_DISABLE_ATA.equals(event.getKey());
+		return TypeScriptCorePreferenceConstants.INSTALL_TYPES_ENABLE_TELEMETRY.equals(event.getKey())
+				|| TypeScriptCorePreferenceConstants.INSTALL_TYPES_DISABLE_ATA.equals(event.getKey());
 	}
 
 	private boolean isTypeScriptBuildPathPreferencesChanged(PreferenceChangeEvent event) {

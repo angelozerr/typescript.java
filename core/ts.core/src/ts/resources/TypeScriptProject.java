@@ -172,7 +172,7 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File tsserverFile = getProjectSettings().getTsserverFile();
 		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile,
-				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition());
+				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(), getProjectSettings().getTsserverPluginsFile());
 		client.setCompletionEntryMatcherProvider(this);
 		return client;
 	}

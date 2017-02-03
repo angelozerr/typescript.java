@@ -34,7 +34,9 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 			TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH);
 	private static final Key PREF_TSSERVER_TRACE_ON_CONSOLE = getTypeScriptCoreKey(
 			TypeScriptCorePreferenceConstants.TSSERVER_TRACE_ON_CONSOLE);
-
+	private static final Key PREF_TSSERVER_EMULATE_PLUGINS = getTypeScriptCoreKey(
+			TypeScriptCorePreferenceConstants.TSSERVER_EMULATE_PLUGINS);
+	
 	public TypeScriptRuntimeConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {
 		super(context, project, getKeys(), container);
@@ -45,11 +47,13 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 		super.createBody(parent);
 		super.addCheckBox(parent, TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_traceOnConsole_label,
 				PREF_TSSERVER_TRACE_ON_CONSOLE, new String[] { "true", "false" }, 0);
+		super.addCheckBox(parent, TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_emulatePlugins_label,
+				PREF_TSSERVER_EMULATE_PLUGINS, new String[] { "true", "false" }, 0);
 	}
 
 	private static Key[] getKeys() {
 		return new Key[] { PREF_USE_EMBEDDED_TYPESCRIPT, PREF_TYPESCRIPT_EMBEDDED, PREF_TYPESCRIPT_PATH,
-				PREF_TSSERVER_TRACE_ON_CONSOLE };
+				PREF_TSSERVER_TRACE_ON_CONSOLE, PREF_TSSERVER_EMULATE_PLUGINS };
 	}
 
 	@Override

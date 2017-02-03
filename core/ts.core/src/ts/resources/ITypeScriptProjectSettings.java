@@ -66,6 +66,8 @@ public interface ITypeScriptProjectSettings {
 	 */
 	File getTsserverFile() throws TypeScriptException;
 
+	File getTsserverPluginsFile() throws TypeScriptException;
+
 	/**
 	 * Returns the tslint/bin/tslint file to execute.
 	 * 
@@ -102,4 +104,5 @@ public interface ITypeScriptProjectSettings {
 	boolean isEnableTelemetry();
 
 	boolean isDisableAutomaticTypingAcquisition();
+
 }

@@ -30,6 +30,8 @@ public class TypeScriptCorePreferenceConstants {
 
 	public static final String TSSERVER_TRACE_ON_CONSOLE = "tsserverTraceOnConsole"; //$NON-NLS-1$
 
+	public static final String TSSERVER_EMULATE_PLUGINS = "tsserverEmulatePlugins"; //$NON-NLS-1$
+
 	// Install @types
 
 	public static final String INSTALL_TYPES_ENABLE_TELEMETRY = "installTypes.enableTelemetry"; //$NON-NLS-1$

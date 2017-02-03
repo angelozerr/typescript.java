@@ -99,4 +99,11 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 			return null;
 		}
 	}
+
+	public static File getTsserverPluginsFile(File typesScriptDir) {
+		if (typesScriptDir.getName().equals("tsserver-plugins")) {
+			return typesScriptDir;
+		}
+		return new File(typesScriptDir, "bin/tsserver-plugins");
+	}
 }

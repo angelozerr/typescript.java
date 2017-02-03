@@ -77,4 +77,6 @@ public interface ITypeScriptRepository {
 	 */
 	String getTslintName();
 
+	File getTsserverPluginsFile();
+
 }

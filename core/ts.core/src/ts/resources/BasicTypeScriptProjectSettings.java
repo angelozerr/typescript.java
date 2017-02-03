@@ -73,6 +73,11 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	public File getTsserverFile() {
 		return repository.getTsserverFile();
 	}
+	
+	@Override
+	public File getTsserverPluginsFile() throws TypeScriptException {
+		return repository.getTsserverPluginsFile();
+	}
 
 	@Override
 	public File getTslintFile() throws TypeScriptException {

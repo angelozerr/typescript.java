@@ -81,6 +81,7 @@ import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 import ts.nodejs.NodejsProcessManager;
+import ts.utils.FileUtils;
 
 /**
  * TypeScript service client implementation.
@@ -150,12 +151,13 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
-		this(projectDir, tsserverFile, nodeFile, false, false);
+		this(projectDir, tsserverFile, nodeFile, false, false, null);
 	}
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile, boolean enableTelemetry,
-			boolean disableAutomaticTypingAcquisition) throws TypeScriptException {
-		this(NodejsProcessManager.getInstance().create(projectDir, tsserverFile, nodeFile,
+			boolean disableAutomaticTypingAcquisition, File tsserverPluginsFile) throws TypeScriptException {
+		this(NodejsProcessManager.getInstance().create(projectDir,
+				tsserverPluginsFile != null ? tsserverPluginsFile : tsserverFile, nodeFile,
 				new INodejsLaunchConfiguration() {
 
 					@Override
@@ -168,6 +170,10 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 						}
 						if (disableAutomaticTypingAcquisition) {
 							args.add("--disableAutomaticTypingAcquisition");
+						}
+						if (tsserverPluginsFile != null) {
+							args.add("--typescriptDir");
+							args.add(FileUtils.getPath(tsserverFile.getParentFile().getParentFile()));
 						}
 						// args.add("--useSingleInferredProject");
 						return args;

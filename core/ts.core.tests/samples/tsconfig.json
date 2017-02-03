@@ -1,12 +1,7 @@
 {
+	"compileOnSave": true,
     "compilerOptions": {
-        "module": "commonjs",
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
+        "outDir": "out",
         "sourceMap": true
-    },
-    "files": [
-        "sample.ts"
-    ]
+    }
 }

@@ -1,0 +1,15 @@
+{
+	"name": "tsserver-plugins",
+	"displayName": "TypeScript tsserver plugins",
+	"description": "Load 'Language Service Plugins' with TypeScript version which doesn't support 'Language Service Plugins'",
+	"version": "1.0.0",	
+	"keywords": [
+		"typescript",
+		"tsserver",
+		"plugins"
+	],
+	"main": "./bin/tsserver-plugins",
+	"dependencies": {
+
+	}
+}
