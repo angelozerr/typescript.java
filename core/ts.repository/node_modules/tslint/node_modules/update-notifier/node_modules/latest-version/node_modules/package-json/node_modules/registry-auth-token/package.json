@@ -1,0 +1,75 @@
+{
+  "name": "registry-auth-token",
+  "version": "3.1.0",
+  "description": "Get the auth token set for an npm registry (if any)",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "posttest": "eslint .",
+    "coverage": "istanbul cover _mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/rexxars/registry-auth-token.git"
+  },
+  "keywords": [
+    "npm",
+    "conf",
+    "config",
+    "npmconf",
+    "registry",
+    "auth",
+    "token",
+    "authtoken"
+  ],
+  "author": {
+    "name": "Espen Hovlandsdal",
+    "email": "espen@hovlandsdal.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rexxars/registry-auth-token/issues"
+  },
+  "homepage": "https://github.com/rexxars/registry-auth-token#readme",
+  "dependencies": {
+    "rc": "^1.1.6"
+  },
+  "devDependencies": {
+    "eslint": "^2.4.0",
+    "eslint-config-bengler": "^1.0.7",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5",
+    "require-uncached": "^1.0.2"
+  },
+  "gitHead": "349c63e86949846b70bc57e6801018800dc76382",
+  "_id": "registry-auth-token@3.1.0",
+  "_shasum": "997c08256e0c7999837b90e944db39d8a790276b",
+  "_from": "registry-auth-token@>=3.0.1 <4.0.0",
+  "_npmVersion": "3.10.3",
+  "_nodeVersion": "6.6.0",
+  "_npmUser": {
+    "name": "rexxars",
+    "email": "rexxars@gmail.com"
+  },
+  "dist": {
+    "shasum": "997c08256e0c7999837b90e944db39d8a790276b",
+    "tarball": "https://registry.npmjs.org/registry-auth-token/-/registry-auth-token-3.1.0.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "leipert",
+      "email": "git@leipert.io"
+    },
+    {
+      "name": "rexxars",
+      "email": "rexxars@gmail.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/registry-auth-token-3.1.0.tgz_1476906788283_0.3755947477184236"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/registry-auth-token/-/registry-auth-token-3.1.0.tgz",
+  "readme": "ERROR: No README data found!"
+}
