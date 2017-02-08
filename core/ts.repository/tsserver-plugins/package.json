@@ -1,15 +1,16 @@
 {
 	"name": "tsserver-plugins",
+	"license": "MIT",
+	"version": "0.1.0",
+	"bin": "./bin/tsserver-plugins",
+	"author": "Angelo ZERR <angelo.zerr@gmail.com>",
 	"displayName": "TypeScript tsserver plugins",
 	"description": "Load 'Language Service Plugins' with TypeScript version which doesn't support 'Language Service Plugins'",
-	"version": "1.0.0",	
-	"keywords": [
-		"typescript",
-		"tsserver",
-		"plugins"
-	],
-	"main": "./bin/tsserver-plugins",
-	"dependencies": {
-
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/angelozerr/tsserver-plugins.git"
+	},
+	"scripts": {
+		"publish": "node ./scripts/git-tag.js"
 	}
 }
