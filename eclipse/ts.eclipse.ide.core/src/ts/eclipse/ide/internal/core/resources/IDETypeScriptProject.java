@@ -373,12 +373,13 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public void compileWithTsserver(List<IFile> updatedTsFiles, List<IFile> removedTsFiles, IProgressMonitor monitor)
 			throws TypeScriptException {
+		List<IFile> tsFilesToClosed = new ArrayList<>();
 		try {
 			List<String> tsFilesToCompile = new ArrayList<>();
 			// Collect ts files to compile by using tsserver to retrieve
 			// dependencies files.
 			// It works only if tsconfig.json declares "compileOnSave: true".
-			collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, false);
+			collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, tsFilesToClosed, false);
 			// Compile ts files with tsserver.
 			compileTsFiles(tsFilesToCompile, getClient());
 			if (removedTsFiles.size() > 0) {
@@ -389,6 +390,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			throw e;
 		} catch (Exception e) {
 			throw new TypeScriptException(e);
+		} finally {
+			for (IFile tsFile : tsFilesToClosed) {
+				closeFile(tsFile);
+			}
 		}
 	}
 
@@ -402,10 +407,18 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * @throws Exception
 	 */
 	private void collectTsFilesToCompile(List<IFile> tsFiles, ITypeScriptServiceClient client,
-			List<String> tsFilesToCompile, boolean exclude) throws Exception {
+			List<String> tsFilesToCompile, List<IFile> tsFilesToClosed, boolean exclude) throws Exception {
 		for (IFile tsFile : tsFiles) {
 			String filename = WorkbenchResourceUtil.getFileName(tsFile);
 			if (!tsFilesToCompile.contains(filename)) {
+				// tsserver needs that file must be opened, force the "open"
+				// if file is not opened.
+				// see
+				// https://github.com/angelozerr/typescript.java/issues/142
+				if (getOpenedFile(tsFile) == null) {
+					openFile(tsFile, null);
+					tsFilesToClosed.add(tsFile);
+				}
 				collectTsFilesToCompile(filename, client, tsFilesToCompile, exclude);
 			}
 		}
