@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - Added save actions
  */
 package ts.eclipse.ide.internal.ui;
 
@@ -94,6 +95,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String FormatterConfigurationBlock_formatOptions_insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets;
 	public static String FormatterConfigurationBlock_formatOptions_placeOpenBraceOnNewLineForFunctions;
 	public static String FormatterConfigurationBlock_formatOptions_placeOpenBraceOnNewLineForControlBlocks;
+
+	// Save actions
+	public static String SaveActionsPreferencePage_performTheSelectedActionsOnSave;
+	public static String SaveActionsPreferencePage_formatSourceCode;
 
 	public static String ValidationConfigurationBlock_tslintjson_group_label;
 	public static String ValidationConfigurationBlock_tslintjson_strategy_DisableTslint;
