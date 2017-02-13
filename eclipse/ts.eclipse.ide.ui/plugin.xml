@@ -504,4 +504,22 @@
 			class="ts.eclipse.ide.internal.ui.preferences.TypeScriptUIPreferenceInitializer" />
 	</extension>
 	  
+	<!-- Wizards -->
+	<extension
+	      point="org.eclipse.ui.newWizards">
+		<category
+		   id="ts.eclipse.ide.ui.new"
+		   name="%NewTypeScriptWizard.category">
+		</category>
+	 	<wizard
+		   id="ts.eclipse.ide.ui.wizards.new.project"
+	       name="%NewTypeScriptProjectWizard.name"
+		   class="ts.eclipse.ide.internal.ui.wizards.NewTypeScriptProjectWizard"
+		   project="true"
+		   category="ts.eclipse.ide.ui.new"
+		   icon="icons/full/obj16/logo.png"
+		   finalPerspective="ts.eclipse.ide.ui.perspectives.TypeScriptPerspective" >
+	       <description>%NewTypeScriptProjectWizard.desc</description>
+		</wizard>
+	</extension>	  
 </plugin>        
