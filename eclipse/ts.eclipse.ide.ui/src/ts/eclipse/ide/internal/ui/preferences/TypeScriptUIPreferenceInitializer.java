@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - added save actions
  */
 package ts.eclipse.ide.internal.ui.preferences;
 
@@ -31,6 +32,8 @@ public class TypeScriptUIPreferenceInitializer extends AbstractPreferenceInitial
 		// initialize properties for TextMate using
 		initializeTextMatePreferences(node);
 
+		// initialize properties for editor save actions
+		initializeEditorSaveActionsPreferences(node);
 	}
 
 	/**
@@ -40,5 +43,15 @@ public class TypeScriptUIPreferenceInitializer extends AbstractPreferenceInitial
 	 */
 	private void initializeTextMatePreferences(IEclipsePreferences node) {
 		node.putBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING, false);
+	}
+
+	/**
+	 * initialize properties for editor save actions
+	 * 
+	 * @param node
+	 */
+	private void initializeEditorSaveActionsPreferences(IEclipsePreferences node) {
+		node.putBoolean(TypeScriptUIPreferenceConstants.EDITOR_SAVE_ACTIONS, false);
+		node.putBoolean(TypeScriptUIPreferenceConstants.EDITOR_SAVE_ACTIONS_FORMAT, true);
 	}
 }

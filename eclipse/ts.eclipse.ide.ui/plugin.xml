@@ -10,6 +10,7 @@
 #
 # Contributors:
 #     Angelo Zerr <angelo.zerr@gmail.com> - Initial API and implementation 
+#     Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - Added save actions
 ###############################################################################
  -->
 <plugin>
@@ -238,7 +239,13 @@
             class="ts.eclipse.ide.internal.ui.preferences.TextMatePreferencePage"
             id="ts.eclipse.ide.ui.preference.TextMatePreferencePage"
             category="ts.eclipse.ide.ui.preference.EditorPreferencePage">
-      </page>                  
+      </page>
+   <page
+         category="ts.eclipse.ide.ui.preference.EditorPreferencePage"
+         class="ts.eclipse.ide.internal.ui.preferences.SaveActionsPreferencePage"
+         id="ts.eclipse.ide.ui.preference.SaveActionsPreferencePage"
+         name="%SaveActionsPreferencePage.name">
+   </page>                  
    </extension>
          		
   <!-- Property Pages -->          		
@@ -330,7 +337,21 @@
 		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
 		     </adapt>         
          </enabledWhen>
-      </page>                                    
+      </page>
+   <page
+         category="ts.eclipse.ide.ui.property.EditorPreferencePage"
+         class="ts.eclipse.ide.internal.ui.preferences.SaveActionsPreferencePage"
+         id="ts.eclipse.ide.ui.property.SaveActionsPreferencePage"
+         name="%SaveActionsPreferencePage.name">
+      <enabledWhen>
+         <adapt
+               type="org.eclipse.core.resources.IProject">
+            <test
+                  property="ts.eclipse.ide.core.isTypeScriptProject">
+            </test>
+         </adapt>
+      </enabledWhen>
+   </page>                                    
    </extension>
 	            
 	<!-- Search -->

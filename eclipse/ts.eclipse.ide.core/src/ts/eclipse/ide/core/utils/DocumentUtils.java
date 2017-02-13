@@ -1,3 +1,14 @@
+/**
+ *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - made toTextEdit public
+ */
 package ts.eclipse.ide.core.utils;
 
 import java.util.List;
@@ -67,7 +78,19 @@ public class DocumentUtils {
 		}
 	}
 
-	private static TextEdit toTextEdit(List<CodeEdit> codeEdits, IDocument document) throws TypeScriptException {
+	/**
+	 * Transforms a list of documents edits into a standard {@link TextEdit}
+	 * object that can be used for more complex operations, such as with the
+	 * refactoring API.
+	 * 
+	 * @param codeEdits
+	 *            list of TypeScript {@link CodeEdit}.
+	 * @param document
+	 *            document to use as context for validating edit positions.
+	 * @return a {@link TextEdit} object.
+	 * @throws TypeScriptException
+	 */
+	public static TextEdit toTextEdit(List<CodeEdit> codeEdits, IDocument document) throws TypeScriptException {
 		MultiTextEdit textEdit = new MultiTextEdit();
 		for (CodeEdit codeEdit : codeEdits) {
 			toTextEdit(codeEdit, document, textEdit);

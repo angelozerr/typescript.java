@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - added save actions
  */
 package ts.eclipse.ide.ui.preferences;
 
@@ -16,11 +17,26 @@ package ts.eclipse.ide.ui.preferences;
  */
 public class TypeScriptUIPreferenceConstants {
 
+	// TextMate
+
 	/**
 	 * True is TextMate must be used to colorize TypeScript, JSX files and false otherwise.
 	 */
 	public final static String USE_TEXMATE_FOR_SYNTAX_COLORING = "useTextMateForSyntaxColoring";
 	
+	// Editor Save Actions
+
+	/**
+	 * True if saving an editor should automatically perform some actions.
+	 */
+	public static final String EDITOR_SAVE_ACTIONS = "editorSaveActions"; // $NON-NLS-1$
+
+	/**
+	 * True if the editor save actions should include formatting the source
+	 * code.
+	 */
+	public static final String EDITOR_SAVE_ACTIONS_FORMAT = "editorSaveActions.format"; // $NON-NLS-1$
+
 	private TypeScriptUIPreferenceConstants() {
 	}
 }

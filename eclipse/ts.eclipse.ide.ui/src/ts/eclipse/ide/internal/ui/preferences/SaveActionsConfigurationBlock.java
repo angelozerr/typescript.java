@@ -6,8 +6,7 @@
  *  http://www.eclipse.org/legal/epl-v10.html
  *
  *  Contributors:
- *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - added reconcileControls hook
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - initial API and implementation
  */
 package ts.eclipse.ide.internal.ui.preferences;
 
@@ -16,8 +15,8 @@ import org.eclipse.jface.dialogs.ControlEnableState;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
@@ -27,26 +26,31 @@ import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
 import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
 
 /**
- * TextMate configuration block.
+ * Editor save actions configuration block.
  *
  */
-public class TextMateConfigurationBlock extends OptionsConfigurationBlock {
+public class SaveActionsConfigurationBlock extends OptionsConfigurationBlock {
 
-	// Editor Options
-	private static final Key PREF_USE_TEXMATE_FOR_SYNTAX_COLORING = getTypeScriptUIKey(
-			TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING);
+	// Editor Save Actions
+	private static final Key PREF_EDITOR_SAVE_ACTIONS = getTypeScriptUIKey(
+			TypeScriptUIPreferenceConstants.EDITOR_SAVE_ACTIONS);
+	private static final Key PREF_EDITOR_SAVE_ACTIONS_FORMAT = getTypeScriptUIKey(
+			TypeScriptUIPreferenceConstants.EDITOR_SAVE_ACTIONS_FORMAT);
 
 	private Composite controlsComposite;
 	private ControlEnableState blockEnableState;
+	private Button saveActionsButton;
+	private Composite saveActionsContainer;
+	private ControlEnableState saveActionsContainerEnableState;
 
-	public TextMateConfigurationBlock(IStatusChangeListener context, IProject project,
+	public SaveActionsConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {
 		super(context, project, getKeys(), container);
 		blockEnableState = null;
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] { PREF_USE_TEXMATE_FOR_SYNTAX_COLORING };
+		return new Key[] { PREF_EDITOR_SAVE_ACTIONS, PREF_EDITOR_SAVE_ACTIONS_FORMAT };
 	}
 
 	public void enablePreferenceContent(boolean enable) {
@@ -83,29 +87,52 @@ public class TextMateConfigurationBlock extends OptionsConfigurationBlock {
 		layout.numColumns = 1;
 		controlsComposite.setLayout(layout);
 
-		// TextMate options
-		createTextMateOptions(controlsComposite);
+		// save actions
+		createSaveActions(controlsComposite);
 		return pageContent;
 	}
 
 	/**
-	 * Create editor options.
+	 * Create save actions.
 	 * 
 	 * @param parent
 	 */
-	private void createTextMateOptions(Composite parent) {
+	private void createSaveActions(Composite parent) {
 
-		Group group = new Group(parent, SWT.NONE);
-		group.setText(TypeScriptUIMessages.TextMateConfigurationBlock_textmate_group_label);
+		// Perform the selected actions on save
+		saveActionsButton = addCheckBox(parent,
+				TypeScriptUIMessages.SaveActionsPreferencePage_performTheSelectedActionsOnSave,
+				PREF_EDITOR_SAVE_ACTIONS, new String[] { "true", "false" }, 0);
 
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
-		group.setLayout(layout);
-		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		saveActionsContainer = new Composite(parent, SWT.NONE);
+		{
+			GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+			data.horizontalIndent = 10;
+			saveActionsContainer.setLayoutData(data);
+			GridLayout layout = new GridLayout();
+			layout.marginHeight = 0;
+			layout.marginWidth = 0;
+			layout.numColumns = 1;
+			saveActionsContainer.setLayout(layout);
+		}
 
-		// Use TextMate for syntax coloring
-		addCheckBox(group, TypeScriptUIMessages.TextMateConfigurationBlock_textmate_SyntaxColoring,
-				PREF_USE_TEXMATE_FOR_SYNTAX_COLORING, new String[] { "true", "false" }, 0);
+		// Format source code
+		addCheckBox(saveActionsContainer, TypeScriptUIMessages.SaveActionsPreferencePage_formatSourceCode,
+				PREF_EDITOR_SAVE_ACTIONS_FORMAT, new String[] { "true", "false" }, 0);
+	}
+
+	@Override
+	protected void reconcileControls() {
+		if (saveActionsButton.getSelection()) {
+			if (saveActionsContainerEnableState != null) {
+				saveActionsContainerEnableState.restore();
+				saveActionsContainerEnableState = null;
+			}
+		} else {
+			if (saveActionsContainerEnableState == null) {
+				saveActionsContainerEnableState = ControlEnableState.disable(saveActionsContainer);
+			}
+		}
 	}
 
 	@Override
