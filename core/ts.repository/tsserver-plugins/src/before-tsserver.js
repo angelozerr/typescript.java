@@ -9,60 +9,96 @@ try {
   Object.defineProperty(ts, "createLanguageService", {
     get: function() {
       return function(host, documentRegistry) {
-    	// Create Language Service
-        var ls = createLanguageService(host, documentRegistry);
-        // Check if tsconfig.json declared plugins like this:
-        // {
-        //   "compilerOptions": {
-        //    "plugins": [
-        //			{ "name": "tslint-language-service"}, 
-        //			{ "name": "@angular/language-service"}
-        //		]
-        //  }
-        //}
-        //
-        var compilerOptions = host.getCompilationSettings();        
-        if (compilerOptions && Object.getOwnPropertyNames(compilerOptions).length > 1) {
-          var project = host.project;
-          // It exists "compilerOptions", reload tsconfig.json because at this step, compilerOptions/plugins is not available.
-          var configFilename = ts.normalizePath(compilerOptions.configFilePath);          
-          var configFileContent = host.readFile(configFilename);
-          var configJsonObject = ts.parseConfigFileTextToJson(configFilename, configFileContent);
-          // get array of compilerOptions/plugins
-          var plugins = configJsonObject.config.compilerOptions.plugins;          
-          if (!(plugins && plugins.length)) {                
-            project.projectService.logger.info("No plugins exist");
-            // No plugins
-          } else {
-        	// Load plugins
-            plugins.forEach(function(plugin) {
-              if (plugin.name) {
+    	
+    	var languageService = createLanguageService(host, documentRegistry);
+    	
+    	function enablePlugins() {    		
+          // Check if tsconfig.json declared plugins like this:
+          // {
+          //   "compilerOptions": {
+          //    "plugins": [
+          //			{ "name": "tslint-language-service"}, 
+          //			{ "name": "@angular/language-service"}
+          //		]
+          //  }
+          //}
+          //
+          var compilerOptions = host.getCompilationSettings();        
+          if (compilerOptions && Object.getOwnPropertyNames(compilerOptions).length > 1) {
+            var project = host.project;
+            // It exists "compilerOptions", reload tsconfig.json because at this step, compilerOptions/plugins is not available.
+            var configFilename = ts.normalizePath(compilerOptions.configFilePath);          
+            var configFileContent = host.readFile(configFilename);
+            var configJsonObject = ts.parseConfigFileTextToJson(configFilename, configFileContent);
+            // get array of compilerOptions/plugins
+            var plugins = configJsonObject.config.compilerOptions.plugins;          
+            
+            if (!(plugins && plugins.length)) {                
+              project.projectService.logger.info("No plugins exist");
+              // No plugins
+              return;
+            }
+
+            if (!/* host. */require) {
+                project.projectService.logger.info("Plugins were requested but not running in environment that supports 'require'. Nothing will be loaded");
+                return;
+            }
+            
+            // Load plugins
+            plugins.forEach(function(pluginConfigEntry) {
+              if (pluginConfigEntry.name) {
                 try {
-                  ls = require(plugin.name)().create({
-                    languageServiceHost: host,
-                    languageService: ls,
-                    project: project,
-                    ts: ts    
-                  });
+                  var resolvedModule = require(pluginConfigEntry.name);
+                  if (resolvedModule) {
+                	  enableProxy(resolvedModule, pluginConfigEntry);
+                  }
                 }
                 catch(e) {
-                  try {
-                    ls = require(plugin.name).create({
-                        languageServiceHost: host,
-                        languageService: ls,
-                        project: project,
-                        ts: ts    
-                    });
-                    }
-                    catch(e) {
-                        console.error(e)
-                    }
+                	console.error(e)
                 }
               }
             });
           }
-        }
-        return ls;
+    	}
+    	
+    	function enableProxy(pluginModule, configEntry) {
+    		var project = host.project;
+    		try {
+    			 var info /* PluginCreateInfo*/ = {
+                    config: configEntry,
+                    project: project,
+                    languageService: languageService,
+                    languageServiceHost: host,
+                    serverHost: project.projectService.host,
+                };
+    			// Remove that when TypeScript will provide custom codefix registration
+    			 // see https://github.com/Microsoft/TypeScript/issues/13435
+    			// This code is used by tslint-language-service (codefix.registerCodeFix(action))
+    			info.ts = ts;
+                if (pluginModule.create === undefined && typeof pluginModule === "function") {
+                    // We might get back a top-level factory function instead,
+                    // depending on the presence of default exports
+                    project.projectService.logger.info("Unwrapping factory function module import");
+                    pluginModule = pluginModule(/* { typescript: ts } */);                    
+                }
+                languageService = pluginModule.create(info);
+                // this.plugins.push(pluginModule);
+            }
+            catch (e) {
+                project.projectService.logger.info("Plugin activation failed: " + e);
+                if (typeof pluginModule === "object") {
+                    project.projectService.logger.info("Plugin top-level keys: " + Object.keys(pluginModule));
+                }
+                else {
+                    project.projectService.logger.info("Plugin load result was: " + pluginModule);
+                }
+            }
+    	}
+    	
+    	enablePlugins();
+    	// Returns Language Service
+    	return languageService;
+    	
       }
     },
     set: function(v) {
