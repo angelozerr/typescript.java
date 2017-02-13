@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - added reconcileControls hook
  */
 package ts.eclipse.ide.internal.ui.preferences;
 
@@ -16,7 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
@@ -97,13 +97,7 @@ public class FormatterConfigurationBlock extends OptionsConfigurationBlock {
 	}
 
 	@Override
-	protected Control createContents(Composite parent) {
-		Composite nodejsComposite = createUI(parent);
-		validateSettings(null, null, null);
-		return nodejsComposite;
-	}
-
-	private Composite createUI(Composite parent) {
+	protected Composite createUI(Composite parent) {
 		final ScrolledPageContent pageContent = new ScrolledPageContent(parent);
 		Composite composite = pageContent.getBody();
 		GridLayout layout = new GridLayout();

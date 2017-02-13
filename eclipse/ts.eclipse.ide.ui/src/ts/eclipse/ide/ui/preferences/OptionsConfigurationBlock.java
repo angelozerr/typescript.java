@@ -6,7 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ * IBM Corporation - initial API and implementation
+ * Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - added reconcileControls hook
  *******************************************************************************/
 package ts.eclipse.ide.ui.preferences;
 
@@ -318,7 +319,14 @@ public abstract class OptionsConfigurationBlock {
 		fShell = shell;
 	}
 
-	protected abstract Control createContents(Composite parent);
+	public final Composite createContents(Composite parent) {
+		Composite contentsComposite = createUI(parent);
+		reconcileControls();
+		validateSettings(null, null, null);
+		return contentsComposite;
+	}
+
+	protected abstract Composite createUI(Composite parent);
 
 	protected Button addCheckBox(Composite parent, String label, Key key, String[] values, int indent) {
 		ControlData data = new ControlData(key, values);
@@ -630,6 +638,7 @@ public abstract class OptionsConfigurationBlock {
 			return;
 		}
 		String oldValue = setValue(data.getKey(), newValue);
+		reconcileControls();
 		validateSettings(data.getKey(), oldValue, newValue);
 	}
 
@@ -637,6 +646,7 @@ public abstract class OptionsConfigurationBlock {
 		Key key = (Key) textControl.getData();
 		String number = textControl.getText();
 		String oldValue = setValue(key, number);
+		reconcileControls();
 		validateSettings(key, oldValue, number);
 	}
 
@@ -644,6 +654,7 @@ public abstract class OptionsConfigurationBlock {
 		Key key = (Key) comboControl.getData();
 		String number = comboControl.getText();
 		String oldValue = setValue(key, number);
+		reconcileControls();
 		validateSettings(key, oldValue, number);
 	}
 
@@ -732,6 +743,7 @@ public abstract class OptionsConfigurationBlock {
 				}
 				fDisabledProjectSettings = null;
 				updateControls();
+				reconcileControls();
 				validateSettings(null, null, null);
 			} else {
 				fDisabledProjectSettings = new IdentityHashMap();
@@ -825,6 +837,7 @@ public abstract class OptionsConfigurationBlock {
 
 		settingsUpdated();
 		updateControls();
+		reconcileControls();
 		validateSettings(null, null, null);
 	}
 
@@ -840,10 +853,14 @@ public abstract class OptionsConfigurationBlock {
 
 		settingsUpdated();
 		updateControls();
+		reconcileControls();
 		validateSettings(null, null, null);
 	}
 
 	public void dispose() {
+	}
+
+	protected void reconcileControls() {
 	}
 
 	protected void updateControls() {
