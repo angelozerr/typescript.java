@@ -21,7 +21,7 @@ import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.nodejs.INodejsInstallManager;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.UseSalsa;
-import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
+import ts.eclipse.ide.core.utils.PreferencesHelper;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.repository.ITypeScriptRepository;
 
@@ -33,7 +33,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = WorkspaceTypeScriptSettingsHelper
+		IEclipsePreferences node = PreferencesHelper
 				.getWorkspaceDefaultPreferences(TypeScriptCorePlugin.PLUGIN_ID);
 
 		// initialize properties for direct access of node.js server (start an
@@ -73,7 +73,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		// Fix embedded TypeScript id preference
 		// See https://github.com/angelozerr/typescript.java/issues/121
 		fixEmbeddedPreference(
-				WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID));
+				PreferencesHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID));
 	}
 
 	/**

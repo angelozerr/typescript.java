@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.utils.PreferencesHelper;
 import ts.utils.StringUtils;
 
 /**
@@ -43,114 +44,18 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 	}
 
 	public String getStringPreferencesValue(String key, String def) {
-		String value = getProjectPreferencesValue(key, def);
-		if (value != null) {
-			return value;
-		}
-		value = getStringWorkspacePreferencesValue(key, def);
-		if (value != null) {
-			return value;
-		}
-		return getStringWorkspaceDefaultPreferencesValue(key, def);
-	}
-
-	public String getProjectPreferencesValue(String key, String def) {
-		IEclipsePreferences node = getProjectPreferences();
-		return node != null ? node.get(key, def) : null;
-	}
-
-	public String getStringWorkspacePreferencesValue(String key, String def) {
-		IEclipsePreferences node = getWorkspacePreferences();
-		return node != null ? node.get(key, def) : null;
-	}
-
-	public String getStringWorkspaceDefaultPreferencesValue(String key, String def) {
-		IEclipsePreferences node = getWorkspaceDefaultPreferences();
-		return node != null ? node.get(key, def) : null;
+		return PreferencesHelper.getStringPreferencesValue(key, def, getProjectPreferences(), getWorkspacePreferences(),
+				getWorkspaceDefaultPreferences());
 	}
 
 	public Boolean getBooleanPreferencesValue(String key, Boolean def) {
-		Boolean value = getProjectPreferencesValue(key, (Boolean) null);
-		if (value != null) {
-			return value;
-		}
-		value = getBooleanWorkspacePreferencesValue(key, (Boolean) null);
-		if (value != null) {
-			return value;
-		}
-		return getBooleanWorkspaceDefaultPreferencesValue(key, def);
-	}
-
-	public Boolean getProjectPreferencesValue(String key, Boolean def) {
-		IEclipsePreferences node = getProjectPreferences();
-		return getBoolean(node, key, def);
-	}
-
-	public Boolean getBooleanWorkspacePreferencesValue(String key, Boolean def) {
-		IEclipsePreferences node = getWorkspacePreferences();
-		return getBoolean(node, key, def);
-	}
-
-	public Boolean getBooleanWorkspaceDefaultPreferencesValue(String key, Boolean def) {
-		IEclipsePreferences node = getWorkspaceDefaultPreferences();
-		return getBoolean(node, key, def);
-	}
-
-	private Boolean getBoolean(IEclipsePreferences preferences, String key, Boolean def) {
-		if (preferences == null) {
-			return def;
-		}
-		String result = preferences.get(key, null);
-		if (result == null) {
-			return def;
-		}
-		try {
-			return Boolean.parseBoolean(result);
-		} catch (Throwable e) {
-			return def;
-		}
+		return PreferencesHelper.getBooleanPreferencesValue(key, def, getProjectPreferences(),
+				getWorkspacePreferences(), getWorkspaceDefaultPreferences());
 	}
 
 	public Integer getIntegerPreferencesValue(String key, Integer def) {
-		Integer value = getProjectPreferencesValue(key, (Integer) null);
-		if (value != null) {
-			return value;
-		}
-		value = getIntegerWorkspacePreferencesValue(key, (Integer) null);
-		if (value != null) {
-			return value;
-		}
-		return getIntegerWorkspaceDefaultPreferencesValue(key, def);
-	}
-
-	public Integer getProjectPreferencesValue(String key, Integer def) {
-		IEclipsePreferences node = getProjectPreferences();
-		return getInteger(node, key, def);
-	}
-
-	public Integer getIntegerWorkspacePreferencesValue(String key, Integer def) {
-		IEclipsePreferences node = getWorkspacePreferences();
-		return getInteger(node, key, def);
-	}
-
-	public Integer getIntegerWorkspaceDefaultPreferencesValue(String key, Integer def) {
-		IEclipsePreferences node = getWorkspaceDefaultPreferences();
-		return getInteger(node, key, def);
-	}
-
-	private Integer getInteger(IEclipsePreferences preferences, String key, Integer def) {
-		if (preferences == null) {
-			return def;
-		}
-		String result = preferences.get(key, null);
-		if (result == null) {
-			return def;
-		}
-		try {
-			return Integer.parseInt(result);
-		} catch (Throwable e) {
-			return def;
-		}
+		return PreferencesHelper.getIntegerPreferencesValue(key, def, getProjectPreferences(),
+				getWorkspacePreferences(), getWorkspaceDefaultPreferences());
 	}
 
 	protected IEclipsePreferences getProjectPreferences() {
@@ -158,11 +63,11 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 	}
 
 	protected IEclipsePreferences getWorkspacePreferences() {
-		return WorkspaceTypeScriptSettingsHelper.getWorkspacePreferences(pluginId);
+		return PreferencesHelper.getWorkspacePreferences(pluginId);
 	}
 
 	protected IEclipsePreferences getWorkspaceDefaultPreferences() {
-		return WorkspaceTypeScriptSettingsHelper.getWorkspaceDefaultPreferences(pluginId);
+		return PreferencesHelper.getWorkspaceDefaultPreferences(pluginId);
 	}
 
 	public void dispose() {
@@ -176,8 +81,12 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 	}
 
 	protected File resolvePath(String path) {
+		return resolvePath(path, getProject());
+	}
+
+	protected static File resolvePath(String path, IProject project) {
 		if (!StringUtils.isEmpty(path)) {
-			IPath p = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getPath(path, getProject());
+			IPath p = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getPath(path, project);
 			return p != null ? p.toFile() : new File(path);
 		}
 		return null;

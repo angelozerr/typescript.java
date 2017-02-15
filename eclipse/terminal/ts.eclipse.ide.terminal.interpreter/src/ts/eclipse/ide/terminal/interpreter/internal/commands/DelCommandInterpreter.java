@@ -20,7 +20,7 @@ public class DelCommandInterpreter extends AbstractCommandInterpreter {
 	@Override
 	public void execute() {
 		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
-				.findContainersForLocation(new Path(getWorkingDir()).append(path));
+				.findContainersForLocation(new Path(getWorkingDir()).append(path).removeLastSegments(1));
 		if (c != null && c.length > 0) {
 			for (int i = 0; i < c.length; i++) {
 				UIJob job = new RefreshContainerJob(c[i], true);

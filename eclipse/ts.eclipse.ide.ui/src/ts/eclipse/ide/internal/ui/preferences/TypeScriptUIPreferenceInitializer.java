@@ -14,7 +14,7 @@ package ts.eclipse.ide.internal.ui.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
+import ts.eclipse.ide.core.utils.PreferencesHelper;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
 
@@ -26,7 +26,7 @@ public class TypeScriptUIPreferenceInitializer extends AbstractPreferenceInitial
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = WorkspaceTypeScriptSettingsHelper
+		IEclipsePreferences node = PreferencesHelper
 				.getWorkspaceDefaultPreferences(TypeScriptUIPlugin.PLUGIN_ID);
 
 		// initialize properties for TextMate using

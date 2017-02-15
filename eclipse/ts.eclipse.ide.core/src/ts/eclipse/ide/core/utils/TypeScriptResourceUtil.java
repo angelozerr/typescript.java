@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.core.utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,12 +35,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 
+import ts.TypeScriptException;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.jsconfig.IDETsconfigJson;
 import ts.eclipse.ide.internal.core.resources.IDEResourcesManager;
+import ts.eclipse.ide.internal.core.resources.IDETypeScriptProjectSettings;
 import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
 import ts.resources.TypeScriptResourcesManager;
 import ts.utils.FileUtils;
@@ -426,6 +429,13 @@ public class TypeScriptResourceUtil {
 		}
 
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(location);
+	}
+
+	public static File getNodejsInstallPath(IProject project) throws TypeScriptException, CoreException {
+		if (isTypeScriptProject(project)) {
+			return getTypeScriptProject(project).getProjectSettings().getNodejsInstallPath();
+		}
+		return IDETypeScriptProjectSettings.getWorkspaceNodejsInstallPath();
 	}
 
 }

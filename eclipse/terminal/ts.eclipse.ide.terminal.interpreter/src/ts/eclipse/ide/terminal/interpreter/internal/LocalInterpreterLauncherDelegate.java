@@ -12,6 +12,7 @@ package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.util.Map;
 
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.terminal.connector.local.launcher.LocalLauncherDelegate;
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalService.Done;
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalServiceOutputStreamMonitorListener;
@@ -28,11 +29,19 @@ public class LocalInterpreterLauncherDelegate extends LocalLauncherDelegate {
 
 	@Override
 	public void execute(Map<String, Object> properties, Done done) {
-		ITerminalServiceOutputStreamMonitorListener[] l = new ITerminalServiceOutputStreamMonitorListener[1];
-		l[0] = new CommandInterpreterProcessor(properties);
-		properties.put(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS, l);
+		properties.put(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS,
+				new ITerminalServiceOutputStreamMonitorListener[] { new CommandInterpreterProcessor(properties) });
 		super.execute(properties, done);
+	}
 
+	@Override
+	public ITerminalConnector createTerminalConnector(Map<String, Object> properties) {
+		if (!properties.containsKey(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS)) {
+			// The execute method of the launcher was not called, register the processor.
+			properties.put(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS,
+					new ITerminalServiceOutputStreamMonitorListener[] { new CommandInterpreterProcessor(properties) });
+		}
+		return super.createTerminalConnector(properties);
 	}
 
 }

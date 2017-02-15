@@ -23,8 +23,8 @@ import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
 import ts.eclipse.ide.core.resources.UseSalsa;
-import ts.eclipse.ide.core.resources.WorkspaceTypeScriptSettingsHelper;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.core.utils.PreferencesHelper;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.resources.ITypeScriptResourcesManagerDelegate;
 import ts.utils.FileUtils;
@@ -113,7 +113,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	}
 
 	public boolean hasSalsaNature(IProject project) {
-		UseSalsa useSalsa = WorkspaceTypeScriptSettingsHelper.getUseSalsa();
+		UseSalsa useSalsa = PreferencesHelper.getUseSalsa();
 		switch (useSalsa) {
 		case Never:
 			return false;

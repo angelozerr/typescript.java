@@ -20,7 +20,7 @@ public class CdCommandInterpreter extends AbstractCommandInterpreter {
 	public void execute() {
 		try {
 			final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
-					.findContainersForLocation(getWorkingDirPath().append(path));
+					.findContainersForLocation(getWorkingDirPath());
 			if (c != null && c.length > 0) {
 				for (int i = 0; i < c.length; i++) {
 					UIJob job = new RefreshContainerJob(c[i], false);

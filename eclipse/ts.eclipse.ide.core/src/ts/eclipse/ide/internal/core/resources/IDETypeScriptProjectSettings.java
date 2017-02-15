@@ -27,6 +27,7 @@ import ts.eclipse.ide.core.resources.AbstractTypeScriptSettings;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
+import ts.eclipse.ide.core.utils.PreferencesHelper;
 import ts.eclipse.ide.internal.core.preferences.TypeScriptCorePreferenceInitializer;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPath;
@@ -82,7 +83,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	@Override
 	public IEmbeddedNodejs getEmbeddedNodejs() {
 		String id = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED_ID, null);
-		return TypeScriptCorePlugin.getNodejsInstallManager().findNodejsInstall(id);
+		return id != null ? TypeScriptCorePlugin.getNodejsInstallManager().findNodejsInstall(id) : null;
 	}
 
 	@Override
@@ -96,6 +97,29 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		// Use Installed node.js
 		String path = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_PATH, null);
 		return resolvePath(path);
+	}
+
+	/**
+	 * Returns the nodejs install path from the workspace.
+	 * 
+	 * @return the nodejs install path from the workspace.
+	 */
+	public static File getWorkspaceNodejsInstallPath() {
+		IEclipsePreferences[] workspacePreferences = new IEclipsePreferences[] {
+				PreferencesHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID),
+				PreferencesHelper.getWorkspaceDefaultPreferences(TypeScriptCorePlugin.PLUGIN_ID) };
+		if (PreferencesHelper.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, false,
+				workspacePreferences)) {
+			// Use Embedded nodejs.
+			String id = PreferencesHelper.getStringPreferencesValue(
+					TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED_ID, null, workspacePreferences);
+			IEmbeddedNodejs embed = TypeScriptCorePlugin.getNodejsInstallManager().findNodejsInstall(id);
+			return embed != null ? embed.getPath() : null;
+		}
+		// Use Installed node.js
+		String path = PreferencesHelper.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_PATH, null,
+				workspacePreferences);
+		return resolvePath(path, null);
 	}
 
 	@Override
