@@ -379,9 +379,15 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			// Collect ts files to compile by using tsserver to retrieve
 			// dependencies files.
 			// It works only if tsconfig.json declares "compileOnSave: true".
-			collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, tsFilesToClosed, false);
+			if (collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, tsFilesToClosed, false,
+					monitor)) {
+				return;
+			}
+
 			// Compile ts files with tsserver.
-			compileTsFiles(tsFilesToCompile, getClient());
+			if (compileTsFiles(tsFilesToCompile, getClient(), monitor)) {
+				return;
+			}
 			if (removedTsFiles.size() > 0) {
 				// ts files was removed, how to get referenced files which must
 				// be recompiled (with errors)?
@@ -404,11 +410,16 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * @param client
 	 * @param tsFilesToCompile
 	 * @param exclude
+	 * @param monitor
 	 * @throws Exception
 	 */
-	private void collectTsFilesToCompile(List<IFile> tsFiles, ITypeScriptServiceClient client,
-			List<String> tsFilesToCompile, List<IFile> tsFilesToClosed, boolean exclude) throws Exception {
+	private boolean collectTsFilesToCompile(List<IFile> tsFiles, ITypeScriptServiceClient client,
+			List<String> tsFilesToCompile, List<IFile> tsFilesToClosed, boolean exclude, IProgressMonitor monitor)
+			throws Exception {
 		for (IFile tsFile : tsFiles) {
+			if (monitor.isCanceled()) {
+				return true;
+			}
 			String filename = WorkbenchResourceUtil.getFileName(tsFile);
 			if (!tsFilesToCompile.contains(filename)) {
 				// tsserver needs that file must be opened, force the "open"
@@ -422,6 +433,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 				collectTsFilesToCompile(filename, client, tsFilesToCompile, exclude);
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -454,12 +466,19 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * 
 	 * @param tsFilesToCompile
 	 * @param client
+	 * @param monitor
+	 * @return true if process must be stopped and false otherwise.
 	 * @throws Exception
 	 */
-	private void compileTsFiles(List<String> tsFilesToCompile, ITypeScriptServiceClient client) throws Exception {
+	private boolean compileTsFiles(List<String> tsFilesToCompile, ITypeScriptServiceClient client,
+			IProgressMonitor monitor) throws Exception {
 		for (String filename : tsFilesToCompile) {
+			if (monitor.isCanceled()) {
+				return true;
+			}
 			compileTsFile(filename, client);
 		}
+		return false;
 	}
 
 	/**
