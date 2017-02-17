@@ -2,6 +2,10 @@
 <?eclipse version="3.0"?>
 <plugin>
 
+	<extension-point id="typeScriptPlugins" 
+   					name="%typeScriptPlugins.name"
+					schema="schema/typeScriptPlugins.exsd" />
+					
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
 		    file-names="tsconfig.json"
@@ -60,4 +64,14 @@
          </schemaCatalogContribution>
 	</extension>
 
+	<!-- tslint plugin -->
+	<extension
+	      point="ts.eclipse.ide.json.core.typeScriptPlugins">
+	    <plugin
+	    	  name="tslint-language-service"
+	          description="%tslint-language-service.description"
+	          url="%tslint-language-service.url" >
+	    </plugin>
+	</extension>
+	
 </plugin>

@@ -113,6 +113,9 @@ public class TsconfigEditorMessages extends NLS {
 	public static String OutputPage_jsx_label;
 	public static String OutputPage_reactNamespace_label;
 
+	// Plugins page
+	public static String PluginsPage_title;
+	
 	// Buttons
 	public static String Button_add;
 	public static String Button_add_pattern;
@@ -123,6 +126,7 @@ public class TsconfigEditorMessages extends NLS {
 	// Add Pattern dialog
 	public static String AddPatternDialog_title;
 	public static String AddPatternDialog_message;
+
 	
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, TsconfigEditorMessages.class);

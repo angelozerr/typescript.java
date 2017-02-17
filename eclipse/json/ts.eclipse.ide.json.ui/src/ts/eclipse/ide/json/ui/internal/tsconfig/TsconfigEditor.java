@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import ts.eclipse.ide.json.ui.AbstractFormEditor;
  * <li>Overview page.</li>
  * <li>Files page.</li>
  * <li>Output page.</li>
+ * <li>Plugins page.</li>
  * <li>Source page.</li>
  * </ul>
  *
@@ -32,5 +33,6 @@ public class TsconfigEditor extends AbstractFormEditor {
 		addPage(new OverviewPage(this));
 		addPage(new FilesPage(this));
 		addPage(new OutputPage(this));
+		// addPage(new PluginsPage(this));
 	}
 }
