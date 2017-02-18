@@ -30,7 +30,7 @@ public class NpmInstallCommandInterpreter extends AbstractCommandInterpreter {
 	}
 
 	@Override
-	public void execute() {
+	public void execute(String newWorkingDir) {
 		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocation(getWorkingDirPath());
 		if (c != null && c.length > 0) {
 			final IContainer container = c[0];

@@ -17,9 +17,12 @@ package ts.eclipse.ide.terminal.interpreter;
 public interface ICommandInterpreter {
 
 	/**
-	 * Execute the command.
+	 * Execute the command interpreter.
+	 * 
+	 * @param newWorkingDir
+	 *            the new working directory after command was applied.
 	 */
-	void execute();
+	void execute(String newWorkingDir);
 
 	/**
 	 * Call when apply of command trace some logs in the shell.

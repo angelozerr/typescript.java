@@ -30,6 +30,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
@@ -216,7 +217,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		}
 
 		// create the new project operation
-		IRunnableWithProgress op = getRunnable(newProjectHandle, description);
+		IRunnableWithProgress op = getRunnable(newProjectHandle, description, mainPage.getLocationPath());
 
 		// run the new project creation operation
 		try {
@@ -529,5 +530,5 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	}
 
 	protected abstract IRunnableWithProgress getRunnable(final IProject newProjectHandle,
-			final IProjectDescription description);
+			final IProjectDescription description, IPath projectLocation);
 }

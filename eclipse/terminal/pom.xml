@@ -10,5 +10,6 @@
   <modules>
   		<module>ts.eclipse.ide.terminal.interpreter</module>
         <module>ts.eclipse.ide.terminal.interpreter.npm</module>
+        <module>ts.eclipse.ide.terminal.interpreter.tests</module>
   </modules>
 </project>

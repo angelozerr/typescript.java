@@ -17,7 +17,7 @@ public class RdCommandInterpreter extends AbstractCommandInterpreter {
 	}
 
 	@Override
-	public void execute() {
+	public void execute(String newWorkingDir) {
 		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
 				.findContainersForLocation(getWorkingDirPath().append(path));
 		if (c != null && c.length > 0) {

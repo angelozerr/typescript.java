@@ -18,8 +18,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.ide,
  org.eclipse.tm.terminal.connector.process
-Export-Package: ts.eclipse.ide.terminal.interpreter
+Export-Package: ts.eclipse.ide.terminal.interpreter,
+ ts.eclipse.ide.terminal.interpreter.internal;x-friends:="ts.eclipse.ide.terminal.interpreter.tests"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.terminal.interpreter.internal.TerminalInterpreterPlugin
-Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
 

@@ -18,7 +18,7 @@ public class DelCommandInterpreter extends AbstractCommandInterpreter {
 	}
 
 	@Override
-	public void execute() {
+	public void execute(String newWorkingDir) {
 		final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
 				.findContainersForLocation(new Path(getWorkingDir()).append(path).removeLastSegments(1));
 		if (c != null && c.length > 0) {

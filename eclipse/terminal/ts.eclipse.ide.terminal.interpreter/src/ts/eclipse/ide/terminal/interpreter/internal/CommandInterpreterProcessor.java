@@ -15,86 +15,78 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.tm.terminal.view.core.interfaces.ITerminalServiceOutputStreamMonitorListener;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
 import ts.eclipse.ide.terminal.interpreter.ICommandTerminalServiceConstants;
-import ts.eclipse.ide.terminal.interpreter.internal.commands.CdCommandInterpreterFactory;
 
-public class CommandInterpreterProcessor extends AbstractCommandProcessor {
-
-	private final ICommandInterpreter NULL_INTERPRETER = new ICommandInterpreter() {
-
-		@Override
-		public void execute() {
-
-		}
-
-		@Override
-		public void onTrace(String line) {
-
-		}
-	};
-
-	private final Map<String, Object> properties;
-	private ITerminalConnectorWrapper connector;
+public class CommandInterpreterProcessor extends CommandTerminalTracker
+		implements ITerminalServiceOutputStreamMonitorListener {
 
 	private ICommandInterpreter interpreter;
+	private final String encoding;
 
 	public CommandInterpreterProcessor(Map<String, Object> properties) {
-		this.properties = properties;
-		this.connector = null;
+		super(getInitialWorkingDir(properties), getInitialCommand(properties));
+		this.encoding = getInitialEncoding(properties);
 	}
 
 	@Override
-	protected String getInitialCommand() {
-		if (connector != null) {
-			return connector.getCommand();
-		}
-		return (String) properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
-	}
-
-	@Override
-	protected String getEncoding() {
-		if (connector != null) {
-			return connector.getEncoding();
-		}
-		return (String) properties.get(ITerminalsConnectorConstants.PROP_ENCODING);
+	public final void onContentReadFromStream(byte[] byteBuffer, int bytesRead) {
+		LinesInfo info = new LinesInfo(byteBuffer, bytesRead, encoding);
+		super.processLines(info.getLines(), info.isProcessAnsiCommand_n());
 	}
 
 	/**
-	 * Returns the initial working directory of the terminal.
+	 * Returns the initial working directory when terminal is opened.
 	 * 
-	 * @return the initial working directory of the terminal.
+	 * @param properties
+	 * @return the initial working directory when terminal is opened.
 	 */
-	@Override
-	protected String getInitialWorkingDir() {
-		if (connector != null) {
-			return connector.getWorkingDir();
-		}
+	private static String getInitialWorkingDir(Map<String, Object> properties) {
 		return (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
 	}
 
-	public void setConnector(ITerminalConnectorWrapper connector) {
-		this.connector = connector;
+	/**
+	 * Returns the initial command when terminal is opened.
+	 * 
+	 * @param properties
+	 * @return the initial command when terminal is opened.
+	 */
+	private static String getInitialCommand(Map<String, Object> properties) {
+		return (String) properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
+	}
+
+	/**
+	 * Returns the initial encoding when terminal is opened.
+	 * 
+	 * @param properties
+	 * @return the initial encoding when terminal is opened.
+	 */
+	private static String getInitialEncoding(Map<String, Object> properties) {
+		return (String) properties.get(ITerminalsConnectorConstants.PROP_ENCODING);
 	}
 
 	@Override
-	protected void endCommand(String newWorkingDir) {
+	protected void submitCommand(LineCommand lineCommand) {
+		initializeInterpreter(lineCommand.getWorkingDir(), lineCommand.getCommand());
+	}
+
+	@Override
+	protected void executingCommand(String line, LineCommand lineCommand) {
 		if (interpreter != null) {
-			interpreter.execute();
+			interpreter.onTrace(line);
+		}
+	}
+
+	@Override
+	protected void terminateCommand(LineCommand lineCommand) {
+		if (interpreter != null) {
+			interpreter.execute(lineCommand.getNewWorkingDir());
 		}
 		interpreter = null;
-		super.endCommand(newWorkingDir);
-	}
-
-	@Override
-	protected void processingCommand(String workingDir, String command, List<String> lines) {
-		initializeInterpreter(workingDir, command);
-		for (int i = 0; i < lines.size(); i++) {
-			interpreter.onTrace(lines.get(i));
-		}
 	}
 
 	/**
@@ -105,14 +97,13 @@ public class CommandInterpreterProcessor extends AbstractCommandProcessor {
 	private void initializeInterpreter(String workingDir, String command) {
 		// Initialize interpreter if needed
 		if (interpreter == null) {
-			String cmd = getCmd(command);
-			ICommandInterpreterFactory factory = CommandInterpreterManager.getInstance().getFactory(cmd);
-			if (factory != null) {
-				List<String> parameters = getParameters(command);
-				interpreter = factory.create(parameters, workingDir);
-			}
-			if (interpreter == null) {
-				interpreter = NULL_INTERPRETER;
+			if (command != null) {
+				String cmd = getCmd(command);
+				ICommandInterpreterFactory factory = CommandInterpreterManager.getInstance().getFactory(cmd);
+				if (factory != null) {
+					List<String> parameters = getParameters(command);
+					interpreter = factory.create(parameters, workingDir);
+				}
 			}
 		}
 	}

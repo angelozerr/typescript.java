@@ -20,5 +20,4 @@ Require-Bundle: org.eclipse.core.runtime,
  ts.eclipse.ide.terminal.interpreter;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.terminal.interpreter.npm.internal.NpmTerminalInterpreterPlugin
-Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
 

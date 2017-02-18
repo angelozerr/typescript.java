@@ -11,11 +11,9 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalService;
-import org.eclipse.tm.terminal.view.core.interfaces.ITerminalServiceOutputStreamMonitorListener;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tm.terminal.view.ui.services.TerminalService;
 
-import ts.eclipse.ide.terminal.interpreter.internal.CommandInterpreterProcessor;
 import ts.eclipse.ide.terminal.interpreter.internal.ITerminalConnectorWrapper;
 
 public class CommandTerminalService extends TerminalService {
@@ -54,6 +52,10 @@ public class CommandTerminalService extends TerminalService {
 
 		TerminalConnectorWrapper connector = getConnector(terminalId, properties);
 		if (connector != null) {
+			String workingDir = (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
+			if (connector.hasWorkingDirChanged(workingDir)) {
+				connector.executeCommand("cd " + workingDir, properties);
+			}
 			connector.executeCommand(command, properties);
 		} else {
 			this.openConsole(properties, done);
@@ -63,13 +65,7 @@ public class CommandTerminalService extends TerminalService {
 	private TerminalConnectorWrapper getConnector(String terminalId, Map<String, Object> properties) {
 		TerminalConnectorWrapper connector = connectors.get(terminalId);
 		if (connector != null) {
-			String workingDir = (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
 			if (connector.isDirty()) {
-				unregisterConnector(connector);
-				return null;
-			} else if (connector.hasWorkingDirChanged(workingDir)) {
-				terminateConsole(properties, null);
-				closeConsole(properties, null);
 				unregisterConnector(connector);
 				return null;
 			}
@@ -94,7 +90,6 @@ public class CommandTerminalService extends TerminalService {
 		private final ITerminalConnector delegate;
 		private final String terminalId;
 		private ITerminalViewControl terminal;
-		private String command;
 
 		private Map<String, Object> properties;
 
@@ -103,13 +98,6 @@ public class CommandTerminalService extends TerminalService {
 			this.delegate = delegate;
 			this.terminalId = terminalId;
 			this.properties = properties;
-			ITerminalServiceOutputStreamMonitorListener[] listeners = (ITerminalServiceOutputStreamMonitorListener[]) properties
-					.get(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS);
-			for (ITerminalServiceOutputStreamMonitorListener listener : listeners) {
-				if (listener instanceof CommandInterpreterProcessor) {
-					((CommandInterpreterProcessor) listener).setConnector(this);
-				}
-			}
 			CommandTerminalService.this.registerConnector(this);
 		}
 
@@ -213,9 +201,5 @@ public class CommandTerminalService extends TerminalService {
 			return (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
 		}
 
-		@Override
-		public String getEncoding() {
-			return (String) properties.get(ITerminalsConnectorConstants.PROP_ENCODING);
-		}
 	}
 }

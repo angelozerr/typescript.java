@@ -2,6 +2,7 @@ package ts.eclipse.ide.terminal.interpreter.internal.commands;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.progress.UIJob;
 
 import ts.eclipse.ide.terminal.interpreter.AbstractCommandInterpreter;
@@ -17,10 +18,10 @@ public class CdCommandInterpreter extends AbstractCommandInterpreter {
 	}
 
 	@Override
-	public void execute() {
+	public void execute(String newWorkingDir) {	
 		try {
 			final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
-					.findContainersForLocation(getWorkingDirPath());
+					.findContainersForLocation(new Path(newWorkingDir));
 			if (c != null && c.length > 0) {
 				for (int i = 0; i < c.length; i++) {
 					UIJob job = new RefreshContainerJob(c[i], false);
