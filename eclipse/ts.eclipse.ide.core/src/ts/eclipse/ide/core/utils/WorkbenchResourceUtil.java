@@ -96,7 +96,7 @@ public class WorkbenchResourceUtil {
 		}
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IContainer container = root.getContainerForLocation(containerPath);
-		if (container.exists()) {
+		if (container != null && container.exists()) {
 			return container;
 		}
 		IContainer[] containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocation(containerPath);
