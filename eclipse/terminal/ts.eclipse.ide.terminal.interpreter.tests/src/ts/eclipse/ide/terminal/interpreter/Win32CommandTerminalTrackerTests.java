@@ -81,7 +81,7 @@ public class Win32CommandTerminalTrackerTests {
 	}
 	
 	@Test
-	public void test() {
+	public void ngClass() {
 		CommandTerminalTracker test = new TrackerTest("D:\\_Personal\\runtime-EclipseApplicationDemoTerminal\\NewCli2\\src\\app", "ng generate class p  --spec false");
 		test.processLines(Arrays.asList(), true);
 		test.processLines(Arrays.asList(), false);
@@ -107,5 +107,23 @@ public class Win32CommandTerminalTrackerTests {
 				"TERMINATE: workingDir=D:\\_Personal\\runtime-EclipseApplicationDemoTerminal\\NewCli2\\src\\app, command=ng generate class p  --spec false"; 
 				
 				Assert.assertEquals(expected, test.toString());
+	}
+	
+	@Test
+	public void ngTwoClasses() {
+		CommandTerminalTracker test = new TrackerTest("C:\\Users\\azerr\\WS\\a2\\src\\app", "ng generate class c6  --spec true");
+		test.processLines(Arrays.asList(), true);
+		test.processLines(Arrays.asList(), false);
+		test.processLines(Arrays.asList("Microsoft Windows [version 6.1.7601]", "Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", "C:\\Users\\azerr\\WS\\a2\\src\\app>ng generate class c6  --spec true"), false);
+		test.processLines(Arrays.asList(), false);
+		test.processLines(Arrays.asList("installing class", "  ", "create", " src\\app\\c6.spec.ts", "  ", "create", " src\\app\\c6.ts"), false);
+		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app>"), false);
+		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app>cd C:\\Users\\azerr\\WS\\a2\\src\\app\\about"), true);
+		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app\\about>ng generate class c8  --spec false"), false);
+		test.processLines(Arrays.asList(), false);
+		test.processLines(Arrays.asList("installing class", "  ", "create", " src\\app\\about\\c8.ts"), false);
+		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app\\about>"), false);
+		
+		System.err.println(test);
 	}
 }
