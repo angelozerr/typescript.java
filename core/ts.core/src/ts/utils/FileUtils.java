@@ -35,7 +35,8 @@ public class FileUtils {
 
 	public static final String TSCONFIG_JSON = "tsconfig.json";
 	public static final String JSCONFIG_JSON = "jsconfig.json";
-
+	public static final String TSLINT_JSON = "tslint.json";
+	
 	/**
 	 * Folders
 	 */

@@ -33,6 +33,8 @@ import ts.repository.ITypeScriptRepository;
  * tslint configuration block.
  *
  */
+// deprecated since now tslint is managed with tslint-language-service
+@Deprecated
 public class ValidationConfigurationBlock extends AbstractTypeScriptRepositoryConfigurationBlock {
 
 	private static final String[] DEFAULT_PATHS = new String[] { "${project_loc:node_modules/tslint}" };

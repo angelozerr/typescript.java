@@ -216,12 +216,12 @@
             id="ts.eclipse.ide.ui.preference.TypeScriptRuntimePreferencePage"
             category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
       </page>      
-	  <page
+	  <!--<page
             name="%ValidationPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.ValidationPreferencePage"
             id="ts.eclipse.ide.ui.preference.ValidationPreferencePage"
             category="ts.eclipse.ide.ui.preference.TypeScriptMainPreferencePage">
-      </page>
+      </page>-->
 	  <page
             name="%EditorPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.EditorPreferencePage"
@@ -294,7 +294,7 @@
 		     </adapt>         
          </enabledWhen>
       </page>
-	  <page
+	  <!--<page
             name="%ValidationPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.ValidationPreferencePage"
             id="ts.eclipse.ide.ui.property.ValidationPreferencePage"
@@ -304,7 +304,7 @@
 		     	  <test property="ts.eclipse.ide.core.isTypeScriptProject" />
 		     </adapt>         
          </enabledWhen>
-      </page>
+      </page>-->
       <page
             name="%EditorPreferencePage.name"        
             class="ts.eclipse.ide.internal.ui.preferences.EditorPreferencePage"

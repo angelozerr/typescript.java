@@ -66,7 +66,7 @@ public class ProblemTypeScriptHover extends AbstractAnnotationHover {
 								position.getOffset() + position.getLength(), errorCodes)
 								.get(5000, TimeUnit.MILLISECONDS);
 						for (CodeAction codeAction : codeActions) {
-							proposals.add(new CodeActionCompletionProposal(codeAction));
+							proposals.add(new CodeActionCompletionProposal(codeAction, tsFile.getName()));
 						}
 						return proposals.toArray(new ICompletionProposal[proposals.size()]);
 					}

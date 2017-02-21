@@ -21,6 +21,8 @@ import ts.eclipse.ide.ui.preferences.PropertyAndPreferencePage;
  * tslint preferences page
  *
  */
+//deprecated since now tslint is managed with tslint-language-service
+@Deprecated
 public class ValidationPreferencePage extends PropertyAndPreferencePage {
 
 	public static final String PREF_ID = "ts.eclipse.ide.ui.preference.ValidationPreferencePage"; //$NON-NLS-1$

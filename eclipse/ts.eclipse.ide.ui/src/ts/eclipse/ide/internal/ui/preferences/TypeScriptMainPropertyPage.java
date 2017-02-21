@@ -91,7 +91,7 @@ public class TypeScriptMainPropertyPage extends PropertyPage implements IWorkben
 					if (COMPILE_LINK.equals(e.text)) {
 						openProjectProperties(project, TypeScriptRuntimePreferencePage.PROP_ID);
 					} else {
-						openProjectProperties(project, ValidationPreferencePage.PROP_ID);
+						// openProjectProperties(project, ValidationPreferencePage.PROP_ID);
 					}
 				}
 			});

@@ -379,13 +379,18 @@ public class TypeScriptResourceUtil {
 		return formatError(TSC_TYPE, code, message);
 	}
 
+	public static IDocument getDocument(IFile file) {
+		IPath location = file.getLocation();
+		return getDocument(location);
+	}
+
 	/**
 	 * Returns the {@link IDocument} from the given file and null if it's not
 	 * possible.
 	 */
-	public static IDocument getDocument(IFile file) {
+	public static IDocument getDocument(IPath location) {
 		ITextFileBufferManager manager = FileBuffers.getTextFileBufferManager();
-		IPath location = file.getLocation();
+
 		boolean connected = false;
 		try {
 			ITextFileBuffer buffer = manager.getTextFileBuffer(location, LocationKind.NORMALIZE);

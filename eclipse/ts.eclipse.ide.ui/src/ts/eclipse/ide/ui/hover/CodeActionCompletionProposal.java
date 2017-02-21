@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.ui.hover;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -19,7 +20,11 @@ import org.eclipse.swt.graphics.Point;
 import ts.client.codefixes.CodeAction;
 import ts.client.codefixes.FileCodeEdits;
 import ts.eclipse.ide.core.utils.DocumentUtils;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.eclipse.ide.ui.utils.EditorUtils;
+import ts.utils.StringUtils;
 
 /**
  * TypeScript {@link CodeAction} completion proposal.
@@ -28,9 +33,11 @@ import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 public class CodeActionCompletionProposal implements ICompletionProposal {
 
 	private final CodeAction codeAction;
+	private final String fileName;
 
-	public CodeActionCompletionProposal(CodeAction codeAction) {
+	public CodeActionCompletionProposal(CodeAction codeAction, String fileName) {
 		this.codeAction = codeAction;
+		this.fileName = fileName;
 	}
 
 	@Override
@@ -41,13 +48,28 @@ public class CodeActionCompletionProposal implements ICompletionProposal {
 	}
 
 	private void apply(FileCodeEdits codeEdits, IDocument document) {
-		String fileName = codeEdits.getFileName();
-		// TODO: support code edit for the given file name.
-		try {
-			DocumentUtils.applyEdits(document, codeEdits.getTextChanges());
-		} catch (Exception e) {
-			TypeScriptUIPlugin.log(e);
+		IDocument documentToUpdate = getDocumentToUpdate(codeEdits.getFileName(), document);
+		if (documentToUpdate != null) {
+			try {
+				DocumentUtils.applyEdits(documentToUpdate, codeEdits.getTextChanges());
+			} catch (Exception e) {
+				TypeScriptUIPlugin.log(e);
+			}
 		}
+	}
+
+	private IDocument getDocumentToUpdate(String fileName, IDocument document) {
+		if (StringUtils.isEmpty(fileName) || this.fileName.equals(fileName)) {
+			// Update the document of the fileName which have opened the
+			// QuickFix
+			return document;
+		}
+		IFile file = WorkbenchResourceUtil.findFileFromWorkspace(fileName);
+		if (file != null && file.exists()) {
+			EditorUtils.openInEditor(file, true);
+			return TypeScriptResourceUtil.getDocument(file);
+		}
+		return null;
 	}
 
 	@Override

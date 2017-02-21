@@ -151,6 +151,9 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 				tsconfigFileListener);
 		TypeScriptCorePlugin.getResourcesWatcher().addFileWatcherListener(getProject(), FileUtils.JSCONFIG_JSON,
 				tsconfigFileListener);
+		// Should be removed when tslint-language-service will support fs.watcher.
+		TypeScriptCorePlugin.getResourcesWatcher().addFileWatcherListener(getProject(), FileUtils.TSLINT_JSON,
+				tsconfigFileListener);
 	}
 
 	/**
