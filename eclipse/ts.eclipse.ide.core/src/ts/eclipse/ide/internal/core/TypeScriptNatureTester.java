@@ -28,6 +28,7 @@ import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 public class TypeScriptNatureTester extends PropertyTester {
 
 	private static final String IS_TYPESCRIPT_PROJECT_PROPERTY = "isTypeScriptProject";
+	private static final String IS_TYPESCRIPT_RESOURCE_PROPERTY = "isTypeScriptResource";
 	private static final String HAS_TYPESCRIPT_BUILDER_PROPERTY = "hasTypeScriptBuilder";
 	private static final String CAN_ADD_TO_BUILDPATH_PROPERTY = "canAddToBuildPath";
 	private static final String CAN_REMOVE_TO_BUILDPATH_PROPERTY = "canRemoveToBuildPath";
@@ -47,6 +48,8 @@ public class TypeScriptNatureTester extends PropertyTester {
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 		if (IS_TYPESCRIPT_PROJECT_PROPERTY.equals(property)) {
 			return testIsTypeScriptProject(receiver);
+		} else if (IS_TYPESCRIPT_RESOURCE_PROPERTY.equals(property)) {
+			return testIsTypeScriptResource(receiver);
 		} else if (HAS_TYPESCRIPT_BUILDER_PROPERTY.equals(property)) {
 			return testHasTypeScriptBuilder(receiver);
 		} else if (CAN_ADD_TO_BUILDPATH_PROPERTY.equals(property)) {
@@ -64,6 +67,16 @@ public class TypeScriptNatureTester extends PropertyTester {
 			IProject project = (IProject) ((IAdaptable) receiver).getAdapter(IProject.class);
 			if (project != null) {
 				return TypeScriptResourceUtil.isTypeScriptProject(project);
+			}
+		}
+		return false;
+	}
+
+	private boolean testIsTypeScriptResource(Object receiver) {
+		if (receiver instanceof IAdaptable) {
+			IResource resource = (IResource) ((IAdaptable) receiver).getAdapter(IResource.class);
+			if (resource != null) {
+				return TypeScriptResourceUtil.isTypeScriptProject(resource.getProject());
 			}
 		}
 		return false;

@@ -523,6 +523,7 @@
         <perspectiveExtension targetID="ts.eclipse.ide.ui.perspectives.TypeScriptPerspective">
             
             <newWizardShortcut id="ts.eclipse.ide.ui.wizards.new.project"/>
+            <newWizardShortcut id="ts.eclipse.ide.ui.wizards.new.class"/>
             
             <newWizardShortcut id="org.eclipse.ui.wizards.new.file"/>
             <newWizardShortcut id="org.eclipse.ui.wizards.new.folder"/>
@@ -560,6 +561,18 @@
 				</adapt>
 			</enablement>
 		</commonWizard>
+		<commonWizard
+			type="new"
+			menuGroupId="ts.eclipse.ide.ui.menu"
+			wizardId="ts.eclipse.ide.ui.wizards.new.class">
+			<enablement>
+				<adapt type="org.eclipse.core.resources.IResource">
+					<test
+		            	forcePluginActivation="true"
+		            	property="ts.eclipse.ide.core.isTypeScriptResource"/>
+				</adapt>
+			</enablement>
+		</commonWizard>
 	</extension>       		  
 	<!-- Wizards -->
 	<extension
@@ -578,5 +591,14 @@
 		   finalPerspective="ts.eclipse.ide.ui.perspectives.TypeScriptPerspective" >
 	       <description>%NewTypeScriptProjectWizard.desc</description>
 		</wizard>
+	 	<wizard
+		   id="ts.eclipse.ide.ui.wizards.new.class"
+	       name="%NewClassWizard.name"
+		   class="ts.eclipse.ide.internal.ui.wizards.NewClassWizard"
+		   category="ts.eclipse.ide.ui.new"
+		   icon="icons/full/obj16/class.gif"
+		   finalPerspective="ts.eclipse.ide.ui.perspectives.TypeScriptPerspective" >
+	       <description>%NewClassWizard.desc</description>
+		</wizard>		
 	</extension>
 </plugin>        
