@@ -26,7 +26,8 @@ public class FileUtils {
 	public static final String JSX_EXTENSION = "jsx";
 	public static final String TSX_EXTENSION = "tsx";
 	public static final String MAP_EXTENSION = "map";
-
+	public static final String DEFINITION_TS_EXTENSION = "d.ts";
+	
 	/**
 	 * Configuration file
 	 */

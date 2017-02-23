@@ -81,6 +81,16 @@ public interface ITypeScriptResourcesManagerDelegate {
 	boolean isTsOrTsxFile(Object fileObject);
 
 	/**
+	 * Returns true if the given file object is a TypeScript definition file
+	 * *.d.ts and false otherwise.
+	 * 
+	 * @param fileObject
+	 * @return true if the given file object is a TypeScript definition file
+	 *         *.d.ts and false otherwise.
+	 */
+	boolean isDefinitionTsFile(Object fileObject);
+
+	/**
 	 * Returns true if the given file object is a TypeScript or TypeScript/JSX
 	 * or JSX file and false otherwise.
 	 * 
@@ -91,8 +101,8 @@ public interface ITypeScriptResourcesManagerDelegate {
 	boolean isTsOrTsxOrJsxFile(Object fileObject);
 
 	/**
-	 * Returns true if the given file object is TypeScript/JSX
-	 * or JSX file and false otherwise.
+	 * Returns true if the given file object is TypeScript/JSX or JSX file and
+	 * false otherwise.
 	 * 
 	 * @param fileObject
 	 * @return true if the given file object is a TypeScript or TypeScript/JSX

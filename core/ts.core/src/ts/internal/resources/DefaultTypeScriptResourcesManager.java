@@ -70,6 +70,13 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 	}
 
 	@Override
+	public boolean isDefinitionTsFile(Object fileObject) {
+		String name = getFileName(fileObject);
+		name = name != null ? name.toLowerCase() : null;
+		return name != null && (name.endsWith(FileUtils.DEFINITION_TS_EXTENSION));
+	}
+
+	@Override
 	public boolean isTsOrTsxOrJsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
 		ext = ext != null ? ext.toLowerCase() : null;
@@ -82,6 +89,15 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 			return FileUtils.getFileExtension(((File) fileObject).getName());
 		} else if (fileObject instanceof String) {
 			return FileUtils.getFileExtension((String) fileObject);
+		}
+		return null;
+	}
+
+	protected String getFileName(Object fileObject) {
+		if (fileObject instanceof File) {
+			return ((File) fileObject).getName();
+		} else if (fileObject instanceof String) {
+			return (String) fileObject;
 		}
 		return null;
 	}
@@ -100,8 +116,7 @@ public class DefaultTypeScriptResourcesManager implements ITypeScriptResourcesMa
 	public boolean isTsxOrJsxFile(Object fileObject) {
 		String ext = getExtension(fileObject);
 		ext = ext != null ? ext.toLowerCase() : null;
-		return ext != null && (FileUtils.TSX_EXTENSION.equals(ext)
-				|| FileUtils.JSX_EXTENSION.equals(ext));
+		return ext != null && (FileUtils.TSX_EXTENSION.equals(ext) || FileUtils.JSX_EXTENSION.equals(ext));
 	}
 
 }

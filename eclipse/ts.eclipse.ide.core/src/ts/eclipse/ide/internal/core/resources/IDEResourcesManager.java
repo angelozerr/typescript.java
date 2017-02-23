@@ -144,6 +144,17 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		return null;
 	}
 
+	protected String getFileName(Object fileObject) {
+		if (fileObject instanceof IFile) {
+			return ((IFile) fileObject).getName();
+		} else if (fileObject instanceof File) {
+			return ((File) fileObject).getName();
+		} else if (fileObject instanceof String) {
+			return (String) fileObject;
+		}
+		return null;
+	}
+
 	@Override
 	public boolean isJsFile(Object fileObject) {
 		String ext = getExtension(fileObject);
@@ -173,6 +184,13 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		String ext = getExtension(fileObject);
 		ext = ext != null ? ext.toLowerCase() : null;
 		return ext != null && (FileUtils.TS_EXTENSION.equals(ext) || FileUtils.TSX_EXTENSION.equals(ext));
+	}
+
+	@Override
+	public boolean isDefinitionTsFile(Object fileObject) {
+		String name = getFileName(fileObject);
+		name = name != null ? name.toLowerCase() : null;
+		return name != null && (name.endsWith(FileUtils.DEFINITION_TS_EXTENSION));
 	}
 
 	@Override

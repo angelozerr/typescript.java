@@ -128,12 +128,14 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 					switch (kind) {
 					case IResourceDelta.ADDED:
 					case IResourceDelta.CHANGED:
-						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)) {
+						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)
+								&& !TypeScriptResourceUtil.isDefinitionTsFile(resource)) {
 							addTsFile(buildPath, tsFilesToCompile, resource);
 						}
 						break;
 					case IResourceDelta.REMOVED:
-						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)) {
+						if (TypeScriptResourceUtil.isTsOrTsxFile(resource)
+								&& !TypeScriptResourceUtil.isDefinitionTsFile(resource)) {
 							addTsFile(buildPath, tsFilesToDelete, resource);
 						}
 						break;
@@ -236,7 +238,8 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 				case IResource.PROJECT:
 					return TypeScriptResourceUtil.isTypeScriptProject((IProject) resource);
 				case IResource.FILE:
-					if (!TypeScriptResourceUtil.isTsOrTsxFile(resource)) {
+					if (!TypeScriptResourceUtil.isTsOrTsxFile(resource)
+							|| TypeScriptResourceUtil.isDefinitionTsFile(resource)) {
 						return false;
 					}
 					int kind = delta.getKind();
