@@ -27,6 +27,7 @@ import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.references.ReferencesResponseBody;
+import ts.client.rename.RenameResponseBody;
 
 /**
  * TypeScript file API.
@@ -182,6 +183,9 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 */
 	public CompletableFuture<List<OccurrencesResponseItem>> occurrences(int position) throws TypeScriptException;
 
+	CompletableFuture<RenameResponseBody> rename(int position, Boolean findInComments,
+			Boolean findInStrings) throws TypeScriptException;
+	
 	/**
 	 * Call implementation from the tsserver.
 	 * 

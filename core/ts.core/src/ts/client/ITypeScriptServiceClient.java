@@ -28,6 +28,7 @@ import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.references.ReferencesResponseBody;
+import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
 
 /**
@@ -200,6 +201,10 @@ public interface ITypeScriptServiceClient {
 	CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset)
 			throws TypeScriptException;
 
+
+	CompletableFuture<RenameResponseBody> rename(String file, int line, int offset, Boolean findInComments,
+			Boolean findInStrings) throws TypeScriptException;
+	
 	CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider)
 			throws TypeScriptException;
 
@@ -207,7 +212,7 @@ public interface ITypeScriptServiceClient {
 
 	CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList)
 			throws TypeScriptException;
-
+	
 	// Since 2.0.3
 
 	/**

@@ -43,6 +43,7 @@ import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.references.ReferencesResponseBody;
+import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
@@ -71,6 +72,7 @@ import ts.internal.client.protocol.ProjectInfoRequest;
 import ts.internal.client.protocol.QuickInfoRequest;
 import ts.internal.client.protocol.ReferencesRequest;
 import ts.internal.client.protocol.ReloadRequest;
+import ts.internal.client.protocol.RenameRequest;
 import ts.internal.client.protocol.Request;
 import ts.internal.client.protocol.Response;
 import ts.internal.client.protocol.SemanticDiagnosticsSyncRequest;
@@ -81,6 +83,7 @@ import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
 import ts.nodejs.NodejsProcessAdapter;
 import ts.nodejs.NodejsProcessManager;
+import ts.repository.TypeScriptRepositoryManager;
 import ts.utils.FileUtils;
 
 /**
@@ -154,11 +157,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		this(projectDir, tsserverFile, nodeFile, false, false, null);
 	}
 
-	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile, boolean enableTelemetry,
+	public TypeScriptServiceClient(final File projectDir, File typescriptDir, File nodeFile, boolean enableTelemetry,
 			boolean disableAutomaticTypingAcquisition, File tsserverPluginsFile) throws TypeScriptException {
 		this(NodejsProcessManager.getInstance().create(projectDir,
-				tsserverPluginsFile != null ? tsserverPluginsFile : tsserverFile, nodeFile,
-				new INodejsLaunchConfiguration() {
+				tsserverPluginsFile != null ? tsserverPluginsFile
+						: TypeScriptRepositoryManager.getTsserverFile(typescriptDir),
+				nodeFile, new INodejsLaunchConfiguration() {
 
 					@Override
 					public List<String> createNodeArgs() {
@@ -173,7 +177,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 						}
 						if (tsserverPluginsFile != null) {
 							args.add("--typescriptDir");
-							args.add(FileUtils.getPath(tsserverFile.getParentFile().getParentFile()));
+							args.add(FileUtils.getPath(typescriptDir));
 						}
 						// args.add("--useSingleInferredProject");
 						return args;
@@ -384,6 +388,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset)
 			throws TypeScriptException {
 		return execute(new OccurrencesRequest(fileName, line, offset), true);
+	}
+
+	@Override
+	public CompletableFuture<RenameResponseBody> rename(String file, int line, int offset, Boolean findInComments,
+			Boolean findInStrings) throws TypeScriptException {
+		return execute(new RenameRequest(file, line, offset, findInComments, findInStrings), true);
 	}
 
 	@Override
