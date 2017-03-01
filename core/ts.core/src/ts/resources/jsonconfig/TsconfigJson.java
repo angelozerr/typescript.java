@@ -36,7 +36,7 @@ public class TsconfigJson {
 
 	private CompilerOptions compilerOptions;
 
-	private boolean compileOnSave;
+	private Boolean compileOnSave;
 
 	private boolean buildOnSave;
 
@@ -47,8 +47,6 @@ public class TsconfigJson {
 	private List<String> defaultExclude;
 
 	public TsconfigJson() {
-		this.compileOnSave = false;
-		this.buildOnSave = false;
 	}
 
 	public void setCompilerOptions(CompilerOptions compilerOptions) {
@@ -60,10 +58,10 @@ public class TsconfigJson {
 	}
 
 	public boolean isCompileOnSave() {
-		return compileOnSave;
+		return compileOnSave != null ? compileOnSave : false;
 	}
 
-	public void setCompileOnSave(boolean compileOnSave) {
+	public void setCompileOnSave(Boolean compileOnSave) {
 		this.compileOnSave = compileOnSave;
 	}
 
