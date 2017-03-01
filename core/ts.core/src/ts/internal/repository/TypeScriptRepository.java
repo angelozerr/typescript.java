@@ -18,7 +18,6 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	private String name;
 	private File typesScriptDir;
 	private File tscFile;
-	private File tsserverFile;
 	private File tslintFile;
 	private String tslintName;
 	private String typesScriptVersion;
@@ -37,17 +36,8 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	}
 
 	private void updateBaseDir(File baseDir) throws TypeScriptRepositoryException {
-		this.typesScriptDir = baseDir;
-		// tsserver file
-		this.tsserverFile = TypeScriptRepositoryManager.getTsserverFile(typesScriptDir);
-		if (!tsserverFile.exists()) {
-			this.typesScriptDir = new File(baseDir, "node_modules/typescript");
-			this.tsserverFile = TypeScriptRepositoryManager.getTsserverFile(typesScriptDir);
-		}
-		if (!tsserverFile.exists()) {
-			throw new TypeScriptRepositoryException(FileUtils.getPath(typesScriptDir)
-					+ " is not a valid TypeScript repository. Check the directory contains node_modules/typescript/bin/tsserver or bin/tsserver.");
-		}
+		this.typesScriptDir = new File(baseDir, "node_modules/typescript");
+		TypeScriptRepositoryManager.validateTypeScriptDir(typesScriptDir);
 		// tsc file
 		this.tscFile = TypeScriptRepositoryManager.getTscFile(typesScriptDir);
 		this.typesScriptVersion = TypeScriptRepositoryManager.getPackageJsonVersion(typesScriptDir);
@@ -98,6 +88,11 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	}
 
 	@Override
+	public File getTypesScriptDir() {
+		return typesScriptDir;
+	}
+
+	@Override
 	public String getTypesScriptVersion() {
 		return typesScriptVersion;
 	}
@@ -105,11 +100,6 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	@Override
 	public File getTscFile() {
 		return tscFile;
-	}
-
-	@Override
-	public File getTsserverFile() {
-		return tsserverFile;
 	}
 
 	@Override

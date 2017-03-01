@@ -20,6 +20,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
 import ts.internal.repository.TypeScriptRepository;
+import ts.utils.FileUtils;
 import ts.utils.IOUtils;
 
 public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager {
@@ -97,6 +98,14 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 			return json.getString("version", null);
 		} catch (Exception e) {
 			return null;
+		}
+	}
+	
+	public static void validateTypeScriptDir(File typesScriptDir) throws TypeScriptRepositoryException {
+		File tsserverFile = TypeScriptRepositoryManager.getTsserverFile(typesScriptDir);
+		if (!tsserverFile.exists()) {
+			throw new TypeScriptRepositoryException(FileUtils.getPath(typesScriptDir)
+					+ " is not a valid TypeScript repository. Check the directory contains bin/tsserver.");
 		}
 	}
 

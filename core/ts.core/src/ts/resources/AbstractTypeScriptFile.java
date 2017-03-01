@@ -31,6 +31,7 @@ import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.references.ReferencesResponseBody;
+import ts.client.rename.RenameResponseBody;
 import ts.internal.LocationReader;
 
 /**
@@ -138,12 +139,12 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		int offset = location.getOffset();
 		return client.quickInfo(this.getName(), line, offset);
 	}
-	
+
 	@Override
 	public CompletableFuture<List<DiagnosticEvent>> geterr() throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
-		return client.geterr(new String[] {getName()}, 0);
+		return client.geterr(new String[] { getName() }, 0);
 	}
 
 	@Override
@@ -226,6 +227,17 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		int line = location.getLine();
 		int offset = location.getOffset();
 		return client.occurrences(this.getName(), line, offset);
+	}
+
+	@Override
+	public CompletableFuture<RenameResponseBody> rename(int position, Boolean findInComments,
+			Boolean findInStrings) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		Location location = this.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
+		return client.rename(this.getName(), line, offset, findInComments, findInStrings);
 	}
 
 	@Override

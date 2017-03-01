@@ -273,11 +273,10 @@ public class NodejsProcess extends AbstractNodejsProcess {
 				reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				return reader.readLine();
 			} catch (IOException e) {
-				e.printStackTrace();
+				return null;
 			} finally {
 				IOUtils.closeQuietly(reader);
 			}
-			return nodejsFile.getName();
 		}
 		return null;
 	}

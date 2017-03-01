@@ -28,6 +28,7 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProjectSettings;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.utils.PreferencesHelper;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.preferences.TypeScriptCorePreferenceInitializer;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPath;
@@ -119,7 +120,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 		// Use Installed node.js
 		String path = PreferencesHelper.getStringPreferencesValue(TypeScriptCorePreferenceConstants.NODEJS_PATH, null,
 				workspacePreferences);
-		return resolvePath(path, null);
+		return WorkbenchResourceUtil.resolvePath(path, null);
 	}
 
 	@Override
@@ -166,18 +167,17 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	}
 
 	@Override
-	public File getTsserverFile() {
+	public File getTypesScriptDir() {
 		if (super.getBooleanPreferencesValue(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false)) {
 			// Use TypeScript Repository.
 			ITypeScriptRepository repository = getRepository(TypeScriptCorePreferenceConstants.EMBEDDED_TYPESCRIPT_ID);
-			return (repository != null) ? repository.getTsserverFile() : null;
+			return (repository != null) ? repository.getTypesScriptDir() : null;
 		}
 
 		// Use Installed TypScript
 		String path = super.getStringPreferencesValue(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
 				null);
-		File resolvedPath = resolvePath(path);
-		return resolvedPath != null ? IDETypeScriptRepositoryManager.getTsserverFile(resolvedPath) : null;
+		return resolvePath(path);
 	}
 
 	@Override

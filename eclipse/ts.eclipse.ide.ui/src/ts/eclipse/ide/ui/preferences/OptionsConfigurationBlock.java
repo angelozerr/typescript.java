@@ -484,10 +484,10 @@ public abstract class OptionsConfigurationBlock {
 			comboBox.select(data.getSelection(currValue));
 		} else {
 			comboBox.setData(key);
-			comboBox.addModifyListener(getTextModifyListener());
 			if (currValue != null) {
 				comboBox.setText(currValue);
 			}
+			comboBox.addModifyListener(getTextModifyListener());
 		}
 
 		fComboBoxes.add(comboBox);

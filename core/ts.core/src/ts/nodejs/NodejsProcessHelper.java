@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ts.OS;
@@ -74,6 +75,15 @@ public class NodejsProcessHelper {
 		}
 	}
 
+	public static String[] getNodejsPaths(OS os) {
+		List<String> paths = new ArrayList<>(Arrays.asList(getDefaultNodejsPaths(os)));		
+		File nodeFile = findNode(os);
+		if (nodeFile != null) {
+			paths.add(0, nodeFile.getAbsolutePath());
+		}
+		return paths.toArray(StringUtils.EMPTY_STRING);
+	}
+	
 	public static File findNode(OS os) {
 		String nodeFileName = getNodeFileName(os);
 		String path = System.getenv("PATH");

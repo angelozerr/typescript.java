@@ -32,6 +32,9 @@ public class TypeScriptUIMessages extends NLS {
 	public static String Button_newFolder;
 	public static String Variables_button;
 
+	// ComboBox
+	public static String ComboBox_none;
+
 	// Errors
 	public static String TypeScriptUIPlugin_internal_error;
 
@@ -64,21 +67,35 @@ public class TypeScriptUIMessages extends NLS {
 	public static String ATAConfigurationBlock_description;
 	public static String ATAConfigurationBlock_disableATA_checkbox_label;
 	public static String ATAConfigurationBlock_enableTelemetry_checkbox_label;
-	
+
 	// nodejs
 	public static String NodejsConfigurationBlock_nodejs_group_label;
 	public static String NodejsConfigurationBlock_embedded_checkbox_label;
 	public static String NodejsConfigurationBlock_installed_checkbox_label;
 	public static String NodejsConfigurationBlock_nodePath_label;
+	public static String NodejsConfigurationBlock_nodeVersion_label;
+
+	public static String NodejsConfigurationBlock_embeddedNode_required_error;
+	public static String NodejsConfigurationBlock_installedNode_required_error;
+	public static String NodejsConfigurationBlock_nodeFile_exists_error;
+	public static String NodejsConfigurationBlock_nodeFile_invalid_error;
 
 	// TypeScript Runtime
 	public static String TypeScriptRuntimeConfigurationBlock_typescript_group_label;
 	public static String TypeScriptRuntimeConfigurationBlock_embedded_checkbox_label;
 	public static String TypeScriptRuntimeConfigurationBlock_installed_checkbox_label;
+	public static String TypeScriptRuntimeConfigurationBlock_tsRuntimePath_label;
+	public static String TypeScriptRuntimeConfigurationBlock_tsRuntimeVersion_label;
+
+	public static String TypeScriptRuntimeConfigurationBlock_embeddedTypeScript_required_error;
+	public static String TypeScriptRuntimeConfigurationBlock_installedTypeScript_required_error;
+	public static String TypeScriptRuntimeConfigurationBlock_typeScriptFile_exists_error;
+	public static String TypeScriptRuntimeConfigurationBlock_typeScriptFile_invalid_error;
 
 	// tsserver
 	public static String TypeScriptRuntimeConfigurationBlock_traceOnConsole_label;
 	public static String TypeScriptRuntimeConfigurationBlock_emulatePlugins_label;
+
 	// Formatter
 	public static String FormatterConfigurationBlock_editorOptions_group_label;
 	public static String FormatterPreferencePage_editorOptions_tabSize;

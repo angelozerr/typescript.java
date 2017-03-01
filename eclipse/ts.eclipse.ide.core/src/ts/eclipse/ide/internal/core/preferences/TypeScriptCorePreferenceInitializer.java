@@ -87,11 +87,10 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		if (!useBundledNodeJsEmbedded(node)) {
 			// Use installed node.js in case there is no embedded install.
 			node.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, false);
-			node.put(TypeScriptCorePreferenceConstants.NODEJS_PATH, IDENodejsProcessHelper.getNodejsPath());
 		} else {
 			node.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, true);
-			node.put(TypeScriptCorePreferenceConstants.NODEJS_PATH, "");
 		}
+		node.put(TypeScriptCorePreferenceConstants.NODEJS_PATH, IDENodejsProcessHelper.getNodejsPath());
 	}
 
 	private static boolean useBundledNodeJsEmbedded(IEclipsePreferences node) {

@@ -33,7 +33,14 @@ public interface ITypeScriptRepository {
 	 * 
 	 * @param baseDir
 	 */
-	void setBaseDir(File baseDir);;
+	void setBaseDir(File baseDir);
+
+	/**
+	 * The TypeScript base directory.
+	 * 
+	 * @return the TypeScript base directory.
+	 */
+	File getTypesScriptDir();
 
 	/**
 	 * Returns the TypeScript version and null otherwise.
@@ -48,13 +55,6 @@ public interface ITypeScriptRepository {
 	 * @return the tsc file.
 	 */
 	File getTscFile();
-
-	/**
-	 * Returns the tsserver file.
-	 * 
-	 * @return the tsserver file.
-	 */
-	File getTsserverFile();
 
 	/**
 	 * Returns the tslint version and null otherwise.

@@ -42,6 +42,10 @@ public class IDENodejsProcessHelper {
 	public static String[] getDefaultNodejsPaths() {
 		return NodejsProcessHelper.getDefaultNodejsPaths(os);
 	}
+	
+	public static String[] getAvailableNodejsPaths() {
+		return NodejsProcessHelper.getNodejsPaths(os);
+	}
 
 	public static OS getOs() {
 		return os;

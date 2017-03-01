@@ -170,8 +170,8 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 	 */
 	protected ITypeScriptServiceClient createServiceClient(File projectDir) throws TypeScriptException {
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
-		File tsserverFile = getProjectSettings().getTsserverFile();
-		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), tsserverFile, nodeFile,
+		File typescriptDir = getProjectSettings().getTypesScriptDir();
+		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), typescriptDir, nodeFile,
 				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(), getProjectSettings().getTsserverPluginsFile());
 		client.setCompletionEntryMatcherProvider(this);
 		return client;

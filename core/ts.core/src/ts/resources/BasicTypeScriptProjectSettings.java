@@ -70,8 +70,8 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	}
 
 	@Override
-	public File getTsserverFile() {
-		return repository.getTsserverFile();
+	public File getTypesScriptDir() {
+		return repository.getTypesScriptDir();
 	}
 	
 	@Override

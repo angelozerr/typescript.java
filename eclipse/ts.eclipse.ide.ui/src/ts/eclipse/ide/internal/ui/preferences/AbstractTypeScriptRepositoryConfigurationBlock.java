@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.IStatusChangeListener;
 import ts.eclipse.ide.ui.preferences.BrowseButtonsComposite;
 import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
@@ -107,11 +108,13 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 		});
 
 		// Create combo of embedded node.js
-		ITypeScriptRepository[] respositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
+		ITypeScriptRepository[] repositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
 		List<String> values = new ArrayList<String>();
 		List<String> labels = new ArrayList<String>();
 		String label = null;
-		for (ITypeScriptRepository repository : respositories) {
+		values.add("");
+		labels.add(TypeScriptUIMessages.ComboBox_none);
+		for (ITypeScriptRepository repository : repositories) {
 			label = getRepositoryLabel(repository);
 			if (label != null) {
 				values.add(repository.getName());
@@ -121,6 +124,14 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 		embeddedComboBox = newComboControl(parent, getEmbeddedTypescriptKey(),
 				values.toArray(new String[values.size()]), labels.toArray(new String[labels.size()]));
 		embeddedComboBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+	}
+
+	protected int getEmbeddedSelectionIndex() {
+		return embeddedComboBox.getSelectionIndex();
+	}
+
+	protected String getInstalledText() {
+		return installedComboBox.getText();
 	}
 
 	protected String getRepositoryLabel(ITypeScriptRepository repository) {
@@ -149,10 +160,14 @@ public abstract class AbstractTypeScriptRepositoryConfigurationBlock extends Opt
 	protected abstract String[] getDefaultPaths();
 
 	private void updateComboBoxes() {
-		boolean embedded = useEmbedded.getSelection();
+		boolean embedded = isUseEmbedded();
 		embeddedComboBox.setEnabled(embedded);
 		installedComboBox.setEnabled(!embedded);
 		browseButtons.setEnabled(!embedded);
+	}
+
+	protected boolean isUseEmbedded() {
+		return useEmbedded.getSelection();
 	}
 
 	@Override

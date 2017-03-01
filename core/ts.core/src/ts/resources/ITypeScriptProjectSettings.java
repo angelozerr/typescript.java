@@ -64,7 +64,7 @@ public interface ITypeScriptProjectSettings {
 	 * @return the typescript/bin/tsserver file to execute.
 	 * @throws TypeScriptException
 	 */
-	File getTsserverFile() throws TypeScriptException;
+	File getTypesScriptDir() throws TypeScriptException;
 
 	File getTsserverPluginsFile() throws TypeScriptException;
 

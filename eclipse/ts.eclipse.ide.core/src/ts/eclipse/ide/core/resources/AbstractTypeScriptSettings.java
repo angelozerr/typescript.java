@@ -14,13 +14,11 @@ import java.io.File;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 
-import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.utils.PreferencesHelper;
-import ts.utils.StringUtils;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 
 /**
  * Abstract class for TypeScript settings which search preferences from the
@@ -81,14 +79,6 @@ public abstract class AbstractTypeScriptSettings implements IPreferenceChangeLis
 	}
 
 	protected File resolvePath(String path) {
-		return resolvePath(path, getProject());
-	}
-
-	protected static File resolvePath(String path, IProject project) {
-		if (!StringUtils.isEmpty(path)) {
-			IPath p = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getPath(path, project);
-			return p != null ? p.toFile() : new File(path);
-		}
-		return null;
+		return WorkbenchResourceUtil.resolvePath(path, getProject());
 	}
 }
