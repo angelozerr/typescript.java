@@ -24,13 +24,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.IStatusChangeListener;
 import ts.eclipse.ide.internal.ui.dialogs.StatusInfo;
-import ts.nodejs.NodejsProcess;
 import ts.repository.ITypeScriptRepository;
 import ts.repository.TypeScriptRepositoryException;
 import ts.repository.TypeScriptRepositoryManager;
