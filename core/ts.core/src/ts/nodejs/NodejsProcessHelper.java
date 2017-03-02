@@ -10,16 +10,13 @@
  */
 package ts.nodejs;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import ts.OS;
-import ts.utils.IOUtils;
+import ts.utils.ProcessHelper;
 import ts.utils.StringUtils;
 
 /**
@@ -28,14 +25,16 @@ import ts.utils.StringUtils;
  */
 public class NodejsProcessHelper {
 
+	private static final String NODE_FILENAME = "node";
+
 	private static final String[] WINDOWS_NODE_PATHS = new String[] {
 			"C:/Program Files/nodejs/node.exe".replace('/', File.separatorChar),
-			"C:/Program Files (x86)/nodejs/node.exe".replace('/', File.separatorChar), "node" };
+			"C:/Program Files (x86)/nodejs/node.exe".replace('/', File.separatorChar), NODE_FILENAME };
 
 	private static final String[] MACOS_NODE_PATHS = new String[] { "/usr/local/bin/node", "/opt/local/bin/node",
-			"node" };
+			NODE_FILENAME };
 
-	private static final String[] LINUX_NODE_PATHS = new String[] { "/usr/local/bin/node", "node" };
+	private static final String[] LINUX_NODE_PATHS = new String[] { "/usr/local/bin/node", NODE_FILENAME };
 
 	private NodejsProcessHelper() {
 	}
@@ -49,7 +48,7 @@ public class NodejsProcessHelper {
 		if (nodeFile != null) {
 			return nodeFile.getAbsolutePath();
 		}
-		return "node";
+		return NODE_FILENAME;
 	}
 
 	public static String getDefaultNodejsPath(OS os) {
@@ -76,14 +75,14 @@ public class NodejsProcessHelper {
 	}
 
 	public static String[] getNodejsPaths(OS os) {
-		List<String> paths = new ArrayList<>(Arrays.asList(getDefaultNodejsPaths(os)));		
+		List<String> paths = new ArrayList<>(Arrays.asList(getDefaultNodejsPaths(os)));
 		File nodeFile = findNode(os);
 		if (nodeFile != null) {
 			paths.add(0, nodeFile.getAbsolutePath());
 		}
 		return paths.toArray(StringUtils.EMPTY_STRING);
 	}
-	
+
 	public static File findNode(OS os) {
 		String nodeFileName = getNodeFileName(os);
 		String path = System.getenv("PATH");
@@ -106,45 +105,13 @@ public class NodejsProcessHelper {
 				return nodeFile;
 			}
 		}
-
-		return getNodeLocation(os);
+		return ProcessHelper.findLocation(NODE_FILENAME, os);
 	}
 
 	private static String getNodeFileName(OS os) {
 		if (os == OS.Windows) {
 			return "node.exe";
 		}
-		return "node";
-	}
-
-	/**
-	 * Returns the node.js location by using command "which node".
-	 * 
-	 * @param os
-	 * @return the node.js location by using command "which node".
-	 */
-	private static File getNodeLocation(OS os) {
-		String[] command = new String[] { "/bin/bash", "-c", "which node" };
-		if (os == OS.Windows) {
-			command = new String[] { "cmd", "/c", "where node" };
-		} else {
-			command = new String[] { "/bin/bash", "-c", "which node" };
-		}
-		BufferedReader reader = null;
-		try {
-			Process p = Runtime.getRuntime().exec(command);
-			reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String nodeFile = reader.readLine();
-			if (StringUtils.isEmpty(nodeFile)) {
-				return null;
-			}
-			File f = new File(nodeFile);
-			return f.exists() ? f : null;
-		} catch (IOException e) {
-			//e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(reader);
-		}
-		return null;
+		return NODE_FILENAME;
 	}
 }

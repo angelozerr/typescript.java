@@ -1,12 +1,14 @@
 package ts.eclipse.ide.terminal.interpreter;
 
+import java.io.File;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tm.terminal.view.core.utils.Env;
 
 public class EnvPath {
+
+	private static final String PATH_ENV = "PATH=";
 
 	// Reference to the monitor to lock if determining the native environment
 	private final static Object ENV_GET_MONITOR = new Object();
@@ -20,28 +22,21 @@ public class EnvPath {
 
 	public static String insertToEnvPath(String... vars) {
 		String nativeEnvPath = getNativeEnvironmentPathCasePreserved();
-		StringBuilder envPath = new StringBuilder(nativeEnvPath.substring(0, "PATH=".length()));
+		StringBuilder envPath = new StringBuilder(nativeEnvPath.substring(0, PATH_ENV.length()));
 		boolean empty = true;
 		for (String var : vars) {
 			if (var == null) {
 				continue;
 			}
 			if (!empty) {
-				envPath.append(getSeparator());
+				envPath.append(File.pathSeparatorChar);
 			}
 			envPath.append(var);
 			empty = false;
 		}
-		envPath.append(getSeparator());
-		envPath.append(nativeEnvPath.substring("PATH=".length(), nativeEnvPath.length()));
+		envPath.append(File.pathSeparatorChar);
+		envPath.append(nativeEnvPath.substring(PATH_ENV.length(), nativeEnvPath.length()));
 		return envPath.toString();
-	}
-
-	private static String getSeparator() {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
-			return ";";
-		}
-		return ":";
 	}
 
 	/**
@@ -56,7 +51,7 @@ public class EnvPath {
 			}
 			String[] envVars = Env.getEnvironment(null, false);
 			for (String envVar : envVars) {
-				if (envVar.toUpperCase().startsWith("PATH=")) {
+				if (envVar.toUpperCase().startsWith(PATH_ENV)) {
 					nativeEnvironmentPathCasePreserved = envVar;
 					return nativeEnvironmentPathCasePreserved;
 				}
