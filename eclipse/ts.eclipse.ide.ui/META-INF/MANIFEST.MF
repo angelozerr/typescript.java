@@ -28,7 +28,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.externaltools,
  org.eclipse.tm4e.markdown,
  org.eclipse.tm4e.core,
- org.eclipse.tm4e.ui
+ org.eclipse.tm4e.ui,
+ com.google.gson
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.ui.TypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"

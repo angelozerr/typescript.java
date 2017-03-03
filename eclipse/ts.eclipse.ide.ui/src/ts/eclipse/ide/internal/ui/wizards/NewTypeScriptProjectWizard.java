@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Springrbua - TypeScript project wizard
  *
  */
 package ts.eclipse.ide.internal.ui.wizards;
@@ -31,8 +32,12 @@ import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.ui.wizards.AbstractNewProjectWizard;
+import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.IOUtils;
 
 /**
@@ -57,7 +62,7 @@ import ts.utils.IOUtils;
  * name is created, the dialog closes, and the call to <code>open</code>
  * returns.
  * </p>
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
@@ -79,7 +84,12 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 	@Override
 	protected IRunnableWithProgress getRunnable(IProject newProjectHandle, IProjectDescription description,
-			IPath projectLocation) {	
+			IPath projectLocation) {
+		TsconfigJson json = new TsconfigJson();
+		json.setCompileOnSave(true);
+		tsconfigPage.addContents(json);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		final String content = gson.toJson(json);
 		return new IRunnableWithProgress() {
 
 			@Override
@@ -107,12 +117,10 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 				// Generate tsconfig.json
 				IFile file = newProjectHandle.getFile(tsconfigPage.getPath());
 				try {
-
 					if (file.exists()) {
-						file.setContents(IOUtils.toInputStream(tsconfigPage.getContents()), 1,
-								new NullProgressMonitor());
+						file.setContents(IOUtils.toInputStream(content), 1, new NullProgressMonitor());
 					} else {
-						file.create(IOUtils.toInputStream(tsconfigPage.getContents()), 1, new NullProgressMonitor());
+						file.create(IOUtils.toInputStream(content), 1, new NullProgressMonitor());
 					}
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);

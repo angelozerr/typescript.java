@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import ts.cmd.tsc.CompilerOptions;
+import ts.utils.BooleanUtils;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
@@ -58,7 +59,7 @@ public class TsconfigJson {
 	}
 
 	public boolean isCompileOnSave() {
-		return compileOnSave != null ? compileOnSave : false;
+		return BooleanUtils.toBoolean(compileOnSave);
 	}
 
 	public void setCompileOnSave(Boolean compileOnSave) {
@@ -79,7 +80,7 @@ public class TsconfigJson {
 	 * @return true if build must ne done on save and false otherwise.
 	 */
 	public boolean isBuildOnSave() {
-		return buildOnSave;
+		return BooleanUtils.toBoolean(buildOnSave);
 	}
 
 	/**

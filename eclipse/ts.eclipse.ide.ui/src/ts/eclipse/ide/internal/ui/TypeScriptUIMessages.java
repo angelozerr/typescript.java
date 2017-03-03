@@ -8,6 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - Added save actions
+ *  Springrbua - TypeScript project wizard
  */
 package ts.eclipse.ide.internal.ui;
 
@@ -168,6 +169,21 @@ public class TypeScriptUIMessages extends NLS {
 	// Implementation
 	public static String TypeScriptImplementationLabelProvider_text;
 
+	// Wizards
+	public static String TSConfigWizardPage_module;
+	public static String TSConfigWizardPage_moduleResolution;
+	public static String TSConfigWizardPage_target;
+	public static String TSConfigWizardPage_outDir;
+	public static String TSConfigWizardPage_declaration;
+	public static String TSConfigWizardPage_sourceMap;
+	public static String TSConfigWizardPage_removeComments;
+	public static String TSConfigWizardPage_emitDecoratorMetadata;
+	public static String TSConfigWizardPage_experimentalDecorators;
+	public static String TSConfigWizardPage_noFallthroughCasesInSwitch;
+	public static String TSConfigWizardPage_noImplicitAny;
+	public static String TSConfigWizardPage_noImplicitReturns;
+	public static String TSConfigWizardPage_strictNullChecks;
+	
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

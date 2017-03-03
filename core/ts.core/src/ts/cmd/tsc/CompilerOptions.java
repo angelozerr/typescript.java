@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ts.cmd.AbstractOptions;
+import ts.utils.BooleanUtils;
 
 /**
  * Instructs the TypeScript compiler how to compile .ts files.
@@ -19,118 +20,118 @@ import ts.cmd.AbstractOptions;
 public class CompilerOptions extends AbstractOptions {
 
 	private Boolean allowJs;
-	private boolean allowSyntheticDefaultImports;
-	private boolean allowUnreachableCode;
-	private boolean allowUnusedLabels;
+	private Boolean allowSyntheticDefaultImports;
+	private Boolean allowUnreachableCode;
+	private Boolean allowUnusedLabels;
 	private String charset;
-	private boolean declaration;
-	private boolean diagnostics;
-	private boolean emitBOM;
-	private boolean emitDecoratorMetadata;
-	private boolean experimentalDecorators;
-	private boolean forceConsistentCasingInFileNames;
-	private boolean help;
-	private boolean inlineSourceMap;
-	private boolean inlineSources;
-	private boolean init;
-	private boolean isolatedModules;
+	private Boolean declaration;
+	private Boolean diagnostics;
+	private Boolean emitBOM;
+	private Boolean emitDecoratorMetadata;
+	private Boolean experimentalDecorators;
+	private Boolean forceConsistentCasingInFileNames;
+	private Boolean help;
+	private Boolean inlineSourceMap;
+	private Boolean inlineSources;
+	private Boolean init;
+	private Boolean isolatedModules;
 	private String jsx;
-	private boolean listEmittedFiles;
-	private boolean listFiles;
+	private Boolean listEmittedFiles;
+	private Boolean listFiles;
 	private String locale;
 	private String mapRoot;
 	private String module;
 	private String moduleResolution;
 	private String newLine;
-	private boolean noEmit;
-	private boolean noEmitHelpers;
-	private boolean noEmitOnError;
-	private boolean noFallthroughCasesInSwitch;
-	private boolean noImplicitAny;
-	private boolean noImplicitReturns;
-	private boolean noImplicitUseStrict;
-	private boolean noLib;
-	private boolean noResolve;
+	private Boolean noEmit;
+	private Boolean noEmitHelpers;
+	private Boolean noEmitOnError;
+	private Boolean noFallthroughCasesInSwitch;
+	private Boolean noImplicitAny;
+	private Boolean noImplicitReturns;
+	private Boolean noImplicitUseStrict;
+	private Boolean noLib;
+	private Boolean noResolve;
 	private String out;
 	private String outDir;
 	private String outFile;
 	private Map<String, List<String>> paths;
-	private boolean preserveConstEnums;
-	private boolean pretty;
+	private Boolean preserveConstEnums;
+	private Boolean pretty;
 	private String project;
 	private String reactNamespace;
-	private boolean removeComments;
+	private Boolean removeComments;
 	private String rootDir;
 	private List<String> rootDirs;
-	private boolean skipDefaultLibCheck;
-	private boolean sourceMap;
+	private Boolean skipDefaultLibCheck;
+	private Boolean sourceMap;
 	private String sourceRoot;
-	private boolean strictNullChecks;
-	private boolean stripInternal;
-	private boolean suppressExcessPropertyErrors;
-	private boolean suppressImplicitAnyIndexErrors;
+	private Boolean strictNullChecks;
+	private Boolean stripInternal;
+	private Boolean suppressExcessPropertyErrors;
+	private Boolean suppressImplicitAnyIndexErrors;
 	private String target;
-	private boolean traceResolution;
-	private boolean version;
+	private Boolean traceResolution;
+	private Boolean version;
 	private Boolean watch;
 
 	public CompilerOptions() {
 	}
 
 	public CompilerOptions(CompilerOptions options) {
-		this.setAllowJs(options.isAllowJs());
-		this.setAllowSyntheticDefaultImports(options.isAllowSyntheticDefaultImports());
-		this.setAllowUnreachableCode(options.isAllowUnreachableCode());
-		this.setAllowUnusedLabels(options.isAllowUnusedLabels());
-		this.setCharset(options.getCharset());
-		this.setDeclaration(options.isDeclaration());
-		this.setDiagnostics(options.isDiagnostics());
-		this.setEmitBOM(options.isEmitBOM());
-		this.setEmitDecoratorMetadata(options.isEmitDecoratorMetadata());
-		this.setExperimentalDecorators(options.isExperimentalDecorators());
-		this.setForceConsistentCasingInFileNames(options.isForceConsistentCasingInFileNames());
-		this.setHelp(options.isHelp());
-		this.setInlineSourceMap(options.isInlineSourceMap());
-		this.setInlineSources(options.isInlineSources());
-		this.setInit(options.isInit());
-		this.setIsolatedModules(options.isIsolatedModules());
-		this.setJsx(options.getJsx());
-		this.setListEmittedFiles(options.isListEmittedFiles());
-		this.setListFiles(options.isListFiles());
-		this.setLocale(options.getLocale());
-		this.setMapRoot(options.getMapRoot());
-		this.setModule(options.getModule());
-		this.setModuleResolution(options.getModuleResolution());
-		this.setNewLine(options.getNewLine());
-		this.setNoEmit(options.isNoEmit());
-		this.setNoEmitHelpers(options.isNoEmitHelpers());
-		this.setNoEmitOnError(options.isNoEmitOnError());
-		this.setNoFallthroughCasesInSwitch(options.isNoFallthroughCasesInSwitch());
-		this.setNoImplicitAny(options.isNoImplicitAny());
-		this.setNoImplicitReturns(options.isNoImplicitReturns());
-		this.setNoImplicitUseStrict(options.isNoImplicitUseStrict());
-		this.setNoLib(options.isNoLib());
-		this.setNoResolve(options.isNoResolve());
-		this.setOut(options.getOut());
-		this.setOutDir(options.getOutDir());
-		this.setOutFile(options.getOutFile());
-		this.setPreserveConstEnums(options.isPreserveConstEnums());
-		this.setPretty(options.isPretty());
-		this.setProject(options.getProject());
-		this.setReactNamespace(options.getReactNamespace());
-		this.setRemoveComments(options.isRemoveComments());
-		this.setRootDir(options.getRootDir());
-		this.setSkipDefaultLibCheck(options.isSkipDefaultLibCheck());
-		this.setSourceMap(options.isSourceMap());
-		this.setSourceRoot(options.getSourceRoot());
-		this.setStrictNullChecks(options.isStrictNullChecks());
-		this.setStripInternal(options.isStripInternal());
-		this.setSuppressExcessPropertyErrors(options.isSuppressExcessPropertyErrors());
-		this.setSuppressImplicitAnyIndexErrors(options.isSuppressImplicitAnyIndexErrors());
-		this.setTarget(options.getTarget());
-		this.setTraceResolution(options.isTraceResolution());
-		this.setVersion(options.isVersion());
-		this.setWatch(options.isWatch());
+		this.setAllowJs(options.allowJs);
+		this.setAllowSyntheticDefaultImports(options.allowSyntheticDefaultImports);
+		this.setAllowUnreachableCode(options.allowUnreachableCode);
+		this.setAllowUnusedLabels(options.allowUnusedLabels);
+		this.setCharset(options.charset);
+		this.setDeclaration(options.declaration);
+		this.setDiagnostics(options.diagnostics);
+		this.setEmitBOM(options.emitBOM);
+		this.setEmitDecoratorMetadata(options.emitDecoratorMetadata);
+		this.setExperimentalDecorators(options.experimentalDecorators);
+		this.setForceConsistentCasingInFileNames(options.forceConsistentCasingInFileNames);
+		this.setHelp(options.help);
+		this.setInlineSourceMap(options.inlineSourceMap);
+		this.setInlineSources(options.inlineSources);
+		this.setInit(options.init);
+		this.setIsolatedModules(options.isolatedModules);
+		this.setJsx(options.jsx);
+		this.setListEmittedFiles(options.listEmittedFiles);
+		this.setListFiles(options.listFiles);
+		this.setLocale(options.locale);
+		this.setMapRoot(options.mapRoot);
+		this.setModule(options.module);
+		this.setModuleResolution(options.moduleResolution);
+		this.setNewLine(options.newLine);
+		this.setNoEmit(options.noEmit);
+		this.setNoEmitHelpers(options.noEmitHelpers);
+		this.setNoEmitOnError(options.noEmitOnError);
+		this.setNoFallthroughCasesInSwitch(options.noFallthroughCasesInSwitch);
+		this.setNoImplicitAny(options.noImplicitAny);
+		this.setNoImplicitReturns(options.noImplicitReturns);
+		this.setNoImplicitUseStrict(options.noImplicitUseStrict);
+		this.setNoLib(options.noLib);
+		this.setNoResolve(options.noResolve);
+		this.setOut(options.out);
+		this.setOutDir(options.outDir);
+		this.setOutFile(options.outFile);
+		this.setPreserveConstEnums(options.preserveConstEnums);
+		this.setPretty(options.pretty);
+		this.setProject(options.project);
+		this.setReactNamespace(options.reactNamespace);
+		this.setRemoveComments(options.removeComments);
+		this.setRootDir(options.rootDir);
+		this.setSkipDefaultLibCheck(options.skipDefaultLibCheck);
+		this.setSourceMap(options.sourceMap);
+		this.setSourceRoot(options.sourceRoot);
+		this.setStrictNullChecks(options.strictNullChecks);
+		this.setStripInternal(options.stripInternal);
+		this.setSuppressExcessPropertyErrors(options.suppressExcessPropertyErrors);
+		this.setSuppressImplicitAnyIndexErrors(options.suppressImplicitAnyIndexErrors);
+		this.setTarget(options.target);
+		this.setTraceResolution(options.traceResolution);
+		this.setVersion(options.version);
+		this.setWatch(options.watch);
 	}
 
 	/**
@@ -141,7 +142,7 @@ public class CompilerOptions extends AbstractOptions {
 	 *         otherwise.
 	 */
 	public Boolean isAllowJs() {
-		return allowJs;
+		return BooleanUtils.toBoolean(allowJs);
 	}
 
 	/**
@@ -160,7 +161,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isAllowSyntheticDefaultImports() {
-		return allowSyntheticDefaultImports;
+		return BooleanUtils.toBoolean(allowSyntheticDefaultImports);
 	}
 
 	/**
@@ -179,7 +180,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isAllowUnreachableCode() {
-		return allowUnreachableCode;
+		return BooleanUtils.toBoolean(allowUnreachableCode);
 	}
 
 	/**
@@ -197,7 +198,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isAllowUnusedLabels() {
-		return allowUnusedLabels;
+		return BooleanUtils.toBoolean(allowUnusedLabels);
 	}
 
 	/**
@@ -233,7 +234,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return true of generates corresponding d.ts files and false otherwise.
 	 */
 	public boolean isDeclaration() {
-		return declaration;
+		return BooleanUtils.toBoolean(declaration);
 	}
 
 	/**
@@ -251,7 +252,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isDiagnostics() {
-		return diagnostics;
+		return BooleanUtils.toBoolean(diagnostics);
 	}
 
 	/**
@@ -269,7 +270,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isEmitBOM() {
-		return emitBOM;
+		return BooleanUtils.toBoolean(emitBOM);
 	}
 
 	/**
@@ -288,7 +289,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isEmitDecoratorMetadata() {
-		return emitDecoratorMetadata;
+		return BooleanUtils.toBoolean(emitDecoratorMetadata);
 	}
 
 	/**
@@ -307,7 +308,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isExperimentalDecorators() {
-		return experimentalDecorators;
+		return BooleanUtils.toBoolean(experimentalDecorators);
 	}
 
 	/**
@@ -325,7 +326,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isForceConsistentCasingInFileNames() {
-		return forceConsistentCasingInFileNames;
+		return BooleanUtils.toBoolean(forceConsistentCasingInFileNames);
 	}
 
 	/**
@@ -343,7 +344,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isHelp() {
-		return help;
+		return BooleanUtils.toBoolean(help);
 	}
 
 	/**
@@ -361,7 +362,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isInlineSourceMap() {
-		return inlineSourceMap;
+		return BooleanUtils.toBoolean(inlineSourceMap);
 	}
 
 	/**
@@ -380,7 +381,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isInlineSources() {
-		return inlineSources;
+		return BooleanUtils.toBoolean(inlineSources);
 	}
 
 	/**
@@ -399,7 +400,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isInit() {
-		return init;
+		return BooleanUtils.toBoolean(init);
 	}
 
 	/**
@@ -417,7 +418,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isIsolatedModules() {
-		return isolatedModules;
+		return BooleanUtils.toBoolean(isolatedModules);
 	}
 
 	/**
@@ -457,7 +458,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isListEmittedFiles() {
-		return listEmittedFiles;
+		return BooleanUtils.toBoolean(listEmittedFiles);
 	}
 
 	/**
@@ -468,7 +469,7 @@ public class CompilerOptions extends AbstractOptions {
 	public void setListEmittedFiles(boolean listEmittedFiles) {
 		this.listEmittedFiles = listEmittedFiles;
 	}
-	
+
 	/**
 	 * Returns Print names of files part of the compilation.
 	 * 
@@ -476,7 +477,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 */
 	public boolean isListFiles() {
-		return listFiles;
+		return BooleanUtils.toBoolean(listFiles);
 	}
 
 	/**
@@ -606,7 +607,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoEmit() {
-		return noEmit;
+		return BooleanUtils.toBoolean(noEmit);
 	}
 
 	/**
@@ -625,7 +626,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoEmitHelpers() {
-		return noEmitHelpers;
+		return BooleanUtils.toBoolean(noEmitHelpers);
 	}
 
 	/**
@@ -644,7 +645,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoEmitOnError() {
-		return noEmitOnError;
+		return BooleanUtils.toBoolean(noEmitOnError);
 	}
 
 	/**
@@ -662,7 +663,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoFallthroughCasesInSwitch() {
-		return noFallthroughCasesInSwitch;
+		return BooleanUtils.toBoolean(noFallthroughCasesInSwitch);
 	}
 
 	/**
@@ -680,7 +681,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoImplicitAny() {
-		return noImplicitAny;
+		return BooleanUtils.toBoolean(noImplicitAny);
 	}
 
 	/**
@@ -698,7 +699,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoImplicitReturns() {
-		return noImplicitReturns;
+		return BooleanUtils.toBoolean(noImplicitReturns);
 	}
 
 	/**
@@ -716,7 +717,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoImplicitUseStrict() {
-		return noImplicitUseStrict;
+		return BooleanUtils.toBoolean(noImplicitUseStrict);
 	}
 
 	/**
@@ -734,7 +735,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoLib() {
-		return noLib;
+		return BooleanUtils.toBoolean(noLib);
 	}
 
 	/**
@@ -753,7 +754,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isNoResolve() {
-		return noResolve;
+		return BooleanUtils.toBoolean(noResolve);
 	}
 
 	/**
@@ -877,7 +878,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isPreserveConstEnums() {
-		return preserveConstEnums;
+		return BooleanUtils.toBoolean(preserveConstEnums);
 	}
 
 	/**
@@ -897,7 +898,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isPretty() {
-		return pretty;
+		return BooleanUtils.toBoolean(pretty);
 	}
 
 	/**
@@ -957,7 +958,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isRemoveComments() {
-		return removeComments;
+		return BooleanUtils.toBoolean(removeComments);
 	}
 
 	/**
@@ -1016,7 +1017,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isSkipDefaultLibCheck() {
-		return skipDefaultLibCheck;
+		return BooleanUtils.toBoolean(skipDefaultLibCheck);
 	}
 
 	/**
@@ -1034,7 +1035,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isSourceMap() {
-		return sourceMap;
+		return BooleanUtils.toBoolean(sourceMap);
 	}
 
 	/**
@@ -1080,7 +1081,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isStrictNullChecks() {
-		return strictNullChecks;
+		return BooleanUtils.toBoolean(strictNullChecks);
 	}
 
 	/**
@@ -1100,7 +1101,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isStripInternal() {
-		return stripInternal;
+		return BooleanUtils.toBoolean(stripInternal);
 	}
 
 	/**
@@ -1118,7 +1119,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isSuppressExcessPropertyErrors() {
-		return suppressExcessPropertyErrors;
+		return BooleanUtils.toBoolean(suppressExcessPropertyErrors);
 	}
 
 	/**
@@ -1139,7 +1140,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isSuppressImplicitAnyIndexErrors() {
-		return suppressImplicitAnyIndexErrors;
+		return BooleanUtils.toBoolean(suppressImplicitAnyIndexErrors);
 	}
 
 	/**
@@ -1178,7 +1179,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isTraceResolution() {
-		return traceResolution;
+		return BooleanUtils.toBoolean(traceResolution);
 	}
 
 	/**
@@ -1196,7 +1197,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public boolean isVersion() {
-		return version;
+		return BooleanUtils.toBoolean(version);
 	}
 
 	/**
@@ -1225,7 +1226,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * @return
 	 */
 	public Boolean isWatch() {
-		return watch;
+		return BooleanUtils.toBoolean(watch);
 	}
 
 	public void fillOptions(List<String> args) {
