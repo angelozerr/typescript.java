@@ -33,21 +33,10 @@ import org.eclipse.ui.texteditor.ITextEditorExtension3;
 import org.eclipse.wst.jsdt.core.IJavaScriptProject;
 import org.eclipse.wst.jsdt.core.JavaScriptCore;
 import org.eclipse.wst.jsdt.core.ToolFactory;
-import org.eclipse.wst.jsdt.core.compiler.IProblem;
 import org.eclipse.wst.jsdt.core.compiler.IScanner;
 import org.eclipse.wst.jsdt.core.compiler.ITerminalSymbols;
 import org.eclipse.wst.jsdt.core.compiler.InvalidInputException;
-import org.eclipse.wst.jsdt.core.dom.AST;
 import org.eclipse.wst.jsdt.core.dom.ASTNode;
-import org.eclipse.wst.jsdt.core.dom.ASTParser;
-import org.eclipse.wst.jsdt.core.dom.DoStatement;
-import org.eclipse.wst.jsdt.core.dom.Expression;
-import org.eclipse.wst.jsdt.core.dom.ForStatement;
-import org.eclipse.wst.jsdt.core.dom.IfStatement;
-import org.eclipse.wst.jsdt.core.dom.JavaScriptUnit;
-import org.eclipse.wst.jsdt.core.dom.Statement;
-import org.eclipse.wst.jsdt.core.dom.WhileStatement;
-import org.eclipse.wst.jsdt.internal.corext.dom.NodeFinder;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 import org.eclipse.wst.jsdt.internal.ui.text.JavaHeuristicScanner;
 import org.eclipse.wst.jsdt.internal.ui.text.Symbols;
@@ -504,101 +493,10 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 	}
 
 	private boolean isClosed(IDocument document, int offset, int length) {
-		
-//		char[]c = {'{', '}'};
-//		JavaPairMatcher matcher = new JavaPairMatcher(c);
-//		IRegion r= matcher.match(document, offset, length);
-//		if (true) {
-//			return r != null;
-//		}
-		
-		CompilationUnitInfo info= getCompilationUnitForMethod(document, offset);
-		if (info == null)
-			return false;
-
-		JavaScriptUnit compilationUnit= null;
-		try {
-			ASTParser parser= ASTParser.newParser(AST.JLS3);
-			parser.setSource(info.buffer);
-			compilationUnit= (JavaScriptUnit) parser.createAST(null);
-		} catch (ArrayIndexOutOfBoundsException x) {
-			// work around for parser problem
-			return false;
-		}
-
-		IProblem[] problems= compilationUnit.getProblems();
-		for (int i= 0; i != problems.length; ++i) {
-			if (problems[i].getID() == IProblem.UnmatchedBracket)
-				return true;
-		}
-
-		final int relativeOffset= offset - info.delta;
-
-		ASTNode node= NodeFinder.perform(compilationUnit, relativeOffset, length);
-
-		if (length == 0) {
-			while (node != null && (relativeOffset == node.getStartPosition() || relativeOffset == node.getStartPosition() + node.getLength()))
-				node= node.getParent();
-		}
-
-		if (node == null)
-			return false;
-
-		switch (node.getNodeType()) {
-			case ASTNode.BLOCK:
-				return getBlockBalance(document, offset, fPartitioning) <= 0;
-
-			case ASTNode.IF_STATEMENT:
-			{
-				IfStatement ifStatement= (IfStatement) node;
-				Expression expression= ifStatement.getExpression();
-				IRegion expressionRegion= createRegion(expression, info.delta);
-				Statement thenStatement= ifStatement.getThenStatement();
-				IRegion thenRegion= createRegion(thenStatement, info.delta);
-
-				// between expression and then statement
-				if (expressionRegion.getOffset() + expressionRegion.getLength() <= offset && offset + length <= thenRegion.getOffset())
-					return thenStatement != null;
-
-				Statement elseStatement= ifStatement.getElseStatement();
-				IRegion elseRegion= createRegion(elseStatement, info.delta);
-
-				if (elseStatement != null) {
-					int sourceOffset= thenRegion.getOffset() + thenRegion.getLength();
-					int sourceLength= elseRegion.getOffset() - sourceOffset;
-					IRegion elseToken= getToken(document, new Region(sourceOffset, sourceLength), ITerminalSymbols.TokenNameelse);
-					return elseToken != null && elseToken.getOffset() + elseToken.getLength() <= offset && offset + length < elseRegion.getOffset();
-				}
-			}
-			break;
-
-			case ASTNode.WHILE_STATEMENT:
-			case ASTNode.FOR_STATEMENT:
-			{
-				Expression expression= node.getNodeType() == ASTNode.WHILE_STATEMENT ? ((WhileStatement) node).getExpression() : ((ForStatement) node).getExpression();
-				IRegion expressionRegion= createRegion(expression, info.delta);
-				Statement body= node.getNodeType() == ASTNode.WHILE_STATEMENT ? ((WhileStatement) node).getBody() : ((ForStatement) node).getBody();
-				IRegion bodyRegion= createRegion(body, info.delta);
-
-				// between expression and body statement
-				if (expressionRegion.getOffset() + expressionRegion.getLength() <= offset && offset + length <= bodyRegion.getOffset())
-					return body != null;
-			}
-			break;
-
-			case ASTNode.DO_STATEMENT:
-			{
-				DoStatement doStatement= (DoStatement) node;
-				IRegion doRegion= createRegion(doStatement, info.delta);
-				Statement body= doStatement.getBody();
-				IRegion bodyRegion= createRegion(body, info.delta);
-
-				if (doRegion.getOffset() + doRegion.getLength() <= offset && offset + length <= bodyRegion.getOffset())
-					return body != null;
-			}
-			break;
-		}
-
+		// JSDT uses complex code with CompilationUnitInfo to know if block, if, while, for statement is well closed.
+		// As TypeScript is a superset of JavaScript and as JSDT doesn't manage correctly ES6 class
+		// we don't do the same thing than JSDT and consider that it is every time closed.
+		// It fix for instance https://github.com/angelozerr/typescript.java/issues/72
 		return true;
 	}
 
