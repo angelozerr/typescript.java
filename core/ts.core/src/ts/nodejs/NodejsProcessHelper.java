@@ -10,12 +10,17 @@
  */
 package ts.nodejs;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import ts.OS;
+import ts.utils.FileUtils;
+import ts.utils.IOUtils;
 import ts.utils.ProcessHelper;
 import ts.utils.StringUtils;
 
@@ -84,34 +89,30 @@ public class NodejsProcessHelper {
 	}
 
 	public static File findNode(OS os) {
-		String nodeFileName = getNodeFileName(os);
-		String path = System.getenv("PATH");
-		String[] paths = path.split("" + File.pathSeparatorChar, 0);
-		List<String> directories = new ArrayList<String>();
-		for (String p : paths) {
-			directories.add(p);
-		}
-
-		// ensure /usr/local/bin is included for OS X
-		if (os == OS.MacOS) {
-			directories.add("/usr/local/bin");
-		}
-
-		// search for Node.js in the PATH directories
-		for (String directory : directories) {
-			File nodeFile = new File(directory, nodeFileName);
-
-			if (nodeFile.exists()) {
-				return nodeFile;
-			}
-		}
-		return ProcessHelper.findLocation(NODE_FILENAME, os);
+		String extension = os == OS.Windows ? ".exe" : null;
+		return ProcessHelper.findLocation(NODE_FILENAME, os, extension);
 	}
 
-	private static String getNodeFileName(OS os) {
-		if (os == OS.Windows) {
-			return "node.exe";
+	/**
+	 * Returns the nodejs version and null otherwise.
+	 * 
+	 * @param nodejsFile
+	 * @return the nodejs version and null otherwise.
+	 */
+	public static String getNodeVersion(File nodejsFile) {
+		if (nodejsFile != null) {
+			BufferedReader reader = null;
+			try {
+				String command = FileUtils.getPath(nodejsFile) + " --version";
+				Process p = Runtime.getRuntime().exec(command);
+				reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				return reader.readLine();
+			} catch (IOException e) {
+				return null;
+			} finally {
+				IOUtils.closeQuietly(reader);
+			}
 		}
-		return NODE_FILENAME;
+		return null;
 	}
 }

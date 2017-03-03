@@ -22,7 +22,6 @@ import java.util.List;
 
 import ts.TypeScriptException;
 import ts.utils.FileUtils;
-import ts.utils.IOUtils;
 
 /**
  * Node.js process.
@@ -258,26 +257,4 @@ public class NodejsProcess extends AbstractNodejsProcess {
 		}
 	}
 
-	/**
-	 * Returns the nodejs version and null otherwise.
-	 * 
-	 * @param nodejsFile
-	 * @return
-	 */
-	public static String getNodeVersion(File nodejsFile) {
-		if (nodejsFile != null) {
-			BufferedReader reader = null;
-			try {
-				String command = FileUtils.getPath(nodejsFile) + " --version";
-				Process p = Runtime.getRuntime().exec(command);
-				reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				return reader.readLine();
-			} catch (IOException e) {
-				return null;
-			} finally {
-				IOUtils.closeQuietly(reader);
-			}
-		}
-		return null;
-	}
 }

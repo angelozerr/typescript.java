@@ -46,6 +46,7 @@ import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog.Mode;
 import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
 import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
 import ts.nodejs.NodejsProcess;
+import ts.nodejs.NodejsProcessHelper;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
@@ -349,7 +350,7 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 			return new NodeJsStatus(null, null, NLS.bind(
 					TypeScriptUIMessages.NodejsConfigurationBlock_nodeFile_exists_error, FileUtils.getPath(nodeFile)));
 		} else {
-			version = NodejsProcess.getNodeVersion(nodeFile);
+			version = NodejsProcessHelper.getNodeVersion(nodeFile);
 			if (StringUtils.isEmpty(version)) {
 				// ERROR: the file path is not a node.exe
 				return new NodeJsStatus(null, null,

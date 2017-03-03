@@ -18,6 +18,7 @@ import ts.client.format.FormatCodeSettings;
 import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.internal.repository.TypeScriptRepository;
 import ts.nodejs.NodejsProcess;
+import ts.nodejs.NodejsProcessHelper;
 import ts.repository.ITypeScriptRepository;
 import ts.repository.TypeScriptRepositoryException;
 
@@ -61,7 +62,7 @@ public class BasicTypeScriptProjectSettings implements ITypeScriptProjectSetting
 	@Override
 	public String getNodeVersion() {
 		File nodejsFile = getNodejsInstallPath();
-		return NodejsProcess.getNodeVersion(nodejsFile);
+		return NodejsProcessHelper.getNodeVersion(nodejsFile);
 	}
 
 	@Override

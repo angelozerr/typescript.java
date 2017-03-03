@@ -32,7 +32,7 @@ import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.preferences.TypeScriptCorePreferenceInitializer;
 import ts.eclipse.ide.internal.core.repository.IDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.resources.buildpath.TypeScriptBuildPath;
-import ts.nodejs.NodejsProcess;
+import ts.nodejs.NodejsProcessHelper;
 import ts.repository.ITypeScriptRepository;
 import ts.resources.SynchStrategy;
 import ts.utils.StringUtils;
@@ -126,7 +126,7 @@ public class IDETypeScriptProjectSettings extends AbstractTypeScriptSettings imp
 	@Override
 	public String getNodeVersion() {
 		File nodejsFile = getNodejsInstallPath();
-		return NodejsProcess.getNodeVersion(nodejsFile);
+		return NodejsProcessHelper.getNodeVersion(nodejsFile);
 	}
 
 	@Override
