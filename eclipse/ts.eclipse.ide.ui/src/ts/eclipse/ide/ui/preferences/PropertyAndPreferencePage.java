@@ -36,8 +36,6 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.internal.ui.dialogs.IStatusChangeListener;
-import ts.eclipse.ide.internal.ui.dialogs.StatusInfo;
 import ts.eclipse.ide.internal.ui.dialogs.StatusUtil;
 import ts.eclipse.ide.internal.ui.dialogs.fields.DialogField;
 import ts.eclipse.ide.internal.ui.dialogs.fields.IDialogFieldListener;
