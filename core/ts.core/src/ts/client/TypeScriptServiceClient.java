@@ -38,6 +38,7 @@ import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.installtypes.BeginInstallTypesEventBody;
 import ts.client.installtypes.EndInstallTypesEventBody;
 import ts.client.installtypes.IInstallTypesListener;
+import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
@@ -56,6 +57,7 @@ import ts.internal.client.protocol.CompletionDetailsRequest;
 import ts.internal.client.protocol.CompletionsRequest;
 import ts.internal.client.protocol.ConfigureRequest;
 import ts.internal.client.protocol.DefinitionRequest;
+import ts.internal.client.protocol.DocCommentTemplateRequest;
 import ts.internal.client.protocol.FormatRequest;
 import ts.internal.client.protocol.GetSupportedCodeFixesRequest;
 import ts.internal.client.protocol.GeterrForProjectRequest;
@@ -453,6 +455,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		return execute(new NavTreeRequest(fileName, positionProvider), true);
 	}
 
+	@Override
+	public CompletableFuture<TextInsertion> docCommentTemplate(String fileName, int line, int offset)
+			throws TypeScriptException {
+		return execute(new DocCommentTemplateRequest(fileName, line, offset), true);
+	}
+	
 	// Since 2.1.0
 
 	@Override

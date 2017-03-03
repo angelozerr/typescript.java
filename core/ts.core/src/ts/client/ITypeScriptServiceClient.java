@@ -23,6 +23,7 @@ import ts.client.configure.ConfigureRequestArguments;
 import ts.client.diagnostics.DiagnosticEvent;
 import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.installtypes.IInstallTypesListener;
+import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
@@ -201,10 +202,9 @@ public interface ITypeScriptServiceClient {
 	CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset)
 			throws TypeScriptException;
 
-
 	CompletableFuture<RenameResponseBody> rename(String file, int line, int offset, Boolean findInComments,
 			Boolean findInStrings) throws TypeScriptException;
-	
+
 	CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider)
 			throws TypeScriptException;
 
@@ -212,7 +212,7 @@ public interface ITypeScriptServiceClient {
 
 	CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList)
 			throws TypeScriptException;
-	
+
 	// Since 2.0.3
 
 	/**
@@ -245,6 +245,9 @@ public interface ITypeScriptServiceClient {
 	// Since 2.0.6
 
 	CompletableFuture<NavigationBarItem> navtree(String fileName, IPositionProvider positionProvider)
+			throws TypeScriptException;
+
+	CompletableFuture<TextInsertion> docCommentTemplate(String fileName, int line, int offset)
 			throws TypeScriptException;
 
 	// Since 2.1.0

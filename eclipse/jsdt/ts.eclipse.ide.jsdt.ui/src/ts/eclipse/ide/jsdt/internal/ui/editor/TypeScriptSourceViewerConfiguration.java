@@ -330,7 +330,7 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 		if (IJavaScriptPartitions.JAVA_DOC.equals(contentType)
 				|| IJavaScriptPartitions.JAVA_MULTI_LINE_COMMENT.equals(contentType)
 				|| IJavaScriptPartitions.JAVASCRIPT_TEMPLATE_LITERAL.equals(contentType)) {
-			return new IAutoEditStrategy[] { new JavaDocAutoIndentStrategy(partitioning) };
+			return new IAutoEditStrategy[] { new JSDocAutoIndentStrategy(partitioning) };
 		} else if (IJavaScriptPartitions.JAVA_STRING.equals(contentType))
 			return new IAutoEditStrategy[] { new SmartSemicolonAutoEditStrategy(partitioning),
 					new JavaStringAutoIndentStrategy(partitioning) };

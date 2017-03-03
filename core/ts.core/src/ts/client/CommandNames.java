@@ -47,6 +47,7 @@ public enum CommandNames {
 	
 	// 2.0.6
 	NavTree("navtree", "2.0.6"),
+	DocCommentTemplate("docCommentTemplate", "2.0.6"),
 	
 	// 2.1.0
 	Implementation("implementation", "2.1.0"),

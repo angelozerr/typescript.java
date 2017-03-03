@@ -23,6 +23,7 @@ import ts.client.completions.ICompletionEntryFactory;
 import ts.client.diagnostics.DiagnosticEvent;
 import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.format.FormatCodeSettings;
+import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
@@ -127,7 +128,7 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 * @throws TypeScriptException
 	 */
 	CompletableFuture<List<DiagnosticEvent>> geterr() throws TypeScriptException;
-	
+
 	/**
 	 * Format the file content according start/end position.
 	 * 
@@ -183,9 +184,9 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 */
 	public CompletableFuture<List<OccurrencesResponseItem>> occurrences(int position) throws TypeScriptException;
 
-	CompletableFuture<RenameResponseBody> rename(int position, Boolean findInComments,
-			Boolean findInStrings) throws TypeScriptException;
-	
+	CompletableFuture<RenameResponseBody> rename(int position, Boolean findInComments, Boolean findInStrings)
+			throws TypeScriptException;
+
 	/**
 	 * Call implementation from the tsserver.
 	 * 
@@ -193,6 +194,8 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 * @throws TypeScriptException
 	 */
 	CompletableFuture<List<FileSpan>> implementation(int position) throws TypeScriptException;
+
+	CompletableFuture<TextInsertion> docCommentTemplate(int position) throws TypeScriptException;
 
 	/**
 	 * Get code fixes.

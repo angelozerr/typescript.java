@@ -27,6 +27,7 @@ import ts.client.configure.ConfigureRequestArguments;
 import ts.client.diagnostics.DiagnosticEvent;
 import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.format.FormatCodeSettings;
+import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
@@ -250,6 +251,16 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		return client.implementation(this.getName(), line, offset);
 	}
 
+	@Override
+	public CompletableFuture<TextInsertion> docCommentTemplate(int position) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		Location location = this.getLocation(position);
+		int line = location.getLine();
+		int offset = location.getOffset();
+		return client.docCommentTemplate(this.getName(), line, offset);
+	}
+	
 	@Override
 	public CompletableFuture<List<CodeAction>> getCodeFixes(int startPosition, int endPosition,
 			List<Integer> errorCodes) throws TypeScriptException {

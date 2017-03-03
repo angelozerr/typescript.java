@@ -23,7 +23,6 @@ import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
-import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -34,15 +33,13 @@ import org.eclipse.wst.jsdt.core.IJavaScriptProject;
 import org.eclipse.wst.jsdt.core.JavaScriptCore;
 import org.eclipse.wst.jsdt.core.ToolFactory;
 import org.eclipse.wst.jsdt.core.compiler.IScanner;
-import org.eclipse.wst.jsdt.core.compiler.ITerminalSymbols;
-import org.eclipse.wst.jsdt.core.compiler.InvalidInputException;
-import org.eclipse.wst.jsdt.core.dom.ASTNode;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 import org.eclipse.wst.jsdt.internal.ui.text.JavaHeuristicScanner;
 import org.eclipse.wst.jsdt.internal.ui.text.Symbols;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 
+import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.jsdt.internal.ui.text.FastTypeScriptPartitionScanner;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.IJSXPartitions;
 import ts.resources.ITypeScriptFile;
@@ -213,7 +210,7 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 				}
 			}
 		} catch (BadLocationException e) {
-			JavaScriptPlugin.log(e);
+			JSDTTypeScriptUIPlugin.log(e);
 		}
 	}
 
@@ -254,7 +251,7 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 			}
 
 		} catch (BadLocationException e) {
-			JavaScriptPlugin.log(e);
+			JSDTTypeScriptUIPlugin.log(e);
 		}
 
 	}
@@ -337,7 +334,7 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 			c.text= buf.toString();
 
 		} catch (BadLocationException e) {
-			JavaScriptPlugin.log(e);
+			JSDTTypeScriptUIPlugin.log(e);
 		}
 	}
 
@@ -633,7 +630,7 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 			command.text= newText;
 
 		} catch (BadLocationException e) {
-			JavaScriptPlugin.log(e);
+			JSDTTypeScriptUIPlugin.log(e);
 		}
 
 	}
@@ -1093,7 +1090,7 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 			}
 
 		} catch (BadLocationException e) {
-			JavaScriptPlugin.log(e);
+			JSDTTypeScriptUIPlugin.log(e);
 		}
 	}
 
@@ -1176,94 +1173,5 @@ public class TypeScriptAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
 			}
 		}
 		return false;
-	}
-
-	private static CompilationUnitInfo getCompilationUnitForMethod(IDocument document, int offset) {
-		try {
-			JavaHeuristicScanner scanner= new JavaHeuristicScanner(document);
-
-			IRegion sourceRange= scanner.findSurroundingBlock(offset);
-			if (sourceRange == null)
-				return null;
-			String source= document.get(sourceRange.getOffset(), sourceRange.getLength());
-
-			StringBuffer contents= new StringBuffer();
-			contents.append("function ____f() {"); //$NON-NLS-1$
-			final int methodOffset= contents.length();
-			contents.append(source);
-			contents.append('}');
-
-			char[] buffer= contents.toString().toCharArray();
-
-			return new CompilationUnitInfo(buffer, sourceRange.getOffset() - methodOffset);
-
-		} catch (BadLocationException e) {
-			JavaScriptPlugin.log(e);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the block balance, i.e. zero if the blocks are balanced at <code>offset</code>, a
-	 * negative number if there are more closing than opening braces, and a positive number if there
-	 * are more opening than closing braces.
-	 * 
-	 * @param document the document
-	 * @param offset the offset
-	 * @param partitioning the partitioning
-	 * @return the block balance
-	 */
-	private static int getBlockBalance(IDocument document, int offset, String partitioning) {
-		if (offset < 1)
-			return -1;
-		if (offset >= document.getLength())
-			return 1;
-
-		int begin= offset;
-		int end= offset - 1;
-
-		JavaHeuristicScanner scanner= new JavaHeuristicScanner(document);
-
-		while (true) {
-			begin= scanner.findOpeningPeer(begin - 1, '{', '}');
-			end= scanner.findClosingPeer(end + 1, '{', '}');
-			if (begin == -1 && end == -1)
-				return 0;
-			if (begin == -1)
-				return -1;
-			if (end == -1)
-				return 1;
-		}
-	}
-
-	private static IRegion createRegion(ASTNode node, int delta) {
-		return node == null ? null : new Region(node.getStartPosition() + delta, node.getLength());
-	}
-
-	private static IRegion getToken(IDocument document, IRegion scanRegion, int tokenId)  {
-
-		try {
-
-			final String source= document.get(scanRegion.getOffset(), scanRegion.getLength());
-
-			fgScanner.setSource(source.toCharArray());
-
-			int id= fgScanner.getNextToken();
-			while (id != ITerminalSymbols.TokenNameEOF && id != tokenId)
-				id= fgScanner.getNextToken();
-
-			if (id == ITerminalSymbols.TokenNameEOF)
-				return null;
-
-			int tokenOffset= fgScanner.getCurrentTokenStartPosition();
-			int tokenLength= fgScanner.getCurrentTokenEndPosition() + 1 - tokenOffset; // inclusive end
-			return new Region(tokenOffset + scanRegion.getOffset(), tokenLength);
-
-		} catch (InvalidInputException x) {
-			return null;
-		} catch (BadLocationException x) {
-			return null;
-		}
 	}
 }
