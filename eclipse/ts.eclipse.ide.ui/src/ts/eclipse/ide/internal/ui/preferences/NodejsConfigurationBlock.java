@@ -45,7 +45,6 @@ import ts.eclipse.ide.ui.preferences.IStatusChangeListener;
 import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
 import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
 import ts.eclipse.ide.ui.preferences.StatusInfo;
-import ts.nodejs.NodejsProcess;
 import ts.nodejs.NodejsProcessHelper;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;

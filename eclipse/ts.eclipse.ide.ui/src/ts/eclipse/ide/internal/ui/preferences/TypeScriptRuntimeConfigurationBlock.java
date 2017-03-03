@@ -69,7 +69,7 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 				PREF_TSSERVER_TRACE_ON_CONSOLE, new String[] { "true", "false" }, 0);
 		super.addCheckBox(parent, TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_emulatePlugins_label,
 				PREF_TSSERVER_EMULATE_PLUGINS, new String[] { "true", "false" }, 0);
-		createTypeScriptRuntimeInfo(parent);
+		createTypeScriptRuntimeInfo(parent.getParent());
 	}
 
 	private void createTypeScriptRuntimeInfo(Composite parent) {
@@ -202,7 +202,8 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 				return new TypeScriptRuntimeStatus(null, null,
 						TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_embeddedTypeScript_required_error);
 			} else {
-				ITypeScriptRepository[] repositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
+				ITypeScriptRepository[] repositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager()
+						.getRepositories();
 				ITypeScriptRepository repository = repositories[selectedIndex - 1];
 				tsRuntimeFile = repository.getTypesScriptDir();
 			}
