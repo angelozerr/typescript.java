@@ -12,79 +12,80 @@
 package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * Command terminal tracker.
  *
  */
-public abstract class CommandTerminalTracker {
+public abstract class CommandTerminalTracker extends AnsiHandler {
+
+	public static boolean DEBUG = false;
 
 	private final String initialWorkingDir;
 	private final String initialCommand;
-
-	private boolean commandToSubmit;
 	private LineCommand lineCommand;
+
+	private String currentText;
+	private int columns;
 
 	public CommandTerminalTracker(String initialWorkingDir, String initialCommand) {
 		this.initialWorkingDir = initialWorkingDir;
 		this.initialCommand = initialCommand;
+		this.columns = 80;
 	}
 
-	public void processLines(List<String> lines, boolean processAnsiCommand_n) {
-		// trace(lines, processAnsiCommand_n);
-		if (processAnsiCommand_n) {
-			this.commandToSubmit = true;
+	@Override
+	protected void processText(String text) {
+		if (DEBUG) {
+			traceProcessText(text);
 		}
-		for (String line : lines) {
-			processLine(line);
-		}
-		submitIfNeeded();
+		processLine(text);
 	}
 
-	private void submitIfNeeded() {
-		if (commandToSubmit && lineCommand != null && lineCommand.hasCommand()) {
-			lineCommand.submit();
+	@Override
+	protected void processCarriageReturnLineFeed() {
+		// CRLF is thrown when:
+		// - User types 'Enter' to submit a command.
+		// - OR in Windows OS, when a new line is displayed in the DOS Command.
+		if (DEBUG) {
+			traceProcessCarriageReturnLineFeed();
 		}
+		if (lineCommand == null) {
+			// Line command was not found in the terminal, ignore the CR event.
+			return;
+		}
+		if (lineCommand.isSubmitted()) {
+			// Line command is already submitted, ignore the CR event.
+			return;
+		}
+		if (currentText != null) {
+			return;
+		}
+		// Submit the command.
+		lineCommand.submit();
 	}
 
 	private void processLine(String line) {
 		if (line == null) {
 			return;
 		}
+		if (line.length() >= columns) {
+			if (currentText == null) {
+				currentText = "";
+			}
+			currentText += line;
+			return;
+		}
+		if (currentText != null) {
+			line = currentText + line;
+			currentText = null;
+		}
 		if (lineCommand == null) {
 			// search line command from the initial workingDir and command
 			lineCommand = tryToCreateLineCommand(line, initialWorkingDir, initialCommand);
 		} else {
+			// Line command is initialized, update it.
 			lineCommand.update(line);
-		}
-	}
-
-	private void trace(List<String> lines, boolean commandToSubmit) {
-		StringBuilder code = new StringBuilder("test.processLines(");
-		code.append("Arrays.asList(");
-		boolean empty = true;
-		for (String line : lines) {
-			if (!empty) {
-				code.append(", ");
-			}
-			code.append("\"");
-			code.append(line.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
-			code.append("\"");
-			empty = false;
-		}
-		code.append(")");
-		code.append(", ");
-		code.append(commandToSubmit);
-		code.append(");");
-		System.err.println(code.toString());
-	}
-
-	private void doSubmitCommand(LineCommand lineCommand) {
-		try {
-			submitCommand(lineCommand);
-		} finally {
-			commandToSubmit = false;
 		}
 	}
 
@@ -107,14 +108,78 @@ public abstract class CommandTerminalTracker {
 			this.command = command;
 			this.beforeWorkingDir = beforeWorkingDir;
 			this.afterWorkingDir = afterWorkingDir;
-			this.state = state.INITIALIZED;
+			this.state = LineCommandState.INITIALIZED;
+		}
+
+		public boolean isSubmitted() {
+			return this.state == LineCommandState.SUBMITTED;
 		}
 
 		public void submit() {
-			if (hasCommand()) {
-				CommandTerminalTracker.this.doSubmitCommand(this);
+			try {
+				// Fire submit command Event.
+				CommandTerminalTracker.this.submitCommand(this);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			} finally {
 				this.state = LineCommandState.SUBMITTED;
 			}
+		}
+
+		public void update(String line) {
+			if (!updateLineCommand(line)) {
+				this.executing(line);
+			}
+		}
+
+		private void executing(String line) {
+			try {
+				CommandTerminalTracker.this.executingCommand(line, this);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+
+		private void terminate() {
+			try {
+				CommandTerminalTracker.this.terminateCommand(this);
+				this.workingDir = this.newWorkingDir;
+				command = null;
+				currentText = null;
+			} finally {
+				state = LineCommandState.INITIALIZED;
+			}
+		}
+
+		private boolean updateLineCommand(String line) {
+			int index = getWorkingDirIndex(line);
+			if (index == -1) {
+				if (state != LineCommandState.SUBMITTED) {
+					this.command = command + line;
+				}
+				return false;
+			}
+			String workinDir = line.substring(beforeWorkingDir.length(), index);
+			if (!new File(workinDir).exists()) {
+				return false;
+			}
+			if (state == LineCommandState.SUBMITTED) {
+				// Case when command is terminated.
+				this.newWorkingDir = workinDir;
+				this.terminate();
+			} else {
+				// Case when user is typing a command, update it.
+				String command = line.substring(index + 1, line.length());
+				this.command = command.trim();
+			}
+			return true;
+		}
+
+		private int getWorkingDirIndex(String line) {
+			if (!line.startsWith(beforeWorkingDir)) {
+				return -1;
+			}
+			return line.indexOf(afterWorkingDir);
 		}
 
 		public String getWorkingDir() {
@@ -129,59 +194,6 @@ public abstract class CommandTerminalTracker {
 			return command;
 		}
 
-		public boolean hasCommand() {
-			return command != null && command.length() > 0;
-		}
-
-		public void update(String line) {
-			if (updateLineCommand(line)) {
-				// It's a line command
-				if (state == LineCommandState.SUBMITTED) {
-					this.terminate();
-				}
-			} else {
-				if (state == LineCommandState.SUBMITTED) {
-					this.executing(line);
-				}
-			}
-		}
-
-		private void executing(String line) {
-			CommandTerminalTracker.this.executingCommand(line, this);
-		}
-
-		private void terminate() {
-			try {
-				CommandTerminalTracker.this.terminateCommand(this);
-				this.workingDir = this.newWorkingDir;
-				this.command = null;
-			} finally {
-				state = LineCommandState.INITIALIZED;
-			}
-		}
-
-		private boolean updateLineCommand(String line) {
-			if (!line.startsWith(beforeWorkingDir)) {
-				return false;
-			}
-			int index = line.indexOf(afterWorkingDir);
-			if (index == -1) {
-				return false;
-			}
-			String workinDir = line.substring(beforeWorkingDir.length(), index);
-			if (!new File(workinDir).exists()) {
-				return false;
-			}
-			String command = line.substring(index + 1, line.length());
-			if (state == LineCommandState.SUBMITTED) {
-				// Case when command is terminated.
-				this.newWorkingDir = workinDir;
-			} else {
-				// Case when user is typing a command.
-				this.command = command;
-			}
-			return true;
-		}
 	}
 
 	private LineCommand tryToCreateLineCommand(String line, String initialWorkingDir, String initialCommand) {
@@ -190,7 +202,10 @@ public abstract class CommandTerminalTracker {
 		}
 		int index = line.indexOf(initialWorkingDir);
 		if (index == -1) {
-			return null;
+			index = line.indexOf(initialWorkingDir.replaceAll("[\\\\]", "/"));
+			if (index == -1) {
+				return null;
+			}
 		}
 		// line contains working dir, compute line command working dir
 		String beforeWorkingDir = line.substring(0, index);
@@ -199,8 +214,26 @@ public abstract class CommandTerminalTracker {
 			initialCommandIndex = line.indexOf(initialCommand);
 		}
 		String afterWorkingDir = line.substring(index + initialWorkingDir.length(),
-				(initialCommandIndex != -1 ? initialCommandIndex : line.length()));
+				(initialCommandIndex != -1 ? initialCommandIndex : line.length())).trim();
 		return new LineCommand(initialWorkingDir, initialCommand, beforeWorkingDir, afterWorkingDir);
+	}
+
+	private void traceProcessText(String text) {
+		StringBuilder code = new StringBuilder("test.processText(");
+		code.append("\"");
+		code.append(text.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
+		code.append("\"");
+		code.append(");");
+		System.err.println(code.toString());
+	}
+
+	private void traceProcessCarriageReturnLineFeed() {
+		StringBuilder code = new StringBuilder("test.processCarriageReturnLineFeed();");
+		System.err.println(code.toString());
+	}
+
+	public void setColumns(int columns) {
+		this.columns = columns;
 	}
 
 	/**
@@ -224,4 +257,5 @@ public abstract class CommandTerminalTracker {
 	 * @param lineCommand
 	 */
 	protected abstract void terminateCommand(LineCommand lineCommand);
+
 }

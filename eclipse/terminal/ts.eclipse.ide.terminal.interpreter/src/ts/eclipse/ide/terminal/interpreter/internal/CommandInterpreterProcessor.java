@@ -35,8 +35,7 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 
 	@Override
 	public final void onContentReadFromStream(byte[] byteBuffer, int bytesRead) {
-		LinesInfo info = new LinesInfo(byteBuffer, bytesRead, encoding);
-		super.processLines(info.getLines(), info.isProcessAnsiCommand_n());
+		super.parse(byteBuffer, bytesRead, encoding);
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 	}
 
 	@Override
-	protected void executingCommand(String line, LineCommand lineCommand) {
+	protected void executingCommand(String line, LineCommand lineCommand) {		
 		if (interpreter != null) {
 			interpreter.onTrace(line);
 		}

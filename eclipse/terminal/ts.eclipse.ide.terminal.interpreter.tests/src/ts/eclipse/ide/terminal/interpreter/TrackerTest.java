@@ -27,6 +27,16 @@ public class TrackerTest extends CommandTerminalTracker {
 	}
 
 	@Override
+	public void processText(String text) {
+		super.processText(text);
+	}
+
+	@Override
+	protected void processCarriageReturnLineFeed() {
+		super.processCarriageReturnLineFeed();
+	}
+
+	@Override
 	protected void submitCommand(LineCommand lineCommand) {
 		write("SUBMIT: workingDir=" + lineCommand.getWorkingDir() + ", command=" + lineCommand.getCommand());
 	}

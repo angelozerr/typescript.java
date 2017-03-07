@@ -17,6 +17,8 @@ import org.eclipse.tm.terminal.connector.local.launcher.LocalLauncherDelegate;
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalServiceOutputStreamMonitorListener;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 
+import ts.eclipse.ide.terminal.interpreter.ICommandTerminalServiceConstants;
+
 /**
  * Extends {@link LocalInterpreterLauncherDelegate} to add custom
  * {@link CommandInterpreterProcessor} by waiting for accept of
@@ -28,13 +30,14 @@ public class LocalInterpreterLauncherDelegate extends LocalLauncherDelegate {
 
 	@Override
 	public ITerminalConnector createTerminalConnector(Map<String, Object> properties) {
-		if (!properties.containsKey(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS)) {
-			// The execute method of the launcher was not called, register the
-			// processor.
-			properties.put(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS,
-					new ITerminalServiceOutputStreamMonitorListener[] { new CommandInterpreterProcessor(properties) });
-		}
-		return super.createTerminalConnector(properties);
+//		 properties.put(ITerminalsConnectorConstants.PROP_PROCESS_PATH,
+//		 "C:\\Users\\azerr\\Downloads\\shell.w32-ix86\\bash.exe");
+
+		CommandInterpreterProcessor processor = new CommandInterpreterProcessor(properties);
+		properties.put(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS,
+				new ITerminalServiceOutputStreamMonitorListener[] { processor });		
+		ITerminalConnector connector = super.createTerminalConnector(properties);
+		return new TerminalConnectorWrapper(connector, processor, properties);
 	}
 
 }
