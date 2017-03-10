@@ -18,11 +18,14 @@
    <feature id="ts-json-feature">
       <category name="JSON Editors"/>
    </feature>
-   <feature id="tm-feature" >
+   <feature id="tm-feature">
       <category name="TypeScript IDE"/>
    </feature>
    <bundle id="minimal-json">
       <category name="TypeScript IDE"/>
+   </bundle>
+   <bundle id="org.joni">
+      <category name="Third Party"/>
    </bundle>
    <category-def name="TypeScript IDE" label="TypeScript IDE">
       <description>
@@ -39,4 +42,5 @@
          Provide JSON Editor for tsconfig.json based on WTP JSON Editor.
       </description>
    </category-def>
+   <category-def name="Third Party" label="Third Party"/>
 </site>
