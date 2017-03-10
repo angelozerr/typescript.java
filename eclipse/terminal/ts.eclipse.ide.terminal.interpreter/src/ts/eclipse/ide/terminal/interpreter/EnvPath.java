@@ -56,7 +56,7 @@ public class EnvPath {
 					return nativeEnvironmentPathCasePreserved;
 				}
 			}
-			nativeEnvironmentPathCasePreserved = "Path=";
+			nativeEnvironmentPathCasePreserved = PATH_ENV;
 			return nativeEnvironmentPathCasePreserved;
 		}
 	}
