@@ -46,24 +46,41 @@ public class Win32NgTerminalTrackerTests {
 				"EXECUTING: src\\app\\c1.ts\n" + 
 				"TERMINATE: workingDir=C:\\Users\\azerr\\WS\\abcd\\src\\app, command=ng generate class c1  --spec false"; 
 				
-				Assert.assertEquals(expected, test.toString());
+		Assert.assertEquals(expected, test.toString());
 	}
 	
-//	@Test
-//	public void ngTwoClasses() {
-//		CommandTerminalTracker test = new TrackerTest("C:\\Users\\azerr\\WS\\a2\\src\\app", "ng generate class c6  --spec true");
-//		test.processLines(Arrays.asList(), true);
-//		test.processLines(Arrays.asList(), false);
-//		test.processLines(Arrays.asList("Microsoft Windows [version 6.1.7601]", "Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", "C:\\Users\\azerr\\WS\\a2\\src\\app>ng generate class c6  --spec true"), false);
-//		test.processLines(Arrays.asList(), false);
-//		test.processLines(Arrays.asList("installing class", "  ", "create", " src\\app\\c6.spec.ts", "  ", "create", " src\\app\\c6.ts"), false);
-//		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app>"), false);
-//		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app>cd C:\\Users\\azerr\\WS\\a2\\src\\app\\about"), true);
-//		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app\\about>ng generate class c8  --spec false"), false);
-//		test.processLines(Arrays.asList(), false);
-//		test.processLines(Arrays.asList("installing class", "  ", "create", " src\\app\\about\\c8.ts"), false);
-//		test.processLines(Arrays.asList("C:\\Users\\azerr\\WS\\a2\\src\\app\\about>"), false);
-//		
-//		System.err.println(test);
-//	}
+	@Test
+	public void ngLongCommand() {
+		TrackerTest test = new TrackerTest("C:\\Users\\azerr\\WS\\aa\\src\\app",
+				"C:/Users/azerr/WS/aa/node_modules/.bin/ng.cmd generate class c  --spec false", "C:/Users/azerr");
+		test.processText("Microsoft Windows [version 6.1.7601]", 94);
+		test.processCarriageReturnLineFeed();
+		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 94);
+		test.processCarriageReturnLineFeed();
+		test.processCarriageReturnLineFeed();
+		test.processText(
+				"C:\\Users\\azerr\\WS\\aa\\src\\app>C:/Users/azerr/WS/aa/node_modules/.bin/ng.cmd generate class c  -",
+				94);
+		test.processCarriageReturnLineFeed();
+		test.processText("-spec false", 94);
+		test.processCarriageReturnLineFeed();
+		test.processText("installing class", 94);
+		test.processCarriageReturnLineFeed();
+		test.processText("  ", 94);
+		test.processText("create", 94);
+		test.processText(" src\\app\\c.ts", 94);
+		test.processCarriageReturnLineFeed();
+		test.processCarriageReturnLineFeed();
+		test.processText("C:\\Users\\azerr\\WS\\aa\\src\\app>", 94);
+
+		String expected = "" + 
+				"SUBMIT: workingDir=C:\\Users\\azerr\\WS\\aa\\src\\app, command=C:/Users/azerr/WS/aa/node_modules/.bin/ng.cmd generate class c  --spec false\n" + 
+				"EXECUTING:installing class\n" + 
+				"EXECUTING:  \n" +   
+				"EXECUTING:create\n" + 
+				"EXECUTING: src\\app\\c.ts\n" + 
+				"TERMINATE: workingDir=C:\\Users\\azerr\\WS\\aa\\src\\app, command=C:/Users/azerr/WS/aa/node_modules/.bin/ng.cmd generate class c  --spec false"; 
+				
+		Assert.assertEquals(expected, test.toString());		
+	}
 }

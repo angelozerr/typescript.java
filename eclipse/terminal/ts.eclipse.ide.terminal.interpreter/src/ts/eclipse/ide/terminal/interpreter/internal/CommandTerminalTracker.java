@@ -21,7 +21,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	private static final String TILD = "~";
 
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	private final String initialWorkingDir;
 	private final String initialCommand;
@@ -174,7 +174,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 			}
 			if (state == LineCommandState.SUBMITTED) {
 				// Case when command is terminated.
-				this.newWorkingDir = workinDir;
+				this.newWorkingDir =  resolveTild(workinDir);
 				this.terminate();
 			} else {
 				// Case when user is typing a command, update it.
@@ -221,7 +221,11 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		String beforeWorkingDir = line.substring(0, index);
 		int initialCommandIndex = -1;
 		if (initialCommand != null) {
+			// If initial command was setted, it should be retrieve from the line.
 			initialCommandIndex = line.indexOf(initialCommand);
+			if (initialCommandIndex == -1) {
+				return null;
+			}
 		}
 		String afterWorkingDir = line.substring(index + initialWorkingDir.length(),
 				(initialCommandIndex != -1 ? initialCommandIndex : line.length())).trim();

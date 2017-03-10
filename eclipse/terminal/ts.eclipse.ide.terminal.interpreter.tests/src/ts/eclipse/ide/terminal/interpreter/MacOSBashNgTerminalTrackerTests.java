@@ -45,7 +45,7 @@ public class MacOSBashNgTerminalTrackerTests {
 				+ "EXECUTING:  \n" 
 				+ "EXECUTING:create\n"
 				+ "EXECUTING: src/app/pascalou.ts\n"
-				+ "TERMINATE: workingDir=~/Documents/mon-workspace/angular2-200/src/app, command=ng generate class pascalou  --spec false";
+				+ "TERMINATE: workingDir=C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app, command=ng generate class pascalou  --spec false";
 
 		Assert.assertEquals(expected, test.toString());
 	}
@@ -76,9 +76,51 @@ public class MacOSBashNgTerminalTrackerTests {
 				+ "EXECUTING:  \n" 
 				+ "EXECUTING:create\n"
 				+ "EXECUTING: src/app/sample.ts\n"
-				+ "TERMINATE: workingDir=~/Documents/mon-workspace/angular2-200/src/app, command=ng generate class sample  --spec false";
+				+ "TERMINATE: workingDir=C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app, command=ng generate class sample  --spec false";
 
 		Assert.assertEquals(expected, test.toString());
 
+	}
+	
+	@Test
+	public void t() {
+		TrackerTest test = new TrackerTest("/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app", "ng generate class example  --spec false", "/Users/pascalleclercq");
+		test.processText("PS1='\\w\\", 80);
+		test.processText("$ '", 80);
+		test.processCarriageReturnLineFeed();
+		test.processCarriageReturnLineFeed();
+		test.processText("ng generate class example  --spec false", 80);
+		test.processCarriageReturnLineFeed();
+		test.processCarriageReturnLineFeed();
+		test.processText("bash-3.2$ PS1='\\w\\$ '", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ng generate class example  --spe ", 150);
+		test.processText("c false", 150);
+		test.processCarriageReturnLineFeed();
+		test.processCarriageReturnLineFeed();
+		test.processText("installing class", 150);
+		test.processCarriageReturnLineFeed();
+		test.processText("  ", 150);
+		test.processText("create", 150);
+		test.processText(" src/app/example.ts", 150);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ", 150);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ", 150);
+
+		String expected = ""
+				+ "SUBMIT: workingDir=/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app, command=ng generate class example  --spec false\n"
+				+ "EXECUTING:installing class\n" 
+				+ "EXECUTING:  \n" 
+				+ "EXECUTING:create\n"
+				+ "EXECUTING: src/app/example.ts\n"
+				+ "TERMINATE: workingDir=/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app, command=ng generate class example  --spec false\n"
+				+ "SUBMIT: workingDir=/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app, command=null\n"
+				+ "TERMINATE: workingDir=/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app, command=null";
+		
+		Assert.assertEquals(expected, test.toString());
+		
 	}
 }
