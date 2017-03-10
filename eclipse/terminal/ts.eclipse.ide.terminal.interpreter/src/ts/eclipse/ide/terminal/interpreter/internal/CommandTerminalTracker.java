@@ -19,6 +19,8 @@ import java.io.File;
  */
 public abstract class CommandTerminalTracker extends AnsiHandler {
 
+	private static final String TILD = "~";
+
 	public static boolean DEBUG = false;
 
 	private final String initialWorkingDir;
@@ -32,12 +34,19 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		this.initialWorkingDir = initialWorkingDir;
 		this.initialCommand = initialCommand;
 		this.columns = 80;
+		if (DEBUG) {
+			traceTrackerTest(initialWorkingDir, initialCommand, getUserHome());
+		}
 	}
 
 	@Override
 	protected void processText(String text) {
+		processText(text, columns);
+	}
+
+	protected void processText(String text, int columns) {
 		if (DEBUG) {
-			traceProcessText(text);
+			traceProcessText(text, columns);
 		}
 		processLine(text);
 	}
@@ -73,11 +82,11 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 			if (currentText == null) {
 				currentText = "";
 			}
-			currentText += line;
+			currentText += rtrim(line);
 			return;
 		}
 		if (currentText != null) {
-			line = currentText + line;
+			line = currentText + rtrim(line);
 			currentText = null;
 		}
 		if (lineCommand == null) {
@@ -160,7 +169,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 				return false;
 			}
 			String workinDir = line.substring(beforeWorkingDir.length(), index);
-			if (!new File(workinDir).exists()) {
+			if (!(new File(workinDir).exists() || workinDir.startsWith(TILD))) {
 				return false;
 			}
 			if (state == LineCommandState.SUBMITTED) {
@@ -200,6 +209,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		if (line == null) {
 			return null;
 		}
+		line = resolveTild(line);
 		int index = line.indexOf(initialWorkingDir);
 		if (index == -1) {
 			index = line.indexOf(initialWorkingDir.replaceAll("[\\\\]", "/"));
@@ -217,12 +227,57 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 				(initialCommandIndex != -1 ? initialCommandIndex : line.length())).trim();
 		return new LineCommand(initialWorkingDir, initialCommand, beforeWorkingDir, afterWorkingDir);
 	}
+	
+	private String resolveTild(String line)  {
+		if (line.contains(TILD)) {
+			String home = getUserHome();
+			return line.replaceFirst("^~", home);
+		}
+		return line;		
+	}
 
-	private void traceProcessText(String text) {
+	protected String getUserHome() {
+		String home = System.getProperty("user.home");
+		if (File.separatorChar == '\\') {
+			// Windows OS with win-bash
+			home = home.replaceAll("[\\\\]", "/");
+		}
+		return home;
+	}
+
+	// ---------------------- Trace to generate JUnit
+
+	private void traceTrackerTest(String initialWorkingDir, String initialCommand, String userHome) {
+		StringBuilder code = new StringBuilder("TrackerTest test = new TrackerTest(");		
+		if (initialWorkingDir == null) {
+			code.append("null");
+		} else {
+			code.append("\"");
+			code.append(initialWorkingDir.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
+			code.append("\"");
+		}
+		code.append(", ");
+		if (initialCommand == null) {
+			code.append("null");
+		} else {
+			code.append("\"");
+			code.append(initialCommand.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
+			code.append("\"");
+		}
+		code.append(", ");
+		code.append("\"");
+		code.append(userHome);
+		code.append("\"");
+		code.append(");");
+		System.err.println(code.toString());
+	}
+
+	private void traceProcessText(String text, int columns) {
 		StringBuilder code = new StringBuilder("test.processText(");
 		code.append("\"");
 		code.append(text.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
-		code.append("\"");
+		code.append("\", ");
+		code.append(columns);
 		code.append(");");
 		System.err.println(code.toString());
 	}
@@ -234,6 +289,14 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	public void setColumns(int columns) {
 		this.columns = columns;
+	}
+	
+	private static String rtrim(String s) {
+		int i = s.length() - 1;
+		while (i >= 0 && Character.isWhitespace(s.charAt(i))) {
+			i--;
+		}
+		return s.substring(0, i + 1);
 	}
 
 	/**

@@ -22,21 +22,21 @@ public class Win32NgTerminalTrackerTests {
 	@Test
 	public void ngClass() {
 		TrackerTest test = new TrackerTest("C:\\Users\\azerr\\WS\\abcd\\src\\app", "ng generate class c1  --spec false");
-		test.processText("Microsoft Windows [version 6.1.7601]");
+		test.processText("Microsoft Windows [version 6.1.7601]", 80);
 		test.processCarriageReturnLineFeed();
-		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.");
-		test.processCarriageReturnLineFeed();
-		test.processCarriageReturnLineFeed();
-		test.processText("C:\\Users\\azerr\\WS\\abcd\\src\\app>ng generate class c1  --spec false");
-		test.processCarriageReturnLineFeed();
-		test.processText("installing class");
-		test.processCarriageReturnLineFeed();
-		test.processText("  ");
-		test.processText("create");
-		test.processText(" src\\app\\c1.ts");
+		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 80);
 		test.processCarriageReturnLineFeed();
 		test.processCarriageReturnLineFeed();
-		test.processText("C:\\Users\\azerr\\WS\\abcd\\src\\app>");
+		test.processText("C:\\Users\\azerr\\WS\\abcd\\src\\app>ng generate class c1  --spec false", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("installing class", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("  ", 80);
+		test.processText("create", 80);
+		test.processText(" src\\app\\c1.ts", 80);
+		test.processCarriageReturnLineFeed();
+		test.processCarriageReturnLineFeed();
+		test.processText("C:\\Users\\azerr\\WS\\abcd\\src\\app>", 80);
 
 		String expected = "" + 
 				"SUBMIT: workingDir=C:\\Users\\azerr\\WS\\abcd\\src\\app, command=ng generate class c1  --spec false\n" + 

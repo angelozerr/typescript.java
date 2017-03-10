@@ -379,11 +379,11 @@ public class AnsiHandler {
 	}
 	
 	protected void processCarriageReturn() {
-//System.err.println("CR");
+
 	}
 
 	protected  void processNewline() {
-		//System.err.println("NL");
+
 	}
 
 	protected void processTab() {
@@ -393,6 +393,5 @@ public class AnsiHandler {
 	protected void processBackspace() {
 		
 	}
-
 
 }

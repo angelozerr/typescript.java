@@ -8,20 +8,77 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *  
- */package ts.eclipse.ide.terminal.interpreter;
-
-import java.util.Arrays;
+ */
+package ts.eclipse.ide.terminal.interpreter;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import ts.eclipse.ide.terminal.interpreter.internal.CommandTerminalTracker;
-
 /**
- * Mac OS bash tracker test.	
+ * Mac OS bash tracker test.
  *
  */
 public class MacOSBashNgTerminalTrackerTests {
 
-	
+	@Test
+	public void ngClass() {
+		TrackerTest test = new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
+				"ng generate class pascalou  --spec false", "C:/Users/azerr");
+		test.processText("bash-3.2$ PS1='\\w\\$ '", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("ng generate class pascalou  --spec false", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ng generate class pascalou  --sp ", 80);
+		test.processText("ec false", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("installing class", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("  ", 80);
+		test.processText("create", 80);
+		test.processText(" src/app/pascalou.ts", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ", 80);
+
+		String expected = ""
+				+ "SUBMIT: workingDir=C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app, command=ng generate class pascalou  --spec false\n"
+				+ "EXECUTING:installing class\n" 
+				+ "EXECUTING:  \n" 
+				+ "EXECUTING:create\n"
+				+ "EXECUTING: src/app/pascalou.ts\n"
+				+ "TERMINATE: workingDir=~/Documents/mon-workspace/angular2-200/src/app, command=ng generate class pascalou  --spec false";
+
+		Assert.assertEquals(expected, test.toString());
+	}
+
+	@Test
+	public void ngClass2() {
+		TrackerTest test = new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
+				"ng generate class sample  --spec false", "C:/Users/azerr");
+		test.processText("bash-3.2$ ", 80);
+		test.processText("PS1='\\w\\$ '", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("ng generate class sample  --spec false", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ng generate class sample  --spec ", 80);
+		test.processText(" false", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("installing class", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("  ", 80);
+		test.processText("create", 80);
+		test.processText(" src/app/sample.ts", 80);
+		test.processCarriageReturnLineFeed();
+		test.processText("~/Documents/mon-workspace/angular2-200/src/app$ ", 80);
+
+		String expected = ""
+				+ "SUBMIT: workingDir=C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app, command=ng generate class sample  --spec false\n"
+				+ "EXECUTING:installing class\n" 
+				+ "EXECUTING:  \n" 
+				+ "EXECUTING:create\n"
+				+ "EXECUTING: src/app/sample.ts\n"
+				+ "TERMINATE: workingDir=~/Documents/mon-workspace/angular2-200/src/app, command=ng generate class sample  --spec false";
+
+		Assert.assertEquals(expected, test.toString());
+
+	}
 }

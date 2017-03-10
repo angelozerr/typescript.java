@@ -24,18 +24,18 @@ public class Win32CommandTerminalTrackerTests {
 	public void cdDot() {
 		TrackerTest test = new TrackerTest(
 				"D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse", null);
-		test.processText("Microsoft Windows [version 6.1.7601]");
+		test.processText("Microsoft Windows [version 6.1.7601]", 80);
 		test.processCarriageReturnLineFeed();
-		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.");
-		test.processCarriageReturnLineFeed();
-		test.processCarriageReturnLineFeed();
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>c");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd .");
+		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 80);
 		test.processCarriageReturnLineFeed();
 		test.processCarriageReturnLineFeed();
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>");
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>c", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd .", 80);
+		test.processCarriageReturnLineFeed();
+		test.processCarriageReturnLineFeed();
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>", 80);
 
 		String expected = ""
 				+ "SUBMIT: workingDir=D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse, command=cd .\n"
@@ -49,39 +49,39 @@ public class Win32CommandTerminalTrackerTests {
 				"D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse", null);
 
 		// Open Terminal
-		test.processText("Microsoft Windows [version 6.1.7601]");
+		test.processText("Microsoft Windows [version 6.1.7601]", 80);
 		test.processCarriageReturnLineFeed();
-		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.");
+		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 80);
 		test.processCarriageReturnLineFeed();
 		test.processCarriageReturnLineFeed();
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>");
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>", 80);
 		
 		// User types "cd .."
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>c");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd .");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd ..");
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>c", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd .", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>cd ..", 80);
 
 		// User types "Enter"
 		test.processCarriageReturnLineFeed();
 		test.processCarriageReturnLineFeed();
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>");
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>", 80);
 		
 		// User types "cd eclipse"
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>c");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd e");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd ec");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd ecl");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd ecli");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd eclip");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd eclips");
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd eclipse");
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>c", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd e", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd ec", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd ecl", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd ecli", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd eclip", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd eclips", 80);
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64>cd eclipse", 80);
 
 		// User types "Enter"
 		test.processCarriageReturnLineFeed();
 		test.processCarriageReturnLineFeed();
-		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>");
+		test.processText("D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse>", 80);
 
 		String expected = ""
 				+ "SUBMIT: workingDir=D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse, command=cd ..\n"
