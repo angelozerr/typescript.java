@@ -185,6 +185,11 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSConfigWizardPage_noImplicitReturns;
 	public static String TSConfigWizardPage_strictNullChecks;
 
+	public static String TypeScriptRuntimeAndNodejsWizardPage_nodejs_group_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label;
+	
 	// NPM Module Versions
 	public static String NPMModuleVersionsSelectionDialog_title;
 	public static String NPMModuleVersionsSelectionDialog_message;

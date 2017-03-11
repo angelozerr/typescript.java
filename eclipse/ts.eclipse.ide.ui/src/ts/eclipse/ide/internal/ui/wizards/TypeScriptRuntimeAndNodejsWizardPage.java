@@ -2,8 +2,11 @@ package ts.eclipse.ide.internal.ui.wizards;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -11,13 +14,16 @@ import org.eclipse.swt.widgets.Group;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
 import ts.eclipse.ide.ui.utils.NPMInstallWidget;
 
 public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 
 	private static final String PAGE_NAME = "TypeScriptRuntimeAndNodejsWizardPage";
-	private NPMInstallWidget npmWidget;
+
+	private Button useEmbeddedTsRuntime;
+	private NPMInstallWidget installTsRuntime;
+
+	private Combo embeddedTsRuntime;
 
 	protected TypeScriptRuntimeAndNodejsWizardPage() {
 		super(PAGE_NAME);
@@ -25,12 +31,12 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 
 	@Override
 	protected void createBody(Composite parent) {
-		final ScrolledPageContent pageContent = new ScrolledPageContent(parent);
-		Composite composite = pageContent.getBody();
+		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		composite.setLayout(layout);
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		Composite controlsComposite = new Composite(composite, SWT.NONE);
 		controlsComposite.setFont(composite.getFont());
@@ -42,15 +48,15 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		layout.numColumns = 1;
 		controlsComposite.setLayout(layout);
 
-		createNodejsBody(composite);
-		createTypeScriptRuntimeBody(composite);
+		// createNodejsBody(controlsComposite);
+		createTypeScriptRuntimeBody(controlsComposite);
 
 	}
 
 	private void createNodejsBody(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		group.setFont(parent.getFont());
-		group.setText(TypeScriptUIMessages.NodejsConfigurationBlock_nodejs_group_label);
+		group.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_nodejs_group_label);
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		int nColumns = 2;
@@ -99,7 +105,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	private void createTypeScriptRuntimeBody(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		group.setFont(parent.getFont());
-		group.setText(TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_typescript_group_label);
+		group.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label);
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		int nColumns = 2;
@@ -111,16 +117,46 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		createEmbeddedTypeScriptField(group);
 		// Install TypeScript
 		createInstallScriptField(group);
+
+		useEmbeddedTsRuntime.setSelection(true);
+		updateTsRuntimeMode();
 	}
 
 	private void createEmbeddedTypeScriptField(Composite parent) {
-		Combo comboBox = new Combo(parent, SWT.READ_ONLY);
+		useEmbeddedTsRuntime = new Button(parent, SWT.RADIO);
+		useEmbeddedTsRuntime
+				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label);
+		useEmbeddedTsRuntime.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateTsRuntimeMode();
+			}
+		});
+
+		embeddedTsRuntime = new Combo(parent, SWT.READ_ONLY);
+		embeddedTsRuntime.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 	}
-	
+
 	private void createInstallScriptField(Composite parent) {
-		npmWidget = new NPMInstallWidget("typescript", parent, SWT.NONE);
-		
+		Button useInstallTsRuntime = new Button(parent, SWT.RADIO);
+		useInstallTsRuntime
+				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label);
+		useInstallTsRuntime.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateTsRuntimeMode();
+			}
+		});
+
+		installTsRuntime = new NPMInstallWidget("typescript", parent, SWT.NONE);
+		installTsRuntime.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+	}
+
+	private void updateTsRuntimeMode() {
+		boolean embedded = useEmbeddedTsRuntime.getSelection();
+		embeddedTsRuntime.setEnabled(embedded);
+		installTsRuntime.setEnabled(!embedded);
 	}
 
 	@Override
