@@ -17,8 +17,6 @@ import org.eclipse.tm.terminal.connector.local.launcher.LocalLauncherDelegate;
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalServiceOutputStreamMonitorListener;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 
-import ts.eclipse.ide.terminal.interpreter.ICommandTerminalServiceConstants;
-
 /**
  * Extends {@link LocalInterpreterLauncherDelegate} to add custom
  * {@link CommandInterpreterProcessor} by waiting for accept of
