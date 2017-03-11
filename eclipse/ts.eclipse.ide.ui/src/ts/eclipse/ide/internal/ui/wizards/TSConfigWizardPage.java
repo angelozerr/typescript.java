@@ -14,7 +14,6 @@ package ts.eclipse.ide.internal.ui.wizards;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -22,9 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import ts.cmd.tsc.CompilerOptions;
@@ -36,8 +33,10 @@ import ts.utils.StringUtils;
  * tsconfig.json wizard page
  *
  */
-public class TSConfigWizardPage extends WizardPage implements Listener {
+public class TSConfigWizardPage extends AbstractWizardPage {
 
+	private static final String PAGE_NAME = "TSConfigWizardPage";
+	
 	// General
 	private Combo cbModule;
 	private Combo cbModuleResolution;
@@ -59,34 +58,12 @@ public class TSConfigWizardPage extends WizardPage implements Listener {
 	private Button chkNoImplicitReturns;
 	private Button chkStrictNullChecks;
 
-	protected TSConfigWizardPage(String pageName) {
-		super(pageName);
+	protected TSConfigWizardPage() {
+		super(PAGE_NAME);
 	}
 
 	@Override
-	public void createControl(Composite parent) {
-		initializeDialogUnits(parent);
-		// top level group
-		Composite topLevel = new Composite(parent, SWT.NONE);
-		topLevel.setLayout(new GridLayout());
-		topLevel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
-		topLevel.setFont(parent.getFont());
-
-		// Text tsconfigText = new Text(parent, style)
-
-		createParamsControl(topLevel);
-
-		// initialize page with default values
-		initializeDefaultValues();
-
-		validatePage();
-		// Show description on opening
-		setErrorMessage(null);
-		setMessage(null);
-		setControl(topLevel);
-	}
-
-	protected void createParamsControl(Composite parent) {
+	protected void createBody(Composite parent) {
 		Font font = parent.getFont();
 
 		// params group
@@ -281,17 +258,14 @@ public class TSConfigWizardPage extends WizardPage implements Listener {
 
 	}
 
-	private void initializeDefaultValues() {
+	@Override
+	protected void initializeDefaultValues() {
 		cbModule.select(cbModule.indexOf("None"));
 		cbModuleResolution.select(cbModuleResolution.indexOf("Node"));
 		cbTarget.select(cbTarget.indexOf("ES3"));
 	}
 
 	@Override
-	public void handleEvent(Event event) {
-		setPageComplete(validatePage());
-	}
-
 	protected boolean validatePage() {
 		boolean valid = true;
 

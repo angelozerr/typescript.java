@@ -68,7 +68,8 @@ import ts.utils.IOUtils;
 public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 	private TSConfigWizardPage tsconfigPage;
-
+	private TypeScriptRuntimeAndNodejsWizardPage tsRuntimeAndNodeJsPage;
+	
 	public NewTypeScriptProjectWizard() {
 		super("NewTypeScriptProjectWizard");
 	}
@@ -76,10 +77,10 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 	@Override
 	public void addPages() {
 		super.addPages();
-		tsconfigPage = new TSConfigWizardPage("tsconfig");//$NON-NLS-1$
-		tsconfigPage.setTitle(ResourceMessages.FileResource_pageTitle);
-		tsconfigPage.setDescription(ResourceMessages.FileResource_description);
+		tsconfigPage = new TSConfigWizardPage();
 		addPage(tsconfigPage);
+		tsRuntimeAndNodeJsPage = new TypeScriptRuntimeAndNodejsWizardPage();
+		addPage(tsRuntimeAndNodeJsPage);
 	}
 
 	@Override

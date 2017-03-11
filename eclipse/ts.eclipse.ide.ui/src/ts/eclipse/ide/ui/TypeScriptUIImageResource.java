@@ -57,7 +57,8 @@ public class TypeScriptUIImageResource {
 	public static final String IMG_JSX = "jsx";
 	public static final String IMG_GLOB_PATTERN = "glob_pattern";
 	public static final String IMG_BUILD = "build";
-
+	public static final String IMG_NPM = "npm";
+	
 	// Enabled/Disbaled
 	public static final String IMG_STOP_ENABLED = "stop_enabled";
 	public static final String IMG_STOP_DISABLED = "stop_disabled";
@@ -163,7 +164,8 @@ public class TypeScriptUIImageResource {
 		registerImage(IMG_JSX, URL_OBJ + IMG_JSX + ".png");
 		registerImage(IMG_GLOB_PATTERN, URL_OBJ + IMG_GLOB_PATTERN + ".gif");
 		registerImage(IMG_BUILD, URL_OBJ + IMG_BUILD + ".gif");
-
+		registerImage(IMG_NPM, URL_OBJ + IMG_NPM + ".png");
+		
 		registerImage(IMG_STOP_ENABLED, URL_ELCL + "launch_stop.gif");
 		registerImage(IMG_STOP_DISABLED, URL_DLCL + "launch_stop.gif");
 		registerImage(IMG_COLLAPSE_ALL_ENABLED, URL_ELCL + "collapseall.gif");

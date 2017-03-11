@@ -28,6 +28,7 @@ public class TypeScriptUIMessages extends NLS {
 	private static ResourceBundle fResourceBundle;
 
 	// Buttons
+	public static String Browse;
 	public static String Browse_FileSystem_button;
 	public static String Browse_Workspace_button;
 	public static String Button_newFolder;
@@ -183,6 +184,11 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSConfigWizardPage_noImplicitAny;
 	public static String TSConfigWizardPage_noImplicitReturns;
 	public static String TSConfigWizardPage_strictNullChecks;
+
+	// NPM Module Versions
+	public static String NPMModuleVersionsSelectionDialog_title;
+	public static String NPMModuleVersionsSelectionDialog_message;
+	public static String NPMModuleVersionsSelectionDialog_searchJob_taskName;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

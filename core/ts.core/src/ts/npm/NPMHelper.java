@@ -20,19 +20,19 @@ import ts.OS;
 import ts.utils.IOUtils;
 
 /**
- * NPM Process helper.
+ * NPM Utilities.
  *
  */
-public class NPMProcessHelper {
+public class NPMHelper {
 
-	// public static void main(String[] args) throws IOException {
-	// List<String> versions = NPMProcessHelper.getVersions("typescript",
-	// OS.Windows);// "@angular/cli");
-	// for (String version : versions) {
-	// System.err.println(version);
-	// }
-	// }
-
+	/**
+	 * Returns the available versions of the given module name.
+	 * 
+	 * @param moduleName
+	 * @param os
+	 * @return the available versions of the given module name.
+	 * @throws IOException
+	 */
 	public static List<String> getVersions(String moduleName, OS os) throws IOException {
 		List<String> versions = new ArrayList<>();
 		BufferedReader reader = null;
@@ -52,5 +52,24 @@ public class NPMProcessHelper {
 			IOUtils.closeQuietly(reader);
 		}
 		return versions;
+	}
+
+	/**
+	 * Returns the "npm install" command for the given module name and version.
+	 * 
+	 * @param moduleName
+	 * @param version
+	 * @return the "npm install" command for the given module name and version.
+	 */
+	public static String getNpmInstallCommand(String moduleName, String version) {
+		StringBuilder cmd = new StringBuilder("npm");
+		cmd.append(" ");
+		cmd.append(" install ");
+		cmd.append(moduleName);
+		if (version != null) {
+			cmd.append("@");
+			cmd.append(version);
+		}
+		return cmd.toString();
 	}
 }
