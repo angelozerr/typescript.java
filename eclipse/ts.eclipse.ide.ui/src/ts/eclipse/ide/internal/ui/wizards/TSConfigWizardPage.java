@@ -59,7 +59,9 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 	private Button chkStrictNullChecks;
 
 	protected TSConfigWizardPage() {
-		super(PAGE_NAME);
+		super(PAGE_NAME, TypeScriptUIMessages.TSConfigWizardPage_title,
+				null);
+		super.setDescription(TypeScriptUIMessages.TSConfigWizardPage_description);
 	}
 
 	@Override

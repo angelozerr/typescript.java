@@ -15,6 +15,7 @@ package ts.eclipse.ide.internal.ui;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -171,6 +172,12 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptImplementationLabelProvider_text;
 
 	// Wizards
+	public static String NewTypeScriptProjectWizard_windowTitle;
+	public static String NewTypeScriptProjectWizard_newProjectTitle;
+	public static String NewTypeScriptProjectWizard_newProjectDescription;
+	
+	public static String TSConfigWizardPage_title;
+	public static String TSConfigWizardPage_description;
 	public static String TSConfigWizardPage_module;
 	public static String TSConfigWizardPage_moduleResolution;
 	public static String TSConfigWizardPage_target;
@@ -185,6 +192,8 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSConfigWizardPage_noImplicitReturns;
 	public static String TSConfigWizardPage_strictNullChecks;
 
+	public static String TypeScriptRuntimeAndNodejsWizardPage_title;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_description;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_nodejs_group_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label;

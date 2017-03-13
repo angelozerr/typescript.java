@@ -23,6 +23,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -36,6 +39,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
+import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
+import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.wizards.AbstractNewProjectWizard;
 import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.IOUtils;
@@ -67,11 +72,27 @@ import ts.utils.IOUtils;
  */
 public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
+	private static final String WIZARD_NAME = "NewTypeScriptProjectWizard";
 	private TSConfigWizardPage tsconfigPage;
 	private TypeScriptRuntimeAndNodejsWizardPage tsRuntimeAndNodeJsPage;
-	
+
 	public NewTypeScriptProjectWizard() {
-		super("NewTypeScriptProjectWizard");
+		super(WIZARD_NAME, TypeScriptUIMessages.NewTypeScriptProjectWizard_newProjectTitle,
+				TypeScriptUIMessages.NewTypeScriptProjectWizard_newProjectDescription);
+	}
+
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+		super.init(workbench, currentSelection);
+		setNeedsProgressMonitor(true);
+		setWindowTitle(TypeScriptUIMessages.NewTypeScriptProjectWizard_windowTitle);
+	}
+
+	@Override
+	protected void initializeDefaultPageImageDescriptor() {
+		ImageDescriptor desc = TypeScriptUIImageResource
+				.getImageDescriptor(TypeScriptUIImageResource.IMG_TS_PROJECT_WIZBAN);// $NON-NLS-1$
+		setDefaultPageImageDescriptor(desc);
 	}
 
 	@Override

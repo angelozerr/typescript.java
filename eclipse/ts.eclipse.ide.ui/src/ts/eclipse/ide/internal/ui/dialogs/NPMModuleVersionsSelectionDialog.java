@@ -31,11 +31,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 
-import ts.eclipse.ide.core.utils.OSHelper;
+import ts.eclipse.ide.core.npm.IDENPMModulesManager;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
-import ts.npm.NPMHelper;
 
 /**
  * Shows a list of NPM module version to the user with a text entry field for a
@@ -70,7 +69,7 @@ public class NPMModuleVersionsSelectionDialog extends FilteredItemsSelectionDial
 			try {
 				// execute "npm view $moduleName versions" to retrieve version
 				// list of the given module name.
-				NPMHelper.getVersions(moduleName, OSHelper.getOs())
+				IDENPMModulesManager.getInstance().getAvailableVersions(moduleName)
 						.forEach(version -> contentProvider.add(version, itemsFilter));
 			} catch (IOException e) {
 				e.printStackTrace();
