@@ -21,7 +21,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	private static final String TILD = "~";
 
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	private final String initialWorkingDir;
 	private final String initialCommand;
@@ -221,7 +221,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		String beforeWorkingDir = line.substring(0, index);
 		int initialCommandIndex = -1;
 		if (initialCommand != null) {
-			// If initial command was setted, it should be retrieve from the line.
+			// If initial command was set, it should be retrieve from the line.
 			initialCommandIndex = line.indexOf(initialCommand);
 			if (initialCommandIndex == -1) {
 				return null;

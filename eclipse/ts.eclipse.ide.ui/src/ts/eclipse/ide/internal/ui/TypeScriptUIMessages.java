@@ -15,6 +15,7 @@ package ts.eclipse.ide.internal.ui;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -28,6 +29,7 @@ public class TypeScriptUIMessages extends NLS {
 	private static ResourceBundle fResourceBundle;
 
 	// Buttons
+	public static String Browse;
 	public static String Browse_FileSystem_button;
 	public static String Browse_Workspace_button;
 	public static String Button_newFolder;
@@ -170,6 +172,12 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptImplementationLabelProvider_text;
 
 	// Wizards
+	public static String NewTypeScriptProjectWizard_windowTitle;
+	public static String NewTypeScriptProjectWizard_newProjectTitle;
+	public static String NewTypeScriptProjectWizard_newProjectDescription;
+	
+	public static String TSConfigWizardPage_title;
+	public static String TSConfigWizardPage_description;
 	public static String TSConfigWizardPage_module;
 	public static String TSConfigWizardPage_moduleResolution;
 	public static String TSConfigWizardPage_target;
@@ -183,6 +191,18 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSConfigWizardPage_noImplicitAny;
 	public static String TSConfigWizardPage_noImplicitReturns;
 	public static String TSConfigWizardPage_strictNullChecks;
+
+	public static String TypeScriptRuntimeAndNodejsWizardPage_title;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_description;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_nodejs_group_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label;
+	
+	// NPM Module Versions
+	public static String NPMModuleVersionsSelectionDialog_title;
+	public static String NPMModuleVersionsSelectionDialog_message;
+	public static String NPMModuleVersionsSelectionDialog_searchJob_taskName;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

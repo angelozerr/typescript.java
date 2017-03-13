@@ -73,6 +73,8 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+
 /**
  * Standard workbench wizard that creates a new TypeScript project resource in
  * the workspace.
@@ -132,11 +134,17 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	 */
 	private static final String PREFERRED_PERSPECTIVES = "preferredPerspectives"; //$NON-NLS-1$
 
+	private final String newProjectTitle;
+
+	private final String newProjectDescription;
+
 	/**
 	 * Creates a wizard for creating a new project resource in the workspace.
 	 */
-	public AbstractNewProjectWizard(String sectionName) {
-		IDialogSettings workbenchSettings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
+	public AbstractNewProjectWizard(String sectionName, String newProjectTitle, String newProjectDescription) {
+		this.newProjectTitle = newProjectTitle;
+		this.newProjectDescription = newProjectDescription;
+		IDialogSettings workbenchSettings = TypeScriptUIPlugin.getDefault().getDialogSettings();
 		IDialogSettings section = workbenchSettings.getSection(sectionName);// $NON-NLS-1$
 		if (section == null) {
 			section = workbenchSettings.addNewSection(sectionName);// $NON-NLS-1$
@@ -157,8 +165,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 				Dialog.applyDialogFont(getControl());
 			}
 		};
-		mainPage.setTitle(ResourceMessages.NewProject_title);
-		mainPage.setDescription(ResourceMessages.NewProject_description);
+		mainPage.setTitle(newProjectTitle);
+		mainPage.setDescription(newProjectDescription);
 		this.addPage(mainPage);
 
 		// only add page if there are already projects in the workspace

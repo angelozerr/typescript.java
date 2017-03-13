@@ -10,7 +10,6 @@ import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.formatter.IFormattingStrategy;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.PlatformUI;
 
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;

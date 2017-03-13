@@ -50,6 +50,8 @@ public class TypeScriptUIImageResource {
 	private static final String URL_OBJ = "full/obj16/";
 	private static final String URL_OVR = "full/ovr16/";
 
+	private static final String WIZBAN = "full/wizban/";
+
 	// General Object Images
 	public static final String IMG_LOGO = "logo";
 	public static final String IMG_TYPESCRIPT_RESOURCES = "tsresources_obj";
@@ -57,6 +59,7 @@ public class TypeScriptUIImageResource {
 	public static final String IMG_JSX = "jsx";
 	public static final String IMG_GLOB_PATTERN = "glob_pattern";
 	public static final String IMG_BUILD = "build";
+	public static final String IMG_NPM = "npm";
 
 	// Enabled/Disbaled
 	public static final String IMG_STOP_ENABLED = "stop_enabled";
@@ -69,6 +72,8 @@ public class TypeScriptUIImageResource {
 	public static final String IMG_VIEW_MENU_DISABLED = "view_menu_disabled";
 
 	public static final String DESC_OVR_LIBRARY = "ovr_library";
+
+	public static final String IMG_TS_PROJECT_WIZBAN = "tsproject_wizban";
 
 	private static Map<ImageDescriptor, URL> fURLMap;
 	private static final File fTempDir;
@@ -163,6 +168,7 @@ public class TypeScriptUIImageResource {
 		registerImage(IMG_JSX, URL_OBJ + IMG_JSX + ".png");
 		registerImage(IMG_GLOB_PATTERN, URL_OBJ + IMG_GLOB_PATTERN + ".gif");
 		registerImage(IMG_BUILD, URL_OBJ + IMG_BUILD + ".gif");
+		registerImage(IMG_NPM, URL_OBJ + IMG_NPM + ".png");
 
 		registerImage(IMG_STOP_ENABLED, URL_ELCL + "launch_stop.gif");
 		registerImage(IMG_STOP_DISABLED, URL_DLCL + "launch_stop.gif");
@@ -174,6 +180,8 @@ public class TypeScriptUIImageResource {
 		registerImage(IMG_VIEW_MENU_DISABLED, URL_DLCL + "view_menu.png");
 
 		registerImage(DESC_OVR_LIBRARY, URL_OVR + "library_ovr.gif");
+
+		registerImage(IMG_TS_PROJECT_WIZBAN, WIZBAN + IMG_TS_PROJECT_WIZBAN + ".png");
 	}
 
 	/**
