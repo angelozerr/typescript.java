@@ -21,7 +21,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	private static final String TILD = "~";
 
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	private final String initialWorkingDir;
 	private final String initialCommand;
