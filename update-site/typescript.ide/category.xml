@@ -22,12 +22,15 @@
       <category name="TypeScript IDE"/>
    </feature>
    <bundle id="minimal-json">
-      <category name="TypeScript IDE"/>
+      <category name="Third Party"/>
    </bundle>
    <bundle id="org.joni">
       <category name="Third Party"/>
    </bundle>
    <bundle id="org.jcodings">
+      <category name="Third Party"/>
+   </bundle>
+   <bundle id="org.objectweb.asm">
       <category name="Third Party"/>
    </bundle>
    <category-def name="TypeScript IDE" label="TypeScript IDE">
