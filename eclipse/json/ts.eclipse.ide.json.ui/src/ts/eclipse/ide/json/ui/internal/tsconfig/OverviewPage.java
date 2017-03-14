@@ -38,6 +38,7 @@ import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.json.ui.AbstractFormPage;
 import ts.eclipse.ide.json.ui.FormLayoutFactory;
+import ts.resources.jsonconfig.TsconfigJson;
 
 /**
  * Overview page for tsconfig.json editor.
@@ -100,11 +101,12 @@ public class OverviewPage extends AbstractFormPage implements ITypeScriptElement
 
 		// Target/Module
 		createCombo(body, TsconfigEditorMessages.OverviewPage_target_label, new JSONPath("compilerOptions.target"),
-				new String[] { "es3", "es5", "es6", "es2015" }, "es3");
+				TsconfigJson.getAvailableTargets(), TsconfigJson.getDefaultTarget());
 		createCombo(body, TsconfigEditorMessages.OverviewPage_module_label, new JSONPath("compilerOptions.module"),
-				new String[] { "none", "commonjs", "amd", "umd", "system", "es6", "es2015" });
+				TsconfigJson.getAvailableModules());
 		createCombo(body, TsconfigEditorMessages.OverviewPage_moduleResolution_label,
-				new JSONPath("compilerOptions.moduleResolution"), new String[] { "node", "classic" }, "classic");
+				new JSONPath("compilerOptions.moduleResolution"), TsconfigJson.getAvailableModuleResolutions(),
+				TsconfigJson.getDefaultModuleResolution());
 		// Others....
 		createCheckbox(body, TsconfigEditorMessages.OverviewPage_experimentalDecorators_label,
 				new JSONPath("compilerOptions.experimentalDecorators"));
@@ -180,8 +182,8 @@ public class OverviewPage extends AbstractFormPage implements ITypeScriptElement
 
 	private void updateTypeScriptNodejsVersion(final IIDETypeScriptProject tsProject) {
 		formText.setText(NLS.bind(TsconfigEditorMessages.OverviewPage_typeScript_node_versions,
-				tsProject.getProjectSettings().getTypeScriptVersion(), tsProject.getProjectSettings().getNodeVersion()), true,
-				false);
+				tsProject.getProjectSettings().getTypeScriptVersion(), tsProject.getProjectSettings().getNodeVersion()),
+				true, false);
 	}
 
 	private void updateCompileBuildOnSaveEnable(boolean hasTypeScriptBuilder) {

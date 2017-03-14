@@ -30,10 +30,21 @@ import ts.utils.StringUtils;
 /**
  * Pojo for tsconfig.json
  * 
- * @see http://www.typescriptlang.org/docs/handbook/tsconfig.json.html
+ * @see http://www.typescriptlang.org/docs/handbook/tsconfig-json.html
  *
  */
 public class TsconfigJson {
+
+	// See
+	// https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/tsconfig.json
+
+	private static final String DEFAULT_TARGET = "es3";
+	private static final String[] AVAILABLE_TARGETS = new String[] { "es3", "es5", "es6", "es2015", "es2016", "es2017",
+			"esnext" };
+	private static final String[] AVAILABLE_MODULES = new String[] { "none", "commonjs", "amd", "umd", "system", "es6",
+			"es2015" };
+	private static final String DEFAULT_MODULE_RESOLUTION = "classic";
+	private static final String[] AVAILABLE_MODULE_RESOLUTIONS = new String[] { "node", "classic" };
 
 	private CompilerOptions compilerOptions;
 
@@ -236,6 +247,51 @@ public class TsconfigJson {
 	 */
 	public static TsconfigJson load(InputStream in) {
 		return load(in, TsconfigJson.class);
+	}
+
+	/**
+	 * Returns the available targets.
+	 * 
+	 * @return the available targets.
+	 */
+	public static String[] getAvailableTargets() {
+		return AVAILABLE_TARGETS;
+	}
+
+	/**
+	 * Returns the default target.
+	 * 
+	 * @return the default target.
+	 */
+	public static String getDefaultTarget() {
+		return DEFAULT_TARGET;
+	}
+
+	/**
+	 * Returns the available modules.
+	 * 
+	 * @return the available modules.
+	 */
+	public static String[] getAvailableModules() {
+		return AVAILABLE_MODULES;
+	}
+
+	/**
+	 * Returns the available module resolutions.
+	 * 
+	 * @return the available module resolutions.
+	 */
+	public static String[] getAvailableModuleResolutions() {
+		return AVAILABLE_MODULE_RESOLUTIONS;
+	}
+
+	/**
+	 * Returns the default module resolution.
+	 * 
+	 * @return the default module resolution.
+	 */
+	public static String getDefaultModuleResolution() {
+		return DEFAULT_MODULE_RESOLUTION;
 	}
 
 }

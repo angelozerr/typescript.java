@@ -36,11 +36,11 @@ import ts.utils.StringUtils;
 public class TSConfigWizardPage extends AbstractWizardPage {
 
 	private static final String PAGE_NAME = "TSConfigWizardPage";
-	
+
 	// General
+	private Combo cbTarget;
 	private Combo cbModule;
 	private Combo cbModuleResolution;
-	private Combo cbTarget;
 	private Text txtOutDir;
 
 	// Generation
@@ -59,8 +59,7 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 	private Button chkStrictNullChecks;
 
 	protected TSConfigWizardPage() {
-		super(PAGE_NAME, TypeScriptUIMessages.TSConfigWizardPage_title,
-				null);
+		super(PAGE_NAME, TypeScriptUIMessages.TSConfigWizardPage_title, null);
 		super.setDescription(TypeScriptUIMessages.TSConfigWizardPage_description);
 	}
 
@@ -85,25 +84,34 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 		subGroup.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
 		subGroup.setFont(font);
 
-		// Module
+		// Target
 		Label label = new Label(subGroup, SWT.NONE);
+		label.setText(TypeScriptUIMessages.TSConfigWizardPage_target);
+		label.setFont(font);
+
+		// Combobox for target
+		cbTarget = new Combo(subGroup, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
+		cbTarget.addListener(SWT.Modify, this);
+		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
+		cbTarget.setLayoutData(data);
+		
+		// Data for Combobox target
+		cbTarget.setItems(TsconfigJson.getAvailableTargets());
+		// cbTarget.select(0); // select "es3"
+		
+		// Module
+		label = new Label(subGroup, SWT.NONE);
 		label.setText(TypeScriptUIMessages.TSConfigWizardPage_module);
 		label.setFont(font);
 
 		// Combobox for module
 		cbModule = new Combo(subGroup, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 		cbModule.addListener(SWT.Modify, this);
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
+		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
 		cbModule.setLayoutData(data);
 
 		// Data for Combobox module
-		cbModule.add("None");
-		cbModule.add("CommonJS");
-		cbModule.add("AMD");
-		cbModule.add("System");
-		cbModule.add("UMD");
-		cbModule.add("ES6");
-		cbModule.add("ES2015");
+		cbModule.setItems(TsconfigJson.getAvailableModules());
 
 		// Module resolution
 		label = new Label(subGroup, SWT.NONE);
@@ -115,30 +123,11 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 		cbModuleResolution.addListener(SWT.Modify, this);
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
 		cbModuleResolution.setLayoutData(data);
-
+		
 		// Data for Combobox moduele resolution
-		cbModuleResolution.add("Node");
-		cbModuleResolution.add("Classic");
-
-		// Target
-		label = new Label(subGroup, SWT.NONE);
-		label.setText(TypeScriptUIMessages.TSConfigWizardPage_target);
-		label.setFont(font);
-
-		// Combobox for target
-		cbTarget = new Combo(subGroup, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
-		cbTarget.addListener(SWT.Modify, this);
-		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
-		cbTarget.setLayoutData(data);
-
-		// Data for Combobox target
-		cbTarget.add("ES3");
-		cbTarget.add("ES5");
-		cbTarget.add("ES6");
-		cbTarget.add("ES2016");
-		cbTarget.add("ES2017");
-		cbTarget.add("ESNext");
-
+		cbModuleResolution.setItems(TsconfigJson.getAvailableModuleResolutions());
+		// cbModuleResolution.select(1); // select "classic"
+		
 		// outDir
 		label = new Label(subGroup, SWT.NONE);
 		label.setText(TypeScriptUIMessages.TSConfigWizardPage_outDir);
