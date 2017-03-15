@@ -13,7 +13,11 @@ package ts.repository;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.eclipsesource.json.Json;
@@ -22,12 +26,25 @@ import com.eclipsesource.json.JsonObject;
 import ts.internal.repository.TypeScriptRepository;
 import ts.utils.FileUtils;
 import ts.utils.IOUtils;
+import ts.utils.VersionHelper;
 
+/**
+ * TypeScript repository manager implementation.
+ *
+ */
 public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager {
 
 	private final Map<String, ITypeScriptRepository> repositories;
-
+	private ITypeScriptRepository[] sortedRepositories;
 	private ITypeScriptRepository defaultRepository;
+
+	private static final Comparator<ITypeScriptRepository> REPOSITORY_COMPARATOR = new Comparator<ITypeScriptRepository>() {
+
+		@Override
+		public int compare(ITypeScriptRepository r1, ITypeScriptRepository r2) {
+			return VersionHelper.versionCompare(r2.getTypesScriptVersion(), r1.getTypesScriptVersion());
+		}
+	};
 
 	public TypeScriptRepositoryManager() {
 		this.repositories = new HashMap<String, ITypeScriptRepository>();
@@ -47,13 +64,19 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 		synchronized (repositories) {
 			ITypeScriptRepository repository = new TypeScriptRepository(baseDir, this);
 			repositories.put(repository.getName(), repository);
+			reset();
 			return repository;
 		}
+	}
+
+	public void reset() {
+		sortedRepositories = null;
 	}
 
 	@Override
 	public ITypeScriptRepository removeRepository(String name) {
 		synchronized (repositories) {
+			reset();
 			return repositories.remove(name);
 		}
 	}
@@ -70,7 +93,12 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 
 	@Override
 	public ITypeScriptRepository[] getRepositories() {
-		return repositories.values().toArray(new ITypeScriptRepository[repositories.size()]);
+		if (sortedRepositories == null) {
+			List<ITypeScriptRepository> reps = new ArrayList<ITypeScriptRepository>(repositories.values());
+			Collections.sort(reps, REPOSITORY_COMPARATOR);
+			sortedRepositories = reps.toArray(new ITypeScriptRepository[reps.size()]);
+		}
+		return sortedRepositories;
 	}
 
 	public static File getTsserverFile(File typesScriptDir) {
@@ -90,7 +118,7 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 	public static File getTslintFile(File tslintScriptDir) {
 		return new File(tslintScriptDir, "bin/tslint");
 	}
-	
+
 	public static String getPackageJsonVersion(File baseDir) {
 		File packageJsonFile = new File(baseDir, "package.json");
 		try {
@@ -100,7 +128,7 @@ public class TypeScriptRepositoryManager implements ITypeScriptRepositoryManager
 			return null;
 		}
 	}
-	
+
 	public static void validateTypeScriptDir(File typesScriptDir) throws TypeScriptRepositoryException {
 		File tsserverFile = TypeScriptRepositoryManager.getTsserverFile(typesScriptDir);
 		if (!tsserverFile.exists()) {

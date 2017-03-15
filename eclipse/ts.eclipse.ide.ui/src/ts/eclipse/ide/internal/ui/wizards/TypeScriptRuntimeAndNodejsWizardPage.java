@@ -12,6 +12,8 @@
 package ts.eclipse.ide.internal.ui.wizards;
 
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -25,8 +27,8 @@ import org.eclipse.swt.widgets.Group;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.utils.NPMInstallWidget;
+import ts.repository.ITypeScriptRepository;
 
 public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 
@@ -38,8 +40,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	private Combo embeddedTsRuntime;
 
 	protected TypeScriptRuntimeAndNodejsWizardPage() {
-		super(PAGE_NAME, TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_title,
-				null);
+		super(PAGE_NAME, TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_title, null);
 		super.setDescription(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_description);
 	}
 
@@ -150,6 +151,13 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		embeddedTsRuntime = new Combo(parent, SWT.READ_ONLY);
 		embeddedTsRuntime.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+		ComboViewer viewer = new ComboViewer(embeddedTsRuntime);
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
+		viewer.setLabelProvider(new TypeScriptRepositoryLabelProvider());
+		ITypeScriptRepository[] repositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
+		viewer.setInput(repositories);
+
+		embeddedTsRuntime.select(0);
 	}
 
 	private void createInstallScriptField(Composite parent) {
