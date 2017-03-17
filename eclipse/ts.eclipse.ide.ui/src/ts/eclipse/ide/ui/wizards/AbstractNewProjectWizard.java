@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceStatus;
@@ -225,7 +226,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		}
 
 		// create the new project operation
-		IRunnableWithProgress op = getRunnable(newProjectHandle, description, mainPage.getLocationPath());
+		IPath projectLocationPath = URIUtil.toPath(mainPage.getLocationURI());
+		IRunnableWithProgress op = getRunnable(newProjectHandle, description, projectLocationPath);
 
 		// run the new project creation operation
 		try {

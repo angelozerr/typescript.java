@@ -13,6 +13,8 @@ package ts.eclipse.ide.ui.utils;
 
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -24,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.NPMModuleVersionsSelectionDialog;
+import ts.npm.NPMHelper;
 
 /**
  * NPM install widget provides :
@@ -40,6 +43,8 @@ public class NPMInstallWidget extends Composite {
 	private final String moduleName;
 	private Text versionText;
 	private Button searchButton;
+
+	private String version;
 
 	public NPMInstallWidget(String moduleName, Composite parent, int style) {
 		super(parent, style);
@@ -58,7 +63,13 @@ public class NPMInstallWidget extends Composite {
 
 		versionText = new Text(body, SWT.SINGLE | SWT.BORDER);
 		versionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		versionText.addModifyListener(new ModifyListener() {
 
+			@Override
+			public void modifyText(ModifyEvent event) {
+				NPMInstallWidget.this.version = versionText.getText();
+			}
+		});
 		searchButton = new Button(body, SWT.PUSH);
 		searchButton.setText(TypeScriptUIMessages.Browse);
 		searchButton.addSelectionListener(new SelectionAdapter() {
@@ -74,10 +85,23 @@ public class NPMInstallWidget extends Composite {
 		});
 	}
 
+	public void setVersion(String version) {
+		versionText.setText(version);
+	}
+
 	@Override
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		versionText.setEnabled(enabled);
 		searchButton.setEnabled(enabled);
+	}
+
+	/**
+	 * Returns the npm install command.
+	 * 
+	 * @return the npm install command.
+	 */
+	public String getNpmInstallCommand() {
+		return NPMHelper.getNpmInstallCommand(moduleName, version);
 	}
 }

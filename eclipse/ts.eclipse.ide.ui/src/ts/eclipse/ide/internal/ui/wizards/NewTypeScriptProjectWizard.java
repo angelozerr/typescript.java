@@ -13,18 +13,24 @@
 package ts.eclipse.ide.internal.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -34,16 +40,21 @@ import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
+import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.wizards.AbstractNewProjectWizard;
 import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.IOUtils;
+import ts.utils.StringUtils;
 
 /**
  * Standard workbench wizard that creates a new TypeScript project resource in
@@ -106,7 +117,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 	@Override
 	protected IRunnableWithProgress getRunnable(IProject newProjectHandle, IProjectDescription description,
-			IPath projectLocation) {
+			IPath projectLocationPath) {
 		TsconfigJson json = new TsconfigJson();
 		json.setCompileOnSave(true);
 		tsconfigPage.addContents(json);
@@ -146,6 +157,35 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 					}
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
+				}
+
+				// Install TypeScript if needed
+				String cmd = tsRuntimeAndNodeJsPage.getNpmInstallCommand();
+				if (!StringUtils.isEmpty(cmd)) {
+
+					// Prepare terminal properties
+					String terminalId = "TypeScript Projects";
+					Map<String, Object> properties = new HashMap<String, Object>();
+					properties.put(ITerminalsConnectorConstants.PROP_TITLE, terminalId);
+					properties.put(ITerminalsConnectorConstants.PROP_ENCODING, StandardCharsets.UTF_8.name());
+					properties.put(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR,
+							projectLocationPath.toString());
+					properties.put(ITerminalsConnectorConstants.PROP_DELEGATE_ID,
+							"ts.eclipse.ide.terminal.interpreter.LocalInterpreterLauncherDelegate");
+					properties.put(ITerminalsConnectorConstants.PROP_TERMINAL_CONNECTOR_ID,
+							"org.eclipse.tm.terminal.connector.local.LocalConnector");
+
+					CommandTerminalService.getInstance().executeCommand(cmd, terminalId, properties, null);
+					
+					IEclipsePreferences node = new ProjectScope(newProjectHandle).getNode(TypeScriptCorePlugin.PLUGIN_ID);
+					node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
+					node.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH, "${project_loc:node_modules/typescript}");
+					try {
+						node.flush();
+					} catch (BackingStoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 
 				getShell().getDisplay().syncExec(new Runnable() {

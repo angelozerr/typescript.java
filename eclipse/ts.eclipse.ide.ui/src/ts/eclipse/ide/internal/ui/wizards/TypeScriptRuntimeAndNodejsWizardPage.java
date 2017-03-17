@@ -34,7 +34,8 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 
 	private static final String PAGE_NAME = "TypeScriptRuntimeAndNodejsWizardPage";
 
-	private Button useEmbeddedTsRuntime;
+	private Button useEmbeddedTsRuntimeButton;
+	private boolean useEmbeddedTsRuntime;
 	private NPMInstallWidget installTsRuntime;
 
 	private Combo embeddedTsRuntime;
@@ -133,15 +134,15 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		// Install TypeScript
 		createInstallScriptField(group);
 
-		useEmbeddedTsRuntime.setSelection(true);
+		useEmbeddedTsRuntimeButton.setSelection(true);
 		updateTsRuntimeMode();
 	}
 
 	private void createEmbeddedTypeScriptField(Composite parent) {
-		useEmbeddedTsRuntime = new Button(parent, SWT.RADIO);
-		useEmbeddedTsRuntime
+		useEmbeddedTsRuntimeButton = new Button(parent, SWT.RADIO);
+		useEmbeddedTsRuntimeButton
 				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label);
-		useEmbeddedTsRuntime.addSelectionListener(new SelectionAdapter() {
+		useEmbeddedTsRuntimeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateTsRuntimeMode();
@@ -176,9 +177,9 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	}
 
 	private void updateTsRuntimeMode() {
-		boolean embedded = useEmbeddedTsRuntime.getSelection();
-		embeddedTsRuntime.setEnabled(embedded);
-		installTsRuntime.setEnabled(!embedded);
+		useEmbeddedTsRuntime = useEmbeddedTsRuntimeButton.getSelection();
+		embeddedTsRuntime.setEnabled(useEmbeddedTsRuntime);
+		installTsRuntime.setEnabled(!useEmbeddedTsRuntime);
 	}
 
 	@Override
@@ -191,6 +192,13 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	protected boolean validatePage() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public String getNpmInstallCommand() {
+		if (useEmbeddedTsRuntime) {
+			return null;
+		}
+		return installTsRuntime.getNpmInstallCommand();
 	}
 
 }
