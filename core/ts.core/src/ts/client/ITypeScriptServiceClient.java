@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - adjusted usage of CompletableFuture
  */
 package ts.client;
 
@@ -77,8 +78,8 @@ public interface ITypeScriptServiceClient {
 	 * @param insertString
 	 * @throws TypeScriptException
 	 */
-	// void changeFile(String fileName, int position, int endPosition, String
-	// insertString) throws TypeScriptException;
+	// void changeFile(String fileName, int position, int
+	// endPosition, String insertString) throws TypeScriptException;
 
 	/**
 	 * Change file content at the given lines/offsets.
@@ -102,10 +103,9 @@ public interface ITypeScriptServiceClient {
 	 * @param fileName
 	 * @param position
 	 * @return completion for the given fileName at the given position.
-	 * @throws TypeScriptException
 	 */
 	// CompletableFuture<List<CompletionEntry>> completions(String fileName, int
-	// position) throws TypeScriptException;
+	// position);
 
 	/**
 	 * Completion for the given fileName at the given line/offset.
@@ -114,16 +114,14 @@ public interface ITypeScriptServiceClient {
 	 * @param line
 	 * @param offset
 	 * @return completion for the given fileName at the given line/offset
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<List<CompletionEntry>> completions(String fileName, int line, int offset)
-			throws TypeScriptException;
+	CompletableFuture<List<CompletionEntry>> completions(String fileName, int line, int offset);
 
 	CompletableFuture<List<CompletionEntry>> completions(String name, int line, int offset,
-			ICompletionEntryFactory instanceCreator) throws TypeScriptException;
+			ICompletionEntryFactory instanceCreator);
 
 	CompletableFuture<List<CompletionEntryDetails>> completionEntryDetails(String fileName, int line, int offset,
-			String[] entryNames, CompletionEntry completionEntry) throws TypeScriptException;
+			String[] entryNames, CompletionEntry completionEntry);
 
 	/**
 	 * Definition for the given fileName at the given line/offset.
@@ -132,9 +130,8 @@ public interface ITypeScriptServiceClient {
 	 * @param line
 	 * @param offset
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<List<FileSpan>> definition(String fileName, int line, int offset) throws TypeScriptException;
+	CompletableFuture<List<FileSpan>> definition(String fileName, int line, int offset);
 
 	/**
 	 * Signature help for the given fileName at the given line/offset.
@@ -143,10 +140,8 @@ public interface ITypeScriptServiceClient {
 	 * @param line
 	 * @param offset
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<SignatureHelpItems> signatureHelp(String fileName, int line, int offset)
-			throws TypeScriptException;
+	CompletableFuture<SignatureHelpItems> signatureHelp(String fileName, int line, int offset);
 
 	/**
 	 * Quick info for the given fileName at the given line/offset.
@@ -155,14 +150,12 @@ public interface ITypeScriptServiceClient {
 	 * @param line
 	 * @param offset
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<QuickInfo> quickInfo(String fileName, int line, int offset) throws TypeScriptException;
+	CompletableFuture<QuickInfo> quickInfo(String fileName, int line, int offset);
 
-	CompletableFuture<List<DiagnosticEvent>> geterr(String[] files, int delay) throws TypeScriptException;
+	CompletableFuture<List<DiagnosticEvent>> geterr(String[] files, int delay);
 
-	CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay, ProjectInfo projectInfo)
-			throws TypeScriptException;
+	CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay, ProjectInfo projectInfo);
 
 	/**
 	 * Format for the given fileName at the given line/offset.
@@ -173,10 +166,8 @@ public interface ITypeScriptServiceClient {
 	 * @param endLine
 	 * @param endOffset
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<List<CodeEdit>> format(String fileName, int line, int offset, int endLine, int endOffset)
-			throws TypeScriptException;
+	CompletableFuture<List<CodeEdit>> format(String fileName, int line, int offset, int endLine, int endOffset);
 
 	/**
 	 * Find references for the given fileName at the given line/offset.
@@ -185,10 +176,8 @@ public interface ITypeScriptServiceClient {
 	 * @param line
 	 * @param offset
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<ReferencesResponseBody> references(String fileName, int line, int offset)
-			throws TypeScriptException;
+	CompletableFuture<ReferencesResponseBody> references(String fileName, int line, int offset);
 
 	/**
 	 * Find occurrences for the given fileName at the given line/offset.
@@ -197,21 +186,17 @@ public interface ITypeScriptServiceClient {
 	 * @param line
 	 * @param offset
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset)
-			throws TypeScriptException;
+	CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset);
 
 	CompletableFuture<RenameResponseBody> rename(String file, int line, int offset, Boolean findInComments,
-			Boolean findInStrings) throws TypeScriptException;
+			Boolean findInStrings);
 
-	CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider)
-			throws TypeScriptException;
+	CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider);
 
 	void configure(ConfigureRequestArguments arguments) throws TypeScriptException;
 
-	CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList)
-			throws TypeScriptException;
+	CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList);
 
 	// Since 2.0.3
 
@@ -220,42 +205,35 @@ public interface ITypeScriptServiceClient {
 	 * 
 	 * @param includeLinePosition
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(String file, Boolean includeLinePosition)
-			throws TypeScriptException;
+	CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(String file, Boolean includeLinePosition);
 
 	/**
 	 * Execute syntactic diagnostics for the given file.
 	 * 
 	 * @param includeLinePosition
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(String file, Boolean includeLinePosition)
-			throws TypeScriptException;
+	CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(String file, Boolean includeLinePosition);
 
 	// Since 2.0.5
 
-	CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced) throws TypeScriptException;
+	CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced);
 
-	CompletableFuture<List<CompileOnSaveAffectedFileListSingleProject>> compileOnSaveAffectedFileList(String fileName)
-			throws TypeScriptException;
+	CompletableFuture<List<CompileOnSaveAffectedFileListSingleProject>> compileOnSaveAffectedFileList(String fileName);
 
 	// Since 2.0.6
 
-	CompletableFuture<NavigationBarItem> navtree(String fileName, IPositionProvider positionProvider)
-			throws TypeScriptException;
+	CompletableFuture<NavigationBarItem> navtree(String fileName, IPositionProvider positionProvider);
 
-	CompletableFuture<TextInsertion> docCommentTemplate(String fileName, int line, int offset)
-			throws TypeScriptException;
+	CompletableFuture<TextInsertion> docCommentTemplate(String fileName, int line, int offset);
 
 	// Since 2.1.0
 
 	CompletableFuture<List<CodeAction>> getCodeFixes(String fileName, IPositionProvider positionProvider, int startLine,
-			int startOffset, int endLine, int endOffset, List<Integer> errorCodes) throws TypeScriptException;
+			int startOffset, int endLine, int endOffset, List<Integer> errorCodes);
 
-	CompletableFuture<List<String>> getSupportedCodeFixes() throws TypeScriptException;
+	CompletableFuture<List<String>> getSupportedCodeFixes();
 
 	//
 	/**
@@ -265,9 +243,8 @@ public interface ITypeScriptServiceClient {
 	 * @param line
 	 * @param offset
 	 * @return
-	 * @throws TypeScriptException
 	 */
-	CompletableFuture<List<FileSpan>> implementation(String fileName, int line, int offset) throws TypeScriptException;
+	CompletableFuture<List<FileSpan>> implementation(String fileName, int line, int offset);
 
 	void addClientListener(ITypeScriptClientListener listener);
 
