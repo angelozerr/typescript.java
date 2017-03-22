@@ -7,20 +7,28 @@ import ts.OS;
 
 public class NPMModule {
 
-	private final String moduleName;
+	private final String name;
 	private final OS os;
 	private List<String> versions;
 
-	NPMModule(String moduleName, OS os) {
-		this.moduleName = moduleName;
+	NPMModule(String name, OS os) {
+		this.name = name;
 		this.os = os;
 	}
 
 	public List<String> getAvailableVersions() throws IOException {
-		if (versions == null) {
-			versions = NPMHelper.getVersions(moduleName, os);
+		if (!isLoaded()) {
+			versions = NPMHelper.getVersions(name, os);
 		}
 		return versions;
+	}
+
+	public boolean isLoaded() {
+		return versions != null;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 }

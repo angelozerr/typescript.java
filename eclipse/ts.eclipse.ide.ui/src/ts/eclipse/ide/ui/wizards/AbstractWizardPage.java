@@ -9,8 +9,9 @@
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *
  */
-package ts.eclipse.ide.internal.ui.wizards;
+package ts.eclipse.ide.ui.wizards;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -20,11 +21,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import ts.eclipse.ide.internal.ui.dialogs.StatusUtil;
+import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
+
 /**
  * Abstract class for wizard page.
  *
  */
-public abstract class AbstractWizardPage extends WizardPage implements Listener {
+public abstract class AbstractWizardPage extends WizardPage implements Listener, IStatusChangeListener {
 
 	protected AbstractWizardPage(String pageName) {
 		super(pageName);
@@ -60,6 +64,12 @@ public abstract class AbstractWizardPage extends WizardPage implements Listener 
 	@Override
 	public void handleEvent(Event event) {
 		setPageComplete(validatePage());
+	}
+
+	@Override
+	public void statusChanged(IStatus status) {
+		setPageComplete(!status.matches(IStatus.ERROR));
+		StatusUtil.applyToStatusLine(this, status);
 	}
 
 	protected abstract void createBody(Composite parent);

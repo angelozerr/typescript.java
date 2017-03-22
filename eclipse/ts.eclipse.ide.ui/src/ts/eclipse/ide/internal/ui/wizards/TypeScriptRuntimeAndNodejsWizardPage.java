@@ -27,7 +27,8 @@ import org.eclipse.swt.widgets.Group;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.utils.NPMInstallWidget;
+import ts.eclipse.ide.ui.widgets.NPMInstallWidget;
+import ts.eclipse.ide.ui.wizards.AbstractWizardPage;
 import ts.repository.ITypeScriptRepository;
 
 public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
@@ -172,7 +173,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 			}
 		});
 
-		installTsRuntime = new NPMInstallWidget("typescript", parent, SWT.NONE);
+		installTsRuntime = new NPMInstallWidget("typescript", this, parent, SWT.NONE);
 		installTsRuntime.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 

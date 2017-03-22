@@ -15,7 +15,6 @@ package ts.eclipse.ide.internal.ui;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -175,7 +174,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String NewTypeScriptProjectWizard_windowTitle;
 	public static String NewTypeScriptProjectWizard_newProjectTitle;
 	public static String NewTypeScriptProjectWizard_newProjectDescription;
-	
+
 	public static String TSConfigWizardPage_title;
 	public static String TSConfigWizardPage_description;
 	public static String TSConfigWizardPage_module;
@@ -198,12 +197,17 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label;
-	
+
 	// NPM Module Versions
 	public static String NPMModuleVersionsSelectionDialog_title;
 	public static String NPMModuleVersionsSelectionDialog_message;
 	public static String NPMModuleVersionsSelectionDialog_searchJob_taskName;
-	
+
+	// NPM Install Widgets
+	public static String NPMInstallWidget_ValidateVersionJob_name;
+	public static String NPMInstallWidget_SearchingVersions_status;
+	public static String NPMInstallWidget_InvalidVersion_status;
+
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

@@ -26,7 +26,7 @@ import ts.cmd.tslint.TslintSettingsStrategy;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.preferences.BrowseButtonsComposite;
-import ts.eclipse.ide.ui.preferences.IStatusChangeListener;
+import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 import ts.repository.ITypeScriptRepository;
 
 /**

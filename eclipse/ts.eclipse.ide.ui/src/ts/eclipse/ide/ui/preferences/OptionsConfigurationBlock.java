@@ -54,6 +54,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 
 /**
  * Abstract options configuration block providing a general implementation for

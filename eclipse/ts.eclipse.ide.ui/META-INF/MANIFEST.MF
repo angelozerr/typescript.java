@@ -47,4 +47,5 @@ Export-Package: ts.eclipse.ide.ui,
  ts.eclipse.ide.ui.preferences,
  ts.eclipse.ide.ui.search,
  ts.eclipse.ide.ui.utils,
+ ts.eclipse.ide.ui.widgets,
  ts.eclipse.ide.ui.wizards

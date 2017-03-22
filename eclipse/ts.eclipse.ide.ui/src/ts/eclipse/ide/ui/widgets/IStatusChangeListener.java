@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Angelo ZERR : copied from  org.eclipse.wst.jsdt.internal.ui.wizards.IStatusChangeListener     
  *******************************************************************************/
-package ts.eclipse.ide.ui.preferences;
+package ts.eclipse.ide.ui.widgets;
 
 import org.eclipse.core.runtime.IStatus;
 

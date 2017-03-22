@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 
 import ts.cmd.tsc.CompilerOptions;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
+import ts.eclipse.ide.ui.wizards.AbstractWizardPage;
 import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.StringUtils;
 

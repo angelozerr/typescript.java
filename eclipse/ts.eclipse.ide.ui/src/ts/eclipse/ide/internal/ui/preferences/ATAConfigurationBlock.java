@@ -23,9 +23,9 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.preferences.IStatusChangeListener;
 import ts.eclipse.ide.ui.preferences.OptionsConfigurationBlock;
 import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
+import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 
 /**
  * Automatic Type Acquisition (ATA) configuration block.

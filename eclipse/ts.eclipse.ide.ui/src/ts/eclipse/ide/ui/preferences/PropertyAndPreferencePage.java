@@ -41,6 +41,7 @@ import ts.eclipse.ide.internal.ui.dialogs.fields.DialogField;
 import ts.eclipse.ide.internal.ui.dialogs.fields.IDialogFieldListener;
 import ts.eclipse.ide.internal.ui.dialogs.fields.LayoutUtil;
 import ts.eclipse.ide.internal.ui.dialogs.fields.SelectionButtonDialogField;
+import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 
 /**
  * Base for project property and preference pages

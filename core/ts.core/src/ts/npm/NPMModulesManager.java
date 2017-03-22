@@ -10,9 +10,7 @@
  */
 package ts.npm;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ts.OS;
@@ -31,13 +29,13 @@ public class NPMModulesManager {
 		this.modules = new HashMap<>();
 	}
 
-	public List<String> getAvailableVersions(String moduleName) throws IOException {
+	public NPMModule getNPMModule(String moduleName) {
 		NPMModule module = modules.get(moduleName);
 		if (module == null) {
 			module = new NPMModule(moduleName, os);
 			modules.put(moduleName, module);
 		}
-		return module.getAvailableVersions();
+		return module;
 	}
 
 	public void resetCache(String moduleName) {

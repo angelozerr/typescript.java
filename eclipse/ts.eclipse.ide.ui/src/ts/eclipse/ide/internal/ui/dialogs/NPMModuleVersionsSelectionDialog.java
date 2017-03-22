@@ -69,7 +69,7 @@ public class NPMModuleVersionsSelectionDialog extends FilteredItemsSelectionDial
 			try {
 				// execute "npm view $moduleName versions" to retrieve version
 				// list of the given module name.
-				IDENPMModulesManager.getInstance().getAvailableVersions(moduleName)
+				IDENPMModulesManager.getInstance().getNPMModule(moduleName).getAvailableVersions()
 						.forEach(version -> contentProvider.add(version, itemsFilter));
 			} catch (IOException e) {
 				e.printStackTrace();
