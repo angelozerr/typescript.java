@@ -135,7 +135,7 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 		label.setFont(font);
 
 		// Text for outDir
-		txtOutDir = new Text(subGroup, SWT.BORDER);
+		txtOutDir = new Text(subGroup, SWT.SINGLE | SWT.BORDER);
 		txtOutDir.addListener(SWT.Modify, this);
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		txtOutDir.setLayoutData(data);

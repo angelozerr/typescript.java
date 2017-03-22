@@ -197,7 +197,9 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label;
-
+	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedNodeJs_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstalledNodeJs_label;
+	
 	// NPM Module Versions
 	public static String NPMModuleVersionsSelectionDialog_title;
 	public static String NPMModuleVersionsSelectionDialog_message;

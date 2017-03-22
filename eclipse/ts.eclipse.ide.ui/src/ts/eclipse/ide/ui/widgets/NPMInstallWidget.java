@@ -12,22 +12,26 @@
 package ts.eclipse.ide.ui.widgets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.jface.fieldassist.ContentProposal;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.IContentProposal;
+import org.eclipse.jface.fieldassist.IContentProposalProvider;
+import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -35,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
 
 import ts.eclipse.ide.core.npm.IDENPMModulesManager;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.internal.ui.dialogs.NPMModuleVersionsSelectionDialog;
+import ts.eclipse.ide.internal.ui.dialogs.VersionLabelProvider;
 import ts.eclipse.ide.ui.preferences.StatusInfo;
 import ts.npm.NPMHelper;
 import ts.npm.NPMModule;
@@ -55,7 +59,7 @@ public class NPMInstallWidget extends Composite {
 
 	private final String moduleName;
 	private Text versionText;
-	private Button searchButton;
+	// private Button searchButton;
 
 	private String version;
 
@@ -95,6 +99,29 @@ public class NPMInstallWidget extends Composite {
 		}
 	}
 
+	private class VersionContentProposalProvider implements IContentProposalProvider {
+
+		@Override
+		public IContentProposal[] getProposals(String contents, int position) {
+			NPMModule module = IDENPMModulesManager.getInstance().getNPMModule(moduleName);
+			if (module.isLoaded()) {
+				List<IContentProposal> list = new ArrayList<>();
+				try {
+					for (String proposal : module.getAvailableVersions()) {
+						if (proposal.length() >= contents.length()
+								&& proposal.substring(0, contents.length()).equalsIgnoreCase(contents)) {
+							list.add(new ContentProposal(proposal));
+						}
+					}
+				} catch (IOException e) {
+					// Should never occurred.
+				}
+				return list.toArray(new IContentProposal[list.size()]);
+			}
+			return null;
+		}
+	}
+
 	public NPMInstallWidget(String moduleName, IStatusChangeListener handler, Composite parent, int style) {
 		super(parent, style);
 		this.moduleName = moduleName;
@@ -103,9 +130,17 @@ public class NPMInstallWidget extends Composite {
 	}
 
 	private void createUI(Composite parent) {
-		this.setLayout(new GridLayout());
+		GridLayout gl = new GridLayout();
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		this.setLayout(gl);
+		this.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
 		Composite body = new Composite(parent, SWT.NONE);
-		body.setLayout(new GridLayout(3, false));
+		gl = new GridLayout(3, false);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		body.setLayout(gl);
 		body.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label versionLabel = new Label(body, SWT.NONE);
@@ -122,21 +157,39 @@ public class NPMInstallWidget extends Composite {
 				validateVersion(version);
 			}
 		});
+		addContentProposal(versionText);
 
 		// Search button
-		searchButton = new Button(body, SWT.PUSH);
-		searchButton.setText(TypeScriptUIMessages.Browse);
-		searchButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				NPMModuleVersionsSelectionDialog dialog = new NPMModuleVersionsSelectionDialog(moduleName,
-						searchButton.getShell(), false);
-				if (dialog.open() == Window.OK) {
-					String version = (String) dialog.getFirstResult();
-					versionText.setText(version);
-				}
-			}
-		});
+		// Remove "Browse" button since Ctrl+Space can be used to open completion. 
+//		searchButton = new Button(body, SWT.PUSH);
+//		searchButton.setText(TypeScriptUIMessages.Browse);
+//		searchButton.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				NPMModuleVersionsSelectionDialog dialog = new NPMModuleVersionsSelectionDialog(moduleName,
+//						searchButton.getShell(), false);
+//				if (dialog.open() == Window.OK) {
+//					String version = (String) dialog.getFirstResult();
+//					versionText.setText(version);
+//				}
+//			}
+//		});
+	}
+
+	private void addContentProposal(Text text) {
+		char[] autoActivationCharacters = null;//new char[] { '.' };
+		KeyStroke keyStroke = null;
+		try {
+			keyStroke = KeyStroke.getInstance("Ctrl+Space");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(),
+				new VersionContentProposalProvider(), keyStroke, autoActivationCharacters);
+		adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+		adapter.setPropagateKeys(true);
+		adapter.setLabelProvider(VersionLabelProvider.getInstance());
+
 	}
 
 	/**
@@ -207,7 +260,7 @@ public class NPMInstallWidget extends Composite {
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		versionText.setEnabled(enabled);
-		searchButton.setEnabled(enabled);
+		//searchButton.setEnabled(enabled);
 	}
 
 	/**

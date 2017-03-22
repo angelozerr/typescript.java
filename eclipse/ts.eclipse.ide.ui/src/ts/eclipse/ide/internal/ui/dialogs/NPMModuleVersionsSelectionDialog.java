@@ -21,9 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -52,7 +50,7 @@ public class NPMModuleVersionsSelectionDialog extends FilteredItemsSelectionDial
 		setTitle(NLS.bind(TypeScriptUIMessages.NPMModuleVersionsSelectionDialog_title, moduleName));
 		setMessage(TypeScriptUIMessages.NPMModuleVersionsSelectionDialog_message);
 		setImage(TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_NPM));
-		setListLabelProvider(new VersionLabelProvider());
+		setListLabelProvider(VersionLabelProvider.getInstance());
 		this.moduleName = moduleName;
 	}
 
@@ -129,14 +127,6 @@ public class NPMModuleVersionsSelectionDialog extends FilteredItemsSelectionDial
 	@Override
 	protected Control createExtendedContentArea(Composite parent) {
 		return null;
-	}
-
-	protected class VersionLabelProvider extends LabelProvider {
-
-		@Override
-		public Image getImage(Object element) {
-			return TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_NPM);
-		}
 	}
 
 	protected class VersionFilter extends ItemsFilter {

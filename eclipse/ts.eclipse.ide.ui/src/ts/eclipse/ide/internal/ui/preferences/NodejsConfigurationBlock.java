@@ -201,7 +201,7 @@ public class NodejsConfigurationBlock extends OptionsConfigurationBlock {
 				dialog.setFilterPath(filePathCombo.getText());
 				String result = dialog.open();
 				if (!StringUtils.isEmpty(result)) {
-					installedComboBox.setText(result);
+					filePathCombo.setText(result);
 				}
 
 			}
