@@ -7,7 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - adjusted usage of CompletableFuture, added required requests
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - adjusted usage of CompletableFuture, added required requests, openExternalProject
  */
 package ts.client;
 
@@ -72,6 +72,7 @@ import ts.internal.client.protocol.MessageType;
 import ts.internal.client.protocol.NavBarRequest;
 import ts.internal.client.protocol.NavTreeRequest;
 import ts.internal.client.protocol.OccurrencesRequest;
+import ts.internal.client.protocol.OpenExternalProjectRequest;
 import ts.internal.client.protocol.OpenRequest;
 import ts.internal.client.protocol.ProjectInfoRequest;
 import ts.internal.client.protocol.QuickInfoRequest;
@@ -230,7 +231,10 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 					// message " + json);
 					return;
 				}
-				Response responseMessage = pendingRequestInfo.requestMessage.parseResponse(json);
+				Response<?> responseMessage = pendingRequestInfo.requestMessage.parseResponse(json);
+				if (responseMessage == null) {
+					responseMessage = GsonHelper.DEFAULT_GSON.fromJson(json, Response.class);
+				}
 				try {
 					handleResponse(responseMessage, message, pendingRequestInfo.startTime);
 					pendingRequestInfo.responseHandler.accept(responseMessage);
@@ -412,6 +416,11 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList) {
 		return execute(new ProjectInfoRequest(file, needFileNameList));
+	}
+
+	@Override
+	public CompletableFuture<Void> openExternalProject(String projectFileName, List<String> rootFileNames) {
+		return executeCausingWait(new OpenExternalProjectRequest(projectFileName, rootFileNames));
 	}
 
 	// Since 2.0.3

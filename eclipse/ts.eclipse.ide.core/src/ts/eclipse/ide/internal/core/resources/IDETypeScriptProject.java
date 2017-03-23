@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - openExternalProject
  */
 package ts.eclipse.ide.internal.core.resources;
 
@@ -349,6 +350,17 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		buildPath = null;
 		ITypeScriptBuildPath newBuildPath = getTypeScriptBuildPath();
 		IDEResourcesManager.getInstance().fireBuildPathChanged(this, oldBuildPath, newBuildPath);
+	}
+
+	@Override
+	protected List<String> getTsconfigFilePaths() {
+		ITsconfigBuildPath[] tsconfigBuildPaths = getTypeScriptBuildPath().getTsconfigBuildPaths();
+		List<String> result = new ArrayList<>(tsconfigBuildPaths.length);
+		for (ITsconfigBuildPath tsconfigBuildPath : tsconfigBuildPaths) {
+			IFile tsconfigFile = tsconfigBuildPath.getTsconfigFile();
+			result.add(WorkbenchResourceUtil.getRelativePath(tsconfigFile, tsconfigFile.getProject()).toString());
+		}
+		return result;
 	}
 
 	@Override
