@@ -14,7 +14,9 @@ package ts.eclipse.ide.internal.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -86,6 +88,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 	private static final String WIZARD_NAME = "NewTypeScriptProjectWizard";
 	private TSConfigWizardPage tsconfigPage;
 	private TypeScriptRuntimeAndNodejsWizardPage tsRuntimeAndNodeJsPage;
+	private TSLintWizardPage tslintPage;
 
 	public NewTypeScriptProjectWizard() {
 		super(WIZARD_NAME, TypeScriptUIMessages.NewTypeScriptProjectWizard_newProjectTitle,
@@ -113,6 +116,8 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 		addPage(tsconfigPage);
 		tsRuntimeAndNodeJsPage = new TypeScriptRuntimeAndNodejsWizardPage();
 		addPage(tsRuntimeAndNodeJsPage);
+		tslintPage = new TSLintWizardPage();
+		addPage(tslintPage);
 	}
 
 	@Override
@@ -159,10 +164,21 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 					throw new InvocationTargetException(e);
 				}
 
-				// Install TypeScript if needed
+				// Install TypeScript/tslint if needed
+				List<String> commands = new ArrayList<>();
+				boolean customTypeScript = false;
 				String cmd = tsRuntimeAndNodeJsPage.getNpmInstallCommand();
 				if (!StringUtils.isEmpty(cmd)) {
-
+					commands.add(cmd);
+					customTypeScript = true;
+				}
+				boolean customTslint = false;
+				cmd = tslintPage.getNpmInstallCommand();
+				if (!StringUtils.isEmpty(cmd)) {
+					commands.add(cmd);
+					customTslint = true;
+				}
+				if (!commands.isEmpty()) {
 					// Prepare terminal properties
 					String terminalId = "TypeScript Projects";
 					Map<String, Object> properties = new HashMap<String, Object>();
@@ -175,16 +191,21 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 					properties.put(ITerminalsConnectorConstants.PROP_TERMINAL_CONNECTOR_ID,
 							"org.eclipse.tm.terminal.connector.local.LocalConnector");
 
-					CommandTerminalService.getInstance().executeCommand(cmd, terminalId, properties, null);
-					
-					IEclipsePreferences node = new ProjectScope(newProjectHandle).getNode(TypeScriptCorePlugin.PLUGIN_ID);
-					node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
-					node.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH, "${project_loc:node_modules/typescript}");
-					try {
-						node.flush();
-					} catch (BackingStoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					CommandTerminalService.getInstance().executeCommand(commands, terminalId, properties, null);
+
+					if (customTypeScript || customTslint) {
+						IEclipsePreferences node = new ProjectScope(newProjectHandle)
+								.getNode(TypeScriptCorePlugin.PLUGIN_ID);
+						if (customTypeScript) {
+							node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
+							node.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
+									"${project_loc:node_modules/typescript}");
+						}
+						try {
+							node.flush();
+						} catch (BackingStoreException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 

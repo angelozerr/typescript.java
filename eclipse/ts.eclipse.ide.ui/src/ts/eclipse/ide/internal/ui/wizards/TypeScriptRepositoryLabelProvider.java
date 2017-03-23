@@ -21,9 +21,22 @@ import ts.repository.ITypeScriptRepository;
  */
 public class TypeScriptRepositoryLabelProvider extends LabelProvider {
 
+	private final boolean tslint;
+
+	public TypeScriptRepositoryLabelProvider() {
+		this(false);
+	}
+
+	public TypeScriptRepositoryLabelProvider(boolean tslint) {
+		this.tslint = tslint;
+	}
+
 	@Override
 	public String getText(Object element) {
 		if (element instanceof ITypeScriptRepository) {
+			if (tslint) {
+				return ((ITypeScriptRepository) element).getTslintName();
+			}
 			return ((ITypeScriptRepository) element).getName();
 		}
 		return super.getText(element);

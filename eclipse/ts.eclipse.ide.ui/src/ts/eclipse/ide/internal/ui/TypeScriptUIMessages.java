@@ -193,10 +193,10 @@ public class TypeScriptUIMessages extends NLS {
 
 	public static String TypeScriptRuntimeAndNodejsWizardPage_title;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_description;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_nodejs_group_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label;
+	public static String TypeScriptRuntimeAndNodejsWizardPage_nodejs_group_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedNodeJs_label;
 	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstalledNodeJs_label;
 	
@@ -210,6 +210,14 @@ public class TypeScriptUIMessages extends NLS {
 	public static String NPMInstallWidget_ValidateVersionJob_name;
 	public static String NPMInstallWidget_SearchingVersions_status;
 	public static String NPMInstallWidget_InvalidVersion_status;
+
+	public static String TSLintWizardPage_enableTslint_text;
+	public static String TSLintWizardPage_title;
+	public static String TSLintWizardPage_description;
+	public static String TSLintWizardPage_tslint_group_label;
+	public static String TSLintWizardPage_useEmbeddedTslintRuntime_label;
+	public static String TSLintWizardPage_useInstallTslintRuntime_label;
+
 
 	public static ResourceBundle getResourceBundle() {
 		try {

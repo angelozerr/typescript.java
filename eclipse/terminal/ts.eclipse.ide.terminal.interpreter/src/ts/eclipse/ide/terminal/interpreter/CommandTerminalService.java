@@ -1,6 +1,7 @@
 package ts.eclipse.ide.terminal.interpreter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -22,6 +23,30 @@ public class CommandTerminalService extends TerminalService {
 
 	public static CommandTerminalService getInstance() {
 		return INSTANCE;
+	}
+
+	public void executeCommand(List<String> commands, String terminalId, final Map<String, Object> properties,
+			final ITerminalService.Done done) {
+		if (commands.isEmpty()) {
+			return;
+		}
+		Assert.isNotNull(terminalId);
+
+		properties.put(ICommandTerminalServiceConstants.TERMINAL_ID, terminalId);
+		properties.put(ICommandTerminalServiceConstants.COMMAND_ID, commands);
+
+		TerminalConnectorWrapper connector = getConnector(terminalId, properties);
+		if (connector != null) {
+			String workingDir = (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
+			if (connector.hasWorkingDirChanged(workingDir)) {
+				connector.executeCommand("cd " + workingDir, properties);
+			}
+			for (String cmd : commands) {
+				connector.executeCommand(cmd, properties);
+			}
+		} else {
+			this.openConsole(properties, done);
+		}
 	}
 
 	public void executeCommand(String command, String terminalId, final Map<String, Object> properties,

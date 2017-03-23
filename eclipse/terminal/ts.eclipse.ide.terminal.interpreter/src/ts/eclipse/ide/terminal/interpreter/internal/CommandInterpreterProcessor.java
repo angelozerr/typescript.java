@@ -11,6 +11,7 @@
 package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,14 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 	 * @return the initial command when terminal is opened.
 	 */
 	private static String getInitialCommand(Map<String, Object> properties) {
-		return (String) properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
+		Object command = properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
+		if (command instanceof Collection) {
+			Collection<String> commands = (Collection<String>) command;
+			for (String cmd : commands) {
+				return cmd;
+			}
+		}
+		return (String) command;
 	}
 
 	/**
@@ -74,7 +82,7 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 	}
 
 	@Override
-	protected void executingCommand(String line, LineCommand lineCommand) {		
+	protected void executingCommand(String line, LineCommand lineCommand) {
 		if (interpreter != null) {
 			interpreter.onTrace(line);
 		}

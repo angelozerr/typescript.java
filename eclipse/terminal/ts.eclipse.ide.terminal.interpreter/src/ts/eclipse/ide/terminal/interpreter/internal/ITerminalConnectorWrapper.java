@@ -21,8 +21,6 @@ public interface ITerminalConnectorWrapper extends ITerminalConnector {
 
 	boolean hasWorkingDirChanged(String workingDir);
 
-	String getCommand();
-
 	String getWorkingDir();
 
 }

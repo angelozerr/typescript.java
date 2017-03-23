@@ -1,6 +1,7 @@
 package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
@@ -45,7 +46,7 @@ public class TerminalConnectorWrapper implements ITerminalConnectorWrapper {
 	public void connect(ITerminalControl control) {
 		delegate.connect(control);
 		if (control instanceof ITerminalViewControl) {
-			terminal = (ITerminalViewControl) control;			
+			terminal = (ITerminalViewControl) control;
 			if (isConfigureShellPrompt()) {
 				// Initialize Shell Prompt to display working dir in the
 				// prompt
@@ -53,7 +54,16 @@ public class TerminalConnectorWrapper implements ITerminalConnectorWrapper {
 				// CommandTerminalTracker
 				executeCommand("PS1='\\w\\$ '", null); // //$NON-NLS-1$
 			}
-			executeCommand(getCommand(), null);
+			Object command = properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
+			if (command instanceof Collection) {
+				Collection<String> commands = (Collection<String>) command;
+				for (String cmd : commands) {
+					executeCommand(cmd, null);
+				}
+			} else {
+				executeCommand((String) command, null);
+			}
+
 		}
 	}
 
@@ -147,10 +157,6 @@ public class TerminalConnectorWrapper implements ITerminalConnectorWrapper {
 			return workingDir != null;
 		}
 		return !wd.equals(workingDir);
-	}
-
-	public String getCommand() {
-		return (String) properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
 	}
 
 	@Override

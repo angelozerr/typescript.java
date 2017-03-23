@@ -309,12 +309,16 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	@Override
 	protected void initializeDefaultValues() {
 		// Default values for TypeScript runtime
-		embeddedTsRuntime.select(0);
+		if (embeddedTsRuntime.getItemCount() > 0) {
+			embeddedTsRuntime.select(0);
+		}
 		useEmbeddedTsRuntimeButton.setSelection(true);
 		updateTsRuntimeMode();
 
 		// Default values for Node.js
-		embeddedNodeJs.select(0);
+		if (embeddedNodeJs.getItemCount() > 0) {
+			embeddedNodeJs.select(0);
+		}
 		useEmbeddedNodeJsButton.setSelection(true);
 		updateNodeJsMode();
 	}

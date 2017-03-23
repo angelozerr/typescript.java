@@ -25,6 +25,7 @@ import org.eclipse.jface.fieldassist.ContentProposal;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
+import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -33,6 +34,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -67,6 +69,9 @@ public class NPMInstallWidget extends Composite {
 	private ValidateVersionJob validateVersionJob;
 	private IStatus status;
 
+	private boolean openPopup;
+	private VersionContentProposalAdapter adapter;
+
 	/**
 	 * Job which loads the available version of the given npm module and
 	 * validates the version field.
@@ -89,6 +94,10 @@ public class NPMInstallWidget extends Composite {
 				if ((display != null) && (!display.isDisposed())) {
 					display.asyncExec(new Runnable() {
 						public void run() {
+							if (openPopup) {
+								openPopup = false;
+								adapter.openProposalPopup();
+							}
 							validateVersionSynch(module);
 						}
 					});
@@ -118,9 +127,26 @@ public class NPMInstallWidget extends Composite {
 					// Should never occurred.
 				}
 				return list.toArray(new IContentProposal[list.size()]);
+			} else {
+				NPMInstallWidget.this.openPopup = true;
+				validateVersionASynch(module);
 			}
 			return null;
 		}
+	}
+
+	private class VersionContentProposalAdapter extends ContentProposalAdapter {
+
+		public VersionContentProposalAdapter(Control control, IControlContentAdapter controlContentAdapter,
+				IContentProposalProvider proposalProvider, KeyStroke keyStroke, char[] autoActivationCharacters) {
+			super(control, controlContentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
+		}
+
+		@Override
+		public void openProposalPopup() {
+			super.openProposalPopup();
+		}
+
 	}
 
 	public NPMInstallWidget(String moduleName, IStatusChangeListener handler, Composite parent, int style) {
@@ -163,31 +189,33 @@ public class NPMInstallWidget extends Composite {
 		addContentProposal(versionText);
 
 		// Search button
-		// Remove "Browse" button since Ctrl+Space can be used to open completion. 
-//		searchButton = new Button(body, SWT.PUSH);
-//		searchButton.setText(TypeScriptUIMessages.Browse);
-//		searchButton.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				NPMModuleVersionsSelectionDialog dialog = new NPMModuleVersionsSelectionDialog(moduleName,
-//						searchButton.getShell(), false);
-//				if (dialog.open() == Window.OK) {
-//					String version = (String) dialog.getFirstResult();
-//					versionText.setText(version);
-//				}
-//			}
-//		});
+		// Remove "Browse" button since Ctrl+Space can be used to open
+		// completion.
+		// searchButton = new Button(body, SWT.PUSH);
+		// searchButton.setText(TypeScriptUIMessages.Browse);
+		// searchButton.addSelectionListener(new SelectionAdapter() {
+		// @Override
+		// public void widgetSelected(SelectionEvent e) {
+		// NPMModuleVersionsSelectionDialog dialog = new
+		// NPMModuleVersionsSelectionDialog(moduleName,
+		// searchButton.getShell(), false);
+		// if (dialog.open() == Window.OK) {
+		// String version = (String) dialog.getFirstResult();
+		// versionText.setText(version);
+		// }
+		// }
+		// });
 	}
 
 	private void addContentProposal(Text text) {
-		char[] autoActivationCharacters = null;//new char[] { '.' };
+		char[] autoActivationCharacters = null;// new char[] { '.' };
 		KeyStroke keyStroke = null;
 		try {
 			keyStroke = KeyStroke.getInstance("Ctrl+Space");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(),
+		adapter = new VersionContentProposalAdapter(text, new TextContentAdapter(),
 				new VersionContentProposalProvider(), keyStroke, autoActivationCharacters);
 		adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
 		adapter.setPropagateKeys(true);
@@ -219,7 +247,7 @@ public class NPMInstallWidget extends Composite {
 		try {
 			List<String> availableVersions = module.getAvailableVersions();
 			String version = versionText.getText();
-			if (availableVersions.contains(version)) {
+			if (StringUtils.isEmpty(version) || availableVersions.contains(version)) {
 				statusChanged(Status.OK_STATUS);
 			} else {
 				statusChanged(new StatusInfo(IStatus.ERROR, NLS
@@ -264,7 +292,7 @@ public class NPMInstallWidget extends Composite {
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		versionText.setEnabled(enabled);
-		//searchButton.setEnabled(enabled);
+		// searchButton.setEnabled(enabled);
 	}
 
 	/**
@@ -278,8 +306,8 @@ public class NPMInstallWidget extends Composite {
 
 	public IStatus getStatus() {
 		return status;
-	}	
-	
+	}
+
 	public Text getVersionText() {
 		return versionText;
 	}
