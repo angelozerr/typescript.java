@@ -65,6 +65,7 @@ public class NPMInstallWidget extends Composite {
 
 	private final IStatusChangeListener handler;
 	private ValidateVersionJob validateVersionJob;
+	private IStatus status;
 
 	/**
 	 * Job which loads the available version of the given npm module and
@@ -126,6 +127,7 @@ public class NPMInstallWidget extends Composite {
 		super(parent, style);
 		this.moduleName = moduleName;
 		this.handler = handler;
+		this.status = Status.OK_STATUS;
 		createUI(this);
 	}
 
@@ -157,6 +159,7 @@ public class NPMInstallWidget extends Composite {
 				validateVersion(version);
 			}
 		});
+		versionText.setMessage(TypeScriptUIMessages.NPMInstallWidget_versionText_message);
 		addContentProposal(versionText);
 
 		// Search button
@@ -240,6 +243,7 @@ public class NPMInstallWidget extends Composite {
 	}
 
 	private void statusChanged(IStatus status) {
+		this.status = status;
 		handler.statusChanged(status);
 	}
 
@@ -270,5 +274,13 @@ public class NPMInstallWidget extends Composite {
 	 */
 	public String getNpmInstallCommand() {
 		return NPMHelper.getNpmInstallCommand(moduleName, version);
+	}
+
+	public IStatus getStatus() {
+		return status;
+	}	
+	
+	public Text getVersionText() {
+		return versionText;
 	}
 }

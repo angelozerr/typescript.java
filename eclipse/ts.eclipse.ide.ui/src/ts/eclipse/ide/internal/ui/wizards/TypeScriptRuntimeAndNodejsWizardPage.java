@@ -11,11 +11,16 @@
  */
 package ts.eclipse.ide.internal.ui.wizards;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -32,12 +37,16 @@ import org.eclipse.swt.widgets.Text;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog.Mode;
+import ts.eclipse.ide.ui.preferences.StatusInfo;
 import ts.eclipse.ide.ui.widgets.NPMInstallWidget;
 import ts.eclipse.ide.ui.wizards.AbstractWizardPage;
+import ts.nodejs.NodejsProcessHelper;
 import ts.repository.ITypeScriptRepository;
+import ts.utils.FileUtils;
 import ts.utils.StringUtils;
 
 public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
@@ -112,6 +121,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		useEmbeddedTsRuntimeButton = new Button(parent, SWT.RADIO);
 		useEmbeddedTsRuntimeButton
 				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label);
+		useEmbeddedTsRuntimeButton.addListener(SWT.Selection, this);
 		useEmbeddedTsRuntimeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -133,6 +143,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		Button useInstallTsRuntime = new Button(parent, SWT.RADIO);
 		useInstallTsRuntime
 				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label);
+		useInstallTsRuntime.addListener(SWT.Selection, this);
 		useInstallTsRuntime.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -140,12 +151,20 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 			}
 		});
 		installTsRuntime = new NPMInstallWidget("typescript", this, parent, SWT.NONE);
+		installTsRuntime.getVersionText().addListener(SWT.Modify, this);
 	}
 
 	private void updateTsRuntimeMode() {
 		useEmbeddedTsRuntime = useEmbeddedTsRuntimeButton.getSelection();
 		embeddedTsRuntime.setEnabled(useEmbeddedTsRuntime);
 		installTsRuntime.setEnabled(!useEmbeddedTsRuntime);
+	}
+
+	private IStatus validateTypeScriptRuntime() {
+		if (useEmbeddedTsRuntimeButton.getSelection()) {
+			return Status.OK_STATUS;
+		}
+		return installTsRuntime.getStatus();
 	}
 
 	// ------------------- Node.js content
@@ -173,6 +192,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		useEmbeddedNodeJsButton = new Button(parent, SWT.RADIO);
 		useEmbeddedNodeJsButton
 				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedNodeJs_label);
+		useEmbeddedNodeJsButton.addListener(SWT.Selection, this);
 		useEmbeddedNodeJsButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -195,27 +215,22 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		}
 		embeddedNodeJs.setItems(valueLabels);
 		embeddedNodeJs.setFont(JFaceResources.getDialogFont());
-
+		embeddedNodeJs.addListener(SWT.Modify, this);
 	}
 
 	private void createInstalledNodejsField(Composite parent) {
 		Button useInstalledNodejs = new Button(parent, SWT.RADIO);
 		useInstalledNodejs.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useInstalledNodeJs_label);
-		useInstalledNodejs.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateNodeJsMode();
-			}
-		});
+		useInstalledNodejs.addListener(SWT.Selection, this);
 
 		String[] defaultPaths = IDENodejsProcessHelper.getAvailableNodejsPaths();
 		installedNodeJs = new Combo(parent, SWT.NONE);
 		installedNodeJs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		installedNodeJs.setItems(defaultPaths);
+		installedNodeJs.addListener(SWT.Modify, this);
 
 		// Create Browse buttons.
 		createBrowseButtons(parent, installedNodeJs);
-
 	}
 
 	protected void createBrowseButtons(final Composite parent, final Combo filePathCombo) {
@@ -250,8 +265,8 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 						Mode.FILE);
 				if (dialog.open() == Window.OK) {
 					IResource resource = (IResource) dialog.getFirstResult();
-					filePathCombo.setText(TypeScriptCorePlugin.getTypeScriptRepositoryManager()
-							.generateFileName(resource, null));
+					filePathCombo.setText(
+							TypeScriptCorePlugin.getTypeScriptRepositoryManager().generateFileName(resource, null));
 				}
 
 			}
@@ -289,7 +304,6 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 200;
 		nodePath.setLayoutData(gridData);
-
 	}
 
 	@Override
@@ -303,7 +317,6 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		embeddedNodeJs.select(0);
 		useEmbeddedNodeJsButton.setSelection(true);
 		updateNodeJsMode();
-
 	}
 
 	private void updateNodeJsMode() {
@@ -312,13 +325,107 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		installedNodeJs.setEnabled(!useEmbeddedNodeJs);
 		browseFileSystemButton.setEnabled(!useEmbeddedNodeJs);
 		browseWorkspaceButton.setEnabled(!useEmbeddedNodeJs);
+	}
 
+	private class NodeJsStatus extends StatusInfo {
+
+		private final File nodeFile;
+		private final String version;
+
+		public NodeJsStatus(File nodeFile, String version, String errorMessage) {
+			if (errorMessage != null) {
+				setError(errorMessage);
+			}
+			this.nodeFile = nodeFile;
+			this.version = version;
+		}
+
+		public File getNodeFile() {
+			return nodeFile;
+		}
+
+		public String getNodeVersion() {
+			return version;
+		}
+	}
+
+	/**
+	 * Update the node version, path labels and returns the validation status of
+	 * the nodejs path.
+	 * 
+	 * @return the validation status of the nodejs path.
+	 */
+	private IStatus validateAndUpdateNodejsPath() {
+		// Compute node.j status
+		NodeJsStatus status = validateNodejsPath();
+		// Update node version & path
+		if (status.isOK()) {
+			nodeVersion.setText(status.getNodeVersion());
+			nodePath.setText(FileUtils.getPath(status.getNodeFile()));
+		} else {
+			nodeVersion.setText("");
+			nodePath.setText("");
+		}
+		return status;
+	}
+
+	/**
+	 * Returns the status of the node.js path.
+	 * 
+	 * @return the status of the node.js path.
+	 */
+	private NodeJsStatus validateNodejsPath() {
+		File nodeFile = null;
+		String version = null;
+		boolean embedded = useEmbeddedNodeJsButton.getSelection();
+		if (embedded) {
+			int selectedIndex = embeddedNodeJs.getSelectionIndex();
+			/*
+			 * if (selectedIndex == 0) { // ERROR: the embedded node.js combo is
+			 * not selected. return new NodeJsStatus(null, null,
+			 * TypeScriptUIMessages.
+			 * NodejsConfigurationBlock_embeddedNode_required_error); } else {
+			 */
+			IEmbeddedNodejs[] installs = TypeScriptCorePlugin.getNodejsInstallManager().getNodejsInstalls();
+			IEmbeddedNodejs install = installs[selectedIndex];
+			nodeFile = install.getPath();
+			// }
+		} else {
+			String nodeJsPath = installedNodeJs.getText();
+			if (StringUtils.isEmpty(nodeJsPath)) {
+				// ERROR: the installed path is empty
+				return new NodeJsStatus(null, null,
+						TypeScriptUIMessages.NodejsConfigurationBlock_installedNode_required_error);
+			} else {
+				nodeFile = WorkbenchResourceUtil.resolvePath(nodeJsPath, null);
+			}
+		}
+
+		if (!nodeFile.exists()) {
+			// ERROR: node.js file doesn't exists
+			return new NodeJsStatus(null, null, NLS.bind(
+					TypeScriptUIMessages.NodejsConfigurationBlock_nodeFile_exists_error, FileUtils.getPath(nodeFile)));
+		} else {
+			version = NodejsProcessHelper.getNodeVersion(nodeFile);
+			if (StringUtils.isEmpty(version)) {
+				// ERROR: the file path is not a node.exe
+				return new NodeJsStatus(null, null,
+						NLS.bind(TypeScriptUIMessages.NodejsConfigurationBlock_nodeFile_invalid_error,
+								FileUtils.getPath(nodeFile)));
+			}
+		}
+		// Node.js path is valid
+		return new NodeJsStatus(nodeFile, version, null);
 	}
 
 	@Override
-	protected boolean validatePage() {
-		// TODO Auto-generated method stub
-		return false;
+	protected IStatus[] validatePage() {
+		IStatus[] status = new IStatus[2];
+		// Validate TypeScript Runtime
+		status[0] = validateTypeScriptRuntime();
+		// Validate Node
+		status[1] = validateAndUpdateNodejsPath();
+		return status;
 	}
 
 	public String getNpmInstallCommand() {

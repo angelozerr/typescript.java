@@ -13,6 +13,7 @@
 package ts.eclipse.ide.internal.ui.wizards;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -95,11 +96,11 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 		cbTarget.addListener(SWT.Modify, this);
 		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
 		cbTarget.setLayoutData(data);
-		
+
 		// Data for Combobox target
 		cbTarget.setItems(TsconfigJson.getAvailableTargets());
 		// cbTarget.select(0); // select "es3"
-		
+
 		// Module
 		label = new Label(subGroup, SWT.NONE);
 		label.setText(TypeScriptUIMessages.TSConfigWizardPage_module);
@@ -124,11 +125,11 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 		cbModuleResolution.addListener(SWT.Modify, this);
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
 		cbModuleResolution.setLayoutData(data);
-		
+
 		// Data for Combobox moduele resolution
 		cbModuleResolution.setItems(TsconfigJson.getAvailableModuleResolutions());
 		// cbModuleResolution.select(1); // select "classic"
-		
+
 		// outDir
 		label = new Label(subGroup, SWT.NONE);
 		label.setText(TypeScriptUIMessages.TSConfigWizardPage_outDir);
@@ -258,10 +259,8 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 	}
 
 	@Override
-	protected boolean validatePage() {
-		boolean valid = true;
-
-		return valid;
+	protected IStatus[] validatePage() {
+		return null;
 	}
 
 	public IPath getPath() {

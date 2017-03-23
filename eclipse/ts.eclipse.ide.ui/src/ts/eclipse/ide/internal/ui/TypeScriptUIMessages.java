@@ -206,6 +206,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String NPMModuleVersionsSelectionDialog_searchJob_taskName;
 
 	// NPM Install Widgets
+	public static String NPMInstallWidget_versionText_message;
 	public static String NPMInstallWidget_ValidateVersionJob_name;
 	public static String NPMInstallWidget_SearchingVersions_status;
 	public static String NPMInstallWidget_InvalidVersion_status;

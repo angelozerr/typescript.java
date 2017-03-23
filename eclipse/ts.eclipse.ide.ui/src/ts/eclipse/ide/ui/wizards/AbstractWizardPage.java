@@ -12,6 +12,7 @@
 package ts.eclipse.ide.ui.wizards;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -39,7 +40,7 @@ public abstract class AbstractWizardPage extends WizardPage implements Listener,
 	}
 
 	@Override
-	public void createControl(Composite parent) {
+	public final void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		// top level group
 		Composite topLevel = new Composite(parent, SWT.NONE);
@@ -47,23 +48,23 @@ public abstract class AbstractWizardPage extends WizardPage implements Listener,
 		topLevel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
 		topLevel.setFont(parent.getFont());
 
-		// Text tsconfigText = new Text(parent, style)
-
+		// Create Body UI
 		createBody(topLevel);
-
 		// initialize page with default values
 		initializeDefaultValues();
-
-		validatePage();
-		// Show description on opening
-		setErrorMessage(null);
-		setMessage(null);
+		// Validate page fields.
+		validateAndUpdateStatus();
 		setControl(topLevel);
 	}
 
 	@Override
 	public void handleEvent(Event event) {
-		setPageComplete(validatePage());
+		validateAndUpdateStatus();
+	}
+
+	private void validateAndUpdateStatus() {
+		IStatus[] status = validatePage();
+		statusChanged(status == null ? Status.OK_STATUS : StatusUtil.getMostSevere(status));
 	}
 
 	@Override
@@ -76,6 +77,6 @@ public abstract class AbstractWizardPage extends WizardPage implements Listener,
 
 	protected abstract void initializeDefaultValues();
 
-	protected abstract boolean validatePage();
+	protected abstract IStatus[] validatePage();
 
 }

@@ -12,6 +12,7 @@
 package ts.eclipse.ide.internal.ui.dialogs;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IMessageProvider;
 
@@ -56,7 +57,7 @@ public class StatusUtil {
 	 * Applies the status to the status line of a dialog page.
 	 */
 	public static void applyToStatusLine(DialogPage page, IStatus status) {
-		String message= status.getMessage();
+		String message= Status.OK_STATUS.equals(status) ? null : status.getMessage();
 		switch (status.getSeverity()) {
 			case IStatus.OK:
 				page.setMessage(message, IMessageProvider.NONE);
