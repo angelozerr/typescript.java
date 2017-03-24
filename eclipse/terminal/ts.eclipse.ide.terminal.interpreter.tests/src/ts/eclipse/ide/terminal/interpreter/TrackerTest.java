@@ -19,10 +19,6 @@ import ts.eclipse.ide.terminal.interpreter.internal.CommandTerminalTracker;
  */
 public class TrackerTest extends CommandTerminalTracker {
 
-	static {
-		CommandTerminalTracker.DEBUG = false;
-	}
-
 	private final String userHome;
 	private final StringBuilder result;
 

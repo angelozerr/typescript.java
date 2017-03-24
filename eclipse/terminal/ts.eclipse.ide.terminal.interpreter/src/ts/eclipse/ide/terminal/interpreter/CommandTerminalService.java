@@ -1,5 +1,6 @@
 package ts.eclipse.ide.terminal.interpreter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,11 @@ public class CommandTerminalService extends TerminalService {
 
 	private final Map<String, TerminalConnectorWrapper> connectors;
 
+	private final List<ICommandInterpreterListener> listeners;
+
 	public CommandTerminalService() {
 		this.connectors = new HashMap<>();
+		this.listeners = new ArrayList<>();
 	}
 
 	public static CommandTerminalService getInstance() {
@@ -89,6 +93,24 @@ public class CommandTerminalService extends TerminalService {
 		synchronized (connectors) {
 			connectors.remove(connector.getTerminalId());
 		}
+	}
+
+	public void addCommandTerminalListener(ICommandInterpreterListener listener) {
+		synchronized (listeners) {
+			if (!listeners.contains(listener)) {
+				listeners.add(listener);
+			}
+		}
+	}
+
+	public void removeCommandTerminalListener(ICommandInterpreterListener listener) {
+		synchronized (listeners) {
+			listeners.remove(listener);
+		}
+	}
+
+	public List<ICommandInterpreterListener> getInterpreterListeners() {
+		return listeners;
 	}
 
 }

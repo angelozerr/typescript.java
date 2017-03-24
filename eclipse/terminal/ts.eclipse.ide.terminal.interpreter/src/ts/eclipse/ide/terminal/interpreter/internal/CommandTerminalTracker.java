@@ -13,6 +13,9 @@ package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.io.File;
 
+import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
+import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterListener;
+
 /**
  * Command terminal tracker.
  *
@@ -20,8 +23,6 @@ import java.io.File;
 public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	private static final String TILD = "~";
-
-	public static boolean DEBUG = false;
 
 	private final String initialWorkingDir;
 	private final String initialCommand;
@@ -34,9 +35,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		this.initialWorkingDir = initialWorkingDir;
 		this.initialCommand = initialCommand;
 		this.columns = 80;
-		if (DEBUG) {
-			traceTrackerTest(initialWorkingDir, initialCommand, getUserHome());
-		}
+		onOpenTerminal(initialWorkingDir, initialCommand, getUserHome());
 	}
 
 	@Override
@@ -45,9 +44,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 	}
 
 	protected void processText(String text, int columns) {
-		if (DEBUG) {
-			traceProcessText(text, columns);
-		}
+		onProcessText(text, columns);
 		processLine(text);
 	}
 
@@ -56,9 +53,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		// CRLF is thrown when:
 		// - User types 'Enter' to submit a command.
 		// - OR in Windows OS, when a new line is displayed in the DOS Command.
-		if (DEBUG) {
-			traceProcessCarriageReturnLineFeed();
-		}
+		onCarriageReturnLineFeed();
 		if (lineCommand == null) {
 			// Line command was not found in the terminal, ignore the CR event.
 			return;
@@ -174,7 +169,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 			}
 			if (state == LineCommandState.SUBMITTED) {
 				// Case when command is terminated.
-				this.newWorkingDir =  resolveTild(workinDir);
+				this.newWorkingDir = resolveTild(workinDir);
 				this.terminate();
 			} else {
 				// Case when user is typing a command, update it.
@@ -231,13 +226,13 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 				(initialCommandIndex != -1 ? initialCommandIndex : line.length())).trim();
 		return new LineCommand(initialWorkingDir, initialCommand, beforeWorkingDir, afterWorkingDir);
 	}
-	
-	private String resolveTild(String line)  {
+
+	private String resolveTild(String line) {
 		if (line.contains(TILD)) {
 			String home = getUserHome();
 			return line.replaceFirst("^~", home);
 		}
-		return line;		
+		return line;
 	}
 
 	protected String getUserHome() {
@@ -251,50 +246,28 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	// ---------------------- Trace to generate JUnit
 
-	private void traceTrackerTest(String initialWorkingDir, String initialCommand, String userHome) {
-		StringBuilder code = new StringBuilder("TrackerTest test = new TrackerTest(");		
-		if (initialWorkingDir == null) {
-			code.append("null");
-		} else {
-			code.append("\"");
-			code.append(initialWorkingDir.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
-			code.append("\"");
+	private void onOpenTerminal(String initialWorkingDir, String initialCommand, String userHome) {
+		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
+			listener.onOpenTerminal(initialWorkingDir, initialCommand, userHome);
 		}
-		code.append(", ");
-		if (initialCommand == null) {
-			code.append("null");
-		} else {
-			code.append("\"");
-			code.append(initialCommand.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
-			code.append("\"");
-		}
-		code.append(", ");
-		code.append("\"");
-		code.append(userHome);
-		code.append("\"");
-		code.append(");");
-		System.err.println(code.toString());
 	}
 
-	private void traceProcessText(String text, int columns) {
-		StringBuilder code = new StringBuilder("test.processText(");
-		code.append("\"");
-		code.append(text.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
-		code.append("\", ");
-		code.append(columns);
-		code.append(");");
-		System.err.println(code.toString());
+	private void onProcessText(String text, int columns) {
+		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
+			listener.onProcessText(text, columns);
+		}
 	}
 
-	private void traceProcessCarriageReturnLineFeed() {
-		StringBuilder code = new StringBuilder("test.processCarriageReturnLineFeed();");
-		System.err.println(code.toString());
+	private void onCarriageReturnLineFeed() {
+		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
+			listener.onCarriageReturnLineFeed();
+		}
 	}
 
 	public void setColumns(int columns) {
 		this.columns = columns;
 	}
-	
+
 	private static String rtrim(String s) {
 		int i = s.length() - 1;
 		while (i >= 0 && Character.isWhitespace(s.charAt(i))) {

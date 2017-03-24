@@ -55,4 +55,12 @@
             class="ts.eclipse.ide.terminal.interpreter.internal.commands.RdCommandInterpreterFactory">
       </factory>
    </extension>
+   
+	<extension point="org.eclipse.ui.views">
+      <view id="com.example.myplugin.view"
+         name="%CommandTerminalDebugView.name"
+         class="ts.eclipse.ide.terminal.interpreter.internal.view.CommandTerminalDebugView"
+      />
+ 	</extension>
+    
 </plugin>        
