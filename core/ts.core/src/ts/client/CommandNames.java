@@ -7,7 +7,6 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - openExternalProject
  */
 package ts.client;
 
@@ -37,7 +36,6 @@ public enum CommandNames {
 	Configure("configure"),
 	ProjectInfo("projectInfo"),
 	Rename("rename"),
-	OpenExternalProject("openExternalProject"),
 	
 	// 2.0.3
 	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.3"), 

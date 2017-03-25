@@ -7,7 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - adjusted usage of CompletableFuture, openExternalProject
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - adjusted usage of CompletableFuture
  */
 package ts.client;
 
@@ -197,16 +197,6 @@ public interface ITypeScriptServiceClient {
 	void configure(ConfigureRequestArguments arguments) throws TypeScriptException;
 
 	CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList);
-
-	/**
-	 * Defines a TypeScript project that is "handled by the client" and
-	 * therefore never closed automatically by the server.
-	 * 
-	 * @param projectFileName
-	 * @param rootFileNames
-	 * @return
-	 */
-	CompletableFuture<Void> openExternalProject(String projectFileName, List<String> rootFileNames);
 
 	// Since 2.0.3
 
