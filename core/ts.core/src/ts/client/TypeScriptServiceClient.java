@@ -291,12 +291,14 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void openFile(String fileName, String content, ScriptKindName scriptKindName) throws TypeScriptException {
-		waitForFuture(executeNoResult(new OpenRequest(fileName, null, content, scriptKindName)));
+		//waitForFuture(executeNoResult(new OpenRequest(fileName, null, content, scriptKindName)));
+		executeNoResult(new OpenRequest(fileName, null, content, scriptKindName));
 	}
 
 	@Override
 	public void closeFile(String fileName) throws TypeScriptException {
-		waitForFuture(executeNoResult(new CloseRequest(fileName)));
+		//waitForFuture(executeNoResult(new CloseRequest(fileName)));
+		executeNoResult(new CloseRequest(fileName));
 	}
 
 	// @Override
@@ -309,7 +311,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String insertString)
 			throws TypeScriptException {
-		waitForFuture(executeNoResult(new ChangeRequest(fileName, line, offset, endLine, endOffset, insertString)));
+		//waitForFuture(executeNoResult(new ChangeRequest(fileName, line, offset, endLine, endOffset, insertString)));
+		executeNoResult(new ChangeRequest(fileName, line, offset, endLine, endOffset, insertString));
 	}
 
 	/**
