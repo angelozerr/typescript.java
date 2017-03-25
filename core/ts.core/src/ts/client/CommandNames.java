@@ -37,6 +37,7 @@ public enum CommandNames {
 	Configure("configure"),
 	ProjectInfo("projectInfo"),
 	Rename("rename"),
+	OpenExternalProject("openExternalProject"),
 	
 	// 2.0.3
 	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.3"), 
@@ -45,7 +46,6 @@ public enum CommandNames {
 	// 2.0.5
 	CompileOnSaveAffectedFileList("compileOnSaveAffectedFileList", "2.0.5"),
 	CompileOnSaveEmitFile("compileOnSaveEmitFile", "2.0.5"),
-	OpenExternalProject("openExternalProject", "2.0.5"),
 	
 	// 2.0.6
 	NavTree("navtree", "2.0.6"),
