@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - adjusted usage of CompletableFuture, added required requests, openExternalProject
  */
 package ts.client;
 
@@ -16,6 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
@@ -69,6 +72,7 @@ import ts.internal.client.protocol.MessageType;
 import ts.internal.client.protocol.NavBarRequest;
 import ts.internal.client.protocol.NavTreeRequest;
 import ts.internal.client.protocol.OccurrencesRequest;
+import ts.internal.client.protocol.OpenExternalProjectRequest;
 import ts.internal.client.protocol.OpenRequest;
 import ts.internal.client.protocol.ProjectInfoRequest;
 import ts.internal.client.protocol.QuickInfoRequest;
@@ -127,31 +131,39 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			if (message.startsWith("{")) {
 				TypeScriptServiceClient.this.dispatchMessage(message);
 			}
-		};
+		}
 
 	};
 
-	private static class PendingRequestInfo {
-		Request<?> requestMessage;
-		Consumer<Response<?>> responseHandler;
-		long startTime;
+	private static abstract class RequestInfo {
+		final Request<?> requestMessage;
+		final long startTime;
+		final CompletableFuture<?> requiredResult;
 
-		PendingRequestInfo(Request<?> requestMessage, Consumer<Response<?>> responseHandler) {
+		RequestInfo(Request<?> requestMessage, CompletableFuture<?> requiredResult) {
 			this.requestMessage = requestMessage;
-			this.responseHandler = responseHandler;
 			this.startTime = System.nanoTime();
+			this.requiredResult = requiredResult;
 		}
 	}
 
-	private static class PendingRequestEventInfo {
-		Request<?> requestMessage;
-		Consumer<Event<?>> eventHandler;
-		long startTime;
+	private static class PendingRequestInfo extends RequestInfo {
+		final Consumer<Response<?>> responseHandler;
 
-		PendingRequestEventInfo(Request<?> requestMessage, Consumer<Event<?>> eventHandler) {
-			this.requestMessage = requestMessage;
+		PendingRequestInfo(Request<?> requestMessage, Consumer<Response<?>> responseHandler,
+				CompletableFuture<?> requiredResult) {
+			super(requestMessage, requiredResult);
+			this.responseHandler = responseHandler;
+		}
+	}
+
+	private static class PendingRequestEventInfo extends RequestInfo {
+		final Consumer<Event<?>> eventHandler;
+
+		PendingRequestEventInfo(Request<?> requestMessage, Consumer<Event<?>> eventHandler,
+				CompletableFuture<?> requiredResult) {
+			super(requestMessage, requiredResult);
 			this.eventHandler = eventHandler;
-			this.startTime = System.nanoTime();
 		}
 	}
 
@@ -219,7 +231,10 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 					// message " + json);
 					return;
 				}
-				Response responseMessage = pendingRequestInfo.requestMessage.parseResponse(json);
+				Response<?> responseMessage = pendingRequestInfo.requestMessage.parseResponse(json);
+				if (responseMessage == null) {
+					responseMessage = GsonHelper.DEFAULT_GSON.fromJson(json, Response.class);
+				}
 				try {
 					handleResponse(responseMessage, message, pendingRequestInfo.startTime);
 					pendingRequestInfo.responseHandler.accept(responseMessage);
@@ -276,18 +291,17 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	@Override
 	public void openFile(String fileName, String content, ScriptKindName scriptKindName) throws TypeScriptException {
-		execute(new OpenRequest(fileName, null, content, scriptKindName), false);
+		waitForFuture(executeNoResult(new OpenRequest(fileName, null, content, scriptKindName)));
 	}
 
 	@Override
 	public void closeFile(String fileName) throws TypeScriptException {
-		execute(new CloseRequest(fileName), false);
+		waitForFuture(executeNoResult(new CloseRequest(fileName)));
 	}
 
 	// @Override
 	// public void changeFile(String fileName, int position, int endPosition,
-	// String insertString)
-	// throws TypeScriptException {
+	// String insertString) {
 	// execute(new ChangeRequest(fileName, position, endPosition, insertString),
 	// false);
 	// }
@@ -295,7 +309,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String insertString)
 			throws TypeScriptException {
-		execute(new ChangeRequest(fileName, line, offset, endLine, endOffset, insertString), false);
+		waitForFuture(executeNoResult(new ChangeRequest(fileName, line, offset, endLine, endOffset, insertString)));
 	}
 
 	/**
@@ -310,7 +324,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		int seq = SequenceHelper.getRequestSeq();
 		String tempFileName = FileTempHelper.updateTempFile(newText, seq);
 		try {
-			execute(new ReloadRequest(fileName, tempFileName, seq), true).get(5000, TimeUnit.MILLISECONDS);
+			execute(new ReloadRequest(fileName, tempFileName, seq)).get(5000, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			if (e instanceof TypeScriptException) {
 				throw (TypeScriptException) e;
@@ -321,114 +335,106 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 	// @Override
 	// public CompletableFuture<List<CompletionEntry>> completions(String
-	// fileName, int position)
-	// throws TypeScriptException {
-	// return execute(new CompletionsRequest(fileName, position), true);
+	// fileName, int position) {
+	// return execute(new CompletionsRequest(fileName, position));
 	// }
 
 	@Override
-	public CompletableFuture<List<CompletionEntry>> completions(String fileName, int line, int offset)
-			throws TypeScriptException {
+	public CompletableFuture<List<CompletionEntry>> completions(String fileName, int line, int offset) {
 		return completions(fileName, line, offset, ICompletionEntryFactory.DEFAULT);
 	}
 
 	@Override
 	public CompletableFuture<List<CompletionEntry>> completions(String fileName, int line, int offset,
-			ICompletionEntryFactory factory) throws TypeScriptException {
+			ICompletionEntryFactory factory) {
 		return execute(
-				new CompletionsRequest(fileName, line, offset, getCompletionEntryMatcherProvider(), this, factory),
-				true);
+				new CompletionsRequest(fileName, line, offset, getCompletionEntryMatcherProvider(), this, factory));
 	}
 
 	@Override
 	public CompletableFuture<List<CompletionEntryDetails>> completionEntryDetails(String fileName, int line, int offset,
-			String[] entryNames, CompletionEntry completionEntry) throws TypeScriptException {
-		return execute(new CompletionDetailsRequest(fileName, line, offset, null, entryNames), true);
+			String[] entryNames, CompletionEntry completionEntry) {
+		return execute(new CompletionDetailsRequest(fileName, line, offset, null, entryNames));
 	}
 
 	@Override
-	public CompletableFuture<List<FileSpan>> definition(String fileName, int line, int offset)
-			throws TypeScriptException {
-		return execute(new DefinitionRequest(fileName, line, offset), true);
+	public CompletableFuture<List<FileSpan>> definition(String fileName, int line, int offset) {
+		return execute(new DefinitionRequest(fileName, line, offset));
 	}
 
 	@Override
-	public CompletableFuture<SignatureHelpItems> signatureHelp(String fileName, int line, int offset)
-			throws TypeScriptException {
-		return execute(new SignatureHelpRequest(fileName, line, offset), true);
+	public CompletableFuture<SignatureHelpItems> signatureHelp(String fileName, int line, int offset) {
+		return execute(new SignatureHelpRequest(fileName, line, offset));
 	}
 
 	@Override
-	public CompletableFuture<QuickInfo> quickInfo(String fileName, int line, int offset) throws TypeScriptException {
-		return execute(new QuickInfoRequest(fileName, line, offset), true);
+	public CompletableFuture<QuickInfo> quickInfo(String fileName, int line, int offset) {
+		return execute(new QuickInfoRequest(fileName, line, offset));
 	}
 
 	@Override
-	public CompletableFuture<List<DiagnosticEvent>> geterr(String[] files, int delay) throws TypeScriptException {
-		return execute(new GeterrRequest(files, delay), true);
+	public CompletableFuture<List<DiagnosticEvent>> geterr(String[] files, int delay) {
+		return execute(new GeterrRequest(files, delay));
 	}
 
 	@Override
-	public CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay, ProjectInfo projectInfo)
-			throws TypeScriptException {
-		return execute(new GeterrForProjectRequest(file, delay, projectInfo), true);
+	public CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay, ProjectInfo projectInfo) {
+		return execute(new GeterrForProjectRequest(file, delay, projectInfo));
 	}
 
 	@Override
-	public CompletableFuture<List<CodeEdit>> format(String fileName, int line, int offset, int endLine, int endOffset)
-			throws TypeScriptException {
-		return execute(new FormatRequest(fileName, line, offset, endLine, endOffset), true);
+	public CompletableFuture<List<CodeEdit>> format(String fileName, int line, int offset, int endLine, int endOffset) {
+		return execute(new FormatRequest(fileName, line, offset, endLine, endOffset));
 	}
 
 	@Override
-	public CompletableFuture<ReferencesResponseBody> references(String fileName, int line, int offset)
-			throws TypeScriptException {
-		return execute(new ReferencesRequest(fileName, line, offset), true);
+	public CompletableFuture<ReferencesResponseBody> references(String fileName, int line, int offset) {
+		return execute(new ReferencesRequest(fileName, line, offset));
 	}
 
 	@Override
-	public CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset)
-			throws TypeScriptException {
-		return execute(new OccurrencesRequest(fileName, line, offset), true);
+	public CompletableFuture<List<OccurrencesResponseItem>> occurrences(String fileName, int line, int offset) {
+		return execute(new OccurrencesRequest(fileName, line, offset));
 	}
 
 	@Override
 	public CompletableFuture<RenameResponseBody> rename(String file, int line, int offset, Boolean findInComments,
-			Boolean findInStrings) throws TypeScriptException {
-		return execute(new RenameRequest(file, line, offset, findInComments, findInStrings), true);
+			Boolean findInStrings) {
+		return execute(new RenameRequest(file, line, offset, findInComments, findInStrings));
 	}
 
 	@Override
-	public CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider)
-			throws TypeScriptException {
-		return execute(new NavBarRequest(fileName, positionProvider), true);
+	public CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider) {
+		return execute(new NavBarRequest(fileName, positionProvider));
 	}
 
 	@Override
 	public void configure(ConfigureRequestArguments arguments) throws TypeScriptException {
-		execute(new ConfigureRequest(arguments), true);
+		waitForFuture(execute(new ConfigureRequest(arguments)));
 	}
 
 	@Override
-	public CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList)
-			throws TypeScriptException {
-		return execute(new ProjectInfoRequest(file, needFileNameList), true);
+	public CompletableFuture<ProjectInfo> projectInfo(String file, String projectFileName, boolean needFileNameList) {
+		return execute(new ProjectInfoRequest(file, needFileNameList));
+	}
+
+	@Override
+	public CompletableFuture<Void> openExternalProject(String projectFileName, List<String> rootFileNames) {
+		return executeCausingWait(new OpenExternalProjectRequest(projectFileName, rootFileNames));
 	}
 
 	// Since 2.0.3
 
 	@Override
-	public CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(String file, Boolean includeLinePosition)
-			throws TypeScriptException {
-		return execute(new SemanticDiagnosticsSyncRequest(file, includeLinePosition), true).thenApply(d -> {
+	public CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(String file, Boolean includeLinePosition) {
+		return execute(new SemanticDiagnosticsSyncRequest(file, includeLinePosition)).thenApply(d -> {
 			return new DiagnosticEventBody(file, (List<Diagnostic>) d);
 		});
 	}
 
 	@Override
-	public CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(String file, Boolean includeLinePosition)
-			throws TypeScriptException {
-		return execute(new SyntacticDiagnosticsSyncRequest(file, includeLinePosition), true).thenApply(d -> {
+	public CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(String file, Boolean includeLinePosition) {
+		return execute(new SyntacticDiagnosticsSyncRequest(file, includeLinePosition)).thenApply(d -> {
 			return new DiagnosticEventBody(file, (List<Diagnostic>) d);
 		});
 	}
@@ -436,105 +442,191 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	// Since 2.0.5
 
 	@Override
-	public CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced)
-			throws TypeScriptException {
-		return execute(new CompileOnSaveEmitFileRequest(fileName, forced), true);
+	public CompletableFuture<Boolean> compileOnSaveEmitFile(String fileName, Boolean forced) {
+		return execute(new CompileOnSaveEmitFileRequest(fileName, forced));
 	}
 
 	@Override
 	public CompletableFuture<List<CompileOnSaveAffectedFileListSingleProject>> compileOnSaveAffectedFileList(
-			String fileName) throws TypeScriptException {
-		return execute(new CompileOnSaveAffectedFileListRequest(fileName), true);
+			String fileName) {
+		return execute(new CompileOnSaveAffectedFileListRequest(fileName));
 	}
 
 	// Since 2.0.6
 
 	@Override
-	public CompletableFuture<NavigationBarItem> navtree(String fileName, IPositionProvider positionProvider)
-			throws TypeScriptException {
-		return execute(new NavTreeRequest(fileName, positionProvider), true);
+	public CompletableFuture<NavigationBarItem> navtree(String fileName, IPositionProvider positionProvider) {
+		return execute(new NavTreeRequest(fileName, positionProvider));
 	}
 
 	@Override
-	public CompletableFuture<TextInsertion> docCommentTemplate(String fileName, int line, int offset)
-			throws TypeScriptException {
-		return execute(new DocCommentTemplateRequest(fileName, line, offset), true);
+	public CompletableFuture<TextInsertion> docCommentTemplate(String fileName, int line, int offset) {
+		return execute(new DocCommentTemplateRequest(fileName, line, offset));
 	}
-	
+
 	// Since 2.1.0
 
 	@Override
 	public CompletableFuture<List<CodeAction>> getCodeFixes(String fileName, IPositionProvider positionProvider,
-			int startLine, int startOffset, int endLine, int endOffset, List<Integer> errorCodes)
-			throws TypeScriptException {
-		return execute(new CodeFixRequest(fileName, startLine, startOffset, endLine, endOffset, errorCodes), true);
+			int startLine, int startOffset, int endLine, int endOffset, List<Integer> errorCodes) {
+		return execute(new CodeFixRequest(fileName, startLine, startOffset, endLine, endOffset, errorCodes));
 	}
 
 	@Override
-	public CompletableFuture<List<String>> getSupportedCodeFixes() throws TypeScriptException {
-		return execute(new GetSupportedCodeFixesRequest(), true);
+	public CompletableFuture<List<String>> getSupportedCodeFixes() {
+		return execute(new GetSupportedCodeFixesRequest());
 	}
 
 	@Override
-	public CompletableFuture<List<FileSpan>> implementation(String fileName, int line, int offset)
-			throws TypeScriptException {
-		return execute(new ImplementationRequest(fileName, line, offset), true);
+	public CompletableFuture<List<FileSpan>> implementation(String fileName, int line, int offset) {
+		return execute(new ImplementationRequest(fileName, line, offset));
 	}
 
-	private <T> CompletableFuture<T> execute(Request<?> request, boolean expectsResult) throws TypeScriptException {
-		if (!expectsResult) {
-			sendRequest(request);
-			return null;
-		}
-		final CompletableFuture<T> result = new CompletableFuture<T>() {
+	/**
+	 * Executes a request that does not expect a result. A future is returned
+	 * (even if there is no result) in order to handle the possible waiting for
+	 * required requests and for their exceptions.
+	 * 
+	 * @param request
+	 */
+	private CompletableFuture<Void> executeNoResult(Request<?> request) {
+		return this._execute(request, false, false);
+	}
 
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
+	/**
+	 * Executes a request that expects a result. The waiting for any pending
+	 * request is chained with the completable future result that the caller has
+	 * to handle anyway.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private <T> CompletableFuture<T> execute(Request<?> request) {
+		return this._execute(request, true, false);
+	}
+
+	/**
+	 * Executes a request that expects a result, causing all subsequent requests
+	 * to wait for this one to complete.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private <T> CompletableFuture<T> executeCausingWait(Request<?> request) {
+		return this._execute(request, true, true);
+	}
+
+	private <T> CompletableFuture<T> _execute(Request<?> request, boolean expectsResult, boolean causesWait) {
+
+		// prepare a future for waiting for all required requests
+		final CompletableFuture<?> requiredFuture = computeRequiredRequestsFuture();
+
+		// send the request after waiting for previous required requests
+		return requiredFuture.thenCompose(requiredResult -> {
+			CompletableFuture<T> result = new CompletableFuture<>();
+
+			// augment the future with response handling, if expected
+			if (expectsResult) {
+				// remove request info after completing exceptionally
+				result.whenComplete((requestResult, e) -> {
+					if (e != null) {
+						if (request instanceof IRequestEventable) {
+							List<String> keys = ((IRequestEventable) request).getKeys();
+							synchronized (receivedRequestMap) {
+								for (String key : keys) {
+									receivedRequestMap.remove(key);
+								}
+							}
+						} else {
+							synchronized (sentRequestMap) {
+								sentRequestMap.remove(request.getSeq());
+							}
+						}
+					}
+				});
+				// register request info in maps for handling the result
 				if (request instanceof IRequestEventable) {
+					Consumer<Event<?>> responseHandler = (event) -> {
+						if (((IRequestEventable) request).accept(event)) {
+							result.complete((T) ((IRequestEventable) request).getEvents());
+						}
+					};
 					List<String> keys = ((IRequestEventable) request).getKeys();
+					PendingRequestEventInfo info = new PendingRequestEventInfo(request, responseHandler,
+							causesWait ? result : null);
 					synchronized (receivedRequestMap) {
 						for (String key : keys) {
-							receivedRequestMap.remove(key);
+							receivedRequestMap.put(key, info);
 						}
 					}
 				} else {
+					Consumer<Response<?>> responseHandler = (response) -> {
+						if (response.isSuccess()) {
+							// tsserver response with success
+							result.complete((T) response.getBody());
+						} else {
+							// tsserver response with error
+							result.completeExceptionally(createException(response.getMessage()));
+						}
+					};
+					int seq = request.getSeq();
 					synchronized (sentRequestMap) {
-						sentRequestMap.remove(request.getSeq());
+						sentRequestMap.put(seq,
+								new PendingRequestInfo(request, responseHandler, causesWait ? result : null));
 					}
 				}
-				return super.cancel(mayInterruptIfRunning);
 			}
-		};
-		if (request instanceof IRequestEventable) {
-			Consumer<Event<?>> responseHandler = (event) -> {
-				if (((IRequestEventable) request).accept(event)) {
-					result.complete((T) ((IRequestEventable) request).getEvents());
-				}
-			};
-			List<String> keys = ((IRequestEventable) request).getKeys();
-			PendingRequestEventInfo info = new PendingRequestEventInfo(request, responseHandler);
-			synchronized (receivedRequestMap) {
-				for (String key : keys) {
-					receivedRequestMap.put(key, info);
-				}
+
+			// send the request
+			try {
+				sendRequest(request);
+			} catch (TypeScriptException e) {
+				result.completeExceptionally(e);
 			}
-		} else {
-			Consumer<Response<?>> responseHandler = (response) -> {
-				if (response.isSuccess()) {
-					// tsserver response with success
-					result.complete((T) response.getBody());
-				} else {
-					// tsserver response with error
-					result.completeExceptionally(createException(response.getMessage()));
-				}
-			};
-			int seq = request.getSeq();
+
+			// complete immediately, if no result expected
+			if (!expectsResult) {
+				result.complete(null);
+			}
+
+			return result;
+		});
+	}
+
+	private CompletableFuture<Void> computeRequiredRequestsFuture() {
+		synchronized (receivedRequestMap) {
 			synchronized (sentRequestMap) {
-				sentRequestMap.put(seq, new PendingRequestInfo(request, responseHandler));
+				if (receivedRequestMap.isEmpty() && sentRequestMap.isEmpty()) {
+					return CompletableFuture.completedFuture(null);
+				}
+				List<CompletableFuture<?>> cfs = new ArrayList<>();
+				for (RequestInfo info : receivedRequestMap.values()) {
+					if (info.requiredResult != null) {
+						cfs.add(info.requiredResult);
+					}
+				}
+				for (RequestInfo info : sentRequestMap.values()) {
+					if (info.requiredResult != null) {
+						cfs.add(info.requiredResult);
+					}
+				}
+				return CompletableFuture.allOf(cfs.toArray(new CompletableFuture<?>[cfs.size()]));
 			}
 		}
-		sendRequest(request);
-		return result;
+	}
+
+	private static <T> T waitForFuture(Future<T> future) throws TypeScriptException {
+		try {
+			return future.get(5000, TimeUnit.MILLISECONDS);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof TypeScriptException) {
+				throw (TypeScriptException) cause;
+			}
+			throw new TypeScriptException(cause);
+		} catch (Exception e) {
+			throw new TypeScriptException(e);
+		}
 	}
 
 	private TypeScriptException createException(String message) {

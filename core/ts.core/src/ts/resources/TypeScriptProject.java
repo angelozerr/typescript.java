@@ -7,11 +7,13 @@
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - openExternalProject
  */
 package ts.resources;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tsc.TypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
 import ts.cmd.tslint.TypeScriptLint;
+import ts.utils.FileUtils;
 
 /**
  * TypeScript project implementation.
@@ -85,6 +88,20 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		return projectDir;
 	}
 
+	/**
+	 * Gets the paths of the tsconfig.json files to take into account for this
+	 * project. This is called each time a new server is started for this
+	 * project.
+	 * <p>
+	 * The default implementation returns an empty list.
+	 * 
+	 * @return tsconfigFilePaths list of tsconfig.json paths, relative to the
+	 *         project directory.
+	 */
+	protected List<String> getTsconfigFilePaths() {
+		return Collections.emptyList();
+	}
+
 	void openFile(ITypeScriptFile tsFile) throws TypeScriptException {
 		String name = tsFile.getName();
 		String contents = tsFile.getContents();
@@ -134,13 +151,20 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 					this.client = createServiceClient(getProjectDir());
 					copyListeners();
 					onCreateClient(client);
+					// determine root files and project name
+					String projectName = projectDir.getCanonicalPath();
+					List<String> rootFiles = new ArrayList<>();
+					for (String tsconfigFilePath : getTsconfigFilePaths()) {
+						rootFiles.add(FileUtils.getPath(new File(projectDir, tsconfigFilePath)));
+					}
+					// opens or updates the external project
+					client.openExternalProject(projectName, rootFiles);
 				} catch (Exception e) {
 					if (e instanceof TypeScriptException) {
 						throw (TypeScriptException) e;
 					}
 					throw new TypeScriptException(e);
 				}
-
 			}
 			return client;
 		}
