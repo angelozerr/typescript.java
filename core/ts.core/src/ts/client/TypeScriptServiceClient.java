@@ -421,11 +421,6 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		return execute(new ProjectInfoRequest(file, needFileNameList));
 	}
 
-	@Override
-	public CompletableFuture<Void> openExternalProject(String projectFileName, List<String> rootFileNames) {
-		return executeCausingWait(new OpenExternalProjectRequest(projectFileName, rootFileNames));
-	}
-
 	// Since 2.0.3
 
 	@Override
@@ -455,6 +450,11 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		return execute(new CompileOnSaveAffectedFileListRequest(fileName));
 	}
 
+	@Override
+	public CompletableFuture<Void> openExternalProject(String projectFileName, List<String> rootFileNames) {
+		return executeCausingWait(new OpenExternalProjectRequest(projectFileName, rootFileNames));
+	}
+	
 	// Since 2.0.6
 
 	@Override

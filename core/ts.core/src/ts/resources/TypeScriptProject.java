@@ -151,14 +151,17 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 					this.client = createServiceClient(getProjectDir());
 					copyListeners();
 					onCreateClient(client);
-					// determine root files and project name
-					String projectName = projectDir.getCanonicalPath();
-					List<String> rootFiles = new ArrayList<>();
-					for (String tsconfigFilePath : getTsconfigFilePaths()) {
-						rootFiles.add(FileUtils.getPath(new File(projectDir, tsconfigFilePath)));
+					if (canSupport(CommandNames.OpenExternalProject)) {
+						// OpenExternalProject is available since 2.0.5.
+						// determine root files and project name
+						String projectName = projectDir.getCanonicalPath();
+						List<String> rootFiles = new ArrayList<>();
+						for (String tsconfigFilePath : getTsconfigFilePaths()) {
+							rootFiles.add(FileUtils.getPath(new File(projectDir, tsconfigFilePath)));
+						}
+						// opens or updates the external project
+						client.openExternalProject(projectName, rootFiles);
 					}
-					// opens or updates the external project
-					client.openExternalProject(projectName, rootFiles);
 				} catch (Exception e) {
 					if (e instanceof TypeScriptException) {
 						throw (TypeScriptException) e;
@@ -196,7 +199,8 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File typescriptDir = getProjectSettings().getTypesScriptDir();
 		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), typescriptDir, nodeFile,
-				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(), getProjectSettings().getTsserverPluginsFile());
+				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(),
+				getProjectSettings().getTsserverPluginsFile());
 		client.setCompletionEntryMatcherProvider(this);
 		return client;
 	}
