@@ -681,7 +681,7 @@
 <!-- TextMate                                                                    -->
 <!-- =========================================================================== -->   
    <extension
-         point="org.eclipse.tm4e.core.grammars">
+         point="org.eclipse.tm4e.registry.grammars">
       <grammar
       		scopeName="source.js"
             path="./syntaxes/JavaScript.tmLanguage.json" >
