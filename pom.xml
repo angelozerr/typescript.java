@@ -222,9 +222,9 @@
 			<layout>p2</layout>
 		</repository>
         <repository>
-          <id>textmate.java</id>
+          <id>tm4e</id>
           <layout>p2</layout>
-          <url>http://oss.opensagres.fr/textmate/0.1.0-SNAPSHOT/</url>
+          <url>http://download.eclipse.org/tm4e/snapshots/</url>
         </repository>
 	</repositories>
 	<scm>
