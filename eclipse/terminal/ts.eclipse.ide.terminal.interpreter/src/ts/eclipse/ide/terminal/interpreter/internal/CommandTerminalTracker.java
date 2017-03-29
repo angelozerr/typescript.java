@@ -37,6 +37,12 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		this.columns = 80;
 		onOpenTerminal(initialWorkingDir, initialCommand, getUserHome());
 	}
+	
+	@Override
+	public synchronized void parse(byte[] byteBuffer, int bytesRead, String encoding) {
+		onContentReadFromStream(byteBuffer, bytesRead, encoding);
+		super.parse(byteBuffer, bytesRead, encoding);
+	}
 
 	@Override
 	protected void processText(String text) {
@@ -73,15 +79,15 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		if (line == null) {
 			return;
 		}
-		if (line.length() >= columns) {
+		if (line.length() >= columns - 1) {
 			if (currentText == null) {
 				currentText = "";
 			}
-			currentText += rtrim(line);
+			currentText += line; //rtrim(line);
 			return;
 		}
 		if (currentText != null) {
-			line = currentText + rtrim(line);
+			line = currentText + line; //rtrim(line);
 			currentText = null;
 		}
 		if (lineCommand == null) {
@@ -249,6 +255,12 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 	private void onOpenTerminal(String initialWorkingDir, String initialCommand, String userHome) {
 		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
 			listener.onOpenTerminal(initialWorkingDir, initialCommand, userHome);
+		}
+	}
+	
+	private void onContentReadFromStream(byte[] byteBuffer, int bytesRead, String encoding) {
+		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
+			listener.onContentReadFromStream(byteBuffer, bytesRead, encoding);
 		}
 	}
 

@@ -86,7 +86,6 @@ public class AnsiHandler {
 
 	public synchronized void parse(byte[] byteBuffer, int bytesRead, String encoding) {
 		this.text = getText(byteBuffer, bytesRead, encoding);
-		// System.err.println(text);
 		this.index = 0;
 		for (int i = 0; i < ansiParameters.length; ++i) {
 			ansiParameters[i] = new StringBuffer();

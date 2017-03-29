@@ -22,4 +22,6 @@ public interface ICommandInterpreterListener {
 
 	void onCarriageReturnLineFeed();
 
+	void onContentReadFromStream(byte[] byteBuffer, int bytesRead, String encoding);
+
 }

@@ -10,9 +10,13 @@
  */
 package ts.eclipse.ide.terminal.interpreter.internal.view;
 
+import java.io.UnsupportedEncodingException;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -34,6 +38,8 @@ import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterListener;
 public class CommandTerminalDebugView extends ViewPart implements ICommandInterpreterListener {
 
 	private Text terminalText;
+	private Text terminalANSI;
+	private CTabFolder folder;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -41,14 +47,33 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 		p.setLayout(new GridLayout());
 		p.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		terminalText = new Text(p, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		folder = new CTabFolder(p, SWT.NONE);
+		folder.setFont(parent.getFont());
+		folder.setLayout(new GridLayout());
+		folder.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		// Text tab
+		terminalText = addTab(folder, "Text");
+		// ANSI tab
+		terminalANSI = addTab(folder, "ANSI");
+
+	}
+
+	public Text addTab(CTabFolder folder, String tabLabel) {
+		CTabItem tabText = new CTabItem(folder, SWT.NONE);
+		tabText.setText(tabLabel);
+
+		Text terminalText = new Text(folder, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		terminalText.setLayoutData(new GridData(GridData.FILL_BOTH));
-		terminalText.setFont(parent.getFont());
+		terminalText.setFont(folder.getFont());
+		tabText.setControl(terminalText);
+		return terminalText;
 	}
 
 	@Override
 	public void setFocus() {
-
+		folder.setFocus();
+		folder.setSelection(0);
 	}
 
 	private class ClearAction extends Action {
@@ -61,6 +86,7 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 		@Override
 		public void run() {
 			terminalText.setText("");
+			terminalANSI.setText("");
 		}
 	}
 
@@ -108,7 +134,7 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 		code.append("\"");
 		code.append(");");
 
-		appendText(code.toString());
+		appendText(code.toString(), terminalText);
 	}
 
 	@Override
@@ -119,24 +145,41 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 		code.append("\", ");
 		code.append(columns);
 		code.append(");");
-		appendText(code.toString());
+		appendText(code.toString(), terminalText);
 	}
 
 	@Override
 	public void onCarriageReturnLineFeed() {
 		StringBuilder code = new StringBuilder("test.processCarriageReturnLineFeed();");
-		appendText(code.toString());
+		appendText(code.toString(), terminalText);
 	}
 
-	private void appendText(String text) {
-		terminalText.getDisplay().asyncExec(new Runnable() {
+	@Override
+	public void onContentReadFromStream(byte[] byteBuffer, int bytesRead, String encoding) {
+		String text = getText(byteBuffer, bytesRead, encoding);
+		appendText(text, terminalANSI);
+	}
+
+	private String getText(byte[] byteBuffer, int bytesRead, String encoding) {
+		if (encoding == null) {
+			return new String(byteBuffer, 0, bytesRead);
+		}
+		try {
+			return new String(byteBuffer, 0, bytesRead, encoding);
+		} catch (UnsupportedEncodingException e) {
+			return new String(byteBuffer, 0, bytesRead);
+		}
+	}
+
+	private void appendText(String s, Text text) {
+		text.getDisplay().asyncExec(new Runnable() {
 
 			@Override
 			public void run() {
-				if (terminalText.getText().length() > 0) {
-					terminalText.append("\n");
+				if (text.getText().length() > 0) {
+					text.append("\n");
 				}
-				terminalText.append(text);
+				text.append(s);
 			}
 		});
 
