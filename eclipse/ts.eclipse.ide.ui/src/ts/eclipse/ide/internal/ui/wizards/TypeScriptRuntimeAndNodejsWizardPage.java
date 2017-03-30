@@ -16,12 +16,15 @@ import java.io.File;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -37,6 +40,7 @@ import org.eclipse.swt.widgets.Text;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
 import ts.eclipse.ide.core.nodejs.IEmbeddedNodejs;
+import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog;
@@ -54,12 +58,18 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	private static final String PAGE_NAME = "TypeScriptRuntimeAndNodejsWizardPage";
 
 	// TypeScript Runtime
+	private boolean hasEmbeddedTsRuntime;
 	private Button useEmbeddedTsRuntimeButton;
 	private boolean useEmbeddedTsRuntime;
 	private Combo embeddedTsRuntime;
 	private NPMInstallWidget installTsRuntime;
 
 	// Node.js
+	private boolean useEmbeddedNodeJs;
+	private String embeddedNodeJsId;
+	private String customNodeJsPath;
+
+	private boolean hasEmbeddedNodeJs;
 	private Button useEmbeddedNodeJsButton;
 	private Combo embeddedNodeJs;
 	private Combo installedNodeJs;
@@ -111,13 +121,17 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		layout.numColumns = nColumns;
 		group.setLayout(layout);
 
-		// Embedded TypeScript
-		createEmbeddedTypeScriptField(group);
+		ITypeScriptRepository[] repositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
+		hasEmbeddedTsRuntime = repositories.length > 0;
+		if (hasEmbeddedTsRuntime) {
+			// Embedded TypeScript
+			createEmbeddedTypeScriptField(group, repositories);
+		}
 		// Install TypeScript
 		createInstallScriptField(group);
 	}
 
-	private void createEmbeddedTypeScriptField(Composite parent) {
+	private void createEmbeddedTypeScriptField(Composite parent, ITypeScriptRepository[] repositories) {
 		useEmbeddedTsRuntimeButton = new Button(parent, SWT.RADIO);
 		useEmbeddedTsRuntimeButton
 				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label);
@@ -135,7 +149,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		ComboViewer viewer = new ComboViewer(embeddedTsRuntime);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		viewer.setLabelProvider(new TypeScriptRepositoryLabelProvider());
-		ITypeScriptRepository[] repositories = TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories();
+
 		viewer.setInput(repositories);
 	}
 
@@ -155,13 +169,16 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	}
 
 	private void updateTsRuntimeMode() {
+		if (!hasEmbeddedTsRuntime) {
+			return;
+		}
 		useEmbeddedTsRuntime = useEmbeddedTsRuntimeButton.getSelection();
 		embeddedTsRuntime.setEnabled(useEmbeddedTsRuntime);
 		installTsRuntime.setEnabled(!useEmbeddedTsRuntime);
 	}
 
 	private IStatus validateTypeScriptRuntime() {
-		if (useEmbeddedTsRuntimeButton.getSelection()) {
+		if (hasEmbeddedTsRuntime && useEmbeddedTsRuntimeButton.getSelection()) {
 			return Status.OK_STATUS;
 		}
 		return installTsRuntime.getStatus();
@@ -180,15 +197,19 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		layout.numColumns = nColumns;
 		group.setLayout(layout);
 
-		// Embedded node.js
-		createEmbeddedNodejsField(group);
+		IEmbeddedNodejs[] installs = TypeScriptCorePlugin.getNodejsInstallManager().getNodejsInstalls();
+		hasEmbeddedNodeJs = installs.length > 0;
+		if (hasEmbeddedNodeJs) {
+			// Embedded node.js
+			createEmbeddedNodejsField(group, installs);
+		}
 		// Installed node.js
 		createInstalledNodejsField(group);
 		// Path info.
 		createNodePathInfo(group);
 	}
 
-	private void createEmbeddedNodejsField(Composite parent) {
+	private void createEmbeddedNodejsField(Composite parent, IEmbeddedNodejs[] installs) {
 		useEmbeddedNodeJsButton = new Button(parent, SWT.RADIO);
 		useEmbeddedNodeJsButton
 				.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedNodeJs_label);
@@ -204,7 +225,6 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		embeddedNodeJs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Create combo of embedded node.js
-		IEmbeddedNodejs[] installs = TypeScriptCorePlugin.getNodejsInstallManager().getNodejsInstalls();
 		String[] values = new String[installs.length];
 		String[] valueLabels = new String[installs.length];
 		int i = 0;
@@ -216,19 +236,34 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		embeddedNodeJs.setItems(valueLabels);
 		embeddedNodeJs.setFont(JFaceResources.getDialogFont());
 		embeddedNodeJs.addListener(SWT.Modify, this);
+		embeddedNodeJs.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				embeddedNodeJsId = embeddedNodeJs.getText();
+			}
+		});
 	}
 
 	private void createInstalledNodejsField(Composite parent) {
-		Button useInstalledNodejs = new Button(parent, SWT.RADIO);
-		useInstalledNodejs.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useInstalledNodeJs_label);
-		useInstalledNodejs.addListener(SWT.Selection, this);
-
+		if (hasEmbeddedNodeJs) {
+			Button useInstalledNodejs = new Button(parent, SWT.RADIO);
+			useInstalledNodejs
+					.setText(TypeScriptUIMessages.TypeScriptRuntimeAndNodejsWizardPage_useInstalledNodeJs_label);
+			useInstalledNodejs.addListener(SWT.Selection, this);
+		}
 		String[] defaultPaths = IDENodejsProcessHelper.getAvailableNodejsPaths();
 		installedNodeJs = new Combo(parent, SWT.NONE);
 		installedNodeJs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		installedNodeJs.setItems(defaultPaths);
 		installedNodeJs.addListener(SWT.Modify, this);
+		installedNodeJs.addModifyListener(new ModifyListener() {
 
+			@Override
+			public void modifyText(ModifyEvent e) {
+				customNodeJsPath = installedNodeJs.getText();
+			}
+		});
 		// Create Browse buttons.
 		createBrowseButtons(parent, installedNodeJs);
 	}
@@ -277,6 +312,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout());
 		GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan = 2;
 		composite.setLayoutData(gridData);
 
 		// Node version label
@@ -309,22 +345,29 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	@Override
 	protected void initializeDefaultValues() {
 		// Default values for TypeScript runtime
-		if (embeddedTsRuntime.getItemCount() > 0) {
+		if (hasEmbeddedTsRuntime) {
 			embeddedTsRuntime.select(0);
+			useEmbeddedTsRuntimeButton.setSelection(true);
 		}
-		useEmbeddedTsRuntimeButton.setSelection(true);
 		updateTsRuntimeMode();
 
 		// Default values for Node.js
-		if (embeddedNodeJs.getItemCount() > 0) {
+		if (hasEmbeddedNodeJs) {
 			embeddedNodeJs.select(0);
+			useEmbeddedNodeJsButton.setSelection(true);
+		} else {
+			if (installedNodeJs.getItemCount() > 0) {
+				installedNodeJs.select(0);
+			}
 		}
-		useEmbeddedNodeJsButton.setSelection(true);
 		updateNodeJsMode();
 	}
 
 	private void updateNodeJsMode() {
-		boolean useEmbeddedNodeJs = useEmbeddedNodeJsButton.getSelection();
+		if (!hasEmbeddedNodeJs) {
+			return;
+		}
+		useEmbeddedNodeJs = useEmbeddedNodeJsButton.getSelection();
 		embeddedNodeJs.setEnabled(useEmbeddedNodeJs);
 		installedNodeJs.setEnabled(!useEmbeddedNodeJs);
 		browseFileSystemButton.setEnabled(!useEmbeddedNodeJs);
@@ -381,19 +424,12 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	private NodeJsStatus validateNodejsPath() {
 		File nodeFile = null;
 		String version = null;
-		boolean embedded = useEmbeddedNodeJsButton.getSelection();
+		boolean embedded = hasEmbeddedNodeJs && useEmbeddedNodeJsButton.getSelection();
 		if (embedded) {
 			int selectedIndex = embeddedNodeJs.getSelectionIndex();
-			/*
-			 * if (selectedIndex == 0) { // ERROR: the embedded node.js combo is
-			 * not selected. return new NodeJsStatus(null, null,
-			 * TypeScriptUIMessages.
-			 * NodejsConfigurationBlock_embeddedNode_required_error); } else {
-			 */
 			IEmbeddedNodejs[] installs = TypeScriptCorePlugin.getNodejsInstallManager().getNodejsInstalls();
 			IEmbeddedNodejs install = installs[selectedIndex];
 			nodeFile = install.getPath();
-			// }
 		} else {
 			String nodeJsPath = installedNodeJs.getText();
 			if (StringUtils.isEmpty(nodeJsPath)) {
@@ -437,6 +473,16 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 			return null;
 		}
 		return installTsRuntime.getNpmInstallCommand();
+	}
+
+	public void updateNodeJSPreferences(IEclipsePreferences preferences) {
+		if (useEmbeddedNodeJs) {
+			preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, true);
+			preferences.put(TypeScriptCorePreferenceConstants.NODEJS_EMBEDDED_ID, embeddedNodeJsId);
+		} else {
+			preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, false);
+			preferences.put(TypeScriptCorePreferenceConstants.NODEJS_PATH, customNodeJsPath);
+		}
 	}
 
 }

@@ -163,7 +163,13 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				}
+				
+				IEclipsePreferences preferences = new ProjectScope(newProjectHandle)
+						.getNode(TypeScriptCorePlugin.PLUGIN_ID);				
 
+				// Update node.js preferences
+				tsRuntimeAndNodeJsPage.updateNodeJSPreferences(preferences);
+				
 				// Install TypeScript/tslint if needed
 				List<String> commands = new ArrayList<>();
 				boolean customTypeScript = false;
@@ -193,22 +199,19 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 					CommandTerminalService.getInstance().executeCommand(commands, terminalId, properties, null);
 
-					if (customTypeScript || customTslint) {
-						IEclipsePreferences node = new ProjectScope(newProjectHandle)
-								.getNode(TypeScriptCorePlugin.PLUGIN_ID);
+					if (customTypeScript || customTslint) {						
 						if (customTypeScript) {
-							node.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
-							node.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
+							preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
+							preferences.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
 									"${project_loc:node_modules/typescript}");
-						}
-						try {
-							node.flush();
-						} catch (BackingStoreException e) {
-							e.printStackTrace();
-						}
+						}						
 					}
 				}
-
+				try {
+					preferences.flush();
+				} catch (BackingStoreException e) {
+					e.printStackTrace();
+				}
 				getShell().getDisplay().syncExec(new Runnable() {
 
 					@Override
