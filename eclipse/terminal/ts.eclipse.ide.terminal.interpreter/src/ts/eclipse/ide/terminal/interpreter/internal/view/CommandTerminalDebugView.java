@@ -177,7 +177,7 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 			@Override
 			public void run() {
 				if (text.getText().length() > 0) {
-					text.append("\n");
+					text.append(System.getProperty("line.separator"));
 				}
 				text.append(s);
 			}
