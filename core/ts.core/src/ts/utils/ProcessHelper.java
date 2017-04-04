@@ -70,7 +70,7 @@ public class ProcessHelper {
 	 * @return the given filename location by using command "which $filename".
 	 */
 	public static File which(String fileName, OS os) {
-		String[] command = getCommand(fileName, os);
+		String[] command = whichCommand(fileName, os);
 		BufferedReader reader = null;
 		try {
 			Process p = Runtime.getRuntime().exec(command);
@@ -88,10 +88,41 @@ public class ProcessHelper {
 		}
 	}
 
-	private static String[] getCommand(String fileName, OS os) {
+	private static String[] whichCommand(String fileName, OS os) {
+		return getCommand("where " + fileName, os);
+	}
+
+	public static String[] getCommand(String command, OS os) {
+		File defaultShell = defaultShell(os);
+		String image = defaultShell.isAbsolute() ? defaultShell.getAbsolutePath() : defaultShell.getPath();
 		if (os == OS.Windows) {
-			return new String[] { "cmd", "/c", "where " + fileName };
+			return new String[] { image, "/c", command };
 		}
-		return new String[] { "/bin/bash", "-c", "which " + fileName };
+		return new String[] { image, "-c", command };
+	}
+
+	/**
+	 * Returns the default shell to launch. Looks at the environment variable
+	 * "SHELL" first before assuming some default default values.
+	 *
+	 * @return The default shell to launch.
+	 */
+	private static final File defaultShell(OS os) {
+		String shell = null;
+		if (os == OS.Windows) {
+			if (System.getenv("ComSpec") != null && !"".equals(System.getenv("ComSpec").trim())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				shell = System.getenv("ComSpec").trim(); //$NON-NLS-1$
+			} else {
+				shell = "cmd.exe"; //$NON-NLS-1$
+			}
+		}
+		if (StringUtils.isEmpty(shell)) {
+			if (System.getenv("SHELL") != null && !"".equals(System.getenv("SHELL").trim())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				shell = System.getenv("SHELL").trim(); //$NON-NLS-1$
+			} else {
+				shell = "/bin/sh"; //$NON-NLS-1$
+			}
+		}
+		return new File(shell);
 	}
 }
