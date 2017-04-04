@@ -217,8 +217,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSLintWizardPage_tslint_group_label;
 	public static String TSLintWizardPage_useEmbeddedTslintRuntime_label;
 	public static String TSLintWizardPage_useInstallTslintRuntime_label;
-
-
+	public static String TSLintWizardPage_tslintPlugin_group_label;
+	public static String TSLintWizardPage_useEmbeddedTslintPlugin_label;
+	public static String TSLintWizardPage_useInstallTslintPlugin_label;
+	
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

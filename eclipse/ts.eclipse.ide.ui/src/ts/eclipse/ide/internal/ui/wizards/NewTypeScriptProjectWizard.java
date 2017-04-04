@@ -123,11 +123,12 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 	@Override
 	protected IRunnableWithProgress getRunnable(IProject newProjectHandle, IProjectDescription description,
 			IPath projectLocationPath) {
-		TsconfigJson json = new TsconfigJson();
-		json.setCompileOnSave(true);
-		tsconfigPage.addContents(json);
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		final String content = gson.toJson(json);
+		// Update tsconfig.json
+		TsconfigJson tsconfig = new TsconfigJson();
+		tsconfig.setCompileOnSave(true);
+		tsconfigPage.updateTsconfig(tsconfig);
+		tslintPage.updateTsconfig(tsconfig);
+		
 		return new IRunnableWithProgress() {
 
 			@Override
@@ -153,6 +154,8 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 				}
 
 				// Generate tsconfig.json
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				String content = gson.toJson(tsconfig);
 				IFile file = newProjectHandle.getFile(tsconfigPage.getPath());
 				try {
 					if (file.exists()) {
@@ -172,18 +175,9 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 				
 				// Install TypeScript/tslint if needed
 				List<String> commands = new ArrayList<>();
-				boolean customTypeScript = false;
-				String cmd = tsRuntimeAndNodeJsPage.getNpmInstallCommand();
-				if (!StringUtils.isEmpty(cmd)) {
-					commands.add(cmd);
-					customTypeScript = true;
-				}
-				boolean customTslint = false;
-				cmd = tslintPage.getNpmInstallCommand();
-				if (!StringUtils.isEmpty(cmd)) {
-					commands.add(cmd);
-					customTslint = true;
-				}
+				boolean customTypeScript = tsRuntimeAndNodeJsPage.updateCommand(commands);				
+				boolean customTslint = tslintPage.updateCommand(commands);
+			
 				if (!commands.isEmpty()) {
 					// Prepare terminal properties
 					String terminalId = "TypeScript Projects";

@@ -253,9 +253,9 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 
 	@Override
 	protected void initializeDefaultValues() {
-		cbModule.select(cbModule.indexOf("None"));
-		cbModuleResolution.select(cbModuleResolution.indexOf("Node"));
-		cbTarget.select(cbTarget.indexOf("ES3"));
+		cbModule.select(cbModule.indexOf("none"));
+		cbModuleResolution.select(cbModuleResolution.indexOf("node"));
+		cbTarget.select(cbTarget.indexOf("es3"));
 	}
 
 	@Override
@@ -268,15 +268,25 @@ public class TSConfigWizardPage extends AbstractWizardPage {
 		return new Path("tsconfig.json");
 	}
 
-	public void addContents(TsconfigJson tsconfig) {
+	public void updateTsconfig(TsconfigJson tsconfig) {
 		CompilerOptions options = tsconfig.getCompilerOptions();
 		if (options == null) {
 			options = new CompilerOptions();
 			tsconfig.setCompilerOptions(options);
 		}
-		options.setModule(cbModule.getText());
+		String module = cbModule.getText();
+		if (!StringUtils.isEmpty(module)) {
+			options.setModule(module);
+		}
+		String moduleResolution = cbModuleResolution.getText();
+		if (!StringUtils.isEmpty(moduleResolution)) {
+			options.setModuleResolution(moduleResolution);
+		}
 		options.setModuleResolution(cbModuleResolution.getText());
-		options.setTarget(cbTarget.getText());
+		String target = cbTarget.getText();
+		if (!StringUtils.isEmpty(target)) {
+			options.setTarget(target);
+		}
 		String outDir = txtOutDir.getText();
 		if (!StringUtils.isEmpty(outDir)) {
 			options.setOutDir(outDir);

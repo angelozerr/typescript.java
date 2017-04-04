@@ -75,6 +75,8 @@ public class CompilerOptions extends AbstractOptions {
 	private Boolean version;
 	private Boolean watch;
 
+	private List<Plugin> plugins;
+
 	public CompilerOptions() {
 	}
 
@@ -1227,6 +1229,14 @@ public class CompilerOptions extends AbstractOptions {
 	 */
 	public Boolean isWatch() {
 		return BooleanUtils.toBoolean(watch);
+	}
+
+	public List<Plugin> getPlugins() {
+		return plugins;
+	}
+
+	public void setPlugins(List<Plugin> plugins) {
+		this.plugins = plugins;
 	}
 
 	public void fillOptions(List<String> args) {

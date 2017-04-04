@@ -22,13 +22,15 @@ import ts.repository.ITypeScriptRepository;
 public class TypeScriptRepositoryLabelProvider extends LabelProvider {
 
 	private final boolean tslint;
+	private final boolean tslintLanguageService;
 
 	public TypeScriptRepositoryLabelProvider() {
-		this(false);
+		this(false, false);
 	}
 
-	public TypeScriptRepositoryLabelProvider(boolean tslint) {
+	public TypeScriptRepositoryLabelProvider(boolean tslint, boolean tslintLanguageService) {
 		this.tslint = tslint;
+		this.tslintLanguageService = tslintLanguageService;
 	}
 
 	@Override
@@ -36,6 +38,8 @@ public class TypeScriptRepositoryLabelProvider extends LabelProvider {
 		if (element instanceof ITypeScriptRepository) {
 			if (tslint) {
 				return ((ITypeScriptRepository) element).getTslintName();
+			} else if (tslintLanguageService) {
+				return ((ITypeScriptRepository) element).getTslintLanguageServiceName();
 			}
 			return ((ITypeScriptRepository) element).getName();
 		}

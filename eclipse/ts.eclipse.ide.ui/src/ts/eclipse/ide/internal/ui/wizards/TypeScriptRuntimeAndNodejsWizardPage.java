@@ -12,6 +12,7 @@
 package ts.eclipse.ide.internal.ui.wizards;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
@@ -468,13 +469,6 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		return status;
 	}
 
-	public String getNpmInstallCommand() {
-		if (useEmbeddedTsRuntime) {
-			return null;
-		}
-		return installTsRuntime.getNpmInstallCommand();
-	}
-
 	public void updateNodeJSPreferences(IEclipsePreferences preferences) {
 		if (useEmbeddedNodeJs) {
 			preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, true);
@@ -483,6 +477,14 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 			preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_NODEJS_EMBEDDED, false);
 			preferences.put(TypeScriptCorePreferenceConstants.NODEJS_PATH, customNodeJsPath);
 		}
+	}
+
+	public boolean updateCommand(List<String> commands) {
+		if (!useEmbeddedTsRuntime) {
+			commands.add(installTsRuntime.getNpmInstallCommand());
+			return true;
+		}
+		return false;
 	}
 
 }

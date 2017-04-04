@@ -1,5 +1,6 @@
 package ts.eclipse.ide.internal.ui.wizards;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,17 +31,22 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
+import ts.cmd.tsc.CompilerOptions;
+import ts.cmd.tsc.Plugin;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.widgets.NPMInstallWidget;
 import ts.eclipse.ide.ui.wizards.AbstractWizardPage;
 import ts.repository.ITypeScriptRepository;
+import ts.resources.jsonconfig.TsconfigJson;
 
 public class TSLintWizardPage extends AbstractWizardPage {
 
 	private static final String PAGE_NAME = "TSLintWizardPage";
 
 	private ControlEnableState fBlockEnableState;
+	private Button enableTslint;
+	private Composite controlsComposite;
 
 	// tslint Runtime
 	private Button useEmbeddedTslintRuntimeButton;
@@ -48,9 +54,11 @@ public class TSLintWizardPage extends AbstractWizardPage {
 	private Combo embeddedTslintRuntime;
 	private NPMInstallWidget installTslintRuntime;
 
-	private Button enableTslint;
-
-	private Composite controlsComposite;
+	// tslint Plugin
+	private Button useEmbeddedTslintPluginButton;
+	private boolean useEmbeddedTslintPlugin;
+	private Combo embeddedTslintPlugin;
+	private NPMInstallWidget installTslintPlugin;
 
 	protected TSLintWizardPage() {
 		super(PAGE_NAME, TypeScriptUIMessages.TSLintWizardPage_title, null);
@@ -74,7 +82,7 @@ public class TSLintWizardPage extends AbstractWizardPage {
 				enableTslintContent(enableTslint.getSelection());
 			}
 		});
-		
+
 		controlsComposite = new Composite(composite, SWT.NONE);
 		controlsComposite.setFont(composite.getFont());
 		controlsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -85,10 +93,10 @@ public class TSLintWizardPage extends AbstractWizardPage {
 		layout.numColumns = 1;
 		controlsComposite.setLayout(layout);
 		createTslintRuntimeBody(controlsComposite);
-
+		createTslintPluginBody(controlsComposite);
 	}
 
-	// ------------------- TypeScript Runtime content
+	// ------------------- tslint Runtime content
 
 	private void createTslintRuntimeBody(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
@@ -102,12 +110,12 @@ public class TSLintWizardPage extends AbstractWizardPage {
 		group.setLayout(layout);
 
 		// Embedded tslint
-		createEmbeddedTypeScriptField(group);
+		createEmbeddedTslintField(group);
 		// Install Typetslint
-		createInstallScriptField(group);
+		createInstallTslintField(group);
 	}
 
-	private void createEmbeddedTypeScriptField(Composite parent) {
+	private void createEmbeddedTslintField(Composite parent) {
 		useEmbeddedTslintRuntimeButton = new Button(parent, SWT.RADIO);
 		useEmbeddedTslintRuntimeButton.setText(TypeScriptUIMessages.TSLintWizardPage_useEmbeddedTslintRuntime_label);
 		useEmbeddedTslintRuntimeButton.addListener(SWT.Selection, this);
@@ -123,14 +131,14 @@ public class TSLintWizardPage extends AbstractWizardPage {
 
 		ComboViewer viewer = new ComboViewer(embeddedTslintRuntime);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setLabelProvider(new TypeScriptRepositoryLabelProvider(true));
+		viewer.setLabelProvider(new TypeScriptRepositoryLabelProvider(true, false));
 		List<ITypeScriptRepository> repositories = Arrays
 				.stream(TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories())
 				.filter(r -> r.getTslintFile() != null).collect(Collectors.toList());
 		viewer.setInput(repositories);
 	}
 
-	private void createInstallScriptField(Composite parent) {
+	private void createInstallTslintField(Composite parent) {
 		Button useInstallTslintRuntime = new Button(parent, SWT.RADIO);
 		useInstallTslintRuntime.setText(TypeScriptUIMessages.TSLintWizardPage_useInstallTslintRuntime_label);
 		useInstallTslintRuntime.addListener(SWT.Selection, this);
@@ -157,6 +165,75 @@ public class TSLintWizardPage extends AbstractWizardPage {
 		return installTslintRuntime.getStatus();
 	}
 
+	// ------------------- tslint Plugin content
+
+	private void createTslintPluginBody(Composite parent) {
+		Group group = new Group(parent, SWT.NONE);
+		group.setFont(parent.getFont());
+		group.setText(TypeScriptUIMessages.TSLintWizardPage_tslintPlugin_group_label);
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		int nColumns = 2;
+		GridLayout layout = new GridLayout();
+		layout.numColumns = nColumns;
+		group.setLayout(layout);
+
+		// Embedded tslint plugin
+		createEmbeddedTslintPluginField(group);
+		// Install tslint plugin
+		createInstallTslintPluginField(group);
+	}
+
+	private void createEmbeddedTslintPluginField(Composite parent) {
+		useEmbeddedTslintPluginButton = new Button(parent, SWT.RADIO);
+		useEmbeddedTslintPluginButton.setText(TypeScriptUIMessages.TSLintWizardPage_useEmbeddedTslintPlugin_label);
+		useEmbeddedTslintPluginButton.addListener(SWT.Selection, this);
+		useEmbeddedTslintPluginButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateTslintPluginMode();
+			}
+		});
+
+		embeddedTslintPlugin = new Combo(parent, SWT.READ_ONLY);
+		embeddedTslintPlugin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		ComboViewer viewer = new ComboViewer(embeddedTslintPlugin);
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
+		viewer.setLabelProvider(new TypeScriptRepositoryLabelProvider(false, true));
+		List<ITypeScriptRepository> repositories = Arrays
+				.stream(TypeScriptCorePlugin.getTypeScriptRepositoryManager().getRepositories())
+				.filter(r -> r.getTslintLanguageServiceName() != null).collect(Collectors.toList());
+		viewer.setInput(repositories);
+	}
+
+	private void createInstallTslintPluginField(Composite parent) {
+		Button useInstallTslintPlugin = new Button(parent, SWT.RADIO);
+		useInstallTslintPlugin.setText(TypeScriptUIMessages.TSLintWizardPage_useInstallTslintPlugin_label);
+		useInstallTslintPlugin.addListener(SWT.Selection, this);
+		useInstallTslintPlugin.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateTslintPluginMode();
+			}
+		});
+		installTslintPlugin = new NPMInstallWidget("tslint-language-service", this, parent, SWT.NONE);
+		installTslintPlugin.getVersionText().addListener(SWT.Modify, this);
+	}
+
+	private void updateTslintPluginMode() {
+		useEmbeddedTslintPlugin = useEmbeddedTslintPluginButton.getSelection();
+		embeddedTslintPlugin.setEnabled(useEmbeddedTslintPlugin);
+		installTslintPlugin.setEnabled(!useEmbeddedTslintPlugin);
+	}
+
+	private IStatus validateTslintPlugin() {
+		if (useEmbeddedTslintPluginButton.getSelection()) {
+			return Status.OK_STATUS;
+		}
+		return installTslintPlugin.getStatus();
+	}
+
 	@Override
 	protected void initializeDefaultValues() {
 		// Default values for tslint runtime
@@ -165,7 +242,13 @@ public class TSLintWizardPage extends AbstractWizardPage {
 		}
 		useEmbeddedTslintRuntimeButton.setSelection(true);
 		updateTslintRuntimeMode();
-		
+
+		if (embeddedTslintPlugin.getItemCount() > 0) {
+			embeddedTslintPlugin.select(0);
+		}
+		useEmbeddedTslintPluginButton.setSelection(true);
+		updateTslintPluginMode();
+
 		// Disable tslint
 		enableTslint.setSelection(false);
 		enableTslintContent(false);
@@ -173,8 +256,9 @@ public class TSLintWizardPage extends AbstractWizardPage {
 
 	@Override
 	protected IStatus[] validatePage() {
-		IStatus[] status = new IStatus[1];
+		IStatus[] status = new IStatus[2];
 		status[0] = validateTslintRuntime();
+		status[1] = validateTslintPlugin();
 		return status;
 	}
 
@@ -190,11 +274,44 @@ public class TSLintWizardPage extends AbstractWizardPage {
 			}
 		}
 	}
-	
+
 	public String getNpmInstallCommand() {
 		if (useEmbeddedTslintRuntime) {
 			return null;
 		}
 		return installTslintRuntime.getNpmInstallCommand();
+	}
+
+	public void updateTsconfig(TsconfigJson tsconfig) {
+		if (enableTslint.getSelection()) {
+			CompilerOptions compilerOptions = tsconfig.getCompilerOptions();
+			if (compilerOptions == null) {
+				compilerOptions = new CompilerOptions();
+				tsconfig.setCompilerOptions(compilerOptions);
+			}
+			List<Plugin> plugins = compilerOptions.getPlugins();
+			if (plugins == null) {
+				plugins = new ArrayList<>();
+				compilerOptions.setPlugins(plugins);
+			}
+
+			Plugin plugin = new Plugin();
+			plugin.setName("tslint-language-service");
+			plugins.add(plugin);
+		}
+
+	}
+
+	public boolean updateCommand(List<String> commands) {
+		if (!useEmbeddedTslintRuntime && !useEmbeddedTslintPlugin) {
+			return false;
+		}
+		if (!useEmbeddedTslintRuntime) {
+			commands.add(installTslintRuntime.getNpmInstallCommand());
+		}
+		if (!useEmbeddedTslintPlugin) {
+			commands.add(installTslintPlugin.getNpmInstallCommand());
+		}
+		return true;
 	}
 }

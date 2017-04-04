@@ -73,7 +73,7 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 	@Override
 	public void setFocus() {
 		folder.setFocus();
-		folder.setSelection(0);
+		selectTextTabIfNeeded();
 	}
 
 	private class ClearAction extends Action {
@@ -176,12 +176,18 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 
 			@Override
 			public void run() {
+				selectTextTabIfNeeded();
 				if (text.getText().length() > 0) {
 					text.append(System.getProperty("line.separator"));
 				}
 				text.append(s);
 			}
 		});
+	}
 
+	private void selectTextTabIfNeeded() {
+		if (folder.getSelectionIndex() == -1) {
+			folder.setSelection(0);
+		}
 	}
 }

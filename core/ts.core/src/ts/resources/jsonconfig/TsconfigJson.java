@@ -50,7 +50,7 @@ public class TsconfigJson {
 
 	private Boolean compileOnSave;
 
-	private boolean buildOnSave;
+	private Boolean buildOnSave;
 
 	private List<String> files;
 

@@ -5,7 +5,6 @@ import java.io.File;
 import ts.repository.ITypeScriptRepository;
 import ts.repository.TypeScriptRepositoryException;
 import ts.repository.TypeScriptRepositoryManager;
-import ts.utils.FileUtils;
 
 /**
  *
@@ -23,6 +22,7 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	private String typesScriptVersion;
 	private String tslintVersion;
 	private File tsserverPluginsFile;
+	private String tslintLanguageServiceName;
 
 	public TypeScriptRepository(File baseDir) throws TypeScriptRepositoryException {
 		this(baseDir, null);
@@ -48,6 +48,12 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 			this.tslintFile = TypeScriptRepositoryManager.getTslintFile(tslintBaseDir);
 			this.tslintVersion = TypeScriptRepositoryManager.getPackageJsonVersion(tslintBaseDir);
 			this.tslintName = generateName("tslint", tslintVersion);
+		}
+		// tslint-language-service file
+		File tslintLanguageServiceBaseDir = new File(baseDir, "node_modules/tslint-language-service");
+		if (tslintLanguageServiceBaseDir.exists()) {
+			String tslintLanguageServiceVersion = TypeScriptRepositoryManager.getPackageJsonVersion(tslintLanguageServiceBaseDir);
+			this.tslintLanguageServiceName= generateName("tslint-language-service", tslintLanguageServiceVersion);
 		}
 		// tsserver-plugins
 		this.tsserverPluginsFile = new File(baseDir, "tsserver-plugins/bin/tsserver-plugins");
@@ -120,6 +126,11 @@ public class TypeScriptRepository implements ITypeScriptRepository {
 	@Override
 	public File getTsserverPluginsFile() {
 		return tsserverPluginsFile;
+	}
+	
+	@Override
+	public String getTslintLanguageServiceName() {
+		return tslintLanguageServiceName;
 	}
 
 }

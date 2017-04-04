@@ -79,4 +79,6 @@ public interface ITypeScriptRepository {
 
 	File getTsserverPluginsFile();
 
+	String getTslintLanguageServiceName();
+
 }
