@@ -12,6 +12,7 @@
 package ts.eclipse.ide.terminal.interpreter;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -21,6 +22,7 @@ import org.junit.Test;
 public class MacOSBashNgTerminalTrackerTests {
 
 	@Test
+	@Ignore
 	public void ngClass() {
 		TrackerTest test = new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
 				"ng generate class pascalou  --spec false", "C:/Users/azerr");
@@ -51,6 +53,7 @@ public class MacOSBashNgTerminalTrackerTests {
 	}
 
 	@Test
+	@Ignore
 	public void ngClass2() {
 		TrackerTest test = new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
 				"ng generate class sample  --spec false", "C:/Users/azerr");
@@ -83,6 +86,7 @@ public class MacOSBashNgTerminalTrackerTests {
 	}
 	
 	@Test
+	@Ignore
 	public void t() {
 		TrackerTest test = new TrackerTest("/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app", "ng generate class example  --spec false", "/Users/pascalleclercq");
 		test.processText("PS1='\\w\\", 80);
@@ -119,7 +123,7 @@ public class MacOSBashNgTerminalTrackerTests {
 				+ "TERMINATE: workingDir=/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app, command=ng generate class example  --spec false\n"
 				+ "SUBMIT: workingDir=/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app, command=null\n"
 				+ "TERMINATE: workingDir=/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app, command=null";
-		
+		System.err.println(test);
 		Assert.assertEquals(expected, test.toString());
 		
 	}

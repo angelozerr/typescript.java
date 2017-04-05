@@ -77,12 +77,14 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 	}
 
 	@Override
-	protected void submitCommand(LineCommand lineCommand) {
+	public void submitCommand(LineCommand lineCommand) {
+		super.submitCommand(lineCommand);
 		initializeInterpreter(lineCommand.getWorkingDir(), lineCommand.getCommand());
 	}
 
 	@Override
 	protected void executingCommand(String line, LineCommand lineCommand) {
+		super.executingCommand(line, lineCommand);
 		if (interpreter != null) {
 			interpreter.onTrace(line);
 		}
@@ -94,6 +96,9 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 			interpreter.execute(lineCommand.getNewWorkingDir());
 		}
 		interpreter = null;
+		// Execute here ancestor terminateCommand command which can executes an
+		// another command.
+		super.terminateCommand(lineCommand);
 	}
 
 	/**
@@ -160,4 +165,5 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 		}
 		return cmdWithParameters;
 	}
+
 }

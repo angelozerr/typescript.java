@@ -12,6 +12,7 @@
 package ts.eclipse.ide.terminal.interpreter;
 
 import ts.eclipse.ide.terminal.interpreter.internal.CommandTerminalTracker;
+import ts.eclipse.ide.terminal.interpreter.internal.LineCommand;
 
 /**
  * Command tracker test.

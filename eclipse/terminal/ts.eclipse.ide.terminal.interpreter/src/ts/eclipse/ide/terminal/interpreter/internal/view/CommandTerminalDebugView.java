@@ -30,6 +30,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterListener;
+import ts.eclipse.ide.terminal.interpreter.internal.LineCommand;
 
 /**
  * Simple View which display Terminal trace from the terminal local interpreter.
@@ -189,5 +190,23 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 		if (folder.getSelectionIndex() == -1) {
 			folder.setSelection(0);
 		}
+	}
+
+	@Override
+	public void onSubmitCommand(LineCommand lineCommand) {
+		StringBuilder code = new StringBuilder("SUBMIT: " + lineCommand);
+		appendText(code.toString(), terminalText);
+	}
+
+	@Override
+	public void onExecutingCommand(String line, LineCommand lineCommand) {
+		StringBuilder code = new StringBuilder("EXECUTING: " + line + " for -> " + lineCommand);
+		appendText(code.toString(), terminalText);
+	}
+
+	@Override
+	public void onTerminateCommand(LineCommand lineCommand) {
+		StringBuilder code = new StringBuilder("TERMINATE: " + lineCommand);
+		appendText(code.toString(), terminalText);		
 	}
 }

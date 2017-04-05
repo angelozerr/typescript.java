@@ -31,6 +31,7 @@ public class LocalInterpreterLauncherDelegate extends LocalLauncherDelegate {
 //		 properties.put(ITerminalsConnectorConstants.PROP_PROCESS_PATH,
 //		 "C:\\Users\\azerr\\Downloads\\shell.w32-ix86\\bash.exe");
 
+//		properties.put(ICommandTerminalServiceConstants.COMMAND_ID, "cd .");
 		CommandInterpreterProcessor processor = new CommandInterpreterProcessor(properties);
 		properties.put(ITerminalsConnectorConstants.PROP_STDOUT_LISTENERS,
 				new ITerminalServiceOutputStreamMonitorListener[] { processor });		

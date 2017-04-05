@@ -12,9 +12,12 @@
 package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterListener;
+import ts.eclipse.ide.terminal.interpreter.ITerminalCommandListener;
 
 /**
  * Command terminal tracker.
@@ -24,20 +27,23 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	private static final String TILD = "~";
 
-	private final String initialWorkingDir;
-	private final String initialCommand;
-	private LineCommand lineCommand;
+	private final List<ITerminalCommandListener> listeners;
 
-	private String currentText;
+	private String workingDir;
+	private final String initialCommand;
+
 	private int columns;
 
+	private LineCommand lineCommand;
+
 	public CommandTerminalTracker(String initialWorkingDir, String initialCommand) {
-		this.initialWorkingDir = initialWorkingDir;
+		this.workingDir = initialWorkingDir;
 		this.initialCommand = initialCommand;
 		this.columns = 80;
+		this.listeners = new ArrayList<>();
 		onOpenTerminal(initialWorkingDir, initialCommand, getUserHome());
 	}
-	
+
 	@Override
 	public synchronized void parse(byte[] byteBuffer, int bytesRead, String encoding) {
 		onContentReadFromStream(byteBuffer, bytesRead, encoding);
@@ -60,177 +66,50 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		// - User types 'Enter' to submit a command.
 		// - OR in Windows OS, when a new line is displayed in the DOS Command.
 		onCarriageReturnLineFeed();
-		if (lineCommand == null) {
-			// Line command was not found in the terminal, ignore the CR event.
-			return;
-		}
-		if (lineCommand.isSubmitted()) {
-			// Line command is already submitted, ignore the CR event.
-			return;
-		}
-		if (currentText != null) {
-			return;
-		}
-		// Submit the command.
-		lineCommand.submit();
 	}
 
 	private void processLine(String line) {
 		if (line == null) {
 			return;
 		}
-		if (line.length() >= columns - 1) {
-			if (currentText == null) {
-				currentText = "";
-			}
-			currentText += line; //rtrim(line);
+		if (!tryTerminateCommand(line)) {
+			tryExecutingCommand(line);
+		}
+
+		// else if (lineCommand != null) {
+		// executingCommand(line, lineCommand);
+		// }
+	}
+
+	private void tryExecutingCommand(String line) {
+		if (lineCommand == null) {
 			return;
 		}
-		if (currentText != null) {
-			line = currentText + line; //rtrim(line);
-			currentText = null;
-		}
-		if (lineCommand == null) {
-			// search line command from the initial workingDir and command
-			lineCommand = tryToCreateLineCommand(line, initialWorkingDir, initialCommand);
-		} else {
-			// Line command is initialized, update it.
-			lineCommand.update(line);
-		}
+		executingCommand(line, lineCommand);
 	}
 
-	private enum LineCommandState {
-		INITIALIZED, SUBMITTED, TERMINATED;
-	}
-
-	public class LineCommand
-
-	{
-		private final String beforeWorkingDir;
-		private final String afterWorkingDir;
-		private LineCommandState state;
-		private String workingDir;
-		private String command;
-		private String newWorkingDir;
-
-		LineCommand(String workingDir, String command, String beforeWorkingDir, String afterWorkingDir) {
-			this.workingDir = workingDir;
-			this.command = command;
-			this.beforeWorkingDir = beforeWorkingDir;
-			this.afterWorkingDir = afterWorkingDir;
-			this.state = LineCommandState.INITIALIZED;
+	public boolean tryTerminateCommand(String line) {
+		String workingDir = null;
+		int length = line.length();
+		char last = line.charAt(length - 1);
+		if (last == '>' || last == '$') {
+			workingDir = line.substring(0, length - 1);
+		} else if (length >= 2 && last == ' ' && line.charAt(length - 2) == '$') {
+			workingDir = line.substring(0, length - 2);
 		}
-
-		public boolean isSubmitted() {
-			return this.state == LineCommandState.SUBMITTED;
+		if (workingDir == null) {
+			return false;
 		}
-
-		public void submit() {
-			try {
-				// Fire submit command Event.
-				CommandTerminalTracker.this.submitCommand(this);
-			} catch (Throwable e) {
-				e.printStackTrace();
-			} finally {
-				this.state = LineCommandState.SUBMITTED;
-			}
-		}
-
-		public void update(String line) {
-			if (!updateLineCommand(line)) {
-				this.executing(line);
-			}
-		}
-
-		private void executing(String line) {
-			try {
-				CommandTerminalTracker.this.executingCommand(line, this);
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-
-		private void terminate() {
-			try {
-				CommandTerminalTracker.this.terminateCommand(this);
-				this.workingDir = this.newWorkingDir;
-				command = null;
-				currentText = null;
-			} finally {
-				state = LineCommandState.INITIALIZED;
-			}
-		}
-
-		private boolean updateLineCommand(String line) {
-			int index = getWorkingDirIndex(line);
-			if (index == -1) {
-				if (state != LineCommandState.SUBMITTED) {
-					this.command = command + line;
-				}
-				return false;
-			}
-			String workinDir = line.substring(beforeWorkingDir.length(), index);
-			if (!(new File(workinDir).exists() || workinDir.startsWith(TILD))) {
-				return false;
-			}
-			if (state == LineCommandState.SUBMITTED) {
-				// Case when command is terminated.
-				this.newWorkingDir = resolveTild(workinDir);
-				this.terminate();
-			} else {
-				// Case when user is typing a command, update it.
-				String command = line.substring(index + 1, line.length());
-				this.command = command.trim();
-			}
+		workingDir = resolveTild(workingDir);
+		if (isDirectory(workingDir)) {
+			terminateCommand(workingDir);
 			return true;
 		}
-
-		private int getWorkingDirIndex(String line) {
-			if (!line.startsWith(beforeWorkingDir)) {
-				return -1;
-			}
-			return line.indexOf(afterWorkingDir);
-		}
-
-		public String getWorkingDir() {
-			return workingDir;
-		}
-
-		public String getNewWorkingDir() {
-			return newWorkingDir;
-		}
-
-		public String getCommand() {
-			return command;
-		}
-
+		return false;
 	}
 
-	private LineCommand tryToCreateLineCommand(String line, String initialWorkingDir, String initialCommand) {
-		if (line == null) {
-			return null;
-		}
-		line = resolveTild(line);
-		int index = line.indexOf(initialWorkingDir);
-		if (index == -1) {
-			index = line.indexOf(initialWorkingDir.replaceAll("[\\\\]", "/"));
-			if (index == -1) {
-				return null;
-			}
-		}
-		// line contains working dir, compute line command working dir
-		String beforeWorkingDir = line.substring(0, index);
-		int initialCommandIndex = -1;
-		if (initialCommand != null) {
-			// If initial command was set, it should be retrieve from the line.
-			initialCommandIndex = line.indexOf(initialCommand);
-			if (initialCommandIndex == -1) {
-				return null;
-			}
-		}
-		String afterWorkingDir = line.substring(index + initialWorkingDir.length(),
-				(initialCommandIndex != -1 ? initialCommandIndex : line.length())).trim();
-		return new LineCommand(initialWorkingDir, initialCommand, beforeWorkingDir, afterWorkingDir);
+	protected boolean isDirectory(String dir) {
+		return new File(dir).exists();
 	}
 
 	private String resolveTild(String line) {
@@ -257,7 +136,7 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 			listener.onOpenTerminal(initialWorkingDir, initialCommand, userHome);
 		}
 	}
-	
+
 	private void onContentReadFromStream(byte[] byteBuffer, int bytesRead, String encoding) {
 		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
 			listener.onContentReadFromStream(byteBuffer, bytesRead, encoding);
@@ -280,34 +159,64 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 		this.columns = columns;
 	}
 
-	private static String rtrim(String s) {
-		int i = s.length() - 1;
-		while (i >= 0 && Character.isWhitespace(s.charAt(i))) {
-			i--;
+	public void addTerminalCommandListener(ITerminalCommandListener listener) {
+		synchronized (listeners) {
+			if (!listeners.contains(listener)) {
+				listeners.add(listener);
+			}
 		}
-		return s.substring(0, i + 1);
 	}
 
-	/**
-	 * Call when a line command was submitted.
-	 * 
-	 * @param lineCommand
-	 */
-	protected abstract void submitCommand(LineCommand lineCommand);
+	public void removeTerminalCommandListener(ITerminalCommandListener listener) {
+		synchronized (listeners) {
+			listeners.remove(listener);
+		}
+	}
 
-	/**
-	 * Call when a line command is executing.
-	 * 
-	 * @param line
-	 * @param lineCommand
-	 */
-	protected abstract void executingCommand(String line, LineCommand lineCommand);
+	private void terminateCommand(String workingDir) {
+		this.workingDir = workingDir;
+		if (lineCommand == null) {
+			submitCommand(new LineCommand(null));
+		} else {
+			lineCommand.setNewWorkingDir(workingDir);
+		}
+		LineCommand oldlineCommand = lineCommand;
+		lineCommand = null;		
+		terminateCommand(oldlineCommand);
+	}
 
-	/**
-	 * Call when a line command is terminated.
-	 * 
-	 * @param lineCommand
-	 */
-	protected abstract void terminateCommand(LineCommand lineCommand);
+	protected void terminateCommand(LineCommand lineCommand) {
+		synchronized (listeners) {			
+			for (ITerminalCommandListener listener : listeners) {
+				listener.onTerminateCommand(lineCommand);
+			}
+		}
+		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
+			listener.onTerminateCommand(lineCommand);
+		}
+	}
 
+	protected void executingCommand(String line, LineCommand lineCommand) {
+		synchronized (listeners) {
+			for (ITerminalCommandListener listener : listeners) {
+				listener.onExecutingCommand(line, lineCommand);
+			}
+		}
+		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
+			listener.onExecutingCommand(line, lineCommand);
+		}
+	}
+
+	protected void submitCommand(LineCommand lineCommand) {
+		this.lineCommand = lineCommand;
+		lineCommand.setWorkingDir(workingDir);
+		synchronized (listeners) {
+			for (ITerminalCommandListener listener : listeners) {
+				listener.onSubmitCommand(lineCommand);
+			}
+		}
+		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
+			listener.onSubmitCommand(lineCommand);
+		}
+	}
 }
