@@ -3,6 +3,9 @@ package ts.utils;
 public class VersionHelper {
 
 	public static boolean canSupport(String version, String sinceVersion) {
+		if(version == null) {
+			return false;
+		}
 		if (sinceVersion == null) {
 			return true;
 		}
