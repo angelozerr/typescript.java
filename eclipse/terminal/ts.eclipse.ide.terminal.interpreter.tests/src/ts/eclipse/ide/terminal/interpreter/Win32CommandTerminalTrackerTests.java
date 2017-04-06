@@ -24,8 +24,9 @@ public class Win32CommandTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void cdDot() {
-		TrackerTest test = new TrackerTest(
-				"D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse", null);
+		//TrackerTest test = new TrackerTest(
+		//		"D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse", null);
+		TrackerTest test = new TrackerTest();
 		test.processText("Microsoft Windows [version 6.1.7601]", 80);
 		test.processCarriageReturnLineFeed();
 		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 80);
@@ -48,9 +49,9 @@ public class Win32CommandTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void cdWithDirectoryChanged() {
-		TrackerTest test = new TrackerTest(
-				"D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse", null);
-
+		//TrackerTest test = new TrackerTest(
+				//"D:\\Logiciels\\eclipses\\eclipse-jee-neon-2-win32-x86_64\\eclipse", null);
+		TrackerTest test = new TrackerTest();
 		// Open Terminal
 		test.processText("Microsoft Windows [version 6.1.7601]", 80);
 		test.processCarriageReturnLineFeed();

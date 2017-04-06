@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -48,15 +49,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
-import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.wizards.AbstractNewProjectWizard;
+import ts.npm.NpmConstants;
+import ts.npm.PackageJson;
 import ts.resources.jsonconfig.TsconfigJson;
 import ts.utils.IOUtils;
-import ts.utils.StringUtils;
 
 /**
  * Standard workbench wizard that creates a new TypeScript project resource in
@@ -123,12 +125,20 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 	@Override
 	protected IRunnableWithProgress getRunnable(IProject newProjectHandle, IProjectDescription description,
 			IPath projectLocationPath) {
+		// Update package.json
+		PackageJson packageJson = new PackageJson();
+		packageJson.setAuthor(System.getProperty("user.name"));
+		packageJson.setName(newProjectHandle.getName());
+		packageJson.setDescription(NpmConstants.DEFAULT_DESCRIPTION);
+		packageJson.setVersion(NpmConstants.DEFAULT_VERSION);
+		packageJson.setLicense(NpmConstants.DEFAULT_LICENSE);
+
 		// Update tsconfig.json
 		TsconfigJson tsconfig = new TsconfigJson();
 		tsconfig.setCompileOnSave(true);
 		tsconfigPage.updateTsconfig(tsconfig);
 		tslintPage.updateTsconfig(tsconfig);
-		
+
 		return new IRunnableWithProgress() {
 
 			@Override
@@ -154,30 +164,22 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 				}
 
 				// Generate tsconfig.json
-				Gson gson = new GsonBuilder().setPrettyPrinting().create();
-				String content = gson.toJson(tsconfig);
-				IFile file = newProjectHandle.getFile(tsconfigPage.getPath());
-				try {
-					if (file.exists()) {
-						file.setContents(IOUtils.toInputStream(content), 1, new NullProgressMonitor());
-					} else {
-						file.create(IOUtils.toInputStream(content), 1, new NullProgressMonitor());
-					}
-				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
-				}
-				
+				IFile tsconfigFile = generateJsonFile(tsconfig, tsconfigPage.getPath(), newProjectHandle);
+
+				// Generate package.json
+				generateJsonFile(packageJson, new Path(NpmConstants.PACKAGE_JSON), newProjectHandle);
+
 				IEclipsePreferences preferences = new ProjectScope(newProjectHandle)
-						.getNode(TypeScriptCorePlugin.PLUGIN_ID);				
+						.getNode(TypeScriptCorePlugin.PLUGIN_ID);
 
 				// Update node.js preferences
 				tsRuntimeAndNodeJsPage.updateNodeJSPreferences(preferences);
-				
+
 				// Install TypeScript/tslint if needed
-				List<String> commands = new ArrayList<>();
-				boolean customTypeScript = tsRuntimeAndNodeJsPage.updateCommand(commands);				
-				boolean customTslint = tslintPage.updateCommand(commands);
-			
+				List<LineCommand> commands = new ArrayList<>();
+				tsRuntimeAndNodeJsPage.updateCommand(commands, preferences);
+				tslintPage.updateCommand(commands);
+
 				if (!commands.isEmpty()) {
 					// Prepare terminal properties
 					String terminalId = "TypeScript Projects";
@@ -193,13 +195,6 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 					CommandTerminalService.getInstance().executeCommand(commands, terminalId, properties, null);
 
-					if (customTypeScript || customTslint) {						
-						if (customTypeScript) {
-							preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
-							preferences.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
-									"${project_loc:node_modules/typescript}");
-						}						
-					}
 				}
 				try {
 					preferences.flush();
@@ -210,7 +205,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 					@Override
 					public void run() {
-						selectAndReveal(file);
+						selectAndReveal(tsconfigFile);
 
 						// Open editor on new file.
 						IWorkbenchWindow dw = getWorkbench().getActiveWorkbenchWindow();
@@ -218,7 +213,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 							if (dw != null) {
 								IWorkbenchPage page = dw.getActivePage();
 								if (page != null) {
-									IDE.openEditor(page, file, true);
+									IDE.openEditor(page, tsconfigFile, true);
 								}
 							}
 						} catch (PartInitException e) {
@@ -230,5 +225,21 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 			}
 		};
+	}
+
+	private IFile generateJsonFile(Object jsonObject, IPath path, IProject project) throws InvocationTargetException {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String content = gson.toJson(jsonObject);
+		IFile file = project.getFile(path);
+		try {
+			if (file.exists()) {
+				file.setContents(IOUtils.toInputStream(content), 1, new NullProgressMonitor());
+			} else {
+				file.create(IOUtils.toInputStream(content), 1, new NullProgressMonitor());
+			}
+		} catch (CoreException e) {
+			throw new InvocationTargetException(e);
+		}
+		return file;
 	}
 }

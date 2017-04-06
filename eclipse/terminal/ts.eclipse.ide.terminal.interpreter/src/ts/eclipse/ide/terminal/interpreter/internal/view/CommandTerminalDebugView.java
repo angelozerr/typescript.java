@@ -30,7 +30,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterListener;
-import ts.eclipse.ide.terminal.interpreter.internal.LineCommand;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
 
 /**
  * Simple View which display Terminal trace from the terminal local interpreter.
@@ -112,24 +112,8 @@ public class CommandTerminalDebugView extends ViewPart implements ICommandInterp
 	}
 
 	@Override
-	public void onOpenTerminal(String initialWorkingDir, String initialCommand, String userHome) {
+	public void onOpenTerminal(String userHome) {
 		StringBuilder code = new StringBuilder("TrackerTest test = new TrackerTest(");
-		if (initialWorkingDir == null) {
-			code.append("null");
-		} else {
-			code.append("\"");
-			code.append(initialWorkingDir.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
-			code.append("\"");
-		}
-		code.append(", ");
-		if (initialCommand == null) {
-			code.append("null");
-		} else {
-			code.append("\"");
-			code.append(initialCommand.replaceAll("[\"]", "\\\"").replaceAll("\\\\", "\\\\\\\\"));
-			code.append("\"");
-		}
-		code.append(", ");
 		code.append("\"");
 		code.append(userHome);
 		code.append("\"");

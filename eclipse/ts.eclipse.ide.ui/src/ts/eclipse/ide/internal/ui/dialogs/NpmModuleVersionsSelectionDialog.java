@@ -29,7 +29,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 
-import ts.eclipse.ide.core.npm.IDENPMModulesManager;
+import ts.eclipse.ide.core.npm.IDENpmModulesManager;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
@@ -39,13 +39,13 @@ import ts.eclipse.ide.ui.TypeScriptUIPlugin;
  * string pattern used to filter the list of versions for a given module name.
  *
  */
-public class NPMModuleVersionsSelectionDialog extends FilteredItemsSelectionDialog {
+public class NpmModuleVersionsSelectionDialog extends FilteredItemsSelectionDialog {
 
 	private static final String DIALOG_SETTINGS = "ts.eclipse.ide.ui.dialogs.NPMModuleVersionsSelectionDialog"; //$NON-NLS-1$
 
 	private final String moduleName;
 
-	public NPMModuleVersionsSelectionDialog(String moduleName, Shell shell, boolean multi) {
+	public NpmModuleVersionsSelectionDialog(String moduleName, Shell shell, boolean multi) {
 		super(shell, multi);
 		setTitle(NLS.bind(TypeScriptUIMessages.NPMModuleVersionsSelectionDialog_title, moduleName));
 		setMessage(TypeScriptUIMessages.NPMModuleVersionsSelectionDialog_message);
@@ -67,7 +67,7 @@ public class NPMModuleVersionsSelectionDialog extends FilteredItemsSelectionDial
 			try {
 				// execute "npm view $moduleName versions" to retrieve version
 				// list of the given module name.
-				IDENPMModulesManager.getInstance().getNPMModule(moduleName).getAvailableVersions()
+				IDENpmModulesManager.getInstance().getNPMModule(moduleName).getAvailableVersions()
 						.forEach(version -> contentProvider.add(version, itemsFilter));
 			} catch (IOException e) {
 				e.printStackTrace();

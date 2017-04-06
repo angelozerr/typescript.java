@@ -23,7 +23,8 @@ public class Win32NgTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void ngClass() {
-		TrackerTest test = new TrackerTest("C:\\Users\\azerr\\WS\\abcd\\src\\app", "ng generate class c1  --spec false");
+		//TrackerTest test = new TrackerTest("C:\\Users\\azerr\\WS\\abcd\\src\\app", "ng generate class c1  --spec false");
+		TrackerTest test = new TrackerTest();
 		test.processText("Microsoft Windows [version 6.1.7601]", 80);
 		test.processCarriageReturnLineFeed();
 		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 80);
@@ -54,8 +55,9 @@ public class Win32NgTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void ngLongCommand() {
-		TrackerTest test = new TrackerTest("C:\\Users\\azerr\\WS\\aa\\src\\app",
-				"C:/Users/azerr/WS/aa/node_modules/.bin/ng.cmd generate class c  --spec false", "C:/Users/azerr");
+		//TrackerTest test = new TrackerTest("C:\\Users\\azerr\\WS\\aa\\src\\app",
+		//		"C:/Users/azerr/WS/aa/node_modules/.bin/ng.cmd generate class c  --spec false", "C:/Users/azerr");
+		TrackerTest test = new TrackerTest();
 		test.processText("Microsoft Windows [version 6.1.7601]", 94);
 		test.processCarriageReturnLineFeed();
 		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 94);
@@ -90,7 +92,8 @@ public class Win32NgTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void longCommand2() {
-		TrackerTest test = new TrackerTest("D:\\_Personal\\runtime-EclipseApplicationNG2", "ng new jjjjjjjjjjjjjjjjjjjjj -si -sg -st -sc --routing -is -it", "C:/Users/azerr");
+		//TrackerTest test = new TrackerTest("D:\\_Personal\\runtime-EclipseApplicationNG2", "ng new jjjjjjjjjjjjjjjjjjjjj -si -sg -st -sc --routing -is -it", "C:/Users/azerr");
+		TrackerTest test = new TrackerTest();
 		test.processText("Microsoft Windows [version 6.1.7601]", 80);
 		test.processCarriageReturnLineFeed();
 		test.processText("Copyright (c) 2009 Microsoft Corporation. Tous droits réservés.", 80);

@@ -2,7 +2,7 @@ package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -21,6 +21,7 @@ import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnecto
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.terminal.interpreter.ICommandTerminalServiceConstants;
 import ts.eclipse.ide.terminal.interpreter.ITerminalCommandListener;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
 
 public class TerminalConnectorWrapper implements ITerminalConnectorWrapper, ITerminalCommandListener {
 
@@ -33,7 +34,7 @@ public class TerminalConnectorWrapper implements ITerminalConnectorWrapper, ITer
 
 	private final Queue<LineCommand> commandsQueue;
 	private boolean terminalReady;
-	
+
 	public TerminalConnectorWrapper(ITerminalConnector delegate, CommandInterpreterProcessor processor,
 			Map<String, Object> properties) {
 		this.delegate = delegate;
@@ -65,16 +66,13 @@ public class TerminalConnectorWrapper implements ITerminalConnectorWrapper, ITer
 				// prompt
 				// This command is required to track working directory by
 				// CommandTerminalTracker
-				executeCommand("PS1='\\w\\$ '", properties, true); //$NON-NLS-1$
+				executeCommand(new LineCommand("PS1='\\w\\$ '"), properties, true); //$NON-NLS-1$
 			}
-			Object command = properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
-			if (command instanceof Collection) {
-				Collection<String> commands = (Collection<String>) command;
-				for (String cmd : commands) {
-					executeCommand(cmd, properties);
-				}
-			} else {
-				executeCommand((String) command, properties);
+			@SuppressWarnings("unchecked")
+			List<LineCommand> commands = (List<LineCommand>) properties
+					.get(ICommandTerminalServiceConstants.COMMAND_ID);
+			for (LineCommand lineCommand : commands) {
+				executeCommand(lineCommand, properties);
 			}
 		}
 	}
@@ -203,22 +201,21 @@ public class TerminalConnectorWrapper implements ITerminalConnectorWrapper, ITer
 		return delegate.getSettingsSummary();
 	}
 
-	public void executeCommand(String cmd, Map<String, Object> properties) {
+	public void executeCommand(LineCommand cmd, Map<String, Object> properties) {
 		executeCommand(cmd, properties, false);
 	}
 
-	private void executeCommand(String cmd, Map<String, Object> properties, boolean nowaitForTerminalready) {
+	private void executeCommand(LineCommand cmd, Map<String, Object> properties, boolean nowaitForTerminalready) {
 		if (cmd == null) {
 			return;
 		}
 		if (properties != null) {
 			this.properties = properties;
 		}
-		LineCommand lineCommand = new LineCommand(cmd);
 		if ((nowaitForTerminalready || (terminalReady && commandsQueue.isEmpty()))) {
-			submitCommand(lineCommand, true);
+			submitCommand(cmd, true);
 		} else {
-			commandsQueue.add(lineCommand);
+			commandsQueue.add(cmd);
 		}
 	}
 

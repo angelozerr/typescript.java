@@ -35,7 +35,8 @@ import ts.cmd.tsc.CompilerOptions;
 import ts.cmd.tsc.Plugin;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.ui.widgets.NPMInstallWidget;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
+import ts.eclipse.ide.ui.widgets.NpmInstallWidget;
 import ts.eclipse.ide.ui.wizards.AbstractWizardPage;
 import ts.repository.ITypeScriptRepository;
 import ts.resources.jsonconfig.TsconfigJson;
@@ -52,13 +53,13 @@ public class TSLintWizardPage extends AbstractWizardPage {
 	private Button useEmbeddedTslintRuntimeButton;
 	private boolean useEmbeddedTslintRuntime;
 	private Combo embeddedTslintRuntime;
-	private NPMInstallWidget installTslintRuntime;
+	private NpmInstallWidget installTslintRuntime;
 
 	// tslint Plugin
 	private Button useEmbeddedTslintPluginButton;
 	private boolean useEmbeddedTslintPlugin;
 	private Combo embeddedTslintPlugin;
-	private NPMInstallWidget installTslintPlugin;
+	private NpmInstallWidget installTslintPlugin;
 
 	protected TSLintWizardPage() {
 		super(PAGE_NAME, TypeScriptUIMessages.TSLintWizardPage_title, null);
@@ -148,7 +149,7 @@ public class TSLintWizardPage extends AbstractWizardPage {
 				updateTslintRuntimeMode();
 			}
 		});
-		installTslintRuntime = new NPMInstallWidget("tslint", this, parent, SWT.NONE);
+		installTslintRuntime = new NpmInstallWidget("tslint", this, parent, SWT.NONE);
 		installTslintRuntime.getVersionText().addListener(SWT.Modify, this);
 	}
 
@@ -217,7 +218,7 @@ public class TSLintWizardPage extends AbstractWizardPage {
 				updateTslintPluginMode();
 			}
 		});
-		installTslintPlugin = new NPMInstallWidget("tslint-language-service", this, parent, SWT.NONE);
+		installTslintPlugin = new NpmInstallWidget("tslint-language-service", this, parent, SWT.NONE);
 		installTslintPlugin.getVersionText().addListener(SWT.Modify, this);
 	}
 
@@ -302,16 +303,12 @@ public class TSLintWizardPage extends AbstractWizardPage {
 
 	}
 
-	public boolean updateCommand(List<String> commands) {
-		if (!useEmbeddedTslintRuntime && !useEmbeddedTslintPlugin) {
-			return false;
-		}
+	public void updateCommand(List<LineCommand> commands) {
 		if (!useEmbeddedTslintRuntime) {
-			commands.add(installTslintRuntime.getNpmInstallCommand());
+			commands.add(new LineCommand(installTslintRuntime.getNpmInstallCommand()));
 		}
 		if (!useEmbeddedTslintPlugin) {
-			commands.add(installTslintPlugin.getNpmInstallCommand());
+			commands.add(new LineCommand(installTslintPlugin.getNpmInstallCommand()));
 		}
-		return true;
 	}
 }

@@ -16,7 +16,7 @@ package ts.eclipse.ide.terminal.interpreter;
  */
 public interface ICommandInterpreterListener extends ITerminalCommandListener{
 
-	void onOpenTerminal(String initialWorkingDir, String initialCommand, String userHome);
+	void onOpenTerminal(String userHome);
 
 	void onProcessText(String text, int columns);
 

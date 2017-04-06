@@ -8,7 +8,7 @@ public class Issue62 {
 	@Test
 	@Ignore
 	public void ngWithWizard() {
-		TrackerTest test = new TrackerTest("/home/johnson_ajar", null, "/home/johnson_ajar");
+		TrackerTest test = new TrackerTest("/home/johnson_ajar");
 		test.processText("p", 233);
 		test.processText("w", 233);
 		test.processText("d", 233);

@@ -1,9 +1,11 @@
 package ts.eclipse.ide.terminal.interpreter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalService;
@@ -29,47 +31,33 @@ public class CommandTerminalService extends TerminalService {
 		return INSTANCE;
 	}
 
-	public void executeCommand(List<String> commands, String terminalId, final Map<String, Object> properties,
-			final ITerminalService.Done done) {
-		if (commands.isEmpty()) {
-			return;
-		}
-		Assert.isNotNull(terminalId);
-
+	public void executeCommand(Collection<LineCommand> commands, String terminalId,
+			final Map<String, Object> properties, ITerminalService.Done done) {
+		Assert.isTrue(commands.size() > 0, "Command list cannot be empty");
+		Assert.isNotNull(terminalId, "Terminal ID cannot be null");
 		properties.put(ICommandTerminalServiceConstants.TERMINAL_ID, terminalId);
 		properties.put(ICommandTerminalServiceConstants.COMMAND_ID, commands);
-
+		
 		TerminalConnectorWrapper connector = getConnector(terminalId, properties);
 		if (connector != null) {
 			String workingDir = (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
 			if (connector.hasWorkingDirChanged(workingDir)) {
-				connector.executeCommand("cd " + workingDir, properties);
+				connector.executeCommand(new LineCommand("cd " + workingDir), properties);
 			}
-			for (String cmd : commands) {
-				connector.executeCommand(cmd, properties);
+			for (LineCommand command : commands) {
+				connector.executeCommand(command, properties);
 			}
 		} else {
 			this.openConsole(properties, done);
 		}
+
 	}
 
 	public void executeCommand(String command, String terminalId, final Map<String, Object> properties,
 			final ITerminalService.Done done) {
-		Assert.isNotNull(terminalId);
-		command = command.trim();
-		properties.put(ICommandTerminalServiceConstants.TERMINAL_ID, terminalId);
-		properties.put(ICommandTerminalServiceConstants.COMMAND_ID, command);
-
-		TerminalConnectorWrapper connector = getConnector(terminalId, properties);
-		if (connector != null) {
-			String workingDir = (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
-			if (connector.hasWorkingDirChanged(workingDir)) {
-				connector.executeCommand("cd " + workingDir, properties);
-			}
-			connector.executeCommand(command, properties);
-		} else {
-			this.openConsole(properties, done);
-		}
+		List<LineCommand> commands = new ArrayList<>();
+		commands.add(new LineCommand(command));
+		executeCommand(commands, terminalId, properties, done);
 	}
 
 	private TerminalConnectorWrapper getConnector(String terminalId, Map<String, Object> properties) {

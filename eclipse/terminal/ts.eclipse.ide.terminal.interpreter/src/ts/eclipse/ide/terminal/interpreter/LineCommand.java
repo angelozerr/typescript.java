@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.terminal.interpreter.internal;
+package ts.eclipse.ide.terminal.interpreter;
 
 /**
  * Terminal line command.
@@ -16,12 +16,18 @@ package ts.eclipse.ide.terminal.interpreter.internal;
  */
 public class LineCommand {
 
+	private final String command;
+	private final ITerminalCommandListener listener;
 	private String workingDir;
-	private String command;
 	private String newWorkingDir;
 
 	public LineCommand(String command) {
+		this(command, null);
+	}
+
+	public LineCommand(String command, ITerminalCommandListener listener) {
 		this.command = command;
+		this.listener = listener;
 	}
 
 	public String getWorkingDir() {
@@ -60,5 +66,9 @@ public class LineCommand {
 		s.append("\"");
 		s.append("}");
 		return s.toString();
+	}
+
+	public ITerminalCommandListener getListener() {
+		return listener;
 	}
 }

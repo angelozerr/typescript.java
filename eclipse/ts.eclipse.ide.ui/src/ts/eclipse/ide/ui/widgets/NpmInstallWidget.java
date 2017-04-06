@@ -39,12 +39,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import ts.eclipse.ide.core.npm.IDENPMModulesManager;
+import ts.eclipse.ide.core.npm.IDENpmModulesManager;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.VersionLabelProvider;
 import ts.eclipse.ide.ui.preferences.StatusInfo;
-import ts.npm.NPMHelper;
-import ts.npm.NPMModule;
+import ts.npm.NpmHelper;
+import ts.npm.NpmModule;
 import ts.utils.StringUtils;
 
 /**
@@ -57,7 +57,7 @@ import ts.utils.StringUtils;
  * </ul>
  *
  */
-public class NPMInstallWidget extends Composite {
+public class NpmInstallWidget extends Composite {
 
 	private final String moduleName;
 	private Text versionText;
@@ -87,10 +87,10 @@ public class NPMInstallWidget extends Composite {
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
 				// Load the available version of the NPM module.
-				NPMModule module = IDENPMModulesManager.getInstance().getNPMModule(moduleName);
+				NpmModule module = IDENpmModulesManager.getInstance().getNPMModule(moduleName);
 				module.getAvailableVersions();
 				// Validate the version field.
-				Display display = NPMInstallWidget.this.getDisplay();
+				Display display = NpmInstallWidget.this.getDisplay();
 				if ((display != null) && (!display.isDisposed())) {
 					display.asyncExec(new Runnable() {
 						public void run() {
@@ -103,7 +103,7 @@ public class NPMInstallWidget extends Composite {
 					});
 				}
 			} catch (Throwable e) {
-				NPMInstallWidget.this.statusChanged(new StatusInfo(IStatus.ERROR, e.getMessage()));
+				NpmInstallWidget.this.statusChanged(new StatusInfo(IStatus.ERROR, e.getMessage()));
 			}
 			return Status.OK_STATUS;
 		}
@@ -113,7 +113,7 @@ public class NPMInstallWidget extends Composite {
 
 		@Override
 		public IContentProposal[] getProposals(String contents, int position) {
-			NPMModule module = IDENPMModulesManager.getInstance().getNPMModule(moduleName);
+			NpmModule module = IDENpmModulesManager.getInstance().getNPMModule(moduleName);
 			if (module.isLoaded()) {
 				List<IContentProposal> list = new ArrayList<>();
 				try {
@@ -128,7 +128,7 @@ public class NPMInstallWidget extends Composite {
 				}
 				return list.toArray(new IContentProposal[list.size()]);
 			} else {
-				NPMInstallWidget.this.openPopup = true;
+				NpmInstallWidget.this.openPopup = true;
 				validateVersionASynch(module);
 			}
 			return null;
@@ -149,7 +149,7 @@ public class NPMInstallWidget extends Composite {
 
 	}
 
-	public NPMInstallWidget(String moduleName, IStatusChangeListener handler, Composite parent, int style) {
+	public NpmInstallWidget(String moduleName, IStatusChangeListener handler, Composite parent, int style) {
 		super(parent, style);
 		this.moduleName = moduleName;
 		this.handler = handler;
@@ -181,7 +181,7 @@ public class NPMInstallWidget extends Composite {
 
 			@Override
 			public void modifyText(ModifyEvent event) {
-				NPMInstallWidget.this.version = versionText.getText();
+				NpmInstallWidget.this.version = versionText.getText();
 				validateVersion(version);
 			}
 		});
@@ -234,7 +234,7 @@ public class NPMInstallWidget extends Composite {
 			// none version, the field is valid.
 			statusChanged(Status.OK_STATUS);
 		} else {
-			NPMModule module = IDENPMModulesManager.getInstance().getNPMModule(moduleName);
+			NpmModule module = IDENpmModulesManager.getInstance().getNPMModule(moduleName);
 			if (module.isLoaded()) {
 				validateVersionSynch(module);
 			} else {
@@ -243,7 +243,7 @@ public class NPMInstallWidget extends Composite {
 		}
 	}
 
-	private void validateVersionSynch(NPMModule module) {
+	private void validateVersionSynch(NpmModule module) {
 		try {
 			List<String> availableVersions = module.getAvailableVersions();
 			String version = versionText.getText();
@@ -258,7 +258,7 @@ public class NPMInstallWidget extends Composite {
 		}
 	}
 
-	private void validateVersionASynch(NPMModule module) {
+	private void validateVersionASynch(NpmModule module) {
 		statusChanged(new StatusInfo(IStatus.WARNING,
 				NLS.bind(TypeScriptUIMessages.NPMInstallWidget_SearchingVersions_status, module.getName())));
 		if (validateVersionJob == null) {
@@ -301,7 +301,7 @@ public class NPMInstallWidget extends Composite {
 	 * @return the npm install command.
 	 */
 	public String getNpmInstallCommand() {
-		return NPMHelper.getNpmInstallCommand(moduleName, version);
+		return NpmHelper.getNpmInstallCommand(moduleName, version);
 	}
 
 	public IStatus getStatus() {

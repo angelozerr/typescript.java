@@ -18,6 +18,7 @@ import java.util.List;
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterListener;
 import ts.eclipse.ide.terminal.interpreter.ITerminalCommandListener;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
 
 /**
  * Command terminal tracker.
@@ -29,19 +30,16 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	private final List<ITerminalCommandListener> listeners;
 
-	private String workingDir;
-	private final String initialCommand;
-
 	private int columns;
 
 	private LineCommand lineCommand;
 
-	public CommandTerminalTracker(String initialWorkingDir, String initialCommand) {
-		this.workingDir = initialWorkingDir;
-		this.initialCommand = initialCommand;
+	private String workingDir;
+
+	public CommandTerminalTracker() {
 		this.columns = 80;
 		this.listeners = new ArrayList<>();
-		onOpenTerminal(initialWorkingDir, initialCommand, getUserHome());
+		onOpenTerminal(getUserHome());
 	}
 
 	@Override
@@ -131,9 +129,9 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 
 	// ---------------------- Trace to generate JUnit
 
-	private void onOpenTerminal(String initialWorkingDir, String initialCommand, String userHome) {
+	private void onOpenTerminal(String userHome) {
 		for (ICommandInterpreterListener listener : CommandTerminalService.getInstance().getInterpreterListeners()) {
-			listener.onOpenTerminal(initialWorkingDir, initialCommand, userHome);
+			listener.onOpenTerminal(userHome);
 		}
 	}
 
@@ -181,12 +179,16 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 			lineCommand.setNewWorkingDir(workingDir);
 		}
 		LineCommand oldlineCommand = lineCommand;
-		lineCommand = null;		
+		lineCommand = null;
 		terminateCommand(oldlineCommand);
 	}
 
 	protected void terminateCommand(LineCommand lineCommand) {
-		synchronized (listeners) {			
+		ITerminalCommandListener l = lineCommand.getListener();
+		if (l != null) {
+			l.onTerminateCommand(lineCommand);
+		}
+		synchronized (listeners) {
 			for (ITerminalCommandListener listener : listeners) {
 				listener.onTerminateCommand(lineCommand);
 			}
@@ -197,6 +199,10 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 	}
 
 	protected void executingCommand(String line, LineCommand lineCommand) {
+		ITerminalCommandListener l = lineCommand.getListener();
+		if (l != null) {
+			l.onExecutingCommand(line, lineCommand);
+		}
 		synchronized (listeners) {
 			for (ITerminalCommandListener listener : listeners) {
 				listener.onExecutingCommand(line, lineCommand);
@@ -210,6 +216,11 @@ public abstract class CommandTerminalTracker extends AnsiHandler {
 	protected void submitCommand(LineCommand lineCommand) {
 		this.lineCommand = lineCommand;
 		lineCommand.setWorkingDir(workingDir);
+
+		ITerminalCommandListener l = lineCommand.getListener();
+		if (l != null) {
+			l.onSubmitCommand(lineCommand);
+		}
 		synchronized (listeners) {
 			for (ITerminalCommandListener listener : listeners) {
 				listener.onSubmitCommand(lineCommand);

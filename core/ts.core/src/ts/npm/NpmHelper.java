@@ -20,10 +20,10 @@ import ts.OS;
 import ts.utils.IOUtils;
 
 /**
- * NPM Utilities.
+ * Npm Utilities.
  *
  */
-public class NPMHelper {
+public class NpmHelper {
 
 	/**
 	 * Returns the available versions of the given module name.
@@ -62,9 +62,7 @@ public class NPMHelper {
 	 * @return the "npm install" command for the given module name and version.
 	 */
 	public static String getNpmInstallCommand(String moduleName, String version) {
-		StringBuilder cmd = new StringBuilder("npm");
-		cmd.append(" ");
-		cmd.append(" install ");
+		StringBuilder cmd = new StringBuilder("npm install ");
 		cmd.append(moduleName);
 		if (version != null) {
 			cmd.append("@");

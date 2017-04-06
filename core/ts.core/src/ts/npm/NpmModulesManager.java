@@ -16,23 +16,23 @@ import java.util.Map;
 import ts.OS;
 
 /**
- * NPM modules manager.
+ * Npm modules manager.
  *
  */
-public class NPMModulesManager {
+public class NpmModulesManager {
 
 	private final OS os;
-	private final Map<String, NPMModule> modules;
+	private final Map<String, NpmModule> modules;
 
-	public NPMModulesManager(OS os) {
+	public NpmModulesManager(OS os) {
 		this.os = os;
 		this.modules = new HashMap<>();
 	}
 
-	public NPMModule getNPMModule(String moduleName) {
-		NPMModule module = modules.get(moduleName);
+	public NpmModule getNPMModule(String moduleName) {
+		NpmModule module = modules.get(moduleName);
 		if (module == null) {
-			module = new NPMModule(moduleName, os);
+			module = new NpmModule(moduleName, os);
 			modules.put(moduleName, module);
 		}
 		return module;

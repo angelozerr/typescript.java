@@ -12,7 +12,6 @@
 package ts.eclipse.ide.terminal.interpreter;
 
 import ts.eclipse.ide.terminal.interpreter.internal.CommandTerminalTracker;
-import ts.eclipse.ide.terminal.interpreter.internal.LineCommand;
 
 /**
  * Command tracker test.
@@ -23,12 +22,11 @@ public class TrackerTest extends CommandTerminalTracker {
 	private final String userHome;
 	private final StringBuilder result;
 
-	public TrackerTest(String initialWorkingDir, String initialCommand) {
-		this(initialWorkingDir, initialCommand, null);
+	public TrackerTest() {
+		this(null);
 	}
 
-	public TrackerTest(String initialWorkingDir, String initialCommand, String userHome) {
-		super(initialWorkingDir, initialCommand);
+	public TrackerTest(String userHome) {
 		this.userHome = userHome;
 		this.result = new StringBuilder();
 	}

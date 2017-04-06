@@ -24,8 +24,9 @@ public class MacOSBashNgTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void ngClass() {
-		TrackerTest test = new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
-				"ng generate class pascalou  --spec false", "C:/Users/azerr");
+		TrackerTest test = new TrackerTest();
+		//new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
+		//		"ng generate class pascalou  --spec false", "C:/Users/azerr");
 		test.processText("bash-3.2$ PS1='\\w\\$ '", 80);
 		test.processCarriageReturnLineFeed();
 		test.processText("ng generate class pascalou  --spec false", 80);
@@ -55,8 +56,9 @@ public class MacOSBashNgTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void ngClass2() {
-		TrackerTest test = new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
-				"ng generate class sample  --spec false", "C:/Users/azerr");
+		//TrackerTest test = new TrackerTest("C:/Users/azerr/Documents/mon-workspace/angular2-200/src/app",
+		//		"ng generate class sample  --spec false", "C:/Users/azerr");
+		TrackerTest test = new TrackerTest();
 		test.processText("bash-3.2$ ", 80);
 		test.processText("PS1='\\w\\$ '", 80);
 		test.processCarriageReturnLineFeed();
@@ -88,7 +90,8 @@ public class MacOSBashNgTerminalTrackerTests {
 	@Test
 	@Ignore
 	public void t() {
-		TrackerTest test = new TrackerTest("/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app", "ng generate class example  --spec false", "/Users/pascalleclercq");
+		//TrackerTest test = new TrackerTest("/Users/pascalleclercq/Documents/mon-workspace/angular2-200/src/app", "ng generate class example  --spec false", "/Users/pascalleclercq");
+		TrackerTest test = new TrackerTest();
 		test.processText("PS1='\\w\\", 80);
 		test.processText("$ '", 80);
 		test.processCarriageReturnLineFeed();

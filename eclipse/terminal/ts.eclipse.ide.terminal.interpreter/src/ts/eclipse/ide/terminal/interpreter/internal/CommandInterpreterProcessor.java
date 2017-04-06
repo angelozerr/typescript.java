@@ -11,7 +11,6 @@
 package ts.eclipse.ide.terminal.interpreter.internal;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnecto
 
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
-import ts.eclipse.ide.terminal.interpreter.ICommandTerminalServiceConstants;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
 
 public class CommandInterpreterProcessor extends CommandTerminalTracker
 		implements ITerminalServiceOutputStreamMonitorListener {
@@ -30,40 +29,12 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 	private final String encoding;
 
 	public CommandInterpreterProcessor(Map<String, Object> properties) {
-		super(getInitialWorkingDir(properties), getInitialCommand(properties));
 		this.encoding = getInitialEncoding(properties);
 	}
 
 	@Override
 	public final void onContentReadFromStream(byte[] byteBuffer, int bytesRead) {
 		super.parse(byteBuffer, bytesRead, encoding);
-	}
-
-	/**
-	 * Returns the initial working directory when terminal is opened.
-	 * 
-	 * @param properties
-	 * @return the initial working directory when terminal is opened.
-	 */
-	private static String getInitialWorkingDir(Map<String, Object> properties) {
-		return (String) properties.get(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR);
-	}
-
-	/**
-	 * Returns the initial command when terminal is opened.
-	 * 
-	 * @param properties
-	 * @return the initial command when terminal is opened.
-	 */
-	private static String getInitialCommand(Map<String, Object> properties) {
-		Object command = properties.get(ICommandTerminalServiceConstants.COMMAND_ID);
-		if (command instanceof Collection) {
-			Collection<String> commands = (Collection<String>) command;
-			for (String cmd : commands) {
-				return cmd;
-			}
-		}
-		return (String) command;
 	}
 
 	/**

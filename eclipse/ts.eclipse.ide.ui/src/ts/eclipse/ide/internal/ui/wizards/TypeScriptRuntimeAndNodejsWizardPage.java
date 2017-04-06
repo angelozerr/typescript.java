@@ -33,10 +33,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.service.prefs.BackingStoreException;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.nodejs.IDENodejsProcessHelper;
@@ -46,8 +48,10 @@ import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog.Mode;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
+import ts.eclipse.ide.terminal.interpreter.TerminalCommandAdapter;
 import ts.eclipse.ide.ui.preferences.StatusInfo;
-import ts.eclipse.ide.ui.widgets.NPMInstallWidget;
+import ts.eclipse.ide.ui.widgets.NpmInstallWidget;
 import ts.eclipse.ide.ui.wizards.AbstractWizardPage;
 import ts.nodejs.NodejsProcessHelper;
 import ts.repository.ITypeScriptRepository;
@@ -63,7 +67,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 	private Button useEmbeddedTsRuntimeButton;
 	private boolean useEmbeddedTsRuntime;
 	private Combo embeddedTsRuntime;
-	private NPMInstallWidget installTsRuntime;
+	private NpmInstallWidget installTsRuntime;
 
 	// Node.js
 	private boolean useEmbeddedNodeJs;
@@ -165,7 +169,7 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 				updateTsRuntimeMode();
 			}
 		});
-		installTsRuntime = new NPMInstallWidget("typescript", this, parent, SWT.NONE);
+		installTsRuntime = new NpmInstallWidget("typescript", this, parent, SWT.NONE);
 		installTsRuntime.getVersionText().addListener(SWT.Modify, this);
 	}
 
@@ -479,12 +483,30 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 		}
 	}
 
-	public boolean updateCommand(List<String> commands) {
+	public void updateCommand(List<LineCommand> commands, final IEclipsePreferences preferences) {
 		if (!useEmbeddedTsRuntime) {
-			commands.add(installTsRuntime.getNpmInstallCommand());
-			return true;
+			commands.add(new LineCommand(installTsRuntime.getNpmInstallCommand(), new TerminalCommandAdapter() {
+				@Override
+				public void onTerminateCommand(LineCommand lineCommand) {
+
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
+							preferences.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
+									"${project_loc:node_modules/typescript}");
+							try {
+								preferences.flush();
+							} catch (BackingStoreException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+
+				}
+			}));
+
 		}
-		return false;
 	}
 
 }
