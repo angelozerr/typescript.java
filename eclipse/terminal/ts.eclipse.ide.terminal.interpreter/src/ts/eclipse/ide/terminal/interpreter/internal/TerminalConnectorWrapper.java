@@ -71,8 +71,10 @@ public class TerminalConnectorWrapper implements ITerminalConnectorWrapper, ITer
 			@SuppressWarnings("unchecked")
 			List<LineCommand> commands = (List<LineCommand>) properties
 					.get(ICommandTerminalServiceConstants.COMMAND_ID);
-			for (LineCommand lineCommand : commands) {
-				executeCommand(lineCommand, properties);
+			if (commands != null) {
+				for (LineCommand lineCommand : commands) {
+					executeCommand(lineCommand, properties);
+				}
 			}
 		}
 	}
