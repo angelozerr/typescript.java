@@ -105,13 +105,13 @@ public class ATAConfigurationBlock extends OptionsConfigurationBlock {
 	private void createDisableATAField(Composite parent) {
 		// Create "Disable ATA" checkbox
 		enableTelemetry = addCheckBox(parent, TypeScriptUIMessages.ATAConfigurationBlock_disableATA_checkbox_label,
-				PREF_INSTALL_TYPES_DISABLE_ATA, new String[] { "true", "true" }, 0);
+				PREF_INSTALL_TYPES_DISABLE_ATA, new String[] { "true", "false" }, 0);
 	}
 	
 	private void createEnableTelementryField(Composite parent) {
 		// Create "Enable telemetry" checkbox
 		enableTelemetry = addCheckBox(parent, TypeScriptUIMessages.ATAConfigurationBlock_enableTelemetry_checkbox_label,
-				PREF_INSTALL_TYPES_ENABLE_TELEMETRY, new String[] { "true", "true" }, 0);
+				PREF_INSTALL_TYPES_ENABLE_TELEMETRY, new String[] { "true", "false" }, 0);
 	}
 
 	/*protected void createBrowseButtons(final Composite parent, final Combo filePathCombo) {
