@@ -14,8 +14,9 @@ import java.util.List;
 
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
+import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterParametersExtractor;
 
-public class CdCommandInterpreterFactory implements ICommandInterpreterFactory {
+public class CdCommandInterpreterFactory implements ICommandInterpreterFactory, ICommandInterpreterParametersExtractor {
 
 	@Override
 	public ICommandInterpreter create(List<String> parameters, String workingDir) {
@@ -26,4 +27,11 @@ public class CdCommandInterpreterFactory implements ICommandInterpreterFactory {
 		return new CdCommandInterpreter(path, workingDir);
 	}
 
+	@Override
+	public String extractParameters(String cmdWithParameters) {
+		if (!cmdWithParameters.startsWith("cd")) {
+			return null;
+		}
+		return cmdWithParameters.length() > 2 ? cmdWithParameters.substring(2, cmdWithParameters.length()) : "";
+	}
 }

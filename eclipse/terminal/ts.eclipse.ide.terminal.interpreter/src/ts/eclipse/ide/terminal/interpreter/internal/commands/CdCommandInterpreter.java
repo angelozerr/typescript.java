@@ -18,7 +18,7 @@ public class CdCommandInterpreter extends AbstractCommandInterpreter {
 	}
 
 	@Override
-	public void execute(String newWorkingDir) {	
+	public void execute(String newWorkingDir) {
 		try {
 			final IContainer[] c = ResourcesPlugin.getWorkspace().getRoot()
 					.findContainersForLocation(new Path(newWorkingDir));

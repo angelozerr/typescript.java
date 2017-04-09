@@ -81,60 +81,9 @@ public class CommandInterpreterProcessor extends CommandTerminalTracker
 		// Initialize interpreter if needed
 		if (interpreter == null) {
 			if (command != null) {
-				String cmd = getCmd(command);
-				ICommandInterpreterFactory factory = CommandInterpreterManager.getInstance().getFactory(cmd);
-				if (factory != null) {
-					List<String> parameters = getParameters(command);
-					interpreter = factory.create(parameters, workingDir);
-				}
+				interpreter = CommandInterpreterManager.getInstance().createInterpreter(command.trim(), workingDir);				
 			}
 		}
-	}
-
-	private List<String> getParameters(String cmdWithParameters) {
-		int index = cmdWithParameters.indexOf(" ");
-		if (index == -1) {
-			// search '.' for "cd..", "cd."
-			index = cmdWithParameters.indexOf(".");
-		}
-		if (index == -1) {
-			return Collections.emptyList();
-		}
-		List<String> parameters = new ArrayList<String>();
-		char[] chars = cmdWithParameters.substring(index, cmdWithParameters.length()).trim().toCharArray();
-		StringBuilder param = null;
-		for (int i = 0; i < chars.length; i++) {
-			char c = chars[i];
-			switch (c) {
-			case ' ':
-				if (param != null) {
-					parameters.add(param.toString());
-				}
-				param = null;
-				break;
-			default:
-				if (param == null) {
-					param = new StringBuilder();
-				}
-				param.append(c);
-			}
-		}
-		if (param != null) {
-			parameters.add(param.toString());
-		}
-		return parameters;
-	}
-
-	private String getCmd(String cmdWithParameters) {
-		int index = cmdWithParameters.indexOf(" ");
-		if (index == -1) {
-			// search '.' for "cd..", "cd."
-			index = cmdWithParameters.indexOf(".");
-		}
-		if (index != -1) {
-			return cmdWithParameters.substring(0, index);
-		}
-		return cmdWithParameters;
 	}
 
 }
