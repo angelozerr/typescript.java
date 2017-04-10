@@ -485,6 +485,9 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 
 	public void updateCommand(List<LineCommand> commands, final IEclipsePreferences preferences) {
 		if (!useEmbeddedTsRuntime) {
+			// when TypeScript is installed when "npm install typescript"
+			// command is terminated, update the project Eclispe preferences
+			// to consume this installed TypeScript runtime.
 			commands.add(new LineCommand(installTsRuntime.getNpmInstallCommand(), new TerminalCommandAdapter() {
 				@Override
 				public void onTerminateCommand(LineCommand lineCommand) {
@@ -505,7 +508,6 @@ public class TypeScriptRuntimeAndNodejsWizardPage extends AbstractWizardPage {
 
 				}
 			}));
-
 		}
 	}
 

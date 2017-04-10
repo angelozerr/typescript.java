@@ -5,6 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ControlEnableState;
@@ -36,6 +40,7 @@ import ts.cmd.tsc.Plugin;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
+import ts.eclipse.ide.terminal.interpreter.TerminalCommandAdapter;
 import ts.eclipse.ide.ui.widgets.NpmInstallWidget;
 import ts.eclipse.ide.ui.wizards.AbstractWizardPage;
 import ts.repository.ITypeScriptRepository;
@@ -303,9 +308,21 @@ public class TSLintWizardPage extends AbstractWizardPage {
 
 	}
 
-	public void updateCommand(List<LineCommand> commands) {
+	public void updateCommand(List<LineCommand> commands, IProject project) {
 		if (!useEmbeddedTslintRuntime) {
 			commands.add(new LineCommand(installTslintRuntime.getNpmInstallCommand()));
+			// generate a tslint.json file by using tslint toolings
+			commands.add(new LineCommand("node node_modules/tslint/bin/tslint -i", new TerminalCommandAdapter() {
+				@Override
+				public void onTerminateCommand(LineCommand lineCommand) {
+					IFile tslintJsonFile = project.getFile("tslint.json");
+					try {
+						tslintJsonFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+					} catch (CoreException e) {						
+						e.printStackTrace();
+					}
+				}
+			}));
 		}
 		if (!useEmbeddedTslintPlugin) {
 			commands.add(new LineCommand(installTslintPlugin.getNpmInstallCommand()));

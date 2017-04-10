@@ -178,7 +178,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 				// Install TypeScript/tslint if needed
 				List<LineCommand> commands = new ArrayList<>();
 				tsRuntimeAndNodeJsPage.updateCommand(commands, preferences);
-				tslintPage.updateCommand(commands);
+				tslintPage.updateCommand(commands, newProjectHandle);
 
 				if (!commands.isEmpty()) {
 					// Prepare terminal properties
