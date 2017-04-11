@@ -3,6 +3,27 @@ if (typeof ts === "undefined") {
 }
 var ts;
 try {
+  var optionDeclarations;
+  Object.defineProperty(ts, "optionDeclarations", {
+    get: function() {
+	  var pluginDecl =  {
+        name: "plugins",
+        type: "list",
+        isTSConfigOnly: true,
+        element: {
+            name: "plugin",
+            type: "object"
+        }
+      }
+      optionDeclarations.push(pluginDecl);
+      return optionDeclarations;
+    },
+    set: function(v) {
+      optionDeclarations = v;
+    },
+    configurable: true,
+    enumerable: true
+  });	
   // Wrap ts.createLanguageService to load plugins declared in the tsconfig.json
   // See https://github.com/Microsoft/TypeScript/issues/11976
   var createLanguageService;
@@ -23,16 +44,13 @@ try {
           //  }
           //}
           //
-          var compilerOptions = host.getCompilationSettings();        
-          if (compilerOptions && Object.getOwnPropertyNames(compilerOptions).length > 1) {
+          var compilerOptions = host.getCompilationSettings();
+          if (compilerOptions) {
             var project = host.project;
-            // It exists "compilerOptions", reload tsconfig.json because at this step, compilerOptions/plugins is not available.
-            var configFilename = ts.normalizePath(compilerOptions.configFilePath);          
-            var configFileContent = host.readFile(configFilename);
-            var configJsonObject = ts.parseConfigFileTextToJson(configFilename, configFileContent);
             // get array of compilerOptions/plugins
-            var plugins = configJsonObject.config.compilerOptions.plugins;          
-            
+            var plugins = compilerOptions.plugins;          
+            // TypeScript 2.0.0 defines psLogger and TypeScript 2.1.0 defines logger.
+            if (!project.projectService.logger && project.projectService.psLogger) project.projectService.logger = project.projectService.psLogger;
             if (!(plugins && plugins.length)) {                
               project.projectService.logger.info("No plugins exist");
               // No plugins
@@ -61,30 +79,26 @@ try {
           }
     	}
     	
-    	function enableProxy(pluginModule, configEntry) {
+    	function enableProxy(pluginModuleFactory, configEntry) {
     		var project = host.project;
     		try {
-    			 var info /* PluginCreateInfo*/ = {
+    		    if (typeof pluginModuleFactory !== "function") {
+                    project.projectService.logger.info("Skipped loading plugin " + configEntry.name + " because it did expose a proper factory function");
+                    return;
+                }
+    			var info /* PluginCreateInfo*/ = {
                     config: configEntry,
                     project: project,
                     languageService: languageService,
                     languageServiceHost: host,
                     serverHost: project.projectService.host,
                 };
-    			// Remove that when TypeScript will provide custom codefix registration
-    			 // see https://github.com/Microsoft/TypeScript/issues/13435
-    			// This code is used by tslint-language-service (codefix.registerCodeFix(action))
-    			info.ts = ts;
-                if (pluginModule.create === undefined && typeof pluginModule === "function") {
-                    // We might get back a top-level factory function instead,
-                    // depending on the presence of default exports
-                    project.projectService.logger.info("Unwrapping factory function module import");
-                    pluginModule = pluginModule(/* { typescript: ts } */);                    
-                }
+    			var pluginModule = pluginModuleFactory({ typescript: ts });
                 languageService = pluginModule.create(info);
                 // this.plugins.push(pluginModule);
             }
             catch (e) {
+            	console.error(e)
                 project.projectService.logger.info("Plugin activation failed: " + e);
                 if (typeof pluginModule === "object") {
                     project.projectService.logger.info("Plugin top-level keys: " + Object.keys(pluginModule));

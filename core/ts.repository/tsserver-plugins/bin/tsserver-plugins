@@ -2,7 +2,8 @@
 
 var fs = require("fs"),
 	vm = require("vm"),
-	mod = require('module')
+	mod = require('module'),
+	path = require('path')
 
 // Retrieve "node_modules/typescript" directory
 var typescriptDir = process.argv.indexOf("--typescriptDir");
@@ -13,9 +14,13 @@ if (typescriptDir > -1) {
   typescriptDir = typescriptDir.substring(0, typescriptDir.length - "typescript.js".length);
 }
 
+var dirname = typescriptDir, filename = typescriptDir  + "tsserver.js";
 // concat 'before-tsserver.js' with 'tsserver.js'
 var src = fs.readFileSync(__dirname  + "/../src/before-tsserver.js");
 src += '\n';
-src += fs.readFileSync(typescriptDir  + "tsserver.js");
+src += fs.readFileSync(filename);
 
-vm.runInThisContext(mod.wrap(src))(exports, require, module, typescriptDir  + "tsserver.js", typescriptDir);
+// Add typescriptDir/node_modules in the path
+module.paths.splice( 0, 0, path.normalize(typescriptDir + "../.."))
+
+vm.runInThisContext(mod.wrap(src))(exports, require, module, filename, dirname);
