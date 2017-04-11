@@ -172,7 +172,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param allowSyntheticDefaultImports
 	 */
-	public void setAllowSyntheticDefaultImports(boolean allowSyntheticDefaultImports) {
+	public void setAllowSyntheticDefaultImports(Boolean allowSyntheticDefaultImports) {
 		this.allowSyntheticDefaultImports = allowSyntheticDefaultImports;
 	}
 
@@ -190,7 +190,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param allowUnreachableCode
 	 */
-	public void setAllowUnreachableCode(boolean allowUnreachableCode) {
+	public void setAllowUnreachableCode(Boolean allowUnreachableCode) {
 		this.allowUnreachableCode = allowUnreachableCode;
 	}
 
@@ -208,7 +208,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param allowUnusedLabels
 	 */
-	public void setAllowUnusedLabels(boolean allowUnusedLabels) {
+	public void setAllowUnusedLabels(Boolean allowUnusedLabels) {
 		this.allowUnusedLabels = allowUnusedLabels;
 	}
 
@@ -244,7 +244,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param declaration
 	 */
-	public void setDeclaration(boolean declaration) {
+	public void setDeclaration(Boolean declaration) {
 		this.declaration = declaration;
 	}
 
@@ -262,7 +262,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param diagnostics
 	 */
-	public void setDiagnostics(boolean diagnostics) {
+	public void setDiagnostics(Boolean diagnostics) {
 		this.diagnostics = diagnostics;
 	}
 
@@ -280,7 +280,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param emitBOM
 	 */
-	public void setEmitBOM(boolean emitBOM) {
+	public void setEmitBOM(Boolean emitBOM) {
 		this.emitBOM = emitBOM;
 	}
 
@@ -300,7 +300,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param emitDecoratorMetadata
 	 */
-	public void setEmitDecoratorMetadata(boolean emitDecoratorMetadata) {
+	public void setEmitDecoratorMetadata(Boolean emitDecoratorMetadata) {
 		this.emitDecoratorMetadata = emitDecoratorMetadata;
 	}
 
@@ -318,7 +318,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param experimentalDecorators
 	 */
-	public void setExperimentalDecorators(boolean experimentalDecorators) {
+	public void setExperimentalDecorators(Boolean experimentalDecorators) {
 		this.experimentalDecorators = experimentalDecorators;
 	}
 
@@ -336,7 +336,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param forceConsistentCasingInFileNames
 	 */
-	public void setForceConsistentCasingInFileNames(boolean forceConsistentCasingInFileNames) {
+	public void setForceConsistentCasingInFileNames(Boolean forceConsistentCasingInFileNames) {
 		this.forceConsistentCasingInFileNames = forceConsistentCasingInFileNames;
 	}
 
@@ -354,7 +354,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param help
 	 */
-	public void setHelp(boolean help) {
+	public void setHelp(Boolean help) {
 		this.help = help;
 	}
 
@@ -372,7 +372,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param inlineSourceMap
 	 */
-	public void setInlineSourceMap(boolean inlineSourceMap) {
+	public void setInlineSourceMap(Boolean inlineSourceMap) {
 		this.inlineSourceMap = inlineSourceMap;
 	}
 
@@ -392,7 +392,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param inlineSources
 	 */
-	public void setInlineSources(boolean inlineSources) {
+	public void setInlineSources(Boolean inlineSources) {
 		this.inlineSources = inlineSources;
 	}
 
@@ -410,7 +410,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param init
 	 */
-	public void setInit(boolean init) {
+	public void setInit(Boolean init) {
 		this.init = init;
 	}
 
@@ -428,7 +428,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param isolatedModules
 	 */
-	public void setIsolatedModules(boolean isolatedModules) {
+	public void setIsolatedModules(Boolean isolatedModules) {
 		this.isolatedModules = isolatedModules;
 	}
 
@@ -468,7 +468,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param listEmittedFiles
 	 */
-	public void setListEmittedFiles(boolean listEmittedFiles) {
+	public void setListEmittedFiles(Boolean listEmittedFiles) {
 		this.listEmittedFiles = listEmittedFiles;
 	}
 
@@ -487,7 +487,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param listFiles
 	 */
-	public void setListFiles(boolean listFiles) {
+	public void setListFiles(Boolean listFiles) {
 		this.listFiles = listFiles;
 	}
 
@@ -617,7 +617,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noEmit
 	 */
-	public void setNoEmit(boolean noEmit) {
+	public void setNoEmit(Boolean noEmit) {
 		this.noEmit = noEmit;
 	}
 
@@ -637,7 +637,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noEmitHelpers
 	 */
-	public void setNoEmitHelpers(boolean noEmitHelpers) {
+	public void setNoEmitHelpers(Boolean noEmitHelpers) {
 		this.noEmitHelpers = noEmitHelpers;
 	}
 
@@ -655,7 +655,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noEmitOnError
 	 */
-	public void setNoEmitOnError(boolean noEmitOnError) {
+	public void setNoEmitOnError(Boolean noEmitOnError) {
 		this.noEmitOnError = noEmitOnError;
 	}
 
@@ -673,7 +673,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noFallthroughCasesInSwitch
 	 */
-	public void setNoFallthroughCasesInSwitch(boolean noFallthroughCasesInSwitch) {
+	public void setNoFallthroughCasesInSwitch(Boolean noFallthroughCasesInSwitch) {
 		this.noFallthroughCasesInSwitch = noFallthroughCasesInSwitch;
 	}
 
@@ -691,7 +691,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noImplicitAny
 	 */
-	public void setNoImplicitAny(boolean noImplicitAny) {
+	public void setNoImplicitAny(Boolean noImplicitAny) {
 		this.noImplicitAny = noImplicitAny;
 	}
 
@@ -709,7 +709,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noImplicitReturns
 	 */
-	public void setNoImplicitReturns(boolean noImplicitReturns) {
+	public void setNoImplicitReturns(Boolean noImplicitReturns) {
 		this.noImplicitReturns = noImplicitReturns;
 	}
 
@@ -727,7 +727,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noImplicitUseStrict
 	 */
-	public void setNoImplicitUseStrict(boolean noImplicitUseStrict) {
+	public void setNoImplicitUseStrict(Boolean noImplicitUseStrict) {
 		this.noImplicitUseStrict = noImplicitUseStrict;
 	}
 
@@ -745,7 +745,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noLib
 	 */
-	public void setNoLib(boolean noLib) {
+	public void setNoLib(Boolean noLib) {
 		this.noLib = noLib;
 	}
 
@@ -765,7 +765,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param noResolve
 	 */
-	public void setNoResolve(boolean noResolve) {
+	public void setNoResolve(Boolean noResolve) {
 		this.noResolve = noResolve;
 	}
 
@@ -890,7 +890,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param preserveConstEnums
 	 */
-	public void setPreserveConstEnums(boolean preserveConstEnums) {
+	public void setPreserveConstEnums(Boolean preserveConstEnums) {
 		this.preserveConstEnums = preserveConstEnums;
 	}
 
@@ -908,7 +908,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param pretty
 	 */
-	public void setPretty(boolean pretty) {
+	public void setPretty(Boolean pretty) {
 		this.pretty = pretty;
 	}
 
@@ -968,7 +968,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param removeComments
 	 */
-	public void setRemoveComments(boolean removeComments) {
+	public void setRemoveComments(Boolean removeComments) {
 		this.removeComments = removeComments;
 	}
 
@@ -1027,7 +1027,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param skipDefaultLibCheck
 	 */
-	public void setSkipDefaultLibCheck(boolean skipDefaultLibCheck) {
+	public void setSkipDefaultLibCheck(Boolean skipDefaultLibCheck) {
 		this.skipDefaultLibCheck = skipDefaultLibCheck;
 	}
 
@@ -1045,7 +1045,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param sourceMap
 	 */
-	public void setSourceMap(boolean sourceMap) {
+	public void setSourceMap(Boolean sourceMap) {
 		this.sourceMap = sourceMap;
 	}
 
@@ -1093,7 +1093,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param strictNullChecks
 	 */
-	public void setStrictNullChecks(boolean strictNullChecks) {
+	public void setStrictNullChecks(Boolean strictNullChecks) {
 		this.strictNullChecks = strictNullChecks;
 	}
 
@@ -1111,7 +1111,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param stripInternal
 	 */
-	public void setStripInternal(boolean stripInternal) {
+	public void setStripInternal(Boolean stripInternal) {
 		this.stripInternal = stripInternal;
 	}
 
@@ -1129,7 +1129,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param suppressExcessPropertyErrors
 	 */
-	public void setSuppressExcessPropertyErrors(boolean suppressExcessPropertyErrors) {
+	public void setSuppressExcessPropertyErrors(Boolean suppressExcessPropertyErrors) {
 		this.suppressExcessPropertyErrors = suppressExcessPropertyErrors;
 	}
 
@@ -1153,7 +1153,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param suppressImplicitAnyIndexErrors
 	 */
-	public void setSuppressImplicitAnyIndexErrors(boolean suppressImplicitAnyIndexErrors) {
+	public void setSuppressImplicitAnyIndexErrors(Boolean suppressImplicitAnyIndexErrors) {
 		this.suppressImplicitAnyIndexErrors = suppressImplicitAnyIndexErrors;
 	}
 
@@ -1189,7 +1189,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param traceResolution
 	 */
-	public void setTraceResolution(boolean traceResolution) {
+	public void setTraceResolution(Boolean traceResolution) {
 		this.traceResolution = traceResolution;
 	}
 
@@ -1207,7 +1207,7 @@ public class CompilerOptions extends AbstractOptions {
 	 * 
 	 * @param version
 	 */
-	public void setVersion(boolean version) {
+	public void setVersion(Boolean version) {
 		this.version = version;
 	}
 
