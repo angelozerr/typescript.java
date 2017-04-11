@@ -37,9 +37,9 @@ public enum CommandNames {
 	ProjectInfo("projectInfo"),
 	Rename("rename"),
 	
-	// 2.0.3
-	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.3"), 
-	SyntacticDiagnosticsSync("syntacticDiagnosticsSync", "2.0.3"), 
+	// 2.0.0
+	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.0"), 
+	SyntacticDiagnosticsSync("syntacticDiagnosticsSync", "2.0.0"), 
 	
 	// 2.0.5
 	CompileOnSaveAffectedFileList("compileOnSaveAffectedFileList", "2.0.5"),
