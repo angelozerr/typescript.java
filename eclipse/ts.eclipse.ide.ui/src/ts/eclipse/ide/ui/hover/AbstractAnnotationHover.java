@@ -139,7 +139,7 @@ public abstract class AbstractAnnotationHover extends AbstractTypeScriptHover {
 			Iterator<Annotation> parent;
 			if (model instanceof IAnnotationModelExtension2)
 				parent = ((IAnnotationModelExtension2) model).getAnnotationIterator(hoverRegion.getOffset(),
-						hoverRegion.getLength(), true, true);
+						hoverRegion.getLength() > 0 ? hoverRegion.getLength() : 1, true, true);
 			else
 				parent = model.getAnnotationIterator();
 			Iterator<Annotation> e = new TypeScriptAnnotationIterator(parent, fAllAnnotations);
@@ -192,22 +192,25 @@ public abstract class AbstractAnnotationHover extends AbstractTypeScriptHover {
 	protected AnnotationInfo createAnnotationInfo(Annotation annotation, Position position, ITextViewer textViewer) {
 		return new AnnotationInfo(annotation, position, textViewer);
 	}
-	
+
 	@Override
 	public IInformationControlCreator getHoverControlCreator() {
 		if (fHoverControlCreator == null)
-			fHoverControlCreator= new HoverControlCreator(getInformationPresenterControlCreator());
+			fHoverControlCreator = new HoverControlCreator(getInformationPresenterControlCreator());
 		return fHoverControlCreator;
 	}
 
 	/*
-	 * @see org.eclipse.jdt.internal.ui.text.java.hover.AbstractJavaEditorTextHover#getInformationPresenterControlCreator()
+	 * @see
+	 * org.eclipse.jdt.internal.ui.text.java.hover.AbstractJavaEditorTextHover#
+	 * getInformationPresenterControlCreator()
+	 * 
 	 * @since 3.4
 	 */
 	@Override
 	public IInformationControlCreator getInformationPresenterControlCreator() {
 		if (fPresenterControlCreator == null)
-			fPresenterControlCreator= new PresenterControlCreator();
+			fPresenterControlCreator = new PresenterControlCreator();
 		return fPresenterControlCreator;
 	}
 
@@ -558,7 +561,8 @@ public abstract class AbstractAnnotationHover extends AbstractTypeScriptHover {
 			if (proposals.length == 1) {
 				text = TypeScriptUIMessages.AbstractAnnotationHover_message_singleQuickFix;
 			} else {
-				text = NLS.bind(TypeScriptUIMessages.AbstractAnnotationHover_message_multipleQuickFix, new Object[] { String.valueOf(proposals.length) });
+				text = NLS.bind(TypeScriptUIMessages.AbstractAnnotationHover_message_multipleQuickFix,
+						new Object[] { String.valueOf(proposals.length) });
 			}
 			quickFixLabel.setText(text);
 
