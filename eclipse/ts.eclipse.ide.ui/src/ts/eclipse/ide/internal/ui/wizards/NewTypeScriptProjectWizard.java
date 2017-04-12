@@ -12,6 +12,7 @@
  */
 package ts.eclipse.ide.internal.ui.wizards;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -52,13 +53,16 @@ import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
+import ts.eclipse.ide.terminal.interpreter.EnvPath;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.wizards.AbstractNewProjectWizard;
 import ts.npm.NpmConstants;
 import ts.npm.PackageJson;
 import ts.resources.jsonconfig.TsconfigJson;
+import ts.utils.FileUtils;
 import ts.utils.IOUtils;
+import ts.utils.StringUtils;
 
 /**
  * Standard workbench wizard that creates a new TypeScript project resource in
@@ -193,6 +197,12 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 					properties.put(ITerminalsConnectorConstants.PROP_TERMINAL_CONNECTOR_ID,
 							"org.eclipse.tm.terminal.connector.local.LocalConnector");
 
+					// Prepare environnement Path:
+					// - add nodejs directory
+					String nodeFilePath = getNodeFilePath();
+					if (!StringUtils.isEmpty(nodeFilePath)) {
+						EnvPath.insertToEnvPath(properties, nodeFilePath);
+					}
 					CommandTerminalService.getInstance().executeCommand(commands, terminalId, properties, null);
 
 				}
@@ -223,6 +233,11 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 					}
 				});
 
+			}
+
+			private String getNodeFilePath() {
+				File nodeFile = TypeScriptResourceUtil.getWorkspaceNodejsInstallPath();
+				return nodeFile != null ? FileUtils.getPath(nodeFile) : null;
 			}
 		};
 	}
