@@ -93,7 +93,8 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptRuntimeConfigurationBlock_installedTypeScript_required_error;
 	public static String TypeScriptRuntimeConfigurationBlock_typeScriptFile_exists_error;
 	public static String TypeScriptRuntimeConfigurationBlock_typeScriptFile_invalid_error;
-
+	public static String TypeScriptRuntimeConfigurationBlock_installedTypeScript_emulatePlugins_warning;
+	
 	// tsserver
 	public static String TypeScriptRuntimeConfigurationBlock_traceOnConsole_label;
 	public static String TypeScriptRuntimeConfigurationBlock_emulatePlugins_label;

@@ -444,6 +444,10 @@ public class TypeScriptResourceUtil {
 		if (isTypeScriptProject(project)) {
 			return getTypeScriptProject(project).getProjectSettings().getNodejsInstallPath();
 		}
+		return getWorkspaceNodejsInstallPath();
+	}
+
+	public static File getWorkspaceNodejsInstallPath() {
 		return IDETypeScriptProjectSettings.getWorkspaceNodejsInstallPath();
 	}
 

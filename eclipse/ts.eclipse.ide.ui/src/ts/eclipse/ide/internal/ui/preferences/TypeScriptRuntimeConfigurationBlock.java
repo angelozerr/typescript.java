@@ -14,10 +14,12 @@ import java.io.File;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -34,6 +36,7 @@ import ts.repository.TypeScriptRepositoryException;
 import ts.repository.TypeScriptRepositoryManager;
 import ts.utils.FileUtils;
 import ts.utils.StringUtils;
+import ts.utils.VersionHelper;
 
 /**
  * TypeScript Runtime configuration block.
@@ -56,6 +59,7 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 
 	private Text tsRuntimePath;
 	private Text tsRuntimeVersion;
+	private Button emulatePlugins;
 
 	public TypeScriptRuntimeConfigurationBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container) {
@@ -67,7 +71,8 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 		super.createBody(parent);
 		super.addCheckBox(parent, TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_traceOnConsole_label,
 				PREF_TSSERVER_TRACE_ON_CONSOLE, new String[] { "true", "false" }, 0);
-		super.addCheckBox(parent, TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_emulatePlugins_label,
+		emulatePlugins = super.addCheckBox(parent,
+				TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_emulatePlugins_label,
 				PREF_TSSERVER_EMULATE_PLUGINS, new String[] { "true", "false" }, 0);
 		createTypeScriptRuntimeInfo(parent.getParent());
 	}
@@ -172,7 +177,7 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 	 * 
 	 * @return the validation status of the TypeScript path.
 	 */
-	private IStatus validateAndUpdateTsRuntimePath() {
+	private TypeScriptRuntimeStatus validateAndUpdateTsRuntimePath() {
 		// Compute runtime status
 		TypeScriptRuntimeStatus status = validateTsRuntimePath();
 		// Update TypeScript version & path
@@ -240,6 +245,17 @@ public class TypeScriptRuntimeConfigurationBlock extends AbstractTypeScriptRepos
 	@Override
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		IStatus status = validateAndUpdateTsRuntimePath();
+		if (status.isOK()) {
+			status = validateUseOfTsserverPlugins(((TypeScriptRuntimeStatus) status).getTsVersion());
+		}
 		fContext.statusChanged(status);
+	}
+
+	private IStatus validateUseOfTsserverPlugins(String tsVersion) {
+		if (emulatePlugins.getSelection() && VersionHelper.canSupport(tsVersion, "2.2.1")) {
+			return new StatusInfo(IStatus.WARNING,
+					TypeScriptUIMessages.TypeScriptRuntimeConfigurationBlock_installedTypeScript_emulatePlugins_warning);
+		}
+		return Status.OK_STATUS;
 	}
 }
