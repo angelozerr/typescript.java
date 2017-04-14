@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: ts.eclipse.ide.json.core;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.3.0.qualifier
 Bundle-Activator: ts.eclipse.ide.json.core.internal.TypeScriptJSONCorePlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
