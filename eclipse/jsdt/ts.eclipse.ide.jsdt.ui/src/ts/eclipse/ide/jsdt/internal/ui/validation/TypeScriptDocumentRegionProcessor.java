@@ -12,6 +12,7 @@ package ts.eclipse.ide.jsdt.internal.ui.validation;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
@@ -94,9 +95,12 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 			return super.getFoldingStrategy();
 		}
 		if (foldingStrategy == null) {
-			foldingStrategy = new TypeScriptFoldingStrategy();
-			foldingStrategy.setViewer((ProjectionViewer) getTextViewer());
-			foldingStrategy.setDocument(getDocument());
+			ITextViewer viewer = getTextViewer();
+			if (viewer instanceof ProjectionViewer) {
+				foldingStrategy = new TypeScriptFoldingStrategy();
+				foldingStrategy.setViewer((ProjectionViewer) viewer);
+				foldingStrategy.setDocument(getDocument());
+			}
 		}
 		return foldingStrategy;
 	}
