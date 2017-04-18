@@ -22,7 +22,7 @@
 					 schema="schema/nodeJSInstalls.exsd" />
  <extension-point id="typeScriptRepositories" name="%typeScriptRepositoriesContribution.name" schema="schema/typeScriptRepositories.exsd"/>
 
-   <extension point="org.eclipse.core.runtime.contentTypes">
+   <extension point="org.eclipse.core.contenttype.contentTypes">
 	<content-type 
 		id="tsSource"
 		name="%tsSourceName"
@@ -33,7 +33,7 @@
 	</content-type>
    </extension>
   		
-   <extension point="org.eclipse.core.runtime.contentTypes">
+   <extension point="org.eclipse.core.contenttype.contentTypes">
 	<content-type 
 		id="jsxSource"
 		name="%jsxSourceName"
@@ -44,7 +44,7 @@
 	</content-type>
    </extension>
 
-   <extension point="org.eclipse.core.runtime.contentTypes">
+   <extension point="org.eclipse.core.contenttype.contentTypes">
 	<content-type 
 		id="tsxSource"
 		name="%tsxSourceName"
