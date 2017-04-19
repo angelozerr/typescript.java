@@ -714,5 +714,28 @@
             contentTypeId="ts.eclipse.ide.core.tsxSource"
             scopeName="source.tsx">
       </scopeNameContentTypeBinding>           
-   </extension>   
+   </extension>
+   
+   <!-- Compare -->
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <viewer
+            extensions="jsx,ts,tsx"
+            class="ts.eclipse.ide.jsdt.internal.ui.compare.TypeScriptContentViewerCreator"
+            id="ts.eclipse.ide.jsdt.ui.compare.TypeScriptContentViewerCreator">
+      </viewer>
+      <contentTypeBinding
+			contentTypeId="ts.eclipse.ide.core.jsxSource"
+            contentMergeViewerId="ts.eclipse.ide.jsdt.ui.compare.TypeScriptContentViewerCreator">
+	  </contentTypeBinding>
+	  <contentTypeBinding
+			contentTypeId="ts.eclipse.ide.core.tsSource"
+            contentMergeViewerId="ts.eclipse.ide.jsdt.ui.compare.TypeScriptContentViewerCreator">
+	  </contentTypeBinding>
+	  <contentTypeBinding
+			contentTypeId="ts.eclipse.ide.core.tsxSource"
+            contentMergeViewerId="ts.eclipse.ide.jsdt.ui.compare.TypeScriptContentViewerCreator">
+	  </contentTypeBinding>
+   </extension>
+
 </plugin>        

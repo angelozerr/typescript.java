@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -10,9 +10,12 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui.editor;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -48,6 +51,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.wst.jsdt.core.JavaScriptCore;
@@ -597,15 +601,47 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 	protected void setPreferenceStore(IPreferenceStore store) {
 		super.setPreferenceStore(store);
 		if (getSourceViewerConfiguration() instanceof JavaScriptSourceViewerConfiguration) {
-			JavaScriptTextTools textTools= JavaScriptPlugin.getDefault().getJavaTextTools();
-			setSourceViewerConfiguration(new TypeScriptSourceViewerConfiguration(textTools.getColorManager(), store, this, IJavaScriptPartitions.JAVA_PARTITIONING));
+			JavaScriptTextTools textTools = JavaScriptPlugin.getDefault().getJavaTextTools();
+			setSourceViewerConfiguration(new TypeScriptSourceViewerConfiguration(textTools.getColorManager(), store,
+					this, IJavaScriptPartitions.JAVA_PARTITIONING));
 		}
 		if (getSourceViewer() instanceof JavaSourceViewer)
-			((JavaSourceViewer)getSourceViewer()).setPreferenceStore(store);
+			((JavaSourceViewer) getSourceViewer()).setPreferenceStore(store);
 	}
-	
+
 	@Override
 	protected boolean affectsTextPresentation(PropertyChangeEvent event) {
-		return ((JavaScriptSourceViewerConfiguration)getSourceViewerConfiguration()).affectsTextPresentation(event) || super.affectsTextPresentation(event);
+		return ((JavaScriptSourceViewerConfiguration) getSourceViewerConfiguration()).affectsTextPresentation(event)
+				|| super.affectsTextPresentation(event);
+	}
+
+	/**
+	 * Sets this editor's actions into activated (default) or deactived state.
+	 * <p>
+	 * XXX: Currently this is done by using a private method from
+	 * {@link AbstractTextEditor} as we don't want to make this risky method API
+	 * at this point, since Java editor breadcrumb might become a Platform UI
+	 * feature during 3.5 and hence we can then delete this workaround.
+	 * </p>
+	 * 
+	 * @param state
+	 *            <code>true</code> if activated
+	 */
+	protected void setActionsActivated(boolean state) {
+		Method method = null;
+		try {
+			method = AbstractTextEditor.class.getDeclaredMethod("setActionActivation", new Class[] { boolean.class }); //$NON-NLS-1$
+		} catch (SecurityException ex) {
+			JSDTTypeScriptUIPlugin.log(ex);
+		} catch (NoSuchMethodException ex) {
+			JSDTTypeScriptUIPlugin.log(ex);
+		}
+		Assert.isNotNull(method);
+		method.setAccessible(true);
+		try {
+			method.invoke(this, new Object[] { Boolean.valueOf(state) });
+		} catch (InvocationTargetException | IllegalArgumentException | IllegalAccessException ex) {
+			JSDTTypeScriptUIPlugin.log(ex);
+		}
 	}
 }

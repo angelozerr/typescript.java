@@ -28,7 +28,7 @@ import org.osgi.service.prefs.BackingStoreException;
  *
  * 
  */
-class EclipsePreferencesAdapter implements IPreferenceStore {
+public class EclipsePreferencesAdapter implements IPreferenceStore {
 
 	/**
 	 * Preference change listener. Listens for events preferences

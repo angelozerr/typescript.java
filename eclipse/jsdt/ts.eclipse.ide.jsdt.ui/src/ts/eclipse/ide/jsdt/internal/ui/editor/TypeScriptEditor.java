@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.GroupMarker;
@@ -43,13 +44,19 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.ITextViewerExtension7;
+import org.eclipse.jface.text.IWidgetTokenKeeper;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TabsToSpacesConverter;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.formatter.FormattingContextProperties;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
+import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -70,12 +77,14 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.wst.jsdt.core.JavaScriptCore;
 import org.eclipse.wst.jsdt.internal.ui.IJavaHelpContextIds;
 import org.eclipse.wst.jsdt.internal.ui.actions.AddBlockCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.actions.RemoveBlockCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ToggleCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
+import org.eclipse.wst.jsdt.internal.ui.text.comment.CommentFormattingContext;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
 import ts.client.Location;
@@ -99,12 +108,102 @@ import ts.eclipse.ide.ui.outline.IEditorOutlineFeatures;
 import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
+import ts.resources.ITypeScriptProject;
 
 /**
  * TypeScript editor.
  *
  */
 public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEditorOutlineFeatures {
+
+	private static final boolean CODE_ASSIST_DEBUG = "true" //$NON-NLS-1$
+			.equalsIgnoreCase(Platform.getDebugOption("ts.eclipse.ide.jsdt.ui/debug/ResultCollector")); //$NON-NLS-1$
+
+	public class AdaptedSourceViewer extends TypeScriptSourceViewer {
+
+		public AdaptedSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler,
+				boolean showAnnotationsOverview, int styles, IPreferenceStore store) {
+			super(parent, verticalRuler, overviewRuler, showAnnotationsOverview, styles, store);
+		}
+
+		public IContentAssistant getContentAssistant() {
+			return fContentAssistant;
+		}
+
+		/*
+		 * @see ITextOperationTarget#doOperation(int)
+		 */
+		public void doOperation(int operation) {
+
+			if (getTextWidget() == null)
+				return;
+
+			switch (operation) {
+			case CONTENTASSIST_PROPOSALS:
+				long time = CODE_ASSIST_DEBUG ? System.currentTimeMillis() : 0;
+				String msg = fContentAssistant.showPossibleCompletions();
+				if (CODE_ASSIST_DEBUG) {
+					long delta = System.currentTimeMillis() - time;
+					System.err.println("Code Assist (total): " + delta); //$NON-NLS-1$
+				}
+				setStatusLineErrorMessage(msg);
+				return;
+			case QUICK_ASSIST:
+				/*
+				 * XXX: We can get rid of this once the SourceViewer has a way
+				 * to update the status line
+				 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=133787
+				 */
+				msg = fQuickAssistAssistant.showPossibleQuickAssists();
+				setStatusLineErrorMessage(msg);
+				return;
+			}
+
+			super.doOperation(operation);
+		}
+
+		/*
+		 * @see IWidgetTokenOwner#requestWidgetToken(IWidgetTokenKeeper)
+		 */
+		public boolean requestWidgetToken(IWidgetTokenKeeper requester) {
+			if (PlatformUI.getWorkbench().getHelpSystem().isContextHelpDisplayed())
+				return false;
+			return super.requestWidgetToken(requester);
+		}
+
+		/*
+		 * @see
+		 * IWidgetTokenOwnerExtension#requestWidgetToken(IWidgetTokenKeeper,
+		 * int)
+		 * 
+		 */
+		public boolean requestWidgetToken(IWidgetTokenKeeper requester, int priority) {
+			if (PlatformUI.getWorkbench().getHelpSystem().isContextHelpDisplayed())
+				return false;
+			return super.requestWidgetToken(requester, priority);
+		}
+
+		/*
+		 * @see
+		 * org.eclipse.jface.text.source.SourceViewer#createFormattingContext()
+		 * 
+		 */
+//		public IFormattingContext createFormattingContext() {
+//			IFormattingContext context = new CommentFormattingContext();
+//
+//			Map preferences;
+//			ITypeScriptFile inputJavaElement = getTypeScriptFile();
+//			ITypeScriptProject javaProject = inputJavaElement != null ? inputJavaElement.getProject() : null;
+////			if (javaProject == null)
+////				preferences = new HashMap(JavaScriptCore.getOptions());
+////			else
+////				preferences = new HashMap(javaProject.getOptions(true));
+//
+//			//context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
+//
+//			return context;
+//		}
+	}
 
 	protected CompositeActionGroup fActionGroups;
 	private CompositeActionGroup fContextMenuGroup;
@@ -742,7 +841,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			ITypeScriptFile tsFile = getTypeScriptFile(document);
 			if (tsFile != null) {
 				occurrencesCollector.setSelection(selection);
-				if(occurrencesFuture != null && !occurrencesFuture.isDone()) {					
+				if (occurrencesFuture != null && !occurrencesFuture.isDone()) {
 					occurrencesFuture.cancel(true);
 				}
 				occurrencesFuture = tsFile.occurrences(selection.getOffset());
