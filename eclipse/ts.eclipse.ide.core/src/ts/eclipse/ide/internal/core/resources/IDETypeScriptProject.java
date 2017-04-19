@@ -29,8 +29,9 @@ import org.eclipse.jface.text.IDocument;
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.compileonsave.CompileOnSaveAffectedFileListSingleProject;
-import ts.client.diagnostics.Diagnostic;
 import ts.client.diagnostics.DiagnosticEventBody;
+import ts.client.diagnostics.IDiagnostic;
+import ts.client.diagnostics.IDiagnostic.DiagnosticCategory;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
@@ -151,7 +152,8 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 				tsconfigFileListener);
 		TypeScriptCorePlugin.getResourcesWatcher().addFileWatcherListener(getProject(), FileUtils.JSCONFIG_JSON,
 				tsconfigFileListener);
-		// Should be removed when tslint-language-service will support fs.watcher.
+		// Should be removed when tslint-language-service will support
+		// fs.watcher.
 		TypeScriptCorePlugin.getResourcesWatcher().addFileWatcherListener(getProject(), FileUtils.TSLINT_JSON,
 				tsconfigFileListener);
 	}
@@ -381,8 +383,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			// Collect ts files to compile by using tsserver to retrieve
 			// dependencies files.
 			// It works only if tsconfig.json declares "compileOnSave: true".
-			if (collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, false,
-					monitor)) {
+			if (collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, false, monitor)) {
 				return;
 			}
 
@@ -412,8 +413,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * @throws Exception
 	 */
 	private boolean collectTsFilesToCompile(List<IFile> tsFiles, ITypeScriptServiceClient client,
-			List<String> tsFilesToCompile, boolean exclude, IProgressMonitor monitor)
-			throws Exception {
+			List<String> tsFilesToCompile, boolean exclude, IProgressMonitor monitor) throws Exception {
 		for (IFile tsFile : tsFiles) {
 			if (monitor.isCanceled()) {
 				return true;
@@ -487,19 +487,30 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			// Delete TypeScript error marker
 			TypeScriptResourceUtil.deleteTscMarker(tsFile);
 			// Add TypeScript error marker if there error errors.
-			DiagnosticEventBody event = client.syntacticDiagnosticsSync(filename, false).get(5000,
+			DiagnosticEventBody event = client.syntacticDiagnosticsSync(filename, true).get(5000,
 					TimeUnit.MILLISECONDS);
 			addMarker(tsFile, event);
-			event = client.semanticDiagnosticsSync(filename, false).get(5000, TimeUnit.MILLISECONDS);
+			event = client.semanticDiagnosticsSync(filename, true).get(5000, TimeUnit.MILLISECONDS);
 			addMarker(tsFile, event);
 		}
 	}
 
 	public void addMarker(IFile tsFile, DiagnosticEventBody event) throws CoreException {
-		List<Diagnostic> diagnostics = event.getDiagnostics();
-		for (Diagnostic diagnostic : diagnostics) {
-			TypeScriptResourceUtil.addTscMarker(tsFile, diagnostic.getText(), IMarker.SEVERITY_ERROR,
-					diagnostic.getStart().getLine());
+		List<IDiagnostic> diagnostics = event.getDiagnostics();
+		for (IDiagnostic diagnostic : diagnostics) {
+			TypeScriptResourceUtil.addTscMarker(tsFile, diagnostic.getText(), getSeverity(diagnostic.getCategory()),
+					diagnostic.getStartLocation().getLine());
+		}
+	}
+
+	private int getSeverity(DiagnosticCategory category) {
+		switch (category) {
+		case Message:
+			return IMarker.SEVERITY_INFO;
+		case Warning:
+			return IMarker.SEVERITY_WARNING;
+		default:
+			return IMarker.SEVERITY_ERROR;
 		}
 	}
 }

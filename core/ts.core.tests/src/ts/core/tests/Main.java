@@ -79,6 +79,7 @@ public class Main {
 		ProjectInfo projectInfo = client.projectInfo(fileName, null, true).get();
 		displayProjectInfo(projectInfo);
 		
+		client.syntacticDiagnosticsSync(fileName, true);
 		//
 		// client.geterrForProjectRequest(file, delay, projectInfo)
 

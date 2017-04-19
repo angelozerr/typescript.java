@@ -8,6 +8,7 @@ import org.eclipse.wst.validation.internal.provisional.core.IValidator;
 
 import ts.TypeScriptException;
 import ts.client.Location;
+import ts.client.diagnostics.IDiagnostic.DiagnosticCategory;
 import ts.cmd.ITypeScriptLinterHandler;
 import ts.cmd.Severity;
 import ts.cmd.tslint.TslintHelper;
@@ -22,7 +23,6 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 
 	private static final String CHAR_END = "charEnd";
 	private static final String CHAR_START = "charStart";
-	private static final String WARNING_SEVERITY = "warning";
 	private final IIDETypeScriptFile tsFile;
 	// private final ITypeScriptProject tsProject;
 	private final IReporter reporter;
@@ -36,7 +36,7 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 	}
 
 	public void addDiagnostic(String event, String file, String text, int startLine, int startOffset, int endLine,
-			int endOffset, String category, Integer code) {
+			int endOffset, DiagnosticCategory category, Integer code) {
 		try {
 			IIDETypeScriptFile tsFile = file != null ? (IIDETypeScriptFile) this.tsFile.getProject().getOpenedFile(file)
 					: this.tsFile;
@@ -65,8 +65,15 @@ public class TypeScriptReporterCollector extends NodejsProcessAdapter
 		}
 	}
 
-	private int getSeverity(String category) {
-		return WARNING_SEVERITY.equals(category) ? IMessage.NORMAL_SEVERITY : IMessage.HIGH_SEVERITY;
+	private int getSeverity(DiagnosticCategory category) {
+		switch(category) {
+		case Message:
+			return IMessage.LOW_SEVERITY;
+		case Warning:
+			return IMessage.NORMAL_SEVERITY;
+		default:
+			return IMessage.HIGH_SEVERITY;
+		}
 	}
 
 	@Override

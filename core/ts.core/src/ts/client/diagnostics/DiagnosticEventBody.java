@@ -22,12 +22,12 @@ public class DiagnosticEventBody {
 	/**
 	 * An array of diagnostic informatdiion items.
 	 */
-	private List<Diagnostic> diagnostics;
+	private List<IDiagnostic> diagnostics;
 
 	public DiagnosticEventBody() {
 	}
 
-	public DiagnosticEventBody(String file, List<Diagnostic> diagnostics) {
+	public DiagnosticEventBody(String file, List<IDiagnostic> diagnostics) {
 		this.file = file;
 		this.diagnostics = diagnostics;
 	}
@@ -36,7 +36,7 @@ public class DiagnosticEventBody {
 		return file;
 	}
 
-	public List<Diagnostic> getDiagnostics() {
+	public List<IDiagnostic> getDiagnostics() {
 		return diagnostics;
 	}
 }

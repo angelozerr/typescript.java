@@ -15,7 +15,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 
 import ts.client.CommandNames;
-import ts.client.diagnostics.Diagnostic;
+import ts.client.diagnostics.IDiagnostic;
 
 /**
  * Synchronous request for syntactic diagnostics of one file.
@@ -30,7 +30,7 @@ public class SyntacticDiagnosticsSyncRequest extends FileRequest<SyntacticDiagno
 	}
 
 	@Override
-	public Response<List<Diagnostic>> parseResponse(JsonObject json) {
+	public Response<List<IDiagnostic>> parseResponse(JsonObject json) {
 		return GsonHelper.DEFAULT_GSON.fromJson(json, SyntacticDiagnosticsSyncResponse.class);
 	}
 

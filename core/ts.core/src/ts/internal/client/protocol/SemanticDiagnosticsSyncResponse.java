@@ -12,13 +12,13 @@ package ts.internal.client.protocol;
 
 import java.util.List;
 
-import ts.client.diagnostics.Diagnostic;
+import ts.client.diagnostics.IDiagnostic;
 
 /**
  * Response object for synchronous sematic diagnostics request.
  * 
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class SemanticDiagnosticsSyncResponse extends Response<List<Diagnostic>> {
+public class SemanticDiagnosticsSyncResponse extends Response<List<IDiagnostic>> {
 
 }

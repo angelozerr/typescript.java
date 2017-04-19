@@ -10,30 +10,33 @@
  */
 package ts.client.diagnostics;
 
-import ts.client.Location;
-
 /**
  * Item of diagnostic information found in a DiagnosticEvent message.
  *
  */
-public class Diagnostic extends AbstractDiagnostic {
+public abstract class AbstractDiagnostic implements IDiagnostic {
 
 	/**
-	 * Starting file location at which text applies.
+	 * Text of diagnostic message.
 	 */
-	private Location start;
+	private String text;
 
 	/**
-	 * The last file location at which the text applies.
+	 * The error code of the diagnostic message.
 	 */
-	private Location end;
+	private Integer code;
 
-	public Location getStartLocation() {
-		return start;
+	private String category;
+
+	public String getText() {
+		return text;
 	}
 
-	public Location getEndLocation() {
-		return end;
+	public Integer getCode() {
+		return code;
 	}
 
+	public DiagnosticCategory getCategory() {
+		return DiagnosticCategory.getCategory(category);
+	}
 }

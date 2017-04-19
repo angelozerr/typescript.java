@@ -35,6 +35,7 @@ import ts.client.configure.ConfigureRequestArguments;
 import ts.client.diagnostics.Diagnostic;
 import ts.client.diagnostics.DiagnosticEvent;
 import ts.client.diagnostics.DiagnosticEventBody;
+import ts.client.diagnostics.IDiagnostic;
 import ts.client.installtypes.BeginInstallTypesEventBody;
 import ts.client.installtypes.EndInstallTypesEventBody;
 import ts.client.installtypes.IInstallTypesListener;
@@ -421,7 +422,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public CompletableFuture<DiagnosticEventBody> semanticDiagnosticsSync(String file, Boolean includeLinePosition)
 			throws TypeScriptException {
 		return execute(new SemanticDiagnosticsSyncRequest(file, includeLinePosition), true).thenApply(d -> {
-			return new DiagnosticEventBody(file, (List<Diagnostic>) d);
+			return new DiagnosticEventBody(file, (List<IDiagnostic>) d);
 		});
 	}
 
@@ -429,7 +430,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public CompletableFuture<DiagnosticEventBody> syntacticDiagnosticsSync(String file, Boolean includeLinePosition)
 			throws TypeScriptException {
 		return execute(new SyntacticDiagnosticsSyncRequest(file, includeLinePosition), true).thenApply(d -> {
-			return new DiagnosticEventBody(file, (List<Diagnostic>) d);
+			return new DiagnosticEventBody(file, (List<IDiagnostic>) d);
 		});
 	}
 
