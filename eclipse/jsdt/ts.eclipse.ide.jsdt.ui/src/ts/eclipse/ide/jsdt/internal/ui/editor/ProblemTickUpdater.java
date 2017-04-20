@@ -19,10 +19,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 
+import ts.client.ScriptKindName;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.problems.IProblemChangeListener;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIImages;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
+import ts.resources.ITypeScriptFile;
 
 final class ProblemTickUpdater {
 
@@ -78,17 +80,28 @@ final class ProblemTickUpdater {
 			return;
 		}
 
-		// Prepare the image
-		Image image;
-		if (severity == IMarker.SEVERITY_ERROR) {
-			image = JSDTTypeScriptUIImages.TSFILE_W_ERROR.get();
-		} else if (severity == IMarker.SEVERITY_WARNING) {
-			image = JSDTTypeScriptUIImages.TSFILE_W_WARNING.get();
-		} else {
-			image = JSDTTypeScriptUIImages.TSFILE.get();
+		ITypeScriptFile tsFile = editor.getTypeScriptFile();
+		ScriptKindName scriptKind = tsFile.getScriptKind();
+		if (scriptKind == null) {
+			scriptKind = ScriptKindName.TS;
 		}
 
+		// Prepare the image
+		Image image = getImage(severity, scriptKind);
+
 		editor.updateTitleImage(image);
+	}
+
+	public Image getImage(int severity, ScriptKindName scriptKind) {
+		boolean jsx = ScriptKindName.JSX.equals(scriptKind) || ScriptKindName.TSX.equals(scriptKind);
+		switch (severity) {
+		case IMarker.SEVERITY_ERROR:
+			return jsx ? JSDTTypeScriptUIImages.JSXFILE_W_ERROR.get() : JSDTTypeScriptUIImages.TSFILE_W_ERROR.get();
+		case IMarker.SEVERITY_WARNING:
+			return jsx ? JSDTTypeScriptUIImages.JSXFILE_W_WARNING.get() : JSDTTypeScriptUIImages.TSFILE_W_WARNING.get();
+		default:
+			return jsx ? JSDTTypeScriptUIImages.JSXFILE.get() : JSDTTypeScriptUIImages.TSFILE.get();
+		}
 	}
 
 }

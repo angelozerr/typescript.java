@@ -25,12 +25,11 @@ import org.osgi.framework.Bundle;
 public enum JSDTTypeScriptUIImages {
 
 	TSFILE("icons/full/obj16/ts.png"),
-
 	TSFILE_W_ERROR(TSFILE, null, null, getSharedImageDescriptor(ISharedImages.IMG_DEC_FIELD_ERROR), null),
-
 	TSFILE_W_WARNING(TSFILE, null, null, getSharedImageDescriptor(ISharedImages.IMG_DEC_FIELD_WARNING), null),
-
-	;
+	JSXFILE("icons/full/obj16/jsx.png"),
+	JSXFILE_W_ERROR(JSXFILE, null, null, getSharedImageDescriptor(ISharedImages.IMG_DEC_FIELD_ERROR), null),
+	JSXFILE_W_WARNING(JSXFILE, null, null, getSharedImageDescriptor(ISharedImages.IMG_DEC_FIELD_WARNING), null);
 
 	private JSDTTypeScriptUIImages(String path) {
 		Bundle bundle = JSDTTypeScriptUIPlugin.getDefault().getBundle();
