@@ -13,12 +13,16 @@ package ts.eclipse.ide.internal.core.resources;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager.ContentTypeChangeEvent;
+import org.eclipse.core.runtime.content.IContentTypeManager.IContentTypeChangeListener;
 
 import ts.client.ScriptKindName;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
@@ -37,6 +41,8 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 
 	private final List<ITypeScriptElementChangedListener> listeners;
 
+	private boolean useJsAsJsx;
+
 	/**
 	 * Contents Types IDS
 	 */
@@ -45,8 +51,25 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	private static final String TSX_CONTENT_TYPE_ID = "ts.eclipse.ide.core.tsxSource";
 	private static final String JSX_CONTENT_TYPE_ID = "ts.eclipse.ide.core.jsxSource";
 
-	public IDEResourcesManager() {
+	private IDEResourcesManager() {
 		this.listeners = new ArrayList<ITypeScriptElementChangedListener>();
+		updateUseJsAsJsx(Platform.getContentTypeManager().getContentType(JSX_CONTENT_TYPE_ID));
+
+		Platform.getContentTypeManager().addContentTypeChangeListener(new IContentTypeChangeListener() {
+
+			@Override
+			public void contentTypeChanged(ContentTypeChangeEvent event) {
+				IContentType contentType = event.getContentType();
+				if (contentType != null && JSX_CONTENT_TYPE_ID.equals(contentType.getId())) {
+					updateUseJsAsJsx(contentType);
+				}
+			}
+		});
+	}
+
+	private void updateUseJsAsJsx(IContentType jsxContentType) {
+		String[] fileSpecs = jsxContentType.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
+		useJsAsJsx = fileSpecs != null && Arrays.asList(fileSpecs).contains(FileUtils.JS_EXTENSION);
 	}
 
 	public static IDEResourcesManager getInstance() {
@@ -234,7 +257,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 			} else if (FileUtils.JSX_EXTENSION.equals(ext)) {
 				return ScriptKindName.JSX;
 			} else if (FileUtils.JS_EXTENSION.equals(ext)) {
-				return ScriptKindName.JS;
+				return useJsAsJsx ? ScriptKindName.JSX : ScriptKindName.JS;
 			}
 		}
 		if (fileObject instanceof IFile) {
@@ -249,7 +272,7 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 					} else if (JSX_CONTENT_TYPE_ID.equals(contentTypeId)) {
 						return ScriptKindName.JSX;
 					} else if (JS_CONTENT_TYPE_ID.equals(contentTypeId)) {
-						return ScriptKindName.JS;
+						return useJsAsJsx ? ScriptKindName.JSX : ScriptKindName.JS;
 					}
 				}
 			} catch (Exception e) {
