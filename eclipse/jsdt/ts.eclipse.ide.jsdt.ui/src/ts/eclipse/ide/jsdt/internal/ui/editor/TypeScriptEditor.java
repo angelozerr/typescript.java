@@ -975,7 +975,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	@Override
 	protected void doSetInput(IEditorInput input) throws CoreException {
 		super.doSetInput(input);
-		problemTickUpdater.update();
+		//problemTickUpdater.update();
 		configureToggleCommentAction();
 		// try {
 		// //IDocument document = getSourceViewer().getDocument();
