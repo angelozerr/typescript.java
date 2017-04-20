@@ -4,16 +4,16 @@
    <extension
          point="ts.eclipse.ide.core.typeScriptRepositories">
       <repository
-            baseDir="archives/1.8.10">
+            baseDir="repositories/1.8.10">
       </repository>
       <repository
-            baseDir="archives/2.0.10">
+            baseDir="repositories/2.0.10">
       </repository>
       <repository
-            baseDir="archives/2.1.6">
+            baseDir="repositories/2.1.6">
       </repository>
       <repository
-            baseDir=".">
+            baseDir="repositories/latest">
       </repository>
    </extension>
 

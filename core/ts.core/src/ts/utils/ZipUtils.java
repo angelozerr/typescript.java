@@ -29,8 +29,8 @@ import ts.internal.io.tar.TarInputStream;
  */
 public class ZipUtils {
 
-	private static final String ZIP_EXTENSION = ".zip";
-	private static final String TAR_GZ_EXTENSION = ".tar.gz";
+	public static final String ZIP_EXTENSION = ".zip";
+	public static final String TAR_GZ_EXTENSION = ".tar.gz";
 	private static final String BIN_FOLDER = "/bin";
 
 	private ZipUtils() {

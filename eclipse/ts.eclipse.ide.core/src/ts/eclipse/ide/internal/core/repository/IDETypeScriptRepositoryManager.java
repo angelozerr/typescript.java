@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -41,6 +42,7 @@ import ts.eclipse.ide.core.repository.IIDETypeScriptRepositoryManager;
 import ts.eclipse.ide.internal.core.Trace;
 import ts.repository.ITypeScriptRepository;
 import ts.repository.TypeScriptRepositoryManager;
+import ts.utils.ZipUtils;
 
 public class IDETypeScriptRepositoryManager extends TypeScriptRepositoryManager
 		implements IIDETypeScriptRepositoryManager, IRegistryChangeListener {
@@ -201,7 +203,32 @@ public class IDETypeScriptRepositoryManager extends TypeScriptRepositoryManager
 			throw new RuntimeException("Bundle location " + bundleDir
 					+ " cannot contribute a TypeScript repository because it is not a directory");
 		}
-		return new File(bundleDir, ce.getAttribute("baseDir"));
+
+		String baseDir = ce.getAttribute("baseDir");
+		File dir = new File(bundleDir, baseDir);
+		if (dir.exists()) {
+			return dir;
+		}
+
+		IPath stateLocationPath = InternalPlatform.getDefault().getStateLocation(Platform.getBundle(bundleId));
+		dir = new File(stateLocationPath.toFile(), baseDir);
+		if (dir.exists()) {
+			return dir;
+		}
+
+		File zipFile = new File(bundleDir, baseDir + ZipUtils.ZIP_EXTENSION);
+		if (zipFile.exists()) {
+			ZipUtils.extractZip(zipFile, dir.getParentFile());
+			return dir;
+		} else {
+			zipFile = new File(bundleDir, baseDir + ZipUtils.TAR_GZ_EXTENSION);
+			if (zipFile.exists()) {
+				ZipUtils.extractTar(zipFile, dir);
+				return dir;
+			}
+		}
+		throw new RuntimeException("Bundle location " + bundleDir
+				+ " cannot contribute a TypeScript repository because it is not a directory");
 	}
 
 	private void resetDefaultRepository() {
@@ -213,12 +240,12 @@ public class IDETypeScriptRepositoryManager extends TypeScriptRepositoryManager
 
 			@Override
 			public int compare(ITypeScriptRepository repo1, ITypeScriptRepository repo2) {
-				Version v1 = extractVerion(repo1);
-				Version v2 = extractVerion(repo2);
+				Version v1 = extractVersion(repo1);
+				Version v2 = extractVersion(repo2);
 				return v2.compareTo(v1);
 			}
 
-			private Version extractVerion(ITypeScriptRepository repo) {
+			private Version extractVersion(ITypeScriptRepository repo) {
 				try {
 					return Version.parseVersion(repo.getTypesScriptVersion());
 				} catch (IllegalArgumentException e) {
@@ -227,7 +254,7 @@ public class IDETypeScriptRepositoryManager extends TypeScriptRepositoryManager
 			}
 		});
 
-		// Reset the the default repository to the newest one available
+		// Reset the default repository to the newest one available
 		if (repositories.isEmpty()) {
 			setDefaultRepository(null);
 		} else {

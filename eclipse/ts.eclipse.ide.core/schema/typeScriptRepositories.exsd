@@ -58,7 +58,7 @@ The version of TypeScript embedded in the repository directory is detected autom
          </documentation>
       </annotation>
       <complexType>
-         <attribute name="baseDir" type="string" use="required">
+         <attribute name="baseDir" type="string">
             <annotation>
                <documentation>
                   The base directory of the repository inside the contributing bundle.
