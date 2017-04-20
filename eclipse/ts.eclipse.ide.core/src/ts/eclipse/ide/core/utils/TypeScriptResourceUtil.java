@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
+import ts.client.ScriptKindName;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.builder.TypeScriptBuilder;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
@@ -65,7 +66,7 @@ public class TypeScriptResourceUtil {
 	public static boolean isDefinitionTsFile(Object element) {
 		return IDEResourcesManager.getInstance().isDefinitionTsFile(element);
 	}
-	
+
 	public static boolean isTsOrTsxOrJsxFile(Object element) {
 		return IDEResourcesManager.getInstance().isTsOrTsxOrJsxFile(element);
 	}
@@ -449,6 +450,18 @@ public class TypeScriptResourceUtil {
 
 	public static File getWorkspaceNodejsInstallPath() {
 		return IDETypeScriptProjectSettings.getWorkspaceNodejsInstallPath();
+	}
+
+	/**
+	 * Returns the {@link ScriptKindName} from the given file object and null
+	 * otherwise.
+	 * 
+	 * @param fileObject
+	 * @return the {@link ScriptKindName} from the given file object and null
+	 * otherwise.
+	 */
+	public static ScriptKindName getScriptKind(Object fileObject) {
+		return IDEResourcesManager.getInstance().getScriptKind(fileObject);
 	}
 
 }

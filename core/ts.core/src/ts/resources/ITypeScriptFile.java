@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2015-2016 Angelo ZERR.
+ *  Copyright (c) 2015-2017 Angelo ZERR.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import ts.TypeScriptException;
 import ts.client.CodeEdit;
 import ts.client.FileSpan;
 import ts.client.IPositionProvider;
+import ts.client.ScriptKindName;
 import ts.client.codefixes.CodeAction;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.ICompletionEntryFactory;
@@ -71,7 +72,19 @@ public interface ITypeScriptFile extends IPositionProvider {
 
 	String getPrefix(int position);
 
+	/**
+	 * Returns the contents of the file.
+	 * 
+	 * @return the contents of the file.
+	 */
 	String getContents();
+
+	/**
+	 * Returns the script kind (ts, tsx, js or jsx) of the file.
+	 * 
+	 * @return the script kind (ts, tsx, js or jsx) of the file.
+	 */
+	ScriptKindName getScriptKind();
 
 	/**
 	 * Flag the file as "opened" into tsserver side.

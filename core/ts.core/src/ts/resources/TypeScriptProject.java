@@ -22,6 +22,7 @@ import ts.TypeScriptException;
 import ts.client.CommandNames;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
+import ts.client.ScriptKindName;
 import ts.client.TypeScriptServiceClient;
 import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.ICompletionEntryMatcherProvider;
@@ -88,7 +89,8 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 	void openFile(ITypeScriptFile tsFile) throws TypeScriptException {
 		String name = tsFile.getName();
 		String contents = tsFile.getContents();
-		getClient().openFile(name, contents);
+		ScriptKindName scriptKind = tsFile.getScriptKind();
+		getClient().openFile(name, contents, scriptKind);
 		this.openedFiles.put(name, tsFile);
 	}
 
@@ -172,7 +174,8 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		File nodeFile = getProjectSettings().getNodejsInstallPath();
 		File typescriptDir = getProjectSettings().getTypesScriptDir();
 		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), typescriptDir, nodeFile,
-				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(), getProjectSettings().getTsserverPluginsFile());
+				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(),
+				getProjectSettings().getTsserverPluginsFile());
 		client.setCompletionEntryMatcherProvider(this);
 		return client;
 	}

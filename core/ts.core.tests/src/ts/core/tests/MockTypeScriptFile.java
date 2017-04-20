@@ -16,7 +16,7 @@ public class MockTypeScriptFile extends AbstractTypeScriptFile {
 	private String contents;
 
 	public MockTypeScriptFile(File file, ITypeScriptProject tsProject, boolean normalize) {
-		super(tsProject);
+		super(tsProject, null);
 		this.file = file;
 		this.normalize = normalize;
 		try {

@@ -21,6 +21,7 @@ import ts.client.Location;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.DocumentUtils;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.resources.AbstractTypeScriptFile;
 import ts.resources.SynchStrategy;
@@ -35,7 +36,7 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 	private IDocument document;
 
 	public IDETypeScriptFile(IResource file, IDocument document, IIDETypeScriptProject tsProject) {
-		super(tsProject);
+		super(tsProject, TypeScriptResourceUtil.getScriptKind(file));
 		this.file = file;
 		update(document);
 	}

@@ -13,7 +13,7 @@ public class SWTTextTypeScriptFile extends AbstractTypeScriptFile {
 	private final Text text;
 
 	public SWTTextTypeScriptFile(String name, Text text, ITypeScriptProject tsProject) {
-		super(tsProject);
+		super(tsProject, null);
 		this.name = name;
 		this.text = text;
 		text.addModifyListener(new ModifyListener() {

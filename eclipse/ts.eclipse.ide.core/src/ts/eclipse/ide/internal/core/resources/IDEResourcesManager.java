@@ -18,7 +18,9 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.content.IContentType;
 
+import ts.client.ScriptKindName;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
@@ -34,6 +36,14 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	private static IDEResourcesManager instance = new IDEResourcesManager();
 
 	private final List<ITypeScriptElementChangedListener> listeners;
+
+	/**
+	 * Contents Types IDS
+	 */
+	private static final String JS_CONTENT_TYPE_ID = "org.eclipse.wst.jsdt.core.jsSource";
+	private static final String TS_CONTENT_TYPE_ID = "ts.eclipse.ide.core.tsSource";
+	private static final String TSX_CONTENT_TYPE_ID = "ts.eclipse.ide.core.tsxSource";
+	private static final String JSX_CONTENT_TYPE_ID = "ts.eclipse.ide.core.jsxSource";
 
 	public IDEResourcesManager() {
 		this.listeners = new ArrayList<ITypeScriptElementChangedListener>();
@@ -157,33 +167,32 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 
 	@Override
 	public boolean isJsFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.JS_EXTENSION.equals(ext.toLowerCase());
+		ScriptKindName kind = getScriptKind(fileObject);
+		return kind != null && (ScriptKindName.JS.equals(kind));
 	}
 
 	@Override
 	public boolean isJsxFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.JSX_EXTENSION.equals(ext.toLowerCase());
+		ScriptKindName kind = getScriptKind(fileObject);
+		return kind != null && (ScriptKindName.JSX.equals(kind));
 	}
 
 	@Override
 	public boolean isTsFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.TS_EXTENSION.equals(ext.toLowerCase());
+		ScriptKindName kind = getScriptKind(fileObject);
+		return kind != null && (ScriptKindName.TS.equals(kind));
 	}
 
 	@Override
 	public boolean isTsxFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		return ext != null && FileUtils.TSX_EXTENSION.equals(ext.toLowerCase());
+		ScriptKindName kind = getScriptKind(fileObject);
+		return kind != null && (ScriptKindName.TSX.equals(kind));
 	}
 
 	@Override
 	public boolean isTsOrTsxFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		ext = ext != null ? ext.toLowerCase() : null;
-		return ext != null && (FileUtils.TS_EXTENSION.equals(ext) || FileUtils.TSX_EXTENSION.equals(ext));
+		ScriptKindName kind = getScriptKind(fileObject);
+		return kind != null && (ScriptKindName.TS.equals(kind) || ScriptKindName.TSX.equals(kind));
 	}
 
 	@Override
@@ -195,17 +204,59 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 
 	@Override
 	public boolean isTsOrTsxOrJsxFile(Object fileObject) {
-		String ext = getExtension(fileObject);
-		ext = ext != null ? ext.toLowerCase() : null;
-		return ext != null && (FileUtils.TS_EXTENSION.equals(ext) || FileUtils.TSX_EXTENSION.equals(ext)
-				|| FileUtils.JSX_EXTENSION.equals(ext));
+		ScriptKindName kind = getScriptKind(fileObject);
+		return kind != null && (ScriptKindName.TS.equals(kind) || ScriptKindName.TSX.equals(kind)
+				|| ScriptKindName.JSX.equals(kind));
 	}
 
 	@Override
 	public boolean isTsxOrJsxFile(Object fileObject) {
+		ScriptKindName kind = getScriptKind(fileObject);
+		return kind != null && (ScriptKindName.TSX.equals(kind) || ScriptKindName.JSX.equals(kind));
+	}
+
+	/**
+	 * Returns the {@link ScriptKindName} from the given file object and null
+	 * otherwise.
+	 * 
+	 * @param fileObject
+	 * @return the {@link ScriptKindName} from the given file object and null
+	 *         otherwise.
+	 */
+	public ScriptKindName getScriptKind(Object fileObject) {
 		String ext = getExtension(fileObject);
-		ext = ext != null ? ext.toLowerCase() : null;
-		return ext != null && (FileUtils.TSX_EXTENSION.equals(ext) || FileUtils.JSX_EXTENSION.equals(ext));
+		if (ext != null) {
+			ext = ext.toLowerCase();
+			if (FileUtils.TS_EXTENSION.equals(ext)) {
+				return ScriptKindName.TS;
+			} else if (FileUtils.TSX_EXTENSION.equals(ext)) {
+				return ScriptKindName.TSX;
+			} else if (FileUtils.JSX_EXTENSION.equals(ext)) {
+				return ScriptKindName.JSX;
+			} else if (FileUtils.JS_EXTENSION.equals(ext)) {
+				return ScriptKindName.JS;
+			}
+		}
+		if (fileObject instanceof IFile) {
+			try {
+				IContentType contentType = ((IFile) fileObject).getContentDescription().getContentType();
+				if (contentType != null) {
+					String contentTypeId = contentType.getId();
+					if (TS_CONTENT_TYPE_ID.equals(contentTypeId)) {
+						return ScriptKindName.TS;
+					} else if (TSX_CONTENT_TYPE_ID.equals(contentTypeId)) {
+						return ScriptKindName.TSX;
+					} else if (JSX_CONTENT_TYPE_ID.equals(contentTypeId)) {
+						return ScriptKindName.JSX;
+					} else if (JS_CONTENT_TYPE_ID.equals(contentTypeId)) {
+						return ScriptKindName.JS;
+					}
+				}
+			} catch (Exception e) {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	public boolean isJsOrJsMapFile(Object fileObject) {
@@ -279,4 +330,5 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 			listeners.remove(listener);
 		}
 	}
+
 }

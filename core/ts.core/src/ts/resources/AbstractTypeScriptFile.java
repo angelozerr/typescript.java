@@ -20,6 +20,7 @@ import ts.client.CommandNames;
 import ts.client.FileSpan;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.Location;
+import ts.client.ScriptKindName;
 import ts.client.codefixes.CodeAction;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.ICompletionEntryFactory;
@@ -42,6 +43,8 @@ import ts.internal.LocationReader;
 public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 
 	private final ITypeScriptProject tsProject;
+	private final ScriptKindName scriptKind;
+
 	private boolean dirty;
 	protected final Object synchLock = new Object();
 	private boolean opened;
@@ -51,8 +54,9 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	private FormatCodeSettings formatOptions;
 	private boolean configureAlreadyDone;
 
-	public AbstractTypeScriptFile(ITypeScriptProject tsProject) {
+	public AbstractTypeScriptFile(ITypeScriptProject tsProject, ScriptKindName scriptKind) {
 		this.tsProject = tsProject;
+		this.scriptKind = scriptKind;
 		this.listeners = new ArrayList<INavbarListener>();
 		this.setDirty(false);
 		this.configureAlreadyDone = false;
@@ -61,6 +65,11 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	@Override
 	public ITypeScriptProject getProject() {
 		return tsProject;
+	}
+
+	@Override
+	public ScriptKindName getScriptKind() {
+		return scriptKind;
 	}
 
 	public void setDirty(boolean dirty) {
@@ -231,8 +240,8 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
-	public CompletableFuture<RenameResponseBody> rename(int position, Boolean findInComments,
-			Boolean findInStrings) throws TypeScriptException {
+	public CompletableFuture<RenameResponseBody> rename(int position, Boolean findInComments, Boolean findInStrings)
+			throws TypeScriptException {
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
 		Location location = this.getLocation(position);
@@ -260,7 +269,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		int offset = location.getOffset();
 		return client.docCommentTemplate(this.getName(), line, offset);
 	}
-	
+
 	@Override
 	public CompletableFuture<List<CodeAction>> getCodeFixes(int startPosition, int endPosition,
 			List<Integer> errorCodes) throws TypeScriptException {
