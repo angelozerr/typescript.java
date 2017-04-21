@@ -5,7 +5,6 @@ import java.util.List;
 
 import ts.client.ITypeScriptServiceClient;
 import ts.client.LoggingInterceptor;
-import ts.client.TypeScriptServiceClient;
 import ts.client.compileonsave.CompileOnSaveAffectedFileListSingleProject;
 import ts.utils.FileUtils;
 
@@ -19,9 +18,7 @@ public class CompilerWithTsserverTest {
 		String fileName = FileUtils.getPath(sampleFile);
 
 		// Create TypeScript client
-		ITypeScriptServiceClient client = new TypeScriptServiceClient(projectDir,
-				new File("../ts.repository/node_modules/typescript/bin/tsserver"), null);
-
+		ITypeScriptServiceClient client = TypeScriptServiceClientFactory.create(projectDir);
 		client.addInterceptor(LoggingInterceptor.getInstance());
 
 		client.openFile(fileName, null);

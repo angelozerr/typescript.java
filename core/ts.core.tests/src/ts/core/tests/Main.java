@@ -27,8 +27,7 @@ public class Main {
 		String fileName = FileUtils.getPath(sampleFile);
 
 		// Create TypeScript client
-		ITypeScriptServiceClient client = new TypeScriptServiceClient(projectDir,
-				new File("../ts.repository/node_modules/typescript/bin/tsserver"), null);
+		ITypeScriptServiceClient client = TypeScriptServiceClientFactory.create(projectDir);
 
 		client.addInterceptor(LoggingInterceptor.getInstance());
 		

@@ -13,7 +13,7 @@
             baseDir="repositories/2.1.6">
       </repository>
       <repository
-            baseDir="repositories/latest">
+            baseDir="repositories/2.2.2">
       </repository>
    </extension>
 
