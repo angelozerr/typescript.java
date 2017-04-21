@@ -1,12 +1,15 @@
 package ts.eclipse.ide.jsdt.internal.ui.actions;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchSite;
+import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
+import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 import org.eclipse.wst.jsdt.ui.actions.SelectionDispatchAction;
 
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
-import ts.eclipse.ide.jsdt.internal.ui.refactoring.reorg.RenameLinkedMode;
+import ts.eclipse.ide.jsdt.internal.ui.refactoring.RenameLinkedMode;
 
 public class RenameTypeScriptElementAction extends SelectionDispatchAction {
 
@@ -68,8 +71,8 @@ public class RenameTypeScriptElementAction extends SelectionDispatchAction {
 			}
 		}
 
-		//IPreferenceStore store= JavaPlugin.getDefault().getPreferenceStore();
-		boolean lightweight= true; //store.getBoolean(PreferenceConstants.REFACTOR_LIGHTWEIGHT);
+		IPreferenceStore store= JavaScriptPlugin.getDefault().getPreferenceStore();
+		boolean lightweight= store.getBoolean(PreferenceConstants.REFACTOR_LIGHTWEIGHT);
 		run(selection, lightweight);
 		
 //		try {

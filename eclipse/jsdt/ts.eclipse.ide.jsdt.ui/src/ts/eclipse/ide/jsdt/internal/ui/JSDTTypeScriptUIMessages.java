@@ -122,6 +122,10 @@ public class JSDTTypeScriptUIMessages extends NLS {
 	public static String RenameInformationPopup_snap_under_left;
 	public static String RenameInformationPopup_snap_under_right;
 	public static String RenameInformationPopup_SnapTo;
+
+	public static String RenameSupport_not_available;
+
+	public static String RenameSupport_dialog_title;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

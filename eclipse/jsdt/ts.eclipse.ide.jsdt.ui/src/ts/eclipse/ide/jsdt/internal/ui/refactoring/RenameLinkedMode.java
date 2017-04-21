@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package ts.eclipse.ide.jsdt.internal.ui.refactoring.reorg;
+package ts.eclipse.ide.jsdt.internal.ui.refactoring;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -54,16 +54,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
-import org.eclipse.wst.jsdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.wst.jsdt.internal.ui.refactoring.reorg.ReorgMessages;
 
 import ts.client.occurrences.OccurrencesResponseItem;
-import ts.client.rename.RenameResponseBody;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.jsdt.internal.ui.editor.EditorHighlightingSynchronizer;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 import ts.eclipse.ide.jsdt.internal.ui.text.correction.proposals.LinkedNamesAssistProposal.DeleteBlockingExitPolicy;
-import ts.eclipse.ide.jsdt.ui.refactoring.RenameSupport;
 import ts.resources.ITypeScriptFile;
 
 //import org.eclipse.jdt.core.ICompilationUnit;
@@ -226,10 +223,6 @@ public class RenameLinkedMode {
 			ITypeScriptFile tsFile = fEditor.getTypeScriptFile();
 			List<OccurrencesResponseItem> occurrences = tsFile.occurrences(offset).get(1000, TimeUnit.MILLISECONDS);
 
-			RenameResponseBody rename = tsFile.rename(offset, false, false).get(1000, TimeUnit.MILLISECONDS);
-			rename.getInfo();
-			System.err.println(rename);
-			
 			// Create Eclipse linked position from the occurrences list.
 			int start, length;
 			for (int i = 0; i < occurrences.size(); i++) {
@@ -353,34 +346,30 @@ public class RenameLinkedMode {
 			String newName = fNamePosition.getContent();
 			if (fOriginalName.equals(newName))
 				return;
-			
-			
-			
-			
-			RenameSupport renameSupport = null; //undoAndCreateRenameSupport(newName);
+
+			RenameSupport renameSupport = undoAndCreateRenameSupport(newName);
 			if (renameSupport == null)
 				return;
-			//
-			// Shell shell= fEditor.getSite().getShell();
-			// boolean executed;
-			// if (fShowPreview) { // could have been updated by
-			// undoAndCreateRenameSupport(..)
-			// executed= renameSupport.openDialog(shell, true);
-			// } else {
-			// renameSupport.perform(shell,
-			// fEditor.getSite().getWorkbenchWindow());
-			// executed= true;
-			// }
-			// if (executed) {
-			// restoreFullSelection();
-			// }
+
+			Shell shell = fEditor.getSite().getShell();
+			boolean executed;
+			if (fShowPreview) { // could have been updated by
+								// undoAndCreateRenameSupport(..)
+				executed = renameSupport.openDialog(shell, true);
+			} else {
+				renameSupport.perform(shell, fEditor.getSite().getWorkbenchWindow());
+				executed = true;
+			}
+			if (executed) {
+				restoreFullSelection();
+			}
 			// JavaModelUtil.reconcile(getCompilationUnit());
-			// } catch (CoreException ex) {
-			// JSDTTypeScriptUIPlugin.log(ex);
-			// } catch (InterruptedException ex) {
-			// // canceling is OK -> redo text changes in that case?
-			// } catch (InvocationTargetException ex) {
-			// JSDTTypeScriptUIPlugin.log(ex);
+		} catch (CoreException ex) {
+			JSDTTypeScriptUIPlugin.log(ex);
+		} catch (InterruptedException ex) {
+			// canceling is OK -> redo text changes in that case?
+		} catch (InvocationTargetException ex) {
+			JSDTTypeScriptUIPlugin.log(ex);
 		} catch (BadLocationException e) {
 			JSDTTypeScriptUIPlugin.log(e);
 		} finally {
@@ -451,8 +440,9 @@ public class RenameLinkedMode {
 		if (newName.length() == 0)
 			return null;
 
-		//RenameJavaElementDescriptor descriptor = createRenameDescriptor(fJavaElement, newName);
-		RenameSupport renameSupport = null;//RenameSupport.create(descriptor);
+		// RenameJavaElementDescriptor descriptor =
+		// createRenameDescriptor(fJavaElement, newName);
+		RenameSupport renameSupport = RenameSupport.create(fEditor.getTypeScriptFile(), selection.getOffset(), newName);
 		return renameSupport;
 	}
 
@@ -464,16 +454,16 @@ public class RenameLinkedMode {
 	public void startFullDialog() {
 		cancel();
 
-		// try {
-		// String newName= fNamePosition.getContent();
-		// RenameSupport renameSupport= undoAndCreateRenameSupport(newName);
-		// if (renameSupport != null)
-		// renameSupport.openDialog(fEditor.getSite().getShell());
-		// } catch (CoreException e) {
-		// JSDTTypeScriptUIPlugin.log(e);
-		// } catch (BadLocationException e) {
-		// JSDTTypeScriptUIPlugin.log(e);
-		// }
+		try {
+			String newName = fNamePosition.getContent();
+			RenameSupport renameSupport = undoAndCreateRenameSupport(newName);
+			if (renameSupport != null)
+				renameSupport.openDialog(fEditor.getSite().getShell());
+		} catch (CoreException e) {
+			JSDTTypeScriptUIPlugin.log(e);
+		} catch (BadLocationException e) {
+			JSDTTypeScriptUIPlugin.log(e);
+		}
 	}
 
 	/**
