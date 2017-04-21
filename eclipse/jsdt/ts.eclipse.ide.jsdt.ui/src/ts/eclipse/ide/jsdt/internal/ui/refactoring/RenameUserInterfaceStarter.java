@@ -15,8 +15,6 @@ import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.participants.RenameProcessor;
 import org.eclipse.swt.widgets.Shell;
 
-import ts.eclipse.ide.jsdt.core.refactoring.TypeScriptRenameProcessor;
-
 public class RenameUserInterfaceStarter extends UserInterfaceStarter {
 
 	public boolean activate(Refactoring refactoring, Shell parent, int saveMode) throws CoreException {

@@ -2,22 +2,31 @@ package ts.eclipse.ide.ui.utils;
 
 import java.io.File;
 
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import ts.client.TextSpan;
@@ -172,6 +181,37 @@ public class EditorUtils {
 		openInEditor(file, span.getStart().getLine(), span.getStart().getOffset(), span.getEnd().getLine(),
 				span.getEnd().getOffset(), true);
 
+	}
+
+	public static Position getPosition(IFile file, TextSpan textSpan) throws BadLocationException {
+		ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+		ITextFileBuffer buffer = bufferManager.getTextFileBuffer(file.getLocation(), LocationKind.IFILE);
+		if (buffer != null) {
+			return getPosition(buffer.getDocument(), textSpan);
+		}
+		IDocumentProvider provider = new TextFileDocumentProvider();
+		try {
+			provider.connect(file);
+			IDocument document = provider.getDocument(file);
+			if (document != null) {
+				return getPosition(document, textSpan);
+			}
+		} catch (CoreException e) {
+		} finally {
+			provider.disconnect(file);
+		}
+		return null;
+	}
+
+	public static Position getPosition(IDocument document, TextSpan textSpan) throws BadLocationException {
+		int startLine = textSpan.getStart().getLine();
+		int startOffset = textSpan.getStart().getOffset();
+		int start = document.getLineOffset(startLine - 1) + startOffset - 1;
+		int endLine = textSpan.getEnd().getLine();
+		int endOffset = textSpan.getEnd().getOffset();
+		int end = document.getLineOffset(endLine - 1) + endOffset - 1;
+		int length = end - start;
+		return new Position(start, length);
 	}
 
 }

@@ -33,8 +33,7 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = PreferencesHelper
-				.getWorkspaceDefaultPreferences(TypeScriptCorePlugin.PLUGIN_ID);
+		IEclipsePreferences node = PreferencesHelper.getWorkspaceDefaultPreferences(TypeScriptCorePlugin.PLUGIN_ID);
 
 		// initialize properties for direct access of node.js server (start an
 		// internal process)
@@ -70,10 +69,12 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		// initialize editor+formation options
 		initializeEditorFormatOptions(node);
 
+		// initialize refactoring
+		initializeRefactoring(node);
+
 		// Fix embedded TypeScript id preference
 		// See https://github.com/angelozerr/typescript.java/issues/121
-		fixEmbeddedPreference(
-				PreferencesHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID));
+		fixEmbeddedPreference(PreferencesHelper.getWorkspacePreferences(TypeScriptCorePlugin.PLUGIN_ID));
 	}
 
 	/**
@@ -175,7 +176,13 @@ public class TypeScriptCorePreferenceInitializer extends AbstractPreferenceIniti
 		node.putBoolean(
 				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS,
 				TypeScriptCorePreferenceConstants.FORMAT_OPTIONS_PLACE_OPEN_BRACE_ON_NEW_LINE_FOR_CONTROL_BLOCKS_DEFAULT);
+	}
 
+	private void initializeRefactoring(IEclipsePreferences node) {
+		node.putBoolean(TypeScriptCorePreferenceConstants.REFACTOR_SAVE_ALL_EDITORS,
+				TypeScriptCorePreferenceConstants.REFACTOR_SAVE_ALL_EDITORS_DEFAULT);
+		node.putBoolean(TypeScriptCorePreferenceConstants.REFACTOR_LIGHTWEIGHT,
+				TypeScriptCorePreferenceConstants.REFACTOR_LIGHTWEIGHT_DEFAULT);
 	}
 
 	/**

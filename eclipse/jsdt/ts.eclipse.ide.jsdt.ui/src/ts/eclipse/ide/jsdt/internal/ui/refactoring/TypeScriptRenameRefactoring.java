@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package ts.eclipse.ide.jsdt.core.refactoring;
+package ts.eclipse.ide.jsdt.internal.ui.refactoring;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;

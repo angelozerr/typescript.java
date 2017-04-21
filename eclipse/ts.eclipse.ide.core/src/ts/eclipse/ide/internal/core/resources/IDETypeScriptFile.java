@@ -48,6 +48,9 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 
 	@Override
 	public void documentAboutToBeChanged(DocumentEvent event) {
+		if (isDisableChanged()) {
+			return;
+		}
 		setDirty(true);
 		if (getProject().getProjectSettings().getSynchStrategy() == SynchStrategy.CHANGE) {
 			synchronized (synchLock) {

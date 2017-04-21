@@ -53,6 +53,7 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	private NavigationBarItemRoot navbar;
 	private FormatCodeSettings formatOptions;
 	private boolean configureAlreadyDone;
+	private boolean disableChanged;
 
 	public AbstractTypeScriptFile(ITypeScriptProject tsProject, ScriptKindName scriptKind) {
 		this.tsProject = tsProject;
@@ -374,5 +375,13 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 			break;
 		}
 
+	}
+	
+	public void setDisableChanged(boolean disableChanged) {
+		this.disableChanged = disableChanged;
+	}
+	
+	public boolean isDisableChanged() {
+		return disableChanged;
 	}
 }

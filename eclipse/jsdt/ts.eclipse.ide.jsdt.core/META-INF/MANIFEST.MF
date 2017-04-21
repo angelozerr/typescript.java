@@ -21,5 +21,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
 Export-Package: ts.eclipse.ide.jsdt.core,
- ts.eclipse.ide.jsdt.core.refactoring,
  ts.eclipse.ide.jsdt.core.template

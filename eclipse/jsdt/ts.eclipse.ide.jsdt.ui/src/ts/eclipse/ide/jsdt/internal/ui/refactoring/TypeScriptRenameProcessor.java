@@ -1,4 +1,4 @@
-package ts.eclipse.ide.jsdt.core.refactoring;
+package ts.eclipse.ide.jsdt.internal.ui.refactoring;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -27,7 +28,9 @@ import ts.client.rename.RenameResponseBody;
 import ts.client.rename.SpanGroup;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
+import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
+import ts.resources.ITypeScriptProject;
 
 public class TypeScriptRenameProcessor extends RenameProcessor {
 
@@ -78,6 +81,7 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 		try {
+			ITypeScriptProject tsProject = tsFile.getProject();
 			RenameResponseBody rename = tsFile.rename(offset, false, false).get(1000, TimeUnit.MILLISECONDS);
 			List<SpanGroup> locs = rename.getLocs();
 
@@ -90,10 +94,8 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 
 				List<TextSpan> spans = loc.getLocs();
 				for (TextSpan textSpan : spans) {
-					int start = tsFile.getPosition(textSpan.getStart());
-					int end = tsFile.getPosition(textSpan.getEnd());
-					int length = end - start;
-					ReplaceEdit edit = new ReplaceEdit(start, length, this.newName);
+					Position position = EditorUtils.getPosition(file, textSpan);
+					ReplaceEdit edit = new ReplaceEdit(position.offset, position.length, this.newName);
 					change.addEdit(edit);
 				}
 				fileChanges.add(change);
@@ -103,7 +105,8 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(IStatus.ERROR, JSDTTypeScriptCorePlugin.PLUGIN_ID, "Error while rename", e));
+			throw new CoreException(
+					new Status(IStatus.ERROR, JSDTTypeScriptCorePlugin.PLUGIN_ID, "Error while rename", e));
 		}
 	}
 
@@ -123,6 +126,6 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 	}
 
 	public int getSaveMode() {
-		return 1; //RefactoringSaveHelper.SAVE_NOTHING;
+		return 1; // RefactoringSaveHelper.SAVE_NOTHING;
 	}
 }

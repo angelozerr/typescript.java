@@ -28,93 +28,92 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.part.ISetSelectionTarget;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 
-
 public class RenameSelectionState {
 	private final Display fDisplay;
 	private final Object fElement;
-	private final List fParts;
-	private final List fSelections;
-	
+	private final List<IWorkbenchPart> fParts;
+	private final List<IStructuredSelection> fSelections;
+
 	public RenameSelectionState(Object element) {
-		fElement= element;
-		fParts= new ArrayList();
-		fSelections= new ArrayList();
-		
+		fElement = element;
+		fParts = new ArrayList<>();
+		fSelections = new ArrayList<>();
+
 		IWorkbenchWindow dw = JavaScriptPlugin.getActiveWorkbenchWindow();
-		if (dw ==  null) {
-			fDisplay= null;
+		if (dw == null) {
+			fDisplay = null;
 			return;
 		}
-		fDisplay= dw.getShell().getDisplay();
+		fDisplay = dw.getShell().getDisplay();
 		IWorkbenchPage page = dw.getActivePage();
 		if (page == null)
 			return;
-		IViewReference vrefs[]= page.getViewReferences();
-		for(int i= 0; i < vrefs.length; i++) {
+		IViewReference vrefs[] = page.getViewReferences();
+		for (int i = 0; i < vrefs.length; i++) {
 			consider(vrefs[i].getPart(false));
 		}
-		IEditorReference refs[]= page.getEditorReferences();
-		for(int i= 0; i < refs.length; i++) {
+		IEditorReference refs[] = page.getEditorReferences();
+		for (int i = 0; i < refs.length; i++) {
 			consider(refs[i].getPart(false));
 		}
 	}
-	
+
 	private void consider(IWorkbenchPart part) {
 		if (part == null)
 			return;
-		ISetSelectionTarget target= null;
+		ISetSelectionTarget target = null;
 		if (!(part instanceof ISetSelectionTarget)) {
-			target= (ISetSelectionTarget)part.getAdapter(ISetSelectionTarget.class);
+			target = (ISetSelectionTarget) part.getAdapter(ISetSelectionTarget.class);
 			if (target == null)
 				return;
 		} else {
-			target= (ISetSelectionTarget)part;
+			target = (ISetSelectionTarget) part;
 		}
-		ISelectionProvider selectionProvider= part.getSite().getSelectionProvider();
+		ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
 		if (selectionProvider == null)
 			return;
-		ISelection s= selectionProvider.getSelection();
+		ISelection s = selectionProvider.getSelection();
 		if (!(s instanceof IStructuredSelection))
 			return;
-		IStructuredSelection selection= (IStructuredSelection)s;
+		IStructuredSelection selection = (IStructuredSelection) s;
 		if (!selection.toList().contains(fElement))
 			return;
 		fParts.add(part);
 		fSelections.add(selection);
 	}
-	
+
 	public void restore(Object newElement) {
 		if (fDisplay == null)
 			return;
-		for (int i= 0; i < fParts.size(); i++) {
-			IStructuredSelection currentSelection= (IStructuredSelection)fSelections.get(i);
-			boolean changed= false;
-			final ISetSelectionTarget target= (ISetSelectionTarget)fParts.get(i);
-			final IStructuredSelection[] newSelection= new IStructuredSelection[1];
-			newSelection[0]= currentSelection;
+		for (int i = 0; i < fParts.size(); i++) {
+			IStructuredSelection currentSelection = (IStructuredSelection) fSelections.get(i);
+			boolean changed = false;
+			final ISetSelectionTarget target = (ISetSelectionTarget) fParts.get(i);
+			final IStructuredSelection[] newSelection = new IStructuredSelection[1];
+			newSelection[0] = currentSelection;
 			if (currentSelection instanceof TreeSelection) {
-				TreeSelection treeSelection= (TreeSelection)currentSelection;
-				TreePath[] paths= treeSelection.getPaths();
-				for (int p= 0; p < paths.length; p++) {
-					TreePath path= paths[p];
+				TreeSelection treeSelection = (TreeSelection) currentSelection;
+				TreePath[] paths = treeSelection.getPaths();
+				for (int p = 0; p < paths.length; p++) {
+					TreePath path = paths[p];
 					if (path.getSegmentCount() > 0 && path.getLastSegment().equals(fElement)) {
-						paths[p]= createTreePath(path, newElement);
-						changed= true;
+						paths[p] = createTreePath(path, newElement);
+						changed = true;
 					}
 				}
 				if (changed) {
-					newSelection[0]= new TreeSelection(paths, treeSelection.getElementComparer());
+					newSelection[0] = new TreeSelection(paths, treeSelection.getElementComparer());
 				}
 			} else {
-				Object[] elements= currentSelection.toArray();
-				for (int e= 0; e < elements.length; e++) {
+				Object[] elements = currentSelection.toArray();
+				for (int e = 0; e < elements.length; e++) {
 					if (elements[e].equals(fElement)) {
-						elements[e]= newElement;
-						changed= true;
+						elements[e] = newElement;
+						changed = true;
 					}
 				}
 				if (changed) {
-					newSelection[0]= new StructuredSelection(elements);
+					newSelection[0] = new StructuredSelection(elements);
 				}
 			}
 			if (changed) {
@@ -126,15 +125,15 @@ public class RenameSelectionState {
 			}
 		}
 	}
-	
+
 	// Method assumes that segment count of path > 0.
 	private TreePath createTreePath(TreePath old, Object newElement) {
-		int count= old.getSegmentCount();
-		Object[] newObjects= new Object[count];
-		for (int i= 0; i < count - 1; i++) {
-			newObjects[i]= old.getSegment(i);
+		int count = old.getSegmentCount();
+		Object[] newObjects = new Object[count];
+		for (int i = 0; i < count - 1; i++) {
+			newObjects[i] = old.getSegment(i);
 		}
-		newObjects[count - 1]= newElement;
+		newObjects[count - 1] = newElement;
 		return new TreePath(newObjects);
 	}
 }

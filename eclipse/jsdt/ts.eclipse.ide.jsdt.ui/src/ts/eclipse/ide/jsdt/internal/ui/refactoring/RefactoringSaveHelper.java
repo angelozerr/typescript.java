@@ -40,7 +40,6 @@ import org.eclipse.ui.actions.GlobalBuildAction;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.wst.jsdt.internal.ui.refactoring.RefactoringMessages;
-import org.eclipse.wst.jsdt.internal.ui.refactoring.RefactoringSavePreferences;
 import org.eclipse.wst.jsdt.internal.ui.refactoring.actions.ListDialog;
 import org.eclipse.wst.jsdt.internal.ui.util.ExceptionHandler;
 

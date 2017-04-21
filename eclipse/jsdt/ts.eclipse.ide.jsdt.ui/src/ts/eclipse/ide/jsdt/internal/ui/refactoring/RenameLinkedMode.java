@@ -204,6 +204,9 @@ public class RenameLinkedMode {
 
 		ISourceViewer viewer = fEditor.getViewer();
 		IDocument document = viewer.getDocument();
+		
+		ITypeScriptFile tsFile = fEditor.getTypeScriptFile();
+		tsFile.setDisableChanged(true);
 		fOriginalSelection = viewer.getSelectedRange();
 		int offset = fOriginalSelection.x;
 
@@ -219,8 +222,7 @@ public class RenameLinkedMode {
 				}
 			}
 
-			// Find occurrences
-			ITypeScriptFile tsFile = fEditor.getTypeScriptFile();
+			// Find occurrences			
 			List<OccurrencesResponseItem> occurrences = tsFile.occurrences(offset).get(1000, TimeUnit.MILLISECONDS);
 
 			// Create Eclipse linked position from the occurrences list.
@@ -381,6 +383,7 @@ public class RenameLinkedMode {
 	}
 
 	public void cancel() {
+		fEditor.getTypeScriptFile().setDisableChanged(false);
 		if (fLinkedModeModel != null) {
 			fLinkedModeModel.exit(ILinkedModeListener.NONE);
 		}

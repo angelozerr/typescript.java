@@ -60,7 +60,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptMainPreferencePage_useSalsa_Never;
 	public static String TypeScriptMainPreferencePage_useSalsa_EveryTime;
 	public static String TypeScriptMainPreferencePage_useSalsa_WhenNoJSDTNature;
-
+	public static String TypeScriptMainPreferencePage_refactoring_title;
+	public static String TypeScriptMainPreferencePage_refactoring_auto_save;
+	public static String TypeScriptMainPreferencePage_refactoring_lightweight;
+	
 	public static String PropertyAndPreferencePage_useprojectsettings_label;
 	public static String PropertyAndPreferencePage_useworkspacesettings_change;
 	public static String PropertyAndPreferencePage_showprojectspecificsettings_label;

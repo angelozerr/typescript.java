@@ -245,4 +245,7 @@ public interface ITypeScriptFile extends IPositionProvider {
 
 	void setFormatOptions(FormatCodeSettings formatOptions);
 
+	void setDisableChanged(boolean disableChanged);
+
+	boolean isDisableChanged();
 }

@@ -5,7 +5,6 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.wst.jsdt.internal.ui.refactoring.RefactoringMessages;
 
-import ts.eclipse.ide.jsdt.core.refactoring.TypeScriptRenameProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 
 public class RenameRefactoringWizard extends RefactoringWizard {
