@@ -81,7 +81,6 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.progress.UIJob;
 
-import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
@@ -360,7 +359,7 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 // XXX workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=170774
 //		fPopup.moveBelow(workbenchShell.getShells()[0]);
 
-		UIJob delayJob= new UIJob(display, JSDTTypeScriptUIMessages.RenameInformationPopup_delayJobName) {
+		UIJob delayJob= new UIJob(display, RefactoringMessages.RenameInformationPopup_delayJobName) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				fDelayJobFinished= true;
@@ -702,7 +701,7 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 		StyledText hint= new StyledText(fPopup, SWT.READ_ONLY | SWT.SINGLE);
 		hint.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
 		String enterKeyName= getEnterBinding();
-		String hintTemplate= JSDTTypeScriptUIMessages.RenameInformationPopup_EnterNewName;
+		String hintTemplate= RefactoringMessages.RenameInformationPopup_EnterNewName;
 		hint.setText(NLS.bind(hintTemplate, enterKeyName));
 		hint.setForeground(foreground);
 		hint.setStyleRange(new StyleRange(hintTemplate.indexOf("{0}"), enterKeyName.length(), null, null, SWT.BOLD)); //$NON-NLS-1$
@@ -719,7 +718,7 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 	private void addLink(Composite parent) {
 		Link link= new Link(parent, SWT.NONE);
 		link.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-		link.setText(JSDTTypeScriptUIMessages.RenameInformationPopup_OptionsLink);
+		link.setText(RefactoringMessages.RenameInformationPopup_OptionsLink);
 		link.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -734,7 +733,7 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 		final ToolItem menuButton = new ToolItem(fToolBar, SWT.PUSH, 0);
 		fMenuImage= TypeScriptUIImageResource.getImage(TypeScriptUIImageResource.IMG_VIEW_MENU_ENABLED);
 		menuButton.setImage(fMenuImage);
-		menuButton.setToolTipText(JSDTTypeScriptUIMessages.RenameInformationPopup_menu);
+		menuButton.setToolTipText(RefactoringMessages.RenameInformationPopup_menu);
 		fToolBar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
@@ -776,7 +775,7 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 			public void menuAboutToShow(IMenuManager manager) {
 				boolean canRefactor= ! fRenameLinkedMode.isOriginalName();
 				
-				IAction refactorAction= new Action(JSDTTypeScriptUIMessages.RenameInformationPopup_RenameInWorkspace) {
+				IAction refactorAction= new Action(RefactoringMessages.RenameInformationPopup_RenameInWorkspace) {
 					@Override
 					public void run() {
 						activateEditor();
@@ -787,7 +786,7 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 				refactorAction.setEnabled(canRefactor);
 				manager.add(refactorAction);
 
-				IAction previewAction= new Action(JSDTTypeScriptUIMessages.RenameInformationPopup_Preview) {
+				IAction previewAction= new Action(RefactoringMessages.RenameInformationPopup_Preview) {
 					@Override
 					public void run() {
 						activateEditor();
@@ -798,7 +797,7 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 				previewAction.setEnabled(canRefactor);
 				manager.add(previewAction);
 
-				IAction openDialogAction= new Action(JSDTTypeScriptUIMessages.RenameInformationPopup_OpenDialog + '\t' + fOpenDialogBinding) {
+				IAction openDialogAction= new Action(RefactoringMessages.RenameInformationPopup_OpenDialog + '\t' + fOpenDialogBinding) {
 					@Override
 					public void run() {
 						activateEditor();
@@ -809,15 +808,15 @@ public class RenameInformationPopup implements IWidgetTokenKeeper, IWidgetTokenK
 
 				manager.add(new Separator());
 
-				MenuManager subMenuManager= new MenuManager(JSDTTypeScriptUIMessages.RenameInformationPopup_SnapTo);
-				addMoveMenuItem(subMenuManager, SNAP_POSITION_UNDER_LEFT_FIELD, JSDTTypeScriptUIMessages.RenameInformationPopup_snap_under_left);
-				addMoveMenuItem(subMenuManager, SNAP_POSITION_UNDER_RIGHT_FIELD, JSDTTypeScriptUIMessages.RenameInformationPopup_snap_under_right);
-				addMoveMenuItem(subMenuManager, SNAP_POSITION_OVER_LEFT_FIELD, JSDTTypeScriptUIMessages.RenameInformationPopup_snap_over_left);
-				addMoveMenuItem(subMenuManager, SNAP_POSITION_OVER_RIGHT_FIELD, JSDTTypeScriptUIMessages.RenameInformationPopup_snap_over_right);
-				addMoveMenuItem(subMenuManager, SNAP_POSITION_LOWER_RIGHT, JSDTTypeScriptUIMessages.RenameInformationPopup_snap_bottom_right);
+				MenuManager subMenuManager= new MenuManager(RefactoringMessages.RenameInformationPopup_SnapTo);
+				addMoveMenuItem(subMenuManager, SNAP_POSITION_UNDER_LEFT_FIELD, RefactoringMessages.RenameInformationPopup_snap_under_left);
+				addMoveMenuItem(subMenuManager, SNAP_POSITION_UNDER_RIGHT_FIELD, RefactoringMessages.RenameInformationPopup_snap_under_right);
+				addMoveMenuItem(subMenuManager, SNAP_POSITION_OVER_LEFT_FIELD, RefactoringMessages.RenameInformationPopup_snap_over_left);
+				addMoveMenuItem(subMenuManager, SNAP_POSITION_OVER_RIGHT_FIELD, RefactoringMessages.RenameInformationPopup_snap_over_right);
+				addMoveMenuItem(subMenuManager, SNAP_POSITION_LOWER_RIGHT, RefactoringMessages.RenameInformationPopup_snap_bottom_right);
 				manager.add(subMenuManager);
 
-				IAction prefsAction= new Action(JSDTTypeScriptUIMessages.RenameInformationPopup_preferences) {
+				IAction prefsAction= new Action(RefactoringMessages.RenameInformationPopup_preferences) {
 					@Override
 					public void run() {
 						fRenameLinkedMode.cancel();

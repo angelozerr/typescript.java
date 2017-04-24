@@ -103,29 +103,6 @@ public class JSDTTypeScriptUIMessages extends NLS {
 	public static String EditTemplateDialog_paste;
 	public static String EditTemplateDialog_select_all;
 	public static String EditTemplateDialog_content_assist;
-
-	// Refactoring
-	public static String RefactorMenu_label;
-	public static String RenameAction_text;
-	public static String RefactorActionGroup_no_refactoring_available;
-	public static String RenameInformationPopup_delayJobName;
-	public static String RenameInformationPopup_EnterNewName;
-	public static String RenameInformationPopup_menu;
-	public static String RenameInformationPopup_OpenDialog;
-	public static String RenameInformationPopup_OptionsLink;
-	public static String RenameInformationPopup_preferences;
-	public static String RenameInformationPopup_Preview;
-	public static String RenameInformationPopup_RenameInWorkspace;
-	public static String RenameInformationPopup_snap_bottom_right;
-	public static String RenameInformationPopup_snap_over_left;
-	public static String RenameInformationPopup_snap_over_right;
-	public static String RenameInformationPopup_snap_under_left;
-	public static String RenameInformationPopup_snap_under_right;
-	public static String RenameInformationPopup_SnapTo;
-
-	public static String RenameSupport_not_available;
-
-	public static String RenameSupport_dialog_title;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

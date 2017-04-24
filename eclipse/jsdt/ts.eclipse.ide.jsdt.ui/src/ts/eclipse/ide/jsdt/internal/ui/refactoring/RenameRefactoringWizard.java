@@ -3,7 +3,6 @@ package ts.eclipse.ide.jsdt.internal.ui.refactoring;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
-import org.eclipse.wst.jsdt.internal.ui.refactoring.RefactoringMessages;
 
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 
@@ -17,7 +16,7 @@ public class RenameRefactoringWizard extends RefactoringWizard {
 
 	@Override
 	protected void addUserInputPages() {
-		String initialSetting= ""; //getNameUpdating().getCurrentElementName();
+		String initialSetting= getNameUpdating().getOldName();
 		RenameInputWizardPage inputPage= createInputPage("TODO desc", initialSetting);
 		//inputPage.setImageDescriptor(fInputPageImageDescriptor);
 		addPage(inputPage);

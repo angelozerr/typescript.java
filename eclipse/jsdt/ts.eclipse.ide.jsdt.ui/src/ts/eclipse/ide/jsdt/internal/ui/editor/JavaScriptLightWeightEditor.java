@@ -232,13 +232,16 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		// installOverrideIndicator(false);
 	}
 
+	protected JavaScriptSourceViewerConfiguration createTypeScriptSourceViewerConfiguration() {
+		return createTypeScriptSourceViewerConfiguration(getPreferenceStore());
+	}
 	/**
 	 * Returns a new Java source viewer configuration.
 	 * 
 	 * @return a new <code>JavaScriptSourceViewerConfiguration</code>
 	 * 
 	 */
-	protected JavaScriptSourceViewerConfiguration createTypeScriptSourceViewerConfiguration() {
+	protected JavaScriptSourceViewerConfiguration createTypeScriptSourceViewerConfiguration(IPreferenceStore store) {
 		JavaScriptTextTools textTools = JavaScriptPlugin.getDefault().getJavaTextTools();
 		return new TypeScriptSourceViewerConfiguration(textTools.getColorManager(), getPreferenceStore(), this,
 				IJavaScriptPartitions.JAVA_PARTITIONING);
@@ -602,8 +605,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		super.setPreferenceStore(store);
 		if (getSourceViewerConfiguration() instanceof JavaScriptSourceViewerConfiguration) {
 			JavaScriptTextTools textTools = JavaScriptPlugin.getDefault().getJavaTextTools();
-			setSourceViewerConfiguration(new TypeScriptSourceViewerConfiguration(textTools.getColorManager(), store,
-					this, IJavaScriptPartitions.JAVA_PARTITIONING));
+			setSourceViewerConfiguration(createTypeScriptSourceViewerConfiguration(store));
 		}
 		if (getSourceViewer() instanceof JavaSourceViewer)
 			((JavaSourceViewer) getSourceViewer()).setPreferenceStore(store);

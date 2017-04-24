@@ -8,6 +8,7 @@ import org.eclipse.wst.jsdt.ui.actions.SelectionDispatchAction;
 
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
+import ts.eclipse.ide.jsdt.internal.ui.refactoring.RefactoringMessages;
 
 public class RenameAction extends SelectionDispatchAction {
 
@@ -22,7 +23,7 @@ public class RenameAction extends SelectionDispatchAction {
 	 */
 	public RenameAction(IWorkbenchSite site) {
 		super(site);
-		setText(JSDTTypeScriptUIMessages.RenameAction_text);
+		setText(RefactoringMessages.RenameAction_text);
 		fRenameJavaElement= new RenameTypeScriptElementAction(site);
 		fRenameJavaElement.setText(getText());
 //		fRenameResource= new RenameResourceAction(site);

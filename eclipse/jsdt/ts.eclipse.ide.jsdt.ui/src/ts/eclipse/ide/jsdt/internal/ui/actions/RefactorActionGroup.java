@@ -24,6 +24,7 @@ import org.eclipse.wst.jsdt.ui.actions.SelectionDispatchAction;
 
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
+import ts.eclipse.ide.jsdt.internal.ui.refactoring.RefactoringMessages;
 import ts.eclipse.ide.jsdt.ui.IContextMenuConstants;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.jsdt.ui.actions.TypeScriptActionConstants;
@@ -61,7 +62,7 @@ public class RefactorActionGroup extends ActionGroup {
 	private static class NoActionAvailable extends Action {
 		public NoActionAvailable() {
 			setEnabled(true);
-			setText(JSDTTypeScriptUIMessages.RefactorActionGroup_no_refactoring_available);
+			setText(RefactoringMessages.RefactorActionGroup_no_refactoring_available);
 		}
 	}
 
@@ -131,7 +132,7 @@ public class RefactorActionGroup extends ActionGroup {
 	}
 
 	private void addRefactorSubmenu(IMenuManager menu) {
-		MenuManager refactorSubmenu = new MenuManager(JSDTTypeScriptUIMessages.RefactorMenu_label, MENU_ID);
+		MenuManager refactorSubmenu = new MenuManager(RefactoringMessages.RefactorMenu_label, MENU_ID);
 		// refactorSubmenu.setActionDefinitionId(QUICK_MENU_ID);
 		if (fEditor != null) {
 			// final ITypeRoot element= getEditorInput();

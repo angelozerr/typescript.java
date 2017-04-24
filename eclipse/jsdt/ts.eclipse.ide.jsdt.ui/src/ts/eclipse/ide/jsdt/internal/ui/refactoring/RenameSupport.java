@@ -23,7 +23,6 @@ import org.eclipse.ltk.core.refactoring.participants.RenameProcessor;
 import org.eclipse.ltk.core.refactoring.participants.RenameRefactoring;
 import org.eclipse.swt.widgets.Shell;
 
-import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.resources.ITypeScriptFile;
 
@@ -51,9 +50,12 @@ public class RenameSupport {
 		// initialize(fRefactoring, newName, flags);
 	}
 
-	public static RenameSupport create(ITypeScriptFile tsFile, int offset, String newName) throws CoreException {
-		TypeScriptRenameProcessor processor = new TypeScriptRenameProcessor(tsFile, offset, null);
-		processor.setNewName(newName);
+	public static RenameSupport create(ITypeScriptFile tsFile, int offset, String oldName, String newName)
+			throws CoreException {
+		TypeScriptRenameProcessor processor = new TypeScriptRenameProcessor(tsFile, offset, oldName);
+		if (newName != null) {
+			processor.setNewName(newName);
+		}
 		return new RenameSupport(processor, newName);
 	}
 
@@ -200,7 +202,7 @@ public class RenameSupport {
 		if (fPreCheckStatus == null) {
 			if (!fRefactoring.isApplicable()) {
 				fPreCheckStatus = RefactoringStatus
-						.createFatalErrorStatus(JSDTTypeScriptUIMessages.RenameSupport_not_available);
+						.createFatalErrorStatus(RefactoringMessages.RenameSupport_not_available);
 			} else {
 				fPreCheckStatus = new RefactoringStatus();
 			}
@@ -209,13 +211,15 @@ public class RenameSupport {
 
 	private void showInformation(Shell parent, RefactoringStatus status) {
 		String message = status.getMessageMatchingSeverity(RefactoringStatus.FATAL);
-		MessageDialog.openInformation(parent, JSDTTypeScriptUIMessages.RenameSupport_dialog_title, message);
+		MessageDialog.openInformation(parent, RefactoringMessages.RenameSupport_dialog_title, message);
 	}
 
 	private RenameSelectionState createSelectionState() {
 		RenameProcessor processor = (RenameProcessor) fRefactoring.getAdapter(RenameProcessor.class);
 		Object[] elements = processor.getElements();
-		RenameSelectionState state = null;//elements.length == 1 ? new RenameSelectionState(elements[0]) : null;
+		RenameSelectionState state = null;// elements.length == 1 ? new
+											// RenameSelectionState(elements[0])
+											// : null;
 		return state;
 	}
 
