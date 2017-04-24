@@ -39,8 +39,14 @@ public class VersionHelper {
 			i++;
 		}
 		// compare first non-equal ordinal number
-		if (i < vals1.length && i < vals2.length) {
-			int diff = Integer.valueOf(vals1[i]).compareTo(Integer.valueOf(vals2[i]));
+		if (i < vals1.length && i < vals2.length) {			
+			String v = vals1[i];
+			int index = v.indexOf('-');
+			if (index > -1) {
+				// ex : 1-insiders
+				v = v.substring(0,  index);
+			}
+			int diff = Integer.valueOf(v).compareTo(Integer.valueOf(vals2[i]));
 			return Integer.signum(diff);
 		}
 		// the strings are equal or one string is a substring of the other

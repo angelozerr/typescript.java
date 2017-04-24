@@ -15,6 +15,7 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.validator.internal.core.Trace;
 import ts.eclipse.ide.validator.internal.core.validation.TypeScriptReporterCollector;
+import ts.utils.VersionHelper;
 
 public class TypeScriptValidationHelper {
 
@@ -23,8 +24,10 @@ public class TypeScriptValidationHelper {
 			IIDETypeScriptProject tsProject = (IIDETypeScriptProject) tsFile.getProject();
 			TypeScriptReporterCollector collector = new TypeScriptReporterCollector(tsFile, reporter, validator);
 			if (tsProject.canSupport(CommandNames.SemanticDiagnosticsSync)) {
-				addDiagnostics(tsFile.semanticDiagnosticsSync(true), collector);
-				addDiagnostics(tsFile.syntacticDiagnosticsSync(true), collector);
+				boolean includeLinePosition = !(VersionHelper
+						.canSupport(tsProject.getProjectSettings().getTypeScriptVersion(), "2.3.1"));
+				addDiagnostics(tsFile.semanticDiagnosticsSync(includeLinePosition), collector);
+				addDiagnostics(tsFile.syntacticDiagnosticsSync(includeLinePosition), collector);
 			} else {
 				List<DiagnosticEvent> events = tsFile.geterr().get(5000, TimeUnit.MILLISECONDS);
 				for (DiagnosticEvent event : events) {
@@ -44,8 +47,9 @@ public class TypeScriptValidationHelper {
 
 	public static void addDiagnostics(DiagnosticEventBody event, TypeScriptReporterCollector collector) {
 		for (IDiagnostic d : event.getDiagnostics()) {
-			collector.addDiagnostic(null, null, d.getText(), d.getStartLocation().getLine(), d.getStartLocation().getOffset(),
-					d.getEndLocation().getLine(), d.getEndLocation().getOffset(), d.getCategory(), d.getCode());
+			collector.addDiagnostic(null, null, d.getFullText(), d.getStartLocation().getLine(),
+					d.getStartLocation().getOffset(), d.getEndLocation().getLine(), d.getEndLocation().getOffset(),
+					d.getCategory(), d.getCode());
 		}
 	}
 

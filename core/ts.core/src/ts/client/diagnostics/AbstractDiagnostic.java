@@ -10,6 +10,8 @@
  */
 package ts.client.diagnostics;
 
+import ts.utils.StringUtils;
+
 /**
  * Item of diagnostic information found in a DiagnosticEvent message.
  *
@@ -28,15 +30,36 @@ public abstract class AbstractDiagnostic implements IDiagnostic {
 
 	private String category;
 
+	/**
+	 * The name of the plugin reporting the message.
+	 */
+	private String source;
+
+	@Override
 	public String getText() {
 		return text;
 	}
 
+	@Override
+	public String getFullText() {
+		if (StringUtils.isEmpty(source)) {
+			return text;
+		}
+		return new StringBuilder("[").append(source).append("] ").append(text != null ? text : "").toString();
+	}
+
+	@Override
 	public Integer getCode() {
 		return code;
 	}
 
+	@Override
 	public DiagnosticCategory getCategory() {
 		return DiagnosticCategory.getCategory(category);
+	}
+
+	@Override
+	public String getSource() {
+		return source;
 	}
 }

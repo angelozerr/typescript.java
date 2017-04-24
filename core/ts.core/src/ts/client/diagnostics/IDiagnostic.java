@@ -36,14 +36,36 @@ public interface IDiagnostic {
 		}
 	}
 
+	/**
+	 * Return text of diagnostic message.
+	 * 
+	 * @return text of diagnostic message.
+	 */
 	String getText();
 
+	String getFullText();
+	
 	Location getStartLocation();
 
 	Location getEndLocation();
 
-	DiagnosticCategory getCategory();
-
+	/**
+	 * Returns the error code of the diagnostic message.
+	 * 
+	 * @return the error code of the diagnostic message.
+	 */
 	Integer getCode();
 
+	/**
+	 * 
+	 * @return
+	 */
+	DiagnosticCategory getCategory();
+
+	/**
+	 * Return the name of the plugin reporting the message.
+	 * 
+	 * @return the name of the plugin reporting the message.
+	 */
+	String getSource();
 }

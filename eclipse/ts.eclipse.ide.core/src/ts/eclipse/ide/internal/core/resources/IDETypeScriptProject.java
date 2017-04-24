@@ -498,7 +498,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	public void addMarker(IFile tsFile, DiagnosticEventBody event) throws CoreException {
 		List<IDiagnostic> diagnostics = event.getDiagnostics();
 		for (IDiagnostic diagnostic : diagnostics) {
-			TypeScriptResourceUtil.addTscMarker(tsFile, diagnostic.getText(), getSeverity(diagnostic.getCategory()),
+			TypeScriptResourceUtil.addTscMarker(tsFile, diagnostic.getFullText(), getSeverity(diagnostic.getCategory()),
 					diagnostic.getStartLocation().getLine());
 		}
 	}
