@@ -51,10 +51,13 @@ public class RefactoringMessages extends NLS {
 	// Wizard
 	public static String RenameInputWizardPage_new_name;
 	public static String RenameRefactoringWizard_internal_error;
-
+	public static String RenameInputWizardPage_findInComments;
+	public static String RenameInputWizardPage_findInStrings;
+	
 	// Actions
 	public static String RenameTypeScriptElementAction_name;
 	public static String RenameTypeScriptElementAction_exception;
+
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

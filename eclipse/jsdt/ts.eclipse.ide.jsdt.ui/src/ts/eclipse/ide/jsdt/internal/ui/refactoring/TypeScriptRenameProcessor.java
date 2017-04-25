@@ -39,6 +39,8 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 	private final String oldName;
 
 	private String newName;
+	private boolean findInComments;
+	private boolean findInStrings;
 
 	public TypeScriptRenameProcessor(ITypeScriptFile tsFile, int offset, String oldName) {
 		this.tsFile = tsFile;
@@ -82,7 +84,8 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 		try {
 			ITypeScriptProject tsProject = tsFile.getProject();
-			RenameResponseBody rename = tsFile.rename(offset, false, false).get(1000, TimeUnit.MILLISECONDS);
+			RenameResponseBody rename = tsFile.rename(offset, isFindInComments(), isFindInStrings()).get(1000,
+					TimeUnit.MILLISECONDS);
 			List<SpanGroup> locs = rename.getLocs();
 
 			List<Change> fileChanges = new ArrayList<>();
@@ -126,6 +129,23 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 	}
 
 	public int getSaveMode() {
-		return 1; // RefactoringSaveHelper.SAVE_NOTHING;
+		return RefactoringSaveHelper.SAVE_ALL_ALWAYS_ASK;
 	}
+
+	public boolean isFindInComments() {
+		return findInComments;
+	}
+
+	public void setFindInComments(boolean findInComments) {
+		this.findInComments = findInComments;
+	}
+
+	public boolean isFindInStrings() {
+		return findInStrings;
+	}
+
+	public void setFindInStrings(boolean findInStrings) {
+		this.findInStrings = findInStrings;
+	}
+
 }

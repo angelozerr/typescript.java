@@ -12,13 +12,21 @@ package ts.eclipse.ide.jsdt.internal.ui.refactoring;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import ts.eclipse.ide.jsdt.internal.ui.util.RowLayouter;
+
 public class RenameInputWizardPage extends TextInputWizardPage {
+
+	private Button findInComments;
+	private Button findInStrings;
 
 	public RenameInputWizardPage(String description, boolean isLastUserPage, String initialValue) {
 		super(description, isLastUserPage, initialValue);
@@ -39,7 +47,7 @@ public class RenameInputWizardPage extends TextInputWizardPage {
 		layout.marginWidth = 0;
 
 		composite.setLayout(layout);
-		// RowLayouter layouter = new RowLayouter(2);
+		RowLayouter layouter = new RowLayouter(2);
 
 		Label label = new Label(composite, SWT.NONE);
 		label.setText(RefactoringMessages.RenameInputWizardPage_new_name);
@@ -50,14 +58,65 @@ public class RenameInputWizardPage extends TextInputWizardPage {
 		gd.widthHint = convertWidthInCharsToPixels(25);
 		text.setLayoutData(gd);
 
-		// layouter.perform(label, text, 1);
+		layouter.perform(label, text, 1);
 
 		Label separator = new Label(composite, SWT.NONE);
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, false, false);
 		gridData.heightHint = 2;
 		separator.setLayoutData(gridData);
 
+		addFindInCommentsCheckbox(composite, layouter);
+		addFindInStringsCheckbox(composite, layouter);
+
 		Dialog.applyDialogFont(superComposite);
+	}
+
+	/**
+	 * Add "Find in comments?" checkbox.
+	 * 
+	 * @param result
+	 * @param layouter
+	 */
+	private void addFindInCommentsCheckbox(Composite result, RowLayouter layouter) {
+		final TypeScriptRenameProcessor ref = (TypeScriptRenameProcessor) getRefactoring()
+				.getAdapter(TypeScriptRenameProcessor.class);
+		String title = RefactoringMessages.RenameInputWizardPage_findInComments;
+		boolean defaultValue = false;
+		findInComments = createCheckbox(result, title, defaultValue, layouter);
+		ref.setFindInComments(findInComments.getSelection());
+		findInComments.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				ref.setFindInComments(findInComments.getSelection());
+			}
+		});
+	}
+
+	/**
+	 * Add "Find in strings?" checkbox.
+	 * 
+	 * @param result
+	 * @param layouter
+	 */
+	private void addFindInStringsCheckbox(Composite result, RowLayouter layouter) {
+		final TypeScriptRenameProcessor ref = (TypeScriptRenameProcessor) getRefactoring()
+				.getAdapter(TypeScriptRenameProcessor.class);
+		String title = RefactoringMessages.RenameInputWizardPage_findInStrings;
+		boolean defaultValue = false;
+		findInStrings = createCheckbox(result, title, defaultValue, layouter);
+		ref.setFindInStrings(findInStrings.getSelection());
+		findInStrings.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				ref.setFindInStrings(findInStrings.getSelection());
+			}
+		});
+	}
+
+	private static Button createCheckbox(Composite parent, String title, boolean value, RowLayouter layouter) {
+		Button checkBox = new Button(parent, SWT.CHECK);
+		checkBox.setText(title);
+		checkBox.setSelection(value);
+		layouter.perform(checkBox);
+		return checkBox;
 	}
 
 }
