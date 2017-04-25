@@ -10,13 +10,13 @@
  */
 package ts.client.diagnostics;
 
-import ts.utils.StringUtils;
-
 /**
  * Item of diagnostic information found in a DiagnosticEvent message.
  *
  */
 public abstract class AbstractDiagnostic implements IDiagnostic {
+
+	private static final String TS_SOURCE = "ts";
 
 	/**
 	 * Text of diagnostic message.
@@ -42,9 +42,8 @@ public abstract class AbstractDiagnostic implements IDiagnostic {
 
 	@Override
 	public String getFullText() {
-		if (StringUtils.isEmpty(source)) {
-			return text;
-		}
+		String text = getText();
+		String source = getSource();
 		return new StringBuilder("[").append(source).append("] ").append(text != null ? text : "").toString();
 	}
 
@@ -60,6 +59,6 @@ public abstract class AbstractDiagnostic implements IDiagnostic {
 
 	@Override
 	public String getSource() {
-		return source;
+		return source != null ? source : TS_SOURCE;
 	}
 }
