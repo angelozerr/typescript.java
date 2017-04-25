@@ -16,7 +16,7 @@ import ts.utils.VersionHelper;
  * Command names of tsserver.
  *
  */
-public enum CommandNames {
+public enum CommandNames implements ISupportable {
 
 	Open("open"), 
 	Close("close"), 

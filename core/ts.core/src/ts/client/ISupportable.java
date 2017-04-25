@@ -8,23 +8,23 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.core.resources;
-
-import org.eclipse.core.resources.IResource;
-
-import ts.resources.ITypeScriptFile;
+package ts.client;
 
 /**
- * IDE TypeScript file API.
+ * Supportable API.
  *
  */
-public interface IIDETypeScriptFile extends ITypeScriptFile {
+public interface ISupportable {
 
 	/**
-	 * Returns the wrapped Eclipse resource.
+	 * Returns true if the given tsserver command can be supported by the
+	 * TypeScript version configured for the project and false otherwise.
 	 * 
-	 * @return
+	 * @param command
+	 * @return true if the given tsserver command can be supported by the
+	 *         TypeScript version configured for the project and false
+	 *         otherwise.
 	 */
-	IResource getResource();
+	boolean canSupport(String version);
 
 }

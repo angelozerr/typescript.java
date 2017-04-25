@@ -19,7 +19,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import ts.TypeScriptException;
+import ts.client.CommandCapability;
 import ts.client.CommandNames;
+import ts.client.ISupportable;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.ScriptKindName;
@@ -55,7 +57,7 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 	protected final Object serverLock = new Object();
 	private ITypeScriptLint tslint;
 
-	private final Map<CommandNames, Boolean> serverCapabilities;
+	private final Map<ISupportable, Boolean> serverCapabilities;
 	private Map<CompilerOptionCapability, Boolean> compilerCapabilities;
 
 	private List<String> supportedCodeFixes;
@@ -65,11 +67,11 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 	public TypeScriptProject(File projectDir, ITypeScriptProjectSettings projectSettings) {
 		this.projectDir = projectDir;
 		this.projectSettings = projectSettings;
-		this.openedFiles = new HashMap<String, ITypeScriptFile>();
+		this.openedFiles = new HashMap<>();
 		this.data = new HashMap<String, Object>();
-		this.listeners = new ArrayList<ITypeScriptClientListener>();
-		this.serverCapabilities = new HashMap<CommandNames, Boolean>();
-		this.compilerCapabilities = new HashMap<CompilerOptionCapability, Boolean>();
+		this.listeners = new ArrayList<>();
+		this.serverCapabilities = new HashMap<>();
+		this.compilerCapabilities = new HashMap<>();
 		this.projectInfo = null;
 	}
 
@@ -327,7 +329,7 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 	}
 
 	@Override
-	public boolean canSupport(CommandNames command) {
+	public boolean canSupport(ISupportable command) {
 		Boolean support = serverCapabilities.get(command);
 		if (support == null) {
 			support = command.canSupport(getProjectSettings().getTypeScriptVersion());
@@ -335,7 +337,7 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		}
 		return support;
 	}
-
+		
 	@Override
 	public boolean canSupport(CompilerOptionCapability option) {
 		Boolean support = compilerCapabilities.get(option);

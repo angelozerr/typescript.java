@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ts.TypeScriptException;
-import ts.client.CommandNames;
+import ts.client.ISupportable;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.diagnostics.DiagnosticEvent;
@@ -89,8 +89,8 @@ public interface ITypeScriptProject {
 	 *         TypeScript version configured for the project and false
 	 *         otherwise.
 	 */
-	boolean canSupport(CommandNames command);
-
+	boolean canSupport(ISupportable command);
+	
 	/**
 	 * Returns true if the given tsc compiler option can be supported by the
 	 * TypeScript version configured for the project and false otherwise.
