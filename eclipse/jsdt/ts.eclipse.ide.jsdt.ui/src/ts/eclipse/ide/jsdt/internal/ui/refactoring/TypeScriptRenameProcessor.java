@@ -24,15 +24,19 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
 import ts.client.TextSpan;
+import ts.client.rename.RenameInfo;
 import ts.client.rename.RenameResponseBody;
 import ts.client.rename.SpanGroup;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
-import ts.resources.ITypeScriptProject;
 
 public class TypeScriptRenameProcessor extends RenameProcessor {
+
+	private static final String TEXT_TYPE = "ts";
+
+	private static final String ID = "ts.eclipse.ide.core.refactoring.rename";
 
 	private final ITypeScriptFile tsFile;
 	private final int offset;
@@ -41,6 +45,8 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 	private String newName;
 	private boolean findInComments;
 	private boolean findInStrings;
+
+	private RenameResponseBody rename;
 
 	public TypeScriptRenameProcessor(ITypeScriptFile tsFile, int offset, String oldName) {
 		this.tsFile = tsFile;
@@ -55,12 +61,12 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 
 	@Override
 	public String getIdentifier() {
-		return "ts.eclipse.ide.core.refactoring.rename";
+		return ID;
 	}
 
 	@Override
 	public String getProcessorName() {
-		return "Rename TypeScript Element";
+		return RefactoringMessages.TypeScriptRenameProcessor_name;
 	}
 
 	@Override
@@ -71,29 +77,44 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 	@Override
 	public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
 			throws CoreException, OperationCanceledException {
+		rename = null;
 		return new RefactoringStatus();
 	}
 
 	@Override
 	public RefactoringStatus checkFinalConditions(IProgressMonitor pm, CheckConditionsContext context)
 			throws CoreException, OperationCanceledException {
-		return new RefactoringStatus();
+		RefactoringStatus status = new RefactoringStatus();
+		// Consume "rename" tsserver command.
+		try {
+			rename = tsFile.rename(offset, isFindInComments(), isFindInStrings()).get(1000, TimeUnit.MILLISECONDS);
+			RenameInfo info = rename.getInfo();
+			if (!info.isCanRename()) {
+				// Refactoring cannot be done.
+				status.addError(info.getLocalizedErrorMessage());
+			}
+		} catch (Exception e) {
+			status.addError(e.getMessage());
+		}
+		return status;
 	}
 
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 		try {
-			ITypeScriptProject tsProject = tsFile.getProject();
-			RenameResponseBody rename = tsFile.rename(offset, isFindInComments(), isFindInStrings()).get(1000,
-					TimeUnit.MILLISECONDS);
-			List<SpanGroup> locs = rename.getLocs();
+			if (rename == null) {
+				throw new CoreException(new Status(IStatus.ERROR, JSDTTypeScriptCorePlugin.PLUGIN_ID,
+						"TypeScript rename cannot be null"));
+			}
 
+			// Convert TypeScript changes to Eclipse changes.
+			List<SpanGroup> locs = rename.getLocs();
 			List<Change> fileChanges = new ArrayList<>();
 			for (SpanGroup loc : locs) {
 				IFile file = WorkbenchResourceUtil.findFileFromWorkspace(loc.getFile());
 				TextFileChange change = new TextFileChange(file.getName(), file);
 				change.setEdit(new MultiTextEdit());
-				change.setTextType("ts");
+				change.setTextType(TEXT_TYPE);
 
 				List<TextSpan> spans = loc.getLocs();
 				for (TextSpan textSpan : spans) {
@@ -103,9 +124,9 @@ public class TypeScriptRenameProcessor extends RenameProcessor {
 				}
 				fileChanges.add(change);
 			}
-			return new CompositeChange("Rename TypeScript Element",
+			return new CompositeChange(RefactoringMessages.TypeScriptRenameProcessor_change_name,
 					fileChanges.toArray(new Change[fileChanges.size()]));
-		} catch (OperationCanceledException e) {
+		} catch (CoreException | OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new CoreException(

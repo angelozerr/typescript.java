@@ -58,6 +58,10 @@ public class RefactoringMessages extends NLS {
 	public static String RenameTypeScriptElementAction_name;
 	public static String RenameTypeScriptElementAction_exception;
 
+	// TypeScript rename processor.
+	public static String TypeScriptRenameProcessor_name;
+	public static String TypeScriptRenameProcessor_change_name;
+
 	
 	public static ResourceBundle getResourceBundle() {
 		try {
