@@ -47,6 +47,9 @@ public class TypeScriptImagesRegistry {
 	public static final String IMG_TYPE_DEFAULT = "ts.eclipse.jface.IMG_TYPE_DEFAULT";
 	public static final String IMG_TYPE_PRIVATE = "ts.eclipse.jface.IMG_TYPE_PRIVATE";
 	public static final String IMG_TYPE_PUBLIC = "ts.eclipse.jface.IMG_TYPE_PUBLIC";
+	public static final String IMG_ELEMENT = "ts.eclipse.jface.IMG_ELEMENT";
+	public static final String IMG_ATTRIBUTE = "ts.eclipse.jface.IMG_ATTRIBUTE";
+	public static final String IMG_COMPONENT = "ts.eclipse.jface.IMG_COMPONENT";
 
 	static {
 		registerImageDescriptor(IMG_KEYWORD,
@@ -56,7 +59,7 @@ public class TypeScriptImagesRegistry {
 		registerImageDescriptor(IMG_SCRIPT,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "script_obj.gif"));
 		registerImageDescriptor(IMG_FOLDER,
-				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "fldr_obj.png"));		
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "fldr_obj.png"));
 		registerImageDescriptor(IMG_CLASS,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "class_obj.gif"));
 		registerImageDescriptor(IMG_ALIAS,
@@ -85,6 +88,12 @@ public class TypeScriptImagesRegistry {
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_private_obj.gif"));
 		registerImageDescriptor(IMG_TYPE_PUBLIC,
 				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "type_public_obj.gif"));
+		registerImageDescriptor(IMG_ELEMENT,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "element_obj.gif"));
+		registerImageDescriptor(IMG_ATTRIBUTE,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "attribute_obj.gif"));
+		registerImageDescriptor(IMG_COMPONENT,
+				ImageDescriptor.createFromFile(TypeScriptImagesRegistry.class, "component_obj.gif"));
 	}
 
 	/**
@@ -162,7 +171,7 @@ public class TypeScriptImagesRegistry {
 			break;
 		case DIRECTORY:
 			imageKey = IMG_FOLDER;
-			break;			
+			break;
 		case ENUM:
 			imageKey = getKey(parts, IMG_ENUM_DEFAULT, IMG_ENUM_PRIVATE, null);
 			break;
@@ -187,6 +196,15 @@ public class TypeScriptImagesRegistry {
 			if (!isInner) {
 				imageKey = IMG_INTERFACE;
 			}
+			break;
+		case ELEMENT:
+			imageKey = IMG_ELEMENT;
+			break;
+		case ATTRIBUTE:
+			imageKey = IMG_ATTRIBUTE;
+			break;
+		case COMPONENT:
+			imageKey = IMG_COMPONENT;
 			break;
 		default:
 		}
