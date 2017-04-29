@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -44,7 +43,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IPluginContribution;
@@ -157,15 +155,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	public void addPages() {
 		super.addPages();
 
-		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage") { //$NON-NLS-1$
-			@Override
-			public void createControl(Composite parent) {
-				super.createControl(parent);
-				createWorkingSetGroup((Composite) getControl(), getSelection(),
-						new String[] { "org.eclipse.ui.resourceWorkingSetPage" }); //$NON-NLS-1$
-				Dialog.applyDialogFont(getControl());
-			}
-		};
+		mainPage = createMainPage();
 		mainPage.setTitle(newProjectTitle);
 		mainPage.setDescription(newProjectDescription);
 		this.addPage(mainPage);
@@ -181,6 +171,10 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		 * NewProject_referenceDescription); this.addPage(referencePage); }
 		 */
 
+	}
+
+	protected WizardNewTypeScriptProjectCreationPage createMainPage() {
+		return new WizardNewTypeScriptProjectCreationPage("basicNewProjectPage", this);
 	}
 
 	/**
