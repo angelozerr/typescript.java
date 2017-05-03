@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import ts.eclipse.ide.internal.ui.dialogs.StatusUtil;
+import ts.eclipse.ide.ui.utils.StatusUtil;
 import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 
 /**

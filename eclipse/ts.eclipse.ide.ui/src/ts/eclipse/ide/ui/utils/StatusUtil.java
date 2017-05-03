@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Angelo ZERR : copied from  org.eclipse.wst.jsdt.internal.ui.dialogs.StatusUtil
  *******************************************************************************/
-package ts.eclipse.ide.internal.ui.dialogs;
+package ts.eclipse.ide.ui.utils;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;

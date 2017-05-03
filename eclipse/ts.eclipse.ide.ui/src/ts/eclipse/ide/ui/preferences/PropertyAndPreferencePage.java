@@ -36,11 +36,11 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.internal.ui.dialogs.StatusUtil;
 import ts.eclipse.ide.internal.ui.dialogs.fields.DialogField;
 import ts.eclipse.ide.internal.ui.dialogs.fields.IDialogFieldListener;
 import ts.eclipse.ide.internal.ui.dialogs.fields.LayoutUtil;
 import ts.eclipse.ide.internal.ui.dialogs.fields.SelectionButtonDialogField;
+import ts.eclipse.ide.ui.utils.StatusUtil;
 import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 
 /**
