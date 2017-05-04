@@ -738,4 +738,14 @@
 	  </contentTypeBinding>
    </extension>
 
+ 	<!-- TextMate Snippets -->
+ 	<extension
+       point="org.eclipse.tm4e.ui.snippets">
+	    <snippet
+	          name="%textmate.snippet.jsx"
+	          path="./snippets/JSXSnippet.jsx"
+	          scopeName="source.js">
+	    </snippet>
+	</extension>
+
 </plugin>        
