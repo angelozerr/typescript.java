@@ -58,6 +58,13 @@ public class CompletionEntry implements IKindProvider {
 	 */
 	private TextSpan replacementSpan;
 
+	/**
+	 * Indicating if commiting this completion entry will require additional
+	 * code action to be made to avoid errors. The code action is normally
+	 * adding an additional import statement.
+	 */
+	private Boolean hasAction;
+
 	private Boolean isFunction;
 
 	private int relevance;
@@ -67,7 +74,7 @@ public class CompletionEntry implements IKindProvider {
 	private final int offset;
 
 	private final transient ICompletionEntryMatcher matcher;
-	
+
 	private final transient ITypeScriptServiceClient client;
 
 	private List<CompletionEntryDetails> entryDetails;
@@ -167,4 +174,7 @@ public class CompletionEntry implements IKindProvider {
 		return this.entryDetails;
 	}
 
+	public boolean hasActions() {
+		return hasAction != null && hasAction;
+	}
 }

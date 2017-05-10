@@ -12,6 +12,8 @@ package ts.client.completions;
 
 import java.util.List;
 
+import ts.client.codefixes.CodeAction;
+
 /**
  * Additional completion entry details, available on demand
  */
@@ -39,6 +41,16 @@ public class CompletionEntryDetails {
 	 */
 	List<SymbolDisplayPart> documentation;
 
+	/**
+	 * JSDoc tags for the symbol.
+	 */
+	List<JSDocTagInfo> tags;
+
+	/**
+	 * The associated code actions for this entry
+	 */
+	List<CodeAction> codeActions;
+
 	public String getName() {
 		return name;
 	}
@@ -57,5 +69,13 @@ public class CompletionEntryDetails {
 
 	public List<SymbolDisplayPart> getDocumentation() {
 		return documentation;
+	}
+
+	public List<JSDocTagInfo> getTags() {
+		return tags;
+	}
+
+	public List<CodeAction> getCodeActions() {
+		return codeActions;
 	}
 }
