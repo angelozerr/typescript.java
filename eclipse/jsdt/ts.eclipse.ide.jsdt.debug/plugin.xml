@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension
+        point="org.eclipse.wst.jsdt.chromium.debug.core.sourceMapLanguageSupports">
+     <support
+           class="ts.eclipse.ide.jsdt.debug.internal.support.TypeScriptSourceMapLanguageSupport"
+           fileExtensions="ts,tsx"
+           id="ts.eclipse.ide.jsdt.debug.support"
+           name="TypeScript Debugging">
+     </support>
+  </extension>
+  
+</plugin>          

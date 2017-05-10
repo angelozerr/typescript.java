@@ -32,6 +32,7 @@ public class IDETsconfigJson extends TsconfigJson {
 	private IFile tsconfigFile;
 	private IContainer outDir;
 	private IFile outFile;
+	private IContainer mapRoot;
 
 	/**
 	 * Load tsconfig.json.
@@ -45,6 +46,7 @@ public class IDETsconfigJson extends TsconfigJson {
 		tsconfig.tsconfigFile = tsconfigFile;
 		tsconfig.outDir = computeOutDir(tsconfig);
 		tsconfig.outFile = computeOutFile(tsconfig);
+		tsconfig.mapRoot = computeMapRoot(tsconfig);
 		return tsconfig;
 	}
 
@@ -133,6 +135,36 @@ public class IDETsconfigJson extends TsconfigJson {
 			}
 			try {
 				return tsconfig.getTsconfigFile().getParent().getFolder(new Path(outDir));
+			} catch (Throwable e) {
+				Trace.trace(Trace.SEVERE, "Error while getting compilerOption/outDir", e);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the compilerOptions/mapRoot as Eclipse folder and null otherwise.
+	 * 
+	 * @return the compilerOptions/mapRoot as Eclipse folder and null otherwise.
+	 */
+	public IContainer getMapRoot() {
+		return mapRoot;
+	}
+
+	/**
+	 * Compute compilerOptions/mapRoot as Eclipse folder and null otherwise.
+	 * 
+	 * @return compilerOptions/mapRoot as Eclipse folder and null otherwise
+	 */
+	private static IContainer computeMapRoot(IDETsconfigJson tsconfig) {
+		CompilerOptions options = tsconfig.getCompilerOptions();
+		if (options != null) {
+			String mapRoot = options.getMapRoot();
+			if (StringUtils.isEmpty(mapRoot)) {
+				return null;
+			}
+			try {
+				return tsconfig.getTsconfigFile().getParent().getFolder(new Path(mapRoot));
 			} catch (Throwable e) {
 				Trace.trace(Trace.SEVERE, "Error while getting compilerOption/outDir", e);
 			}
