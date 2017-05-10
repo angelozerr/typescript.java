@@ -29,11 +29,20 @@ public class WizardNewTypeScriptProjectCreationPage extends WizardNewProjectCrea
 	}
 
 	@Override
-	public void createControl(Composite parent) {
+	public final void createControl(Composite parent) {
 		super.createControl(parent);
-		createWorkingSetGroup((Composite) getControl(), wizard.getSelection(),
-				new String[] { "org.eclipse.ui.resourceWorkingSetPage" }); //$NON-NLS-1$
-		Dialog.applyDialogFont(getControl());
+		Composite body = (Composite) getControl();
+		createPageBody(body);
+		Dialog.applyDialogFont(body);
+	}
+
+	/**
+	 * Create page body. User can override this method to add new UI fields.
+	 * 
+	 * @param parent
+	 */
+	protected void createPageBody(Composite parent) {
+		createWorkingSetGroup(parent, wizard.getSelection(), new String[] { "org.eclipse.ui.resourceWorkingSetPage" }); //$NON-NLS-1$
 	}
 
 }
