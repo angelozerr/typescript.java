@@ -63,7 +63,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptMainPreferencePage_refactoring_title;
 	public static String TypeScriptMainPreferencePage_refactoring_auto_save;
 	public static String TypeScriptMainPreferencePage_refactoring_lightweight;
-	
+
 	public static String PropertyAndPreferencePage_useprojectsettings_label;
 	public static String PropertyAndPreferencePage_useworkspacesettings_change;
 	public static String PropertyAndPreferencePage_showprojectspecificsettings_label;
@@ -97,7 +97,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TypeScriptRuntimeConfigurationBlock_typeScriptFile_exists_error;
 	public static String TypeScriptRuntimeConfigurationBlock_typeScriptFile_invalid_error;
 	public static String TypeScriptRuntimeConfigurationBlock_installedTypeScript_emulatePlugins_warning;
-	
+
 	// tsserver
 	public static String TypeScriptRuntimeConfigurationBlock_traceOnConsole_label;
 	public static String TypeScriptRuntimeConfigurationBlock_emulatePlugins_label;
@@ -179,6 +179,14 @@ public class TypeScriptUIMessages extends NLS {
 	public static String NewTypeScriptProjectWizard_newProjectTitle;
 	public static String NewTypeScriptProjectWizard_newProjectDescription;
 
+	public static String AbstractWizardNewTypeScriptProjectCreationPage_nodejs_group_label;
+	public static String AbstractWizardNewTypeScriptProjectCreationPage_useEmbeddedNodeJs_label;
+	public static String AbstractWizardNewTypeScriptProjectCreationPage_useInstalledNodeJs_label;
+
+	public static String WizardNewTypeScriptProjectCreationPage_typescript_group_label;
+	public static String WizardNewTypeScriptProjectCreationPage_useEmbeddedTsRuntime_label;
+	public static String WizardNewTypeScriptProjectCreationPage_useInstallTsRuntime_label;
+
 	public static String TSConfigWizardPage_title;
 	public static String TSConfigWizardPage_description;
 	public static String TSConfigWizardPage_module;
@@ -195,15 +203,6 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSConfigWizardPage_noImplicitReturns;
 	public static String TSConfigWizardPage_strictNullChecks;
 
-	public static String TypeScriptRuntimeAndNodejsWizardPage_title;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_description;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_typescript_group_label;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedTsRuntime_label;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstallTsRuntime_label;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_nodejs_group_label;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_useEmbeddedNodeJs_label;
-	public static String TypeScriptRuntimeAndNodejsWizardPage_useInstalledNodeJs_label;
-	
 	// NPM Module Versions
 	public static String NPMModuleVersionsSelectionDialog_title;
 	public static String NPMModuleVersionsSelectionDialog_message;
@@ -224,7 +223,7 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSLintWizardPage_tslintPlugin_group_label;
 	public static String TSLintWizardPage_useEmbeddedTslintPlugin_label;
 	public static String TSLintWizardPage_useInstallTslintPlugin_label;
-	
+
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)

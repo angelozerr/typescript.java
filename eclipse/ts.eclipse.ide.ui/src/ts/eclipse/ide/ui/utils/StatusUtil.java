@@ -52,7 +52,7 @@ public class StatusUtil {
 		}
 		return max;
 	}
-		
+
 	/**
 	 * Applies the status to the status line of a dialog page.
 	 */
@@ -66,18 +66,18 @@ public class StatusUtil {
 			case IStatus.WARNING:
 				page.setMessage(message, IMessageProvider.WARNING);
 				page.setErrorMessage(null);
-				break;				
+				break;
 			case IStatus.INFO:
 				page.setMessage(message, IMessageProvider.INFORMATION);
 				page.setErrorMessage(null);
-				break;			
+				break;
 			default:
 				if (message.length() == 0) {
 					message= null;
 				}
 				page.setMessage(null);
 				page.setErrorMessage(message);
-				break;		
+				break;
 		}
 	}
 }
