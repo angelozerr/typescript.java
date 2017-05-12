@@ -307,7 +307,7 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 			if (status == null || (currStatus = StatusUtil.getMostSevere(status.toArray(new IStatus[] {}))) == null)
 				currStatus = Status.OK_STATUS;
 			statusChanged(currStatus);
-			valid = currStatus.isOK();
+			valid = !currStatus.matches(IStatus.ERROR);
 		}
 		return valid;
 	}
