@@ -93,7 +93,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 	private static final String WIZARD_NAME = "NewTypeScriptProjectWizard";
 	private TSConfigWizardPage tsconfigPage;
-	private TypeScriptRuntimeAndNodejsWizardPage tsRuntimeAndNodeJsPage;
+	private TypeScriptRuntimeWizardPage tsRuntimeAndNodeJsPage;
 	private TSLintWizardPage tslintPage;
 
 	public NewTypeScriptProjectWizard() {
@@ -120,7 +120,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 		super.addPages();
 		tsconfigPage = new TSConfigWizardPage();
 		addPage(tsconfigPage);
-		tsRuntimeAndNodeJsPage = new TypeScriptRuntimeAndNodejsWizardPage();
+		tsRuntimeAndNodeJsPage = new TypeScriptRuntimeWizardPage();
 		addPage(tsRuntimeAndNodeJsPage);
 		tslintPage = new TSLintWizardPage();
 		addPage(tslintPage);
@@ -177,7 +177,7 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 						.getNode(TypeScriptCorePlugin.PLUGIN_ID);
 
 				// Update node.js preferences
-				tsRuntimeAndNodeJsPage.updateNodeJSPreferences(preferences);
+				mainPage.updateNodeJSPreferences(preferences);
 
 				// Install TypeScript/tslint if needed
 				List<LineCommand> commands = new ArrayList<>();

@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
  *     		- Bug 44162 [Wizards]  Define constants for wizard ids of new.file, new.folder, and new.project
- *     Angelo Zerr <angelo.zerr@gmail.com> - adapt for TypeScript init project.     
+ *     Angelo Zerr <angelo.zerr@gmail.com> - adapt for TypeScript init project.
  *******************************************************************************/
 package ts.eclipse.ide.ui.wizards;
 
@@ -57,7 +57,6 @@ import org.eclipse.ui.activities.IActivityManager;
 import org.eclipse.ui.activities.IIdentifier;
 import org.eclipse.ui.activities.IWorkbenchActivitySupport;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
-import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.IPreferenceConstants;
@@ -96,20 +95,20 @@ import ts.eclipse.ide.ui.TypeScriptUIPlugin;
  * name is created, the dialog closes, and the call to <code>open</code>
  * returns.
  * </p>
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
  */
 public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension {
 
 	/**
 	 * The wizard id for creating new projects in the workspace.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	// public static final String WIZARD_ID =
 	// "org.eclipse.ui.wizards.new.project"; //$NON-NLS-1$
 
-	private WizardNewProjectCreationPage mainPage;
+	protected WizardNewTypeScriptProjectCreationPage mainPage;
 
 	private WizardNewProjectReferencePage referencePage;
 
