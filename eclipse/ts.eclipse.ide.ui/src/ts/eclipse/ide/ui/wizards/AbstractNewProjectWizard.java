@@ -108,7 +108,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	// public static final String WIZARD_ID =
 	// "org.eclipse.ui.wizards.new.project"; //$NON-NLS-1$
 
-	protected WizardNewTypeScriptProjectCreationPage mainPage;
+	protected AbstractWizardNewTypeScriptProjectCreationPage mainPage;
 
 	private WizardNewProjectReferencePage referencePage;
 
@@ -172,7 +172,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 	}
 
-	protected WizardNewTypeScriptProjectCreationPage createMainPage() {
+	protected AbstractWizardNewTypeScriptProjectCreationPage createMainPage() {
 		return new WizardNewTypeScriptProjectCreationPage("basicNewProjectPage", this);
 	}
 
