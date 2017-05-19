@@ -50,18 +50,14 @@ public class TypeScriptContentFormatter implements IContentFormatter {
 			int startPosition = region.getOffset();
 			int endPosition = region.getOffset() + region.getLength() - 1;
 			tsFile.format(startPosition, endPosition).thenAccept(codeEdits -> {
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							DocumentUtils.applyEdits(document, codeEdits);
-						} catch (Exception e) {
-							IStatus status = new Status(IStatus.ERROR, JSDTTypeScriptUIPlugin.PLUGIN_ID, e.getMessage(),
-									e);
-							ErrorDialog.openError(getShell(),
-									JSDTTypeScriptUIMessages.TypeScriptContentFormatter_Error_title,
-									JSDTTypeScriptUIMessages.TypeScriptContentFormatter_Error_message, status);
-						}
+				Display.getDefault().asyncExec(() -> {
+					try {
+						DocumentUtils.applyEdits(document, codeEdits);
+					} catch (Exception e) {
+						IStatus status = new Status(IStatus.ERROR, JSDTTypeScriptUIPlugin.PLUGIN_ID, e.getMessage(), e);
+						ErrorDialog.openError(getShell(),
+								JSDTTypeScriptUIMessages.TypeScriptContentFormatter_Error_title,
+								JSDTTypeScriptUIMessages.TypeScriptContentFormatter_Error_message, status);
 					}
 				});
 			});
