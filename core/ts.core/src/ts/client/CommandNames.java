@@ -52,8 +52,12 @@ public enum CommandNames implements ISupportable {
 	// 2.1.0
 	Implementation("implementation", "2.1.0"),
 	GetSupportedCodeFixes("getSupportedCodeFixes", "2.1.0"),
-	GetCodeFixes("getCodeFixes", "2.1.0");
+	GetCodeFixes("getCodeFixes", "2.1.0"),
 
+	// 2.4.0
+	GetApplicableRefactors("getApplicableRefactors", "2.4.0"),
+    GetRefactorCodeActions("getRefactorCodeActions", "2.4.0");
+    
 	private final String name;
 	private final String sinceVersion;
 

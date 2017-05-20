@@ -28,6 +28,8 @@ import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
+import ts.client.refactors.ApplicableRefactorInfo;
+import ts.client.refactors.RefactorCodeActions;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
@@ -257,7 +259,6 @@ public interface ITypeScriptServiceClient {
 
 	CompletableFuture<List<String>> getSupportedCodeFixes() throws TypeScriptException;
 
-	//
 	/**
 	 * Definition for the given fileName at the given line/offset.
 	 * 
@@ -268,6 +269,14 @@ public interface ITypeScriptServiceClient {
 	 * @throws TypeScriptException
 	 */
 	CompletableFuture<List<FileSpan>> implementation(String fileName, int line, int offset) throws TypeScriptException;
+
+	// Since 2.4.0
+
+	CompletableFuture<List<ApplicableRefactorInfo>> getApplicableRefactors(String fileName, int line, int offset)
+			throws TypeScriptException;
+
+	CompletableFuture<RefactorCodeActions> getRefactorCodeActions(String fileName, int line, int offset,
+			String refactorName) throws TypeScriptException;
 
 	void addClientListener(ITypeScriptClientListener listener);
 

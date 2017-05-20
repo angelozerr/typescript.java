@@ -32,7 +32,6 @@ import ts.client.completions.CompletionEntryDetails;
 import ts.client.completions.ICompletionEntryFactory;
 import ts.client.completions.ICompletionEntryMatcherProvider;
 import ts.client.configure.ConfigureRequestArguments;
-import ts.client.diagnostics.Diagnostic;
 import ts.client.diagnostics.DiagnosticEvent;
 import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.diagnostics.IDiagnostic;
@@ -44,6 +43,8 @@ import ts.client.navbar.NavigationBarItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
+import ts.client.refactors.ApplicableRefactorInfo;
+import ts.client.refactors.RefactorCodeActions;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
@@ -60,6 +61,8 @@ import ts.internal.client.protocol.ConfigureRequest;
 import ts.internal.client.protocol.DefinitionRequest;
 import ts.internal.client.protocol.DocCommentTemplateRequest;
 import ts.internal.client.protocol.FormatRequest;
+import ts.internal.client.protocol.GetApplicableRefactorsRequest;
+import ts.internal.client.protocol.GetRefactorCodeActionsRequest;
 import ts.internal.client.protocol.GetSupportedCodeFixesRequest;
 import ts.internal.client.protocol.GeterrForProjectRequest;
 import ts.internal.client.protocol.GeterrRequest;
@@ -461,7 +464,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			throws TypeScriptException {
 		return execute(new DocCommentTemplateRequest(fileName, line, offset), true);
 	}
-	
+
 	// Since 2.1.0
 
 	@Override
@@ -480,6 +483,20 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public CompletableFuture<List<FileSpan>> implementation(String fileName, int line, int offset)
 			throws TypeScriptException {
 		return execute(new ImplementationRequest(fileName, line, offset), true);
+	}
+
+	// Since 2.4.0
+
+	@Override
+	public CompletableFuture<List<ApplicableRefactorInfo>> getApplicableRefactors(String fileName, int line, int offset)
+			throws TypeScriptException {
+		return execute(new GetApplicableRefactorsRequest(fileName, line, offset), true);
+	}
+
+	@Override
+	public CompletableFuture<RefactorCodeActions> getRefactorCodeActions(String fileName, int line, int offset,
+			String refactorName) throws TypeScriptException {
+		return execute(new GetRefactorCodeActionsRequest(fileName, line, offset, refactorName), true);
 	}
 
 	private <T> CompletableFuture<T> execute(Request<?> request, boolean expectsResult) throws TypeScriptException {
