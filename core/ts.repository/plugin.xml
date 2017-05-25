@@ -15,6 +15,9 @@
       <repository
             baseDir="repositories/2.2.2">
       </repository>
+      <repository
+            baseDir="repositories/2.3.3">
+      </repository>      
    </extension>
 
 </plugin>
