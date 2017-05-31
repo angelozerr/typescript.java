@@ -1,6 +1,5 @@
 package ts.eclipse.ide.ui.wizards;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
@@ -17,7 +16,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -27,6 +28,7 @@ import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.wizards.TypeScriptRepositoryLabelProvider;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.terminal.interpreter.TerminalCommandAdapter;
+import ts.eclipse.ide.ui.utils.StatusUtil;
 import ts.eclipse.ide.ui.widgets.NpmInstallWidget;
 import ts.repository.ITypeScriptRepository;
 
@@ -103,22 +105,6 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 		installTsRuntime.getVersionText().addListener(SWT.Modify, this);
 	}
 
-	private void updateTsRuntimeMode() {
-		if (!hasEmbeddedTsRuntime) {
-			return;
-		}
-		useEmbeddedTsRuntime = useEmbeddedTsRuntimeButton.getSelection();
-		embeddedTsRuntime.setEnabled(useEmbeddedTsRuntime);
-		installTsRuntime.setEnabled(!useEmbeddedTsRuntime);
-	}
-
-	private IStatus validateTypeScriptRuntime() {
-		if (hasEmbeddedTsRuntime && useEmbeddedTsRuntimeButton.getSelection()) {
-			return Status.OK_STATUS;
-		}
-		return installTsRuntime.getStatus();
-	}
-
 	@Override
 	protected void initializeDefaultValues() {
 		super.initializeDefaultValues();
@@ -128,18 +114,39 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 			embeddedTsRuntime.select(0);
 			useEmbeddedTsRuntimeButton.setSelection(true);
 		}
-		updateTsRuntimeMode();
 	}
 
 	@Override
-	protected ArrayList<IStatus> validatePageImpl() {
-		ArrayList<IStatus> status = super.validatePageImpl();
-		if (status == null)
-			status = new ArrayList<>();
-		status.add(validateTypeScriptRuntime());
-		return status;
+	protected void updateComponents(Event event) {
+		super.updateComponents(event);
+		Widget item = event != null ? event.item : null;
+		if (item == null || item == useEmbeddedTsRuntimeButton)
+			updateTsRuntimeMode();
 	}
 
+	private void updateTsRuntimeMode() {
+		if (!hasEmbeddedTsRuntime) {
+			return;
+		}
+		useEmbeddedTsRuntime = useEmbeddedTsRuntimeButton.getSelection();
+		embeddedTsRuntime.setEnabled(useEmbeddedTsRuntime);
+		installTsRuntime.setEnabled(!useEmbeddedTsRuntime);
+	}
+
+	@Override
+	protected IStatus validatePageImpl() {
+		return StatusUtil.getMoreSevere(super.validatePageImpl(), validateTypeScriptRuntime());
+	}
+
+	/** Validates the selected TypeScript Runtime. */
+	private IStatus validateTypeScriptRuntime() {
+		if (hasEmbeddedTsRuntime && useEmbeddedTsRuntimeButton.getSelection()) {
+			return Status.OK_STATUS;
+		}
+		return installTsRuntime.getStatus();
+	}
+
+	@Override
 	public void updateCommand(List<LineCommand> commands, final IEclipsePreferences preferences) {
 		if (!useEmbeddedTsRuntime) {
 			// when TypeScript is installed when "npm install typescript"
