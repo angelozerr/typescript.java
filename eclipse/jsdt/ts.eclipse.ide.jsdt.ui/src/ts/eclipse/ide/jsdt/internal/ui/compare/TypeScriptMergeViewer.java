@@ -256,7 +256,7 @@ public class TypeScriptMergeViewer extends TextMergeViewer {
 				tools.getColorManager(), fPreferenceStore, null, getDocumentPartitioning()) {
 			@Override
 			public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
-				return new TypeScriptContentFormatter(project.getProject());
+				return project != null ? new TypeScriptContentFormatter(project.getProject()) : null;
 			}
 		};
 		if (editorInput != null) {
