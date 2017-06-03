@@ -137,4 +137,9 @@ public class IDETypeScriptFile extends AbstractTypeScriptFile implements IIDETyp
 			}
 		}
 	}
+	
+	@Override
+	public IDocument getDocument() {
+		return document;
+	}
 }

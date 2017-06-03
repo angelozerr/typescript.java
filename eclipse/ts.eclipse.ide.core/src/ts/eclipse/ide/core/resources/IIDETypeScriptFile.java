@@ -11,6 +11,7 @@
 package ts.eclipse.ide.core.resources;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.text.IDocument;
 
 import ts.resources.ITypeScriptFile;
 
@@ -26,5 +27,7 @@ public interface IIDETypeScriptFile extends ITypeScriptFile {
 	 * @return
 	 */
 	IResource getResource();
+	
+	IDocument getDocument();
 
 }
