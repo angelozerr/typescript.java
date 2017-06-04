@@ -49,7 +49,7 @@ import ts.utils.StringUtils;
 
 /**
  * NPM install widget provides :
- * 
+ *
  * <ul>
  * <li>a text field to fill a NPM module version</li>
  * <li>a "Browse..." button to search available versions for the given node
@@ -226,7 +226,7 @@ public class NpmInstallWidget extends Composite {
 	/**
 	 * Validate the given version and update the status of the
 	 * {@link IStatusChangeListener}.
-	 * 
+	 *
 	 * @param version
 	 */
 	private void validateVersion(String version) {
@@ -259,7 +259,7 @@ public class NpmInstallWidget extends Composite {
 	}
 
 	private void validateVersionASynch(NpmModule module) {
-		statusChanged(new StatusInfo(IStatus.WARNING,
+		statusChanged(new StatusInfo(IStatus.ERROR,
 				NLS.bind(TypeScriptUIMessages.NPMInstallWidget_SearchingVersions_status, module.getName())));
 		if (validateVersionJob == null) {
 			validateVersionJob = new ValidateVersionJob();
@@ -297,7 +297,7 @@ public class NpmInstallWidget extends Composite {
 
 	/**
 	 * Returns the npm install command.
-	 * 
+	 *
 	 * @return the npm install command.
 	 */
 	public String getNpmInstallCommand() {

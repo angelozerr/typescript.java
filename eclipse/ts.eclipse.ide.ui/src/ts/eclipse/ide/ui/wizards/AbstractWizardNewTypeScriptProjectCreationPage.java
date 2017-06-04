@@ -11,12 +11,10 @@
 package ts.eclipse.ide.ui.wizards;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
@@ -38,6 +36,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
@@ -98,6 +97,9 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		// initialize page with default values
 		initializeDefaultValues();
 
+		// Updates the state of the components
+		updateComponents(null);
+
 	}
 
 	/**
@@ -134,18 +136,12 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		createNodePathInfo(group);
 	}
 
-	/** Creates the Filed for the embedded Node.js. */
+	/** Creates the field for the embedded Node.js. */
 	private void createEmbeddedNodejsField(Composite parent, IEmbeddedNodejs[] installs) {
 		useEmbeddedNodeJsButton = new Button(parent, SWT.RADIO);
 		useEmbeddedNodeJsButton
 				.setText(TypeScriptUIMessages.AbstractWizardNewTypeScriptProjectCreationPage_useEmbeddedNodeJs_label);
 		useEmbeddedNodeJsButton.addListener(SWT.Selection, this);
-		useEmbeddedNodeJsButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateNodeJsMode();
-			}
-		});
 
 		embeddedNodeJs = new Combo(parent, SWT.READ_ONLY);
 		embeddedNodeJs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -236,7 +232,7 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		});
 	}
 
-	/** Creates the Info part, wehre Node.js path and version is shown. */
+	/** Creates the Info part, where Node.js path and version is shown. */
 	private void createNodePathInfo(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout());
@@ -283,39 +279,22 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 				installedNodeJs.select(0);
 			}
 		}
-		updateNodeJsMode();
-	}
-
-	/** Updates the Node.js mode and enables/disables the widgets accordingly. */
-	private void updateNodeJsMode() {
-		if (!hasEmbeddedNodeJs) {
-			return;
-		}
-		useEmbeddedNodeJs = useEmbeddedNodeJsButton.getSelection();
-		embeddedNodeJs.setEnabled(useEmbeddedNodeJs);
-		installedNodeJs.setEnabled(!useEmbeddedNodeJs);
-		browseFileSystemButton.setEnabled(!useEmbeddedNodeJs);
-		browseWorkspaceButton.setEnabled(!useEmbeddedNodeJs);
 	}
 
 	@Override
 	protected boolean validatePage() {
 		boolean valid = super.validatePage();
 		if (valid) {
-			ArrayList<IStatus> status = validatePageImpl();
-			IStatus currStatus;
-			if (status == null || (currStatus = StatusUtil.getMostSevere(status.toArray(new IStatus[] {}))) == null)
-				currStatus = Status.OK_STATUS;
-			statusChanged(currStatus);
-			valid = !currStatus.matches(IStatus.ERROR);
+			IStatus status = validatePageImpl();
+			statusChanged(status);
+			valid = !status.matches(IStatus.ERROR);
 		}
 		return valid;
 	}
 
-	protected ArrayList<IStatus> validatePageImpl() {
-		ArrayList<IStatus> status = new ArrayList<>();
-		status.add(validateAndUpdateNodejsPath());
-		return status;
+	/** Validates the Page and returns the most severe status. */
+	protected IStatus validatePageImpl() {
+		return validateAndUpdateNodejsPath();
 	}
 
 	/**
@@ -397,17 +376,36 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 	}
 
 	@Override
-	public void statusChanged(IStatus status) {
-		if (isPageComplete())
-			setPageComplete(!status.matches(IStatus.ERROR));
+	public final void statusChanged(IStatus status) {
 		StatusUtil.applyToStatusLine(this, status);
 	}
 
 	@Override
 	public void handleEvent(Event event) {
-		validatePage();
+		setPageComplete(validatePage());
+		updateComponents(event);
 	}
 
+	/** Updates the state of the components. */
+	protected void updateComponents(Event event) {
+		Widget item = event != null ? event.item : null;
+		if (item == null || item == useEmbeddedNodeJsButton)
+			updateNodeJsMode();
+	}
+
+	/** Updates the Node.js mode and enables/disables the widgets accordingly. */
+	private void updateNodeJsMode() {
+		if (!hasEmbeddedNodeJs) {
+			return;
+		}
+		useEmbeddedNodeJs = useEmbeddedNodeJsButton.getSelection();
+		embeddedNodeJs.setEnabled(useEmbeddedNodeJs);
+		installedNodeJs.setEnabled(!useEmbeddedNodeJs);
+		browseFileSystemButton.setEnabled(!useEmbeddedNodeJs);
+		browseWorkspaceButton.setEnabled(!useEmbeddedNodeJs);
+	}
+
+	/** Updates the Commands, which should be executed after creating the Project. */
 	public void updateCommand(List<LineCommand> commands, final IEclipsePreferences preferences) {
 	}
 
