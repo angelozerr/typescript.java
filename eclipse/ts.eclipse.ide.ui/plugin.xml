@@ -240,6 +240,12 @@
             id="ts.eclipse.ide.ui.preference.TextMatePreferencePage"
             category="ts.eclipse.ide.ui.preference.EditorPreferencePage">
       </page>
+	  <page
+            name="%CodeLensPreferencePage.name"        
+            class="ts.eclipse.ide.internal.ui.preferences.CodeLensPreferencePage"
+            id="ts.eclipse.ide.ui.preference.CodeLensPreferencePage"
+            category="ts.eclipse.ide.ui.preference.EditorPreferencePage">
+      </page>      
    <page
          category="ts.eclipse.ide.ui.preference.EditorPreferencePage"
          class="ts.eclipse.ide.internal.ui.preferences.SaveActionsPreferencePage"

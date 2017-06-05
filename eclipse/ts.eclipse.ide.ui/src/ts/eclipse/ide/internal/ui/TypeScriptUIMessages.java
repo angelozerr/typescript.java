@@ -137,6 +137,10 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TextMateConfigurationBlock_textmate_group_label;
 	public static String TextMateConfigurationBlock_textmate_SyntaxColoring;
 
+	// CodeLens
+	public static String CodeLensConfigurationBlock_CodeLens_group_label;
+	public static String CodeLensConfigurationBlock_CodeLens_activate;
+	
 	// Search
 	public static String TypeScriptSearchQuery_label;
 	public static String TypeScriptSearchQuery_result;
