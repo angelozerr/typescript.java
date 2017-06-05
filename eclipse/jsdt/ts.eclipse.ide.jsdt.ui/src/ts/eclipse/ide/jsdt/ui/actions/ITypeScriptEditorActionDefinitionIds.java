@@ -65,7 +65,7 @@ public interface ITypeScriptEditorActionDefinitionIds extends ITextEditorActionD
 
 	/**
 	 * Action definition ID of the search -> references in project action (value
-	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"</code>
+	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"</code>	
 	 * ).
 	 */
 	public static final String SEARCH_REFERENCES_IN_PROJECT = "ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"; //$NON-NLS-1$
@@ -86,6 +86,12 @@ public interface ITypeScriptEditorActionDefinitionIds extends ITextEditorActionD
 	 */
 	public static final String OPEN_IMPLEMENTATION = "ts.eclipse.ide.jsdt.ui.edit.text.java.open.implementation"; //$NON-NLS-1$
 	
+	/**
+	 * Action definition ID of the navigate -> open action
+	 * (value <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor"</code>).
+	 */
+	public static final String OPEN_EDITOR= "ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor"; //$NON-NLS-1$
+
 	/**
 	 * Action definition ID of the refactor -> rename element action
 	 * (value <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"</code>).

@@ -1,0 +1,33 @@
+package org.eclipse.swt.custom.patch.internal;
+
+import java.lang.reflect.Method;
+
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.TextLayout;
+
+import javassist.util.proxy.MethodHandler;
+
+public class StyledTextRendererEmulator implements MethodHandler {
+
+	@Override
+	public Object invoke(Object obj, Method thisMethod, Method proceed, Object[] args) throws Throwable {
+		if ("getTextLayout".equals(thisMethod.getName()) && args.length > 1) {
+			int lineIndex = (int) args[0];
+			int orientation = (int) args[1];
+			int width = (int) args[2];
+			int lineSpacing = (int) args[3];
+			return getTextLayout(lineIndex, orientation, width, lineSpacing, obj, proceed, args);
+		}
+		return proceed.invoke(obj, args);
+	}
+
+	protected TextLayout getTextLayout(int lineIndex, int orientation, int width, int lineSpacing, Object obj,
+			Method proceed, Object[] args) throws Exception {
+		args[0] = lineIndex;
+		args[1] = orientation;
+		args[2] = width;
+		args[3] = lineSpacing;		
+		return (TextLayout) proceed.invoke(obj, args);
+	}
+
+}

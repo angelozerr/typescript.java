@@ -34,8 +34,11 @@ public class TypeScriptUIPreferenceInitializer extends AbstractPreferenceInitial
 
 		// initialize properties for editor save actions
 		initializeEditorSaveActionsPreferences(node);
+		
+		// initialize properties for editor codelens
+		initializeEditorCodeLensPreferences(node);
 	}
-
+	
 	/**
 	 * initialize properties for TextMate using
 	 * 
@@ -54,4 +57,9 @@ public class TypeScriptUIPreferenceInitializer extends AbstractPreferenceInitial
 		node.putBoolean(TypeScriptUIPreferenceConstants.EDITOR_SAVE_ACTIONS, false);
 		node.putBoolean(TypeScriptUIPreferenceConstants.EDITOR_SAVE_ACTIONS_FORMAT, true);
 	}
+	
+	private void initializeEditorCodeLensPreferences(IEclipsePreferences node) {
+		node.putBoolean(TypeScriptUIPreferenceConstants.EDITOR_ACTIVATE_CODELENS, false);
+	}
+
 }

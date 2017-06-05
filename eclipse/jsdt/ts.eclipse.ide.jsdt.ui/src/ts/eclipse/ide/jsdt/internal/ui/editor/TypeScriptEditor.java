@@ -48,16 +48,19 @@ import org.eclipse.jface.text.IWidgetTokenKeeper;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TabsToSpacesConverter;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
-import org.eclipse.jface.text.formatter.FormattingContextProperties;
-import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.link.LinkedModeModel;
+import org.eclipse.jface.text.provisional.codelens.CodeLensContribution;
+import org.eclipse.jface.text.provisional.codelens.CodeLensProviderRegistry;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
+import org.eclipse.jface.text.source.IChangeRulerColumn;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.patch.LineNumberChangeRulerColumnPatch;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -77,14 +80,12 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-import org.eclipse.wst.jsdt.core.JavaScriptCore;
 import org.eclipse.wst.jsdt.internal.ui.IJavaHelpContextIds;
 import org.eclipse.wst.jsdt.internal.ui.actions.AddBlockCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.actions.RemoveBlockCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider;
 import org.eclipse.wst.jsdt.internal.ui.javaeditor.ToggleCommentAction;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
-import org.eclipse.wst.jsdt.internal.ui.text.comment.CommentFormattingContext;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
 
 import ts.client.Location;
@@ -101,20 +102,30 @@ import ts.eclipse.ide.jsdt.internal.ui.actions.CompositeActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.IndentAction;
 import ts.eclipse.ide.jsdt.internal.ui.actions.RefactorActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.TypeScriptSearchActionGroup;
+import ts.eclipse.ide.jsdt.internal.ui.editor.codelens.TypeScriptImplementationsCodeLensProvider;
+import ts.eclipse.ide.jsdt.internal.ui.editor.codelens.TypeScriptReferencesCodeLensProvider;
 import ts.eclipse.ide.jsdt.ui.IContextMenuConstants;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.outline.IEditorOutlineFeatures;
 import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
+import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
-import ts.resources.ITypeScriptProject;
 
 /**
  * TypeScript editor.
  *
  */
 public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEditorOutlineFeatures {
+
+	static String CODELENS_TARGET = "typeScript.codeLens";
+
+	static {
+		CodeLensProviderRegistry registry = CodeLensProviderRegistry.getInstance();
+		registry.register(CODELENS_TARGET, new TypeScriptReferencesCodeLensProvider());
+		registry.register(CODELENS_TARGET, new TypeScriptImplementationsCodeLensProvider());
+	}
 
 	private static final boolean CODE_ASSIST_DEBUG = "true" //$NON-NLS-1$
 			.equalsIgnoreCase(Platform.getDebugOption("ts.eclipse.ide.jsdt.ui/debug/ResultCollector")); //$NON-NLS-1$
@@ -188,21 +199,23 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		 * org.eclipse.jface.text.source.SourceViewer#createFormattingContext()
 		 * 
 		 */
-//		public IFormattingContext createFormattingContext() {
-//			IFormattingContext context = new CommentFormattingContext();
-//
-//			Map preferences;
-//			ITypeScriptFile inputJavaElement = getTypeScriptFile();
-//			ITypeScriptProject javaProject = inputJavaElement != null ? inputJavaElement.getProject() : null;
-////			if (javaProject == null)
-////				preferences = new HashMap(JavaScriptCore.getOptions());
-////			else
-////				preferences = new HashMap(javaProject.getOptions(true));
-//
-//			//context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
-//
-//			return context;
-//		}
+		// public IFormattingContext createFormattingContext() {
+		// IFormattingContext context = new CommentFormattingContext();
+		//
+		// Map preferences;
+		// ITypeScriptFile inputJavaElement = getTypeScriptFile();
+		// ITypeScriptProject javaProject = inputJavaElement != null ?
+		// inputJavaElement.getProject() : null;
+		//// if (javaProject == null)
+		//// preferences = new HashMap(JavaScriptCore.getOptions());
+		//// else
+		//// preferences = new HashMap(javaProject.getOptions(true));
+		//
+		// //context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES,
+		// preferences);
+		//
+		// return context;
+		// }
 	}
 
 	protected CompositeActionGroup fActionGroups;
@@ -285,6 +298,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	private TypeScriptContentOutlinePage contentOutlinePage;
 
 	private final ProblemTickUpdater problemTickUpdater;
+	private CodeLensContribution contribution;
 
 	public TypeScriptEditor() {
 		super();
@@ -417,6 +431,10 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			PlatformUI.getWorkbench().removeWindowListener(fActivationListener);
 			fActivationListener = null;
 		}
+
+		if (contribution != null) {
+			contribution.dispose();
+		}
 	}
 
 	void updateTitleImage(Image titleImage) {
@@ -440,6 +458,26 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		PlatformUI.getWorkbench().addWindowListener(fActivationListener);
 		editorSelectionChangedListener = new EditorSelectionChangedListener();
 		editorSelectionChangedListener.install(getSelectionProvider());
+
+		if (isActivateCodeLenses()) {
+			installCodeLenses();
+		}
+	}
+
+	protected boolean isActivateCodeLenses() {
+		IPreferenceStore store = getPreferenceStore();
+		return store != null && store.getBoolean(TypeScriptUIPreferenceConstants.EDITOR_ACTIVATE_CODELENS);
+	}
+
+	private void installCodeLenses() {
+		try {
+			ITextViewer textViewer = getSourceViewer();
+			contribution = new CodeLensContribution(textViewer);
+			contribution.addTarget(CODELENS_TARGET);
+			contribution.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -975,7 +1013,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	@Override
 	protected void doSetInput(IEditorInput input) throws CoreException {
 		super.doSetInput(input);
-		//problemTickUpdater.update();
+		// problemTickUpdater.update();
 		configureToggleCommentAction();
 		// try {
 		// //IDocument document = getSourceViewer().getDocument();
@@ -1200,5 +1238,20 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			int offset = sourceViewer.getVisibleRegion().getOffset();
 			return offset + styledText.getCaretOffset();
 		}
+	}
+
+	/**
+	 * Creates a new line number ruler column that is appropriately initialized.
+	 *
+	 * @return the created line number column
+	 */
+	protected IVerticalRulerColumn createLineNumberRulerColumn() {
+		/*
+		 * Left for compatibility. See LineNumberColumn.
+		 */
+		fLineNumberRulerColumn = LineNumberChangeRulerColumnPatch.create(getSharedColors());
+		((IChangeRulerColumn) fLineNumberRulerColumn).setHover(createChangeHover());
+		initializeLineNumberRulerColumn(fLineNumberRulerColumn);
+		return fLineNumberRulerColumn;
 	}
 }

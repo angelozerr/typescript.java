@@ -20,10 +20,11 @@ public class TypeScriptUIPreferenceConstants {
 	// TextMate
 
 	/**
-	 * True is TextMate must be used to colorize TypeScript, JSX files and false otherwise.
+	 * True is TextMate must be used to colorize TypeScript, JSX files and false
+	 * otherwise.
 	 */
 	public final static String USE_TEXMATE_FOR_SYNTAX_COLORING = "useTextMateForSyntaxColoring";
-	
+
 	// Editor Save Actions
 
 	/**
@@ -36,6 +37,11 @@ public class TypeScriptUIPreferenceConstants {
 	 * code.
 	 */
 	public static final String EDITOR_SAVE_ACTIONS_FORMAT = "editorSaveActions.format"; // $NON-NLS-1$
+
+	/**
+	 * True if codelenses is activate and false otherwise.
+	 */
+	public static final String EDITOR_ACTIVATE_CODELENS = "editorActivate.codelens"; // $NON-NLS-1$
 
 	private TypeScriptUIPreferenceConstants() {
 	}

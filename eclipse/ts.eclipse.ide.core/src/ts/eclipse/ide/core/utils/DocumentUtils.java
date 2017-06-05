@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.RewriteSessionEditProcessor;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MalformedTreeException;
@@ -71,9 +70,10 @@ public class DocumentUtils {
 
 		try {
 			TextEdit edit = toTextEdit(codeEdits, document);
-			//RewriteSessionEditProcessor editProcessor = new RewriteSessionEditProcessor(document, edit,
-			//		org.eclipse.text.edits.TextEdit.NONE);
-			//editProcessor.performEdits();
+			// RewriteSessionEditProcessor editProcessor = new
+			// RewriteSessionEditProcessor(document, edit,
+			// org.eclipse.text.edits.TextEdit.NONE);
+			// editProcessor.performEdits();
 			edit.apply(document);
 		} finally {
 			if (manager != null) {
