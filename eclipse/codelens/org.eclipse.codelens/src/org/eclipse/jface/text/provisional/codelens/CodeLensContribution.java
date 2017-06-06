@@ -3,6 +3,7 @@ package org.eclipse.jface.text.provisional.codelens;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,7 +33,7 @@ public class CodeLensContribution {
 
 	private ViewZoneChangeAccessor accessor;
 	private List<CodeLens> _lenses;
-	private CompletableFuture<Collection<CodeLensData>> symbols;
+	private CompletableFuture<Collection<CodeLensData>> symbolsPromise;
 
 	public CodeLensContribution(ITextViewer textViewer) {
 		this.textViewer = textViewer;
@@ -51,13 +52,13 @@ public class CodeLensContribution {
 	}
 
 	private void onModelChange() {
-		if (symbols != null) {
-			symbols.cancel(true);
+		if (symbolsPromise != null) {
+			symbolsPromise.cancel(true);
 		}
-		symbols = getCodeLensData(textViewer, targets);
-		//symbols.exceptionally(ex -> ex.printStackTrace());
-		symbols.thenAccept(s -> {
-			renderCodeLensSymbols(s);
+		symbolsPromise = getCodeLensData(textViewer, targets);
+		// symbols.exceptionally(ex -> ex.printStackTrace());
+		symbolsPromise.thenAccept(symbols -> {
+			renderCodeLensSymbols(symbols);
 		});
 
 	}
@@ -65,9 +66,9 @@ public class CodeLensContribution {
 	private static CompletableFuture<Collection<CodeLensData>> getCodeLensData(ITextViewer textViewer,
 			List<String> targets) {
 		return CompletableFuture.supplyAsync(() -> {
-			Collection<CodeLensData> symbols = new ArrayList<>();
+			List<CodeLensData> symbols = new ArrayList<>();
 			for (String target : targets) {
-				Collection<ICodeLensProvider> providers = CodeLensProviderRegistry.getInstance().all(target);
+				List<ICodeLensProvider> providers = CodeLensProviderRegistry.getInstance().all(target);
 				if (providers != null) {
 					for (ICodeLensProvider provider : providers) {
 						ICodeLens[] lenses = provider.provideCodeLenses(textViewer);
@@ -75,10 +76,29 @@ public class CodeLensContribution {
 							symbols.add(new CodeLensData(lenses[i], provider));
 						}
 					}
+					Collections.sort(symbols, (a, b) -> {
+						// sort by lineNumber, provider-rank, and column
+						if (a.getSymbol().getRange().startLineNumber < b.getSymbol().getRange().startLineNumber) {
+							return -1;
+						} else if (a.getSymbol().getRange().startLineNumber > b.getSymbol()
+								.getRange().startLineNumber) {
+							return 1;
+						} else if (providers.indexOf(a.getProvider()) < providers.indexOf(b.getProvider())) {
+							return -1;
+						} else if (providers.indexOf(a.getProvider()) > providers.indexOf(b.getProvider())) {
+							return 1;
+						} else if (a.getSymbol().getRange().startColumn < b.getSymbol().getRange().startColumn) {
+							return -1;
+						} else if (a.getSymbol().getRange().startColumn > b.getSymbol().getRange().startColumn) {
+							return 1;
+						} else {
+							return 0;
+						}
+					});
 				}
 			}
 			return symbols;
-		});		
+		});
 	}
 
 	private void renderCodeLensSymbols(Collection<CodeLensData> symbols) {
@@ -182,11 +202,12 @@ public class CodeLensContribution {
 			lenses.get(i).updateCommands(resolvedSymbols);
 			i++;
 		}
-		
 
 		Display.getDefault().syncExec(() -> {
-			textViewer.getTextWidget().redraw();				
-		});	
+			this._lenses.forEach((lens) -> {
+				lens.redraw(accessor);
+			});
+		});
 	}
 
 	public CodeLensContribution addTarget(String target) {
@@ -200,7 +221,7 @@ public class CodeLensContribution {
 	}
 
 	public void dispose() {
-		
+
 	}
 
 	/*

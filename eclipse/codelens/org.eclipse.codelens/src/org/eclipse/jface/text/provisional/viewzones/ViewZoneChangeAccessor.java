@@ -51,38 +51,27 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 		viewZones.add(zone);
 		StyledText styledText = textViewer.getTextWidget();
 		zone.setStyledText(styledText);
-//		int line = zone.getAfterLineNumber();
-//		if (line == 0) {
-//			styledText.setTopMargin(originalTopMargin + zone.getHeightInPx());
-//			// StyledTextRendererHelper.updateSpacing(styledText);
-//		} else {
-//			line--;
-//			int start = styledText.getOffsetAtLine(line);
-//			int length = styledText.getText().length() - start;
-//			styledText.redrawRange(start, length, true);
-//		}
 	}
 
 	@Override
 	public void removeZone(IViewZone zone) {
+		zone.dispose();
 		viewZones.remove(zone);
-		StyledText styledText = textViewer.getTextWidget();
-//		int line = zone.getAfterLineNumber();
-//		if (line == 0) {
-//			styledText.setTopMargin(originalTopMargin);
-//		} else {
-//			line--;
-//			int start = styledText.getOffsetAtLine(line);
-//			int length = styledText.getText().length() - start;
-//			styledText.redrawRange(start, length, true);
-//		}
 	}
 
-	// @Override
-	// public void layoutZone(int id) {
-	// // TODO Auto-generated method stub
-	//
-	// }
+	@Override
+	public void layoutZone(IViewZone zone) {
+		StyledText styledText = textViewer.getTextWidget();
+		int line = zone.getAfterLineNumber();
+		if (line == 0) {
+			styledText.setTopMargin(zone.isDisposed() ? originalTopMargin : zone.getHeightInPx());
+		} else {
+			line--;
+			int start = styledText.getOffsetAtLine(line);
+			int length = styledText.getText().length() - start;
+			styledText.redrawRange(start, length, true);
+		}
+	}
 
 	public IViewZone getViewZone(int lineNumber) {
 		for (IViewZone viewZone : viewZones) {
@@ -203,7 +192,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 				if (lineIndex == 0) {
 					IViewZone viewZone = getViewZone(lineIndex);
 					if (viewZone != null) {
-						viewZone.getRenderer().draw(viewZone, x, 0, event.gc, fTextWidget);
+						viewZone.getRenderer().draw(viewZone, x, 0, gc, fTextWidget);
 					} else {
 						if (originalTopMargin != fTextWidget.getTopMargin()) {
 							fTextWidget.setTopMargin(originalTopMargin);
@@ -215,7 +204,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 				if (viewZone != null) {
 					Point topLeft = fTextWidget.getLocationAtOffset(viewZone.getOffsetAtLine());
 					y = topLeft.y; // fTextWidget.getLinePixel(lineIndex);
-					viewZone.getRenderer().draw(viewZone, x, y - viewZone.getHeightInPx(), event.gc, fTextWidget);
+					viewZone.getRenderer().draw(viewZone, x, y - viewZone.getHeightInPx(), gc, fTextWidget);
 				}
 			}
 		}

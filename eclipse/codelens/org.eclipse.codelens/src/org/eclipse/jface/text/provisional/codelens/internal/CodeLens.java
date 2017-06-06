@@ -17,12 +17,19 @@ public class CodeLens {
 		accessor.addZone(zone);
 		_data = data;
 	}
+	
+	public boolean isValid() {
+		return zone != null && !zone.isDisposed();
+	}
 
 	public void dispose(CodeLensHelper helper, ViewZoneChangeAccessor accessor) {
 		accessor.removeZone(zone);
 	}
 
 	public int getLineNumber() {
+		if (!isValid()) {
+			return -1;
+		}
 		return zone.getAfterLineNumber();
 	}
 
@@ -49,5 +56,9 @@ public class CodeLens {
 			}
 			zone.setText(text.toString());
 		}
+	}
+
+	public void redraw(ViewZoneChangeAccessor accessor) {
+		accessor.layoutZone(zone);
 	}
 }

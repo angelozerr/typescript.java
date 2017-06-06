@@ -24,7 +24,7 @@ public interface IViewZoneChangeAccessor {
 	 * Change a zone's position. The editor will rescan the `afterLineNumber`
 	 * and `afterColumn` properties of a view zone.
 	 */
-	// void layoutZone(int id);
+	void layoutZone(IViewZone zone);
 
 	/**
 	 * Returns number of zones.

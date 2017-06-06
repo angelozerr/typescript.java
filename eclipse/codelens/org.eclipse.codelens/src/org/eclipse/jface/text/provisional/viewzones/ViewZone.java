@@ -8,8 +8,9 @@ public class ViewZone implements IViewZone {
 	private int offsetAtLine;
 	private int afterLineNumber;
 	private int height;
-	
+
 	private final IViewZoneRenderer<?> renderer;
+	private boolean disposed;
 
 	public ViewZone(int afterLineNumber, int height, IViewZoneRenderer<?> renderer) {
 		this.height = height;
@@ -53,16 +54,16 @@ public class ViewZone implements IViewZone {
 	public IViewZoneRenderer<?> getRenderer() {
 		return renderer;
 	}
-	
-	protected void redraw() {
-		int line = getAfterLineNumber();
-		if (line == 0) {
-			styledText.setTopMargin(getHeightInPx());
-		} else {
-			line--;
-			int start = styledText.getOffsetAtLine(line);
-			int length = styledText.getOffsetAtLine(line + 1) - start;
-			styledText.redrawRange(start, length, true);
-		}
+
+	@Override
+	public void dispose() {
+		this.disposed = true;
+		this.setStyledText(null);
 	}
+
+	@Override
+	public boolean isDisposed() {
+		return disposed;
+	}
+
 }

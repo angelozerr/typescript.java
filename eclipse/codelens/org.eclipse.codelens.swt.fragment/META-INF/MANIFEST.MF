@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Fragment
 Bundle-SymbolicName: org.eclipse.codelens.swt.fragment
 Bundle-Version: 1.3.0.qualifier
-Fragment-Host: org.eclipse.swt
+Fragment-Host: org.eclipse.swt;bundle-version="3.105.3.v20170228-0512"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Import-Package: javassist,
