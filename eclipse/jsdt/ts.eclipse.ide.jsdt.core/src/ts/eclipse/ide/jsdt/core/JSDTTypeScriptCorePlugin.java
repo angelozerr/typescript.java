@@ -43,7 +43,7 @@ public class JSDTTypeScriptCorePlugin extends Plugin {
 		super.start(context);
 		plugin = this;
 		//Platform.getPlugin("org.eclipse.wst.jsdt.core")
-		isJSDT2 = Platform.getBundle("org.eclipse.wst.jsdt.core").getVersion().toString().startsWith("2.0.0");
+		isJSDT2 = !Platform.getBundle("org.eclipse.wst.jsdt.core").getVersion().toString().startsWith("1.");
 	}
 
 	/*
