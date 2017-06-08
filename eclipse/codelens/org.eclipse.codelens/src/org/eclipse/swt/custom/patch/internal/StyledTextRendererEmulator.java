@@ -1,12 +1,23 @@
+/**
+ *  Copyright (c) 2015-2017 Angelo ZERR.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ */
 package org.eclipse.swt.custom.patch.internal;
 
 import java.lang.reflect.Method;
-
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.TextLayout;
-
 import javassist.util.proxy.MethodHandler;
 
+/**
+ * Javassist method handler to override getTextLayout of StyledTextRenderer.
+ *
+ */
 public class StyledTextRendererEmulator implements MethodHandler {
 
 	@Override
@@ -26,7 +37,7 @@ public class StyledTextRendererEmulator implements MethodHandler {
 		args[0] = lineIndex;
 		args[1] = orientation;
 		args[2] = width;
-		args[3] = lineSpacing;		
+		args[3] = lineSpacing;
 		return (TextLayout) proceed.invoke(obj, args);
 	}
 
