@@ -19,15 +19,22 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionDelta;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
+import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager.ContentTypeChangeEvent;
 import org.eclipse.core.runtime.content.IContentTypeManager.IContentTypeChangeListener;
 
 import ts.client.ScriptKindName;
+import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.resources.ITypeScriptElementChangedListener;
+import ts.eclipse.ide.core.resources.ITypeScriptResourceParticipant;
 import ts.eclipse.ide.core.resources.UseSalsa;
 import ts.eclipse.ide.core.resources.buildpath.ITypeScriptBuildPath;
 import ts.eclipse.ide.core.utils.PreferencesHelper;
@@ -35,13 +42,18 @@ import ts.eclipse.ide.internal.core.Trace;
 import ts.resources.ITypeScriptResourcesManagerDelegate;
 import ts.utils.FileUtils;
 
-public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate {
+public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate, IRegistryChangeListener {
 
 	private static IDEResourcesManager instance = new IDEResourcesManager();
-
 	private final List<ITypeScriptElementChangedListener> listeners;
 
 	private boolean useJsAsJsx;
+
+	private static final String EXTENSION_TYPESCRIPT_RESOURCE_PARTICIPANTS = "typeScriptResourceParticipants";
+	private static final String CLASS_ATTR = "class";
+	private boolean registryListenerIntialized;
+	private boolean extensionResourceParticipantsLoaded;
+	private List<ITypeScriptResourceParticipant> resourceParticipants;
 
 	/**
 	 * Contents Types IDS
@@ -52,6 +64,8 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 	private static final String JSX_CONTENT_TYPE_ID = "ts.eclipse.ide.core.jsxSource";
 
 	private IDEResourcesManager() {
+		this.registryListenerIntialized = false;
+		this.resourceParticipants = new ArrayList<>();
 		this.listeners = new ArrayList<ITypeScriptElementChangedListener>();
 		updateUseJsAsJsx(Platform.getContentTypeManager().getContentType(JSX_CONTENT_TYPE_ID));
 
@@ -300,7 +314,17 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		if (isJsFile(fileObject)) {
 			return hasSalsaNature(project);
 		}
-		return (isTsOrTsxOrJsxFile(fileObject));
+		if (isTsOrTsxOrJsxFile(fileObject)) {
+			return true;
+		}
+		// Use extension point
+		loadExtensionResourceParticipants();
+		for (ITypeScriptResourceParticipant participant : resourceParticipants) {
+			if (participant.canConsumeTsserver(project, fileObject)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -354,4 +378,93 @@ public class IDEResourcesManager implements ITypeScriptResourcesManagerDelegate 
 		}
 	}
 
+	private synchronized void loadExtensionResourceParticipants() {
+		if (extensionResourceParticipantsLoaded)
+			return;
+		// Immediately set the flag, as to ensure that this method is never
+		// called twice
+		extensionResourceParticipantsLoaded = true;
+
+		Trace.trace(Trace.EXTENSION_POINT, "->- Loading .typeScriptResourceParticipants extension point ->-");
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IConfigurationElement[] cf = registry.getConfigurationElementsFor(TypeScriptCorePlugin.PLUGIN_ID,
+				EXTENSION_TYPESCRIPT_RESOURCE_PARTICIPANTS);
+		
+		addExtensionResourceParticipants(cf);
+		addRegistryListenerIfNeeded();
+
+		Trace.trace(Trace.EXTENSION_POINT, "-<- Done loading .typeScriptResourceParticipants extension point -<-");
+	}
+
+	@Override
+	public void registryChanged(final IRegistryChangeEvent event) {
+		IExtensionDelta[] deltas = event.getExtensionDeltas(TypeScriptCorePlugin.PLUGIN_ID,
+				EXTENSION_TYPESCRIPT_RESOURCE_PARTICIPANTS);
+		if (deltas != null) {
+			synchronized (this) {
+				for (IExtensionDelta delta : deltas) {
+					IConfigurationElement[] cf = delta.getExtension().getConfigurationElements();
+					if (delta.getKind() == IExtensionDelta.ADDED) {
+						addExtensionResourceParticipants(cf);
+					} else {
+						removeExtensionResourceParticipants(cf);
+					}
+				}
+			}
+		}
+	}
+
+	private void addExtensionResourceParticipants(IConfigurationElement[] cf) {
+		for (IConfigurationElement ce : cf) {
+			try {
+				String className = ce.getAttribute(CLASS_ATTR);
+				ITypeScriptResourceParticipant participant = (ITypeScriptResourceParticipant) ce
+						.createExecutableExtension(CLASS_ATTR);
+				synchronized (resourceParticipants) {
+					resourceParticipants.add(participant);
+				}
+				Trace.trace(Trace.EXTENSION_POINT, "  Loaded typeScriptResourceParticipants: " + className);
+			} catch (Throwable t) {
+				Trace.trace(Trace.SEVERE, "  Error while loading typeScriptResourceParticipants", t);
+			}
+		}
+	}
+
+	private void removeExtensionResourceParticipants(IConfigurationElement[] cf) {
+		for (IConfigurationElement ce : cf) {
+			try {
+				String className = ce.getAttribute(CLASS_ATTR);
+				synchronized (resourceParticipants) {
+					for (ITypeScriptResourceParticipant participant : resourceParticipants) {
+						if (className.equals(participant.getClass().getName())) {
+							resourceParticipants.remove(participant);
+							Trace.trace(Trace.EXTENSION_POINT, "Unloaded typeScriptResourceParticipants: " + className);
+
+							break;
+						}
+					}
+				}
+			} catch (Throwable t) {
+				Trace.trace(Trace.SEVERE, "Error while unloading typeScriptResourceParticipants", t);
+			}
+		}
+	}
+
+	private void addRegistryListenerIfNeeded() {
+		if (registryListenerIntialized)
+			return;
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		registry.addRegistryChangeListener(this, TypeScriptCorePlugin.PLUGIN_ID);
+		registryListenerIntialized = true;
+	}
+
+	public void initialize() {
+
+	}
+
+	public void destroy() {
+		Platform.getExtensionRegistry().removeRegistryChangeListener(this);
+	}
 }

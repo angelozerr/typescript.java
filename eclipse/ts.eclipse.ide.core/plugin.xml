@@ -20,7 +20,12 @@
 	<extension-point id="nodeJSInstalls" 
 					 name="%nodeJSInstallsContribution.name"
 					 schema="schema/nodeJSInstalls.exsd" />
- <extension-point id="typeScriptRepositories" name="%typeScriptRepositoriesContribution.name" schema="schema/typeScriptRepositories.exsd"/>
+ 	<extension-point id="typeScriptRepositories" 
+ 					 name="%typeScriptRepositoriesContribution.name" 
+ 					 schema="schema/typeScriptRepositories.exsd"/>
+ 	<extension-point id="typeScriptResourceParticipants" 
+ 					 name="%typeScriptResourceParticipants.name" 
+ 					 schema="schema/typeScriptResourceParticipants.exsd"/>
 
    <extension point="org.eclipse.core.contenttype.contentTypes">
 	<content-type 

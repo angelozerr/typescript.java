@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="ts.eclipse.ide.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="ts.eclipse.ide.core" id="typescriptResourceParticpants" name="TypeScript Resource Particpants"/>
+      </appInfo>
+      <documentation>
+         Extension point to provided embedded TypeScript Repositories.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="participant"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="participant">
+      <annotation>
+         <documentation>
+            This extension point allows developers to supply a repository containing a TypeScript installation as well as the TSLint tool.
+&lt;p&gt;
+A repository is represented by a root directory containing a &lt;i&gt;node_modules&lt;/i&gt; directory, itself containing the &lt;i&gt;typescript&lt;/i&gt; and &lt;i&gt;tslit&lt;/i&gt; packages.
+&lt;p&gt;
+The version of TypeScript embedded in the repository directory is detected automatically. On first startup, the repository containing the most recent version is selected as active repository. The user is always free to change the active repository.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Extension point to know if a given resource can consume tsserver or not.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":ts.eclipse.ide.core.resources.ITypeScriptResourceParticipant"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         2.0
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         This plugin itself does not have any predefined repositories
+      </documentation>
+   </annotation>
+
+
+</schema>

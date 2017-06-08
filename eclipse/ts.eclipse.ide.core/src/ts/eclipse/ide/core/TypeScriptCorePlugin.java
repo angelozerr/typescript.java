@@ -53,11 +53,13 @@ public class TypeScriptCorePlugin extends Plugin {
 		// set up resource management for IDE
 		ConfigurableTypeScriptResourcesManager resourceManager = ConfigurableTypeScriptResourcesManager.getInstance();
 		resourceManager.setTypeScriptResourcesManagerDelegate(IDEResourcesManager.getInstance());
+		IDEResourcesManager.getInstance().initialize();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		ResourcesWatcher.getInstance().dispose();
+		IDEResourcesManager.getInstance().destroy();
 		plugin = null;
 		super.stop(context);
 	}

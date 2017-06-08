@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.jsdt.internal.ui.editor.contentassist;
+package ts.eclipse.ide.jsdt.ui.editor.contentassist;
 
 import java.lang.reflect.Constructor;
 
@@ -19,6 +19,7 @@ import ts.client.ITypeScriptServiceClient;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.ICompletionEntryFactory;
 import ts.client.completions.ICompletionEntryMatcher;
+import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.JSDTTypeScriptCompletionProposal;
 
 /**
  * TypeScript {@link ICompletionProposal} implementation with JSDT

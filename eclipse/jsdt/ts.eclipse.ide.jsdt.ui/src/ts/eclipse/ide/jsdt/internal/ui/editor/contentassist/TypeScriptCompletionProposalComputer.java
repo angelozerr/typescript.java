@@ -30,6 +30,7 @@ import ts.TypeScriptNoContentAvailableException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
+import ts.eclipse.ide.jsdt.ui.editor.contentassist.JSDTCompletionProposalFactory;
 import ts.eclipse.ide.jsdt.ui.editor.contentassist.TypeScriptContentAssistInvocationContext;
 import ts.resources.ITypeScriptFile;
 
