@@ -43,7 +43,7 @@ public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvide
 				NavigationBarItem tree = tsProject.getClient().navtree(tsFile.getName(), tsFile).get(1000,
 						TimeUnit.MILLISECONDS);
 				List<Range> referenceableSpans = new ArrayList<>();
-				if (tree != null && tree.getChildItems().size() > 0) {
+				if (tree != null && tree.hasChildItems()) {
 					tree.getChildItems().forEach(item -> this.walkNavTree(tsFile, item, null, referenceableSpans));
 				}
 				return referenceableSpans.stream().map(span -> new ReferencesCodeLens(tsFile, span))
