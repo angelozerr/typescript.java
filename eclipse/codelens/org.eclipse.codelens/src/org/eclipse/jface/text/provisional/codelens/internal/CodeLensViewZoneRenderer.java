@@ -5,6 +5,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 public class CodeLensViewZoneRenderer implements IViewZoneRenderer<CodeLensViewZone> {
@@ -23,11 +24,36 @@ public class CodeLensViewZoneRenderer implements IViewZoneRenderer<CodeLensViewZ
 		gc.setForeground(styledText.getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
 		String text = viewZone.getText();
-		if (text != null) {
+		if (text != null) {						
+			int leading = getLeadingSpaces(styledText.getLine(viewZone.getAfterLineNumber()));
+			if (leading > 0) {
+				Point topLeft = styledText.getLocationAtOffset(viewZone.getOffsetAtLine() + leading);
+				paintX+=topLeft.x;
+			}
 			Font font = new Font(styledText.getDisplay(), "Arial", 9, SWT.ITALIC);
 			gc.setFont(font);
 			gc.drawText(text, paintX, paintY + 4);
 		}
 	}
+	
+	private static int getLeadingSpaces(String line)
+	{
+	    int counter = 0;
+
+	    char[] chars = line.toCharArray();
+	    for (char c : chars)
+	    {
+	        if (c == '\t')
+	            counter ++;
+	        else if (c == ' ')
+	            counter++;
+	        else
+	            break;
+	    }
+
+	    return counter;
+	}
+
+
 
 }
