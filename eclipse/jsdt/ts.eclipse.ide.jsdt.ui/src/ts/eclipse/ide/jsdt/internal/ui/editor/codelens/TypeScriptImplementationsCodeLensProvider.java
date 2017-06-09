@@ -31,10 +31,11 @@ public class TypeScriptImplementationsCodeLensProvider extends TypeScriptBaseCod
 			List<FileSpan> refs = tsFile.implementation(position).get(1000, TimeUnit.MILLISECONDS);
 			int refCount = refs.size();
 			if (refCount == 1) {
-				codeLens.setCommand(new Command("1 implementation", null));
+				codeLens.setCommand(new Command("1 implementation", "implementation"));
 			} else {
-				codeLens.setCommand(new Command(MessageFormat.format("{0} implementations", refCount), null));
+				codeLens.setCommand(new Command(MessageFormat.format("{0} implementations", refCount), "implementation"));
 			}
+			
 			// (response -> {
 			// response.getRefs().stream().map(reference -> {
 			// return null;

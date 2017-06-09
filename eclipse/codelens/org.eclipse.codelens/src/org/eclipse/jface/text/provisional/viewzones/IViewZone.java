@@ -2,6 +2,7 @@ package org.eclipse.jface.text.provisional.viewzones;
 
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.GC;
 
 public interface IViewZone {
 
@@ -18,9 +19,7 @@ public interface IViewZone {
 	int getHeightInPx();
 
 	void setStyledText(StyledText styledText);
-
-	IViewZoneRenderer getRenderer();
-
+	
 	boolean isDisposed();
 
 	void dispose();
@@ -31,4 +30,7 @@ public interface IViewZone {
 
 	void mouseEnter(MouseEvent event);
 
+	void onMouseClick(MouseEvent event);
+
+	void draw(int paintX, int paintY, GC gc);
 }

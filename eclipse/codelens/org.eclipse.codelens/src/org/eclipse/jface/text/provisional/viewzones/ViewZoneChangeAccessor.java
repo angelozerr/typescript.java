@@ -39,21 +39,22 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 
 		@Override
 		public void mouseUp(MouseEvent arg0) {
+			System.err.println("mouseUp");
 			if (hoveredZone != null) {
 
 			}
 		}
 
 		@Override
-		public void mouseDown(MouseEvent arg0) {
-			if (hoveredZone != null) {
-
+		public void mouseDown(MouseEvent event) {
+			if (event.button == 1 && hoveredZone != null) {
+				hoveredZone.onMouseClick(event);
 			}
 		}
 
 		@Override
 		public void mouseDoubleClick(MouseEvent arg0) {
-			// TODO Auto-generated method stub
+			System.err.println("mouseDoubleClick");
 
 		}
 
@@ -70,6 +71,10 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 						hoveredZone.mouseHover(event);
 						layoutZone(hoveredZone);
 					} else {
+						if (hoveredZone != null) {
+							hoveredZone.mouseExit(event);
+							layoutZone(hoveredZone);
+						}
 						hoveredZone = zone;
 						hoveredZone.mouseEnter(event);
 						layoutZone(hoveredZone);
@@ -146,7 +151,8 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 				synchronized (viewZones) {
 					List<IViewZone> toRemove = new ArrayList<>();
 					for (IViewZone viewZone : viewZones) {
-						// System.err.println("before:" + viewZone.getAfterLineNumber());
+						// System.err.println("before:" +
+						// viewZone.getAfterLineNumber());
 						int offset = viewZone.getOffsetAtLine();
 						if (start <= offset && offset < start + replaceCharCount) {
 							// this zone is being deleted from the text
@@ -157,7 +163,8 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 							offset += newCharCount - replaceCharCount;
 						}
 						viewZone.setOffsetAtLine(offset);
-						// System.err.println("after:" + viewZone.getAfterLineNumber());
+						// System.err.println("after:" +
+						// viewZone.getAfterLineNumber());
 					}
 
 					for (IViewZone viewZone : toRemove) {
@@ -169,8 +176,8 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 		});
 
 		this.mouseListener = new ViewZoneMouseListener();
-		//textViewer.getTextWidget().addMouseTrackListener(mouseListener);
-		//textViewer.getTextWidget().addMouseListener(mouseListener);
+		textViewer.getTextWidget().addMouseListener(mouseListener);
+		textViewer.getTextWidget().addMouseTrackListener(mouseListener);
 
 		((ITextViewerExtension2) textViewer).addPainter(this);
 	}
@@ -393,7 +400,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 				if (viewZone != null) {
 					Point topLeft = fTextWidget.getLocationAtOffset(viewZone.getOffsetAtLine());
 					y = topLeft.y; // fTextWidget.getLinePixel(lineIndex);
-					viewZone.getRenderer().draw(viewZone, x, y - viewZone.getHeightInPx(), gc, fTextWidget);
+					viewZone.draw(x, y - viewZone.getHeightInPx(), gc);
 				}
 			}
 		}

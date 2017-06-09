@@ -49,20 +49,7 @@ public class CodeLens {
 	}
 
 	public void updateCommands(List<ICodeLens> resolvedSymbols) {
-		if (resolvedSymbols == null || resolvedSymbols.size() < 1) {
-			zone.setText("no command");
-		} else {
-			StringBuilder text = new StringBuilder();
-			int i = 0;
-			for (ICodeLens codeLens : resolvedSymbols) {
-				if (i > 0) {
-					text.append(" | ");
-				}
-				text.append(codeLens.getCommand().getTitle());
-				i++;
-			}
-			zone.setText(text.toString());
-		}
+		zone.updateCommands(resolvedSymbols);
 	}
 
 	public void redraw(ViewZoneChangeAccessor accessor) {

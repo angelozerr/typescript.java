@@ -1,6 +1,6 @@
 package org.eclipse.jface.text.provisional.codelens;
 
-public class CodeLens implements ICodeLens {
+public abstract class CodeLens implements ICodeLens {
 
 	private Range range;
 	private ICommand command;

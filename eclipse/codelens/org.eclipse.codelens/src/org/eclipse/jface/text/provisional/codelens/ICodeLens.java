@@ -26,5 +26,7 @@ public interface ICodeLens {
 	 * The command this code lens represents.
 	 */
 	ICommand getCommand();
+
+	void open();
 	
 }

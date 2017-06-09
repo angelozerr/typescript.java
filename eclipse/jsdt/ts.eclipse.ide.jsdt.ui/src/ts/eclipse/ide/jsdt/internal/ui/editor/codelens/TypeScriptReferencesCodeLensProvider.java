@@ -31,9 +31,9 @@ public class TypeScriptReferencesCodeLensProvider extends TypeScriptBaseCodeLens
 			List<ReferencesResponseItem> refs = tsFile.references(position).get(1000, TimeUnit.MILLISECONDS).getRefs();
 			int refCount = refs.size() - 1;
 			if (refCount == 1) {
-				codeLens.setCommand(new Command("1 reference", null));
+				codeLens.setCommand(new Command("1 reference", "references"));
 			} else {
-				codeLens.setCommand(new Command(MessageFormat.format("{0} references", refCount), null));
+				codeLens.setCommand(new Command(MessageFormat.format("{0} references", refCount), "references"));
 			}
 			// (response -> {
 			// response.getRefs().stream().map(reference -> {
