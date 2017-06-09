@@ -10,7 +10,6 @@
  */
 package org.eclipse.swt.custom.patch;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.custom.StyledText;
@@ -58,7 +57,7 @@ public class StyledTextRenderer extends StyledTextRendererEmulator {
 
 			// invalidate text layout.
 			// call styledText.setVariableLineHeight();
-			setVariableLineHeight();
+			StyledTextPatcher.setVariableLineHeight(styledText);
 
 			// recreate text layout.
 			layout = super.getTextLayout(lineIndex, orientation, width, newSpacing, obj, proceed, args);
@@ -66,10 +65,4 @@ public class StyledTextRenderer extends StyledTextRendererEmulator {
 		return layout;
 	}
 
-	private void setVariableLineHeight()
-			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		Method m1 = styledText.getClass().getDeclaredMethod("setVariableLineHeight");
-		m1.setAccessible(true);
-		m1.invoke(styledText);
-	}
 }

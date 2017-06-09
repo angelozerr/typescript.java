@@ -1,6 +1,7 @@
 package org.eclipse.jface.text.provisional.viewzones;
 
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseEvent;
 
 public class ViewZone implements IViewZone {
 
@@ -29,14 +30,21 @@ public class ViewZone implements IViewZone {
 
 	@Override
 	public int getAfterLineNumber() {
-		if (afterLineNumber == -1) {
+		if (offsetAtLine != -1) {
+			try {
 			afterLineNumber = styledText.getLineAtOffset(offsetAtLine);
+			}catch(Exception e) {
+				//e.printStackTrace();
+				return -1;
+			}
 		}
 		return afterLineNumber;
 	}
 
 	public int getOffsetAtLine() {
-		offsetAtLine = styledText.getOffsetAtLine(afterLineNumber);
+		if (offsetAtLine == -1) {
+			offsetAtLine = styledText.getOffsetAtLine(afterLineNumber);
+		}
 		return offsetAtLine;
 	}
 
@@ -64,6 +72,21 @@ public class ViewZone implements IViewZone {
 	@Override
 	public boolean isDisposed() {
 		return disposed;
+	}
+	
+	@Override
+	public void mouseHover(MouseEvent event) {
+		// System.err.println("mouseHover");
+	}
+	
+	@Override
+	public void mouseEnter(MouseEvent event) {
+		// System.err.println("mouseEnter");
+	}
+	
+	@Override
+	public void mouseExit(MouseEvent event) {
+		// System.err.println("mouseExit");
 	}
 
 }

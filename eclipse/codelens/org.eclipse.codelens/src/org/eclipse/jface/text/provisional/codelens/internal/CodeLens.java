@@ -30,9 +30,16 @@ public class CodeLens {
 		if (!isValid()) {
 			return -1;
 		}
-		return zone.getAfterLineNumber();
+		return zone.getAfterLineNumber() + 1;
 	}
 
+	public int getOffsetAtLine() {
+		if (!isValid()) {
+			return -1;
+		}
+		return zone.getOffsetAtLine();
+	}
+	
 	public void updateCodeLensSymbols(List<CodeLensData> data, CodeLensHelper helper) {
 		this._data = data;
 	}
@@ -60,5 +67,12 @@ public class CodeLens {
 
 	public void redraw(ViewZoneChangeAccessor accessor) {
 		accessor.layoutZone(zone);
+	}
+	
+	public Integer getTopMargin() {
+		if (isValid() && zone.getAfterLineNumber() == 0) {
+			return zone.getHeightInPx();
+		}
+		return null;
 	}
 }

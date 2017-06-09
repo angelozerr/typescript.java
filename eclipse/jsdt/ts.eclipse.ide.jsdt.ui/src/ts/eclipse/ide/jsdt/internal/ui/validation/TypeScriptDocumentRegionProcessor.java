@@ -14,8 +14,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.provisional.codelens.CodeLensStrategy;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.wst.sse.ui.internal.reconcile.DocumentRegionProcessor;
 import org.eclipse.wst.sse.ui.internal.reconcile.validator.ValidatorStrategy;
@@ -24,8 +26,11 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
+import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptFoldingStrategy;
+import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.folding.IndentFoldingStrategy;
+import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
 import ts.utils.FileUtils;
 
 /**
@@ -40,6 +45,7 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 	private final IResource resource;
 	private final String contentType;
 	private IndentFoldingStrategy foldingStrategy;
+	private CodeLensStrategy codeLensStrategy;
 
 	public TypeScriptDocumentRegionProcessor(IResource resource) {
 		this.contentType = getContentType(resource);
@@ -121,8 +127,9 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 		if (getTypeScriptFoldingStrategy() != null) {
 			getTypeScriptFoldingStrategy().reconcile(dirtyRegion, null);
 		}
-
+		
 		super.process(dirtyRegion);
+		
 	}
 
 	/**
@@ -162,5 +169,28 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 				e.printStackTrace();
 			}
 		}
+		if (getCodeLensStrategy() != null) {
+			getCodeLensStrategy().reconcile(null, null);
+		}
+	}
+
+	protected IReconcilingStrategy getCodeLensStrategy() {
+		if (!TypeScriptUIPlugin.getDefault().getPreferenceStore()
+				.getBoolean(TypeScriptUIPreferenceConstants.EDITOR_ACTIVATE_CODELENS)) {
+			return null;
+		}
+		if (codeLensStrategy == null && getDocument() != null) {
+			// String contentTypeId = getContentType(getDocument());
+			// if (contentTypeId == null) {
+			// contentTypeId = IContentTypeManager.CT_TEXT;
+			// }
+			if (getTextViewer() instanceof ISourceViewer) {
+				ISourceViewer viewer = (ISourceViewer) getTextViewer();
+				codeLensStrategy = new CodeLensStrategy(viewer);
+				codeLensStrategy.addTarget(TypeScriptEditor.CODELENS_TARGET);
+				codeLensStrategy.setDocument(getDocument());
+			}
+		}
+		return codeLensStrategy;
 	}
 }

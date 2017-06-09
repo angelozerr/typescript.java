@@ -11,7 +11,9 @@
 package org.eclipse.swt.custom.patch.internal;
 
 import java.lang.reflect.Method;
+
 import org.eclipse.swt.graphics.TextLayout;
+
 import javassist.util.proxy.MethodHandler;
 
 /**

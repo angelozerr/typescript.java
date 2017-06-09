@@ -49,7 +49,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TabsToSpacesConverter;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.link.LinkedModeModel;
-import org.eclipse.jface.text.provisional.codelens.CodeLensContribution;
+import org.eclipse.jface.text.provisional.codelens.CodeLensStrategy;
 import org.eclipse.jface.text.provisional.codelens.CodeLensProviderRegistry;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -119,7 +119,7 @@ import ts.resources.ITypeScriptFile;
  */
 public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEditorOutlineFeatures {
 
-	static String CODELENS_TARGET = "typeScript.codeLens";
+	public static String CODELENS_TARGET = "typeScript.codeLens";
 
 	static {
 		CodeLensProviderRegistry registry = CodeLensProviderRegistry.getInstance();
@@ -298,7 +298,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	private TypeScriptContentOutlinePage contentOutlinePage;
 
 	private final ProblemTickUpdater problemTickUpdater;
-	private CodeLensContribution contribution;
+	//private CodeLensContribution contribution;
 
 	public TypeScriptEditor() {
 		super();
@@ -432,9 +432,9 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			fActivationListener = null;
 		}
 
-		if (contribution != null) {
-			contribution.dispose();
-		}
+//		if (contribution != null) {
+//			contribution.dispose();
+//		}
 	}
 
 	void updateTitleImage(Image titleImage) {
@@ -459,26 +459,30 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 		editorSelectionChangedListener = new EditorSelectionChangedListener();
 		editorSelectionChangedListener.install(getSelectionProvider());
 
-		if (isActivateCodeLenses()) {
-			installCodeLenses();
-		}
+//		if (isActivateCodeLenses()) {
+//			installCodeLenses();
+//		}
 	}
 
-	protected boolean isActivateCodeLenses() {
-		IPreferenceStore store = getPreferenceStore();
-		return store != null && store.getBoolean(TypeScriptUIPreferenceConstants.EDITOR_ACTIVATE_CODELENS);
-	}
+//	protected boolean isActivateCodeLenses() {
+//		IPreferenceStore store = getPreferenceStore();
+//		return store != null && store.getBoolean(TypeScriptUIPreferenceConstants.EDITOR_ACTIVATE_CODELENS);
+//	}
 
-	private void installCodeLenses() {
-		try {
-			ITextViewer textViewer = getSourceViewer();
-			contribution = new CodeLensContribution(textViewer);
-			contribution.addTarget(CODELENS_TARGET);
-			contribution.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	private void installCodeLenses() {
+//		try {
+//			ITextViewer textViewer = getSourceViewer();
+//			contribution = new CodeLensContribution(textViewer);
+//			contribution.addTarget(CODELENS_TARGET);
+//			//contribution.start();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+//	
+//	public CodeLensContribution getCodeLensContribution() {
+//		return contribution;
+//	};
 
 	/*
 	 * @see AbstractTextEditor#handlePreferenceStoreChanged(PropertyChangeEvent)

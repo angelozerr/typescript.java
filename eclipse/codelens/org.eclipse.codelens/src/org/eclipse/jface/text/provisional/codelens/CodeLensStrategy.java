@@ -6,44 +6,51 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.jface.text.ITextListener;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.provisional.codelens.internal.CodeLens;
 import org.eclipse.jface.text.provisional.codelens.internal.CodeLensData;
 import org.eclipse.jface.text.provisional.codelens.internal.CodeLensHelper;
 import org.eclipse.jface.text.provisional.viewzones.ViewZoneChangeAccessor;
+import org.eclipse.jface.text.reconciler.DirtyRegion;
+import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.patch.StyledTextPatcher;
 import org.eclipse.swt.widgets.Display;
 
 // /vscode/src/vs/editor/contrib/codelens/common/codelens.ts
-public class CodeLensContribution {
+public class CodeLensStrategy implements IReconcilingStrategy {
 
 	private final ITextViewer textViewer;
 	private final List<String> targets;
-	private ITextListener internalListener = new ITextListener() {
 
-		@Override
-		public void textChanged(TextEvent event) {
-			if (event.getDocumentEvent() != null) {
-				onModelChange();
-			}
-		}
-	};
+	private AtomicInteger count = new AtomicInteger(0);
 
 	private ViewZoneChangeAccessor accessor;
 	private List<CodeLens> _lenses;
-	private CompletableFuture<Collection<CodeLensData>> symbolsPromise;
+	private CompletableFuture<Void> symbolsPromise;
+	private boolean invalidateTextPresentation;
 
-	public CodeLensContribution(ITextViewer textViewer) {
+	public CodeLensStrategy(ITextViewer textViewer) {
+		this(textViewer, true);
+	}
+
+	public CodeLensStrategy(ITextViewer textViewer, boolean invalidateTextPresentation) {
 		this.textViewer = textViewer;
+		this.invalidateTextPresentation = invalidateTextPresentation;
 		this.targets = new ArrayList<>();
-		textViewer.addTextListener(internalListener);
-		try {
-			this.accessor = new ViewZoneChangeAccessor(textViewer);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		textViewer.getTextWidget().getDisplay().syncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				CodeLensStrategy.this.accessor = new ViewZoneChangeAccessor(textViewer);	
+			}
+		});
+		
 		this._lenses = new ArrayList<>();
 	}
 
@@ -55,16 +62,19 @@ public class CodeLensContribution {
 		if (symbolsPromise != null) {
 			symbolsPromise.cancel(true);
 		}
-		symbolsPromise = getCodeLensData(textViewer, targets);
-		// symbols.exceptionally(ex -> ex.printStackTrace());
-		symbolsPromise.thenAccept(symbols -> {
+		int modelCount = count.incrementAndGet();
+		symbolsPromise = getCodeLensData(textViewer, targets, modelCount).thenAccept(symbols -> {
 			renderCodeLensSymbols(symbols);
+		}).exceptionally(e -> {
+			e.printStackTrace();
+			return null;
 		});
+		;
 
 	}
 
-	private static CompletableFuture<Collection<CodeLensData>> getCodeLensData(ITextViewer textViewer,
-			List<String> targets) {
+	private CompletableFuture<Collection<CodeLensData>> getCodeLensData(ITextViewer textViewer, List<String> targets,
+			int modelCount) {
 		return CompletableFuture.supplyAsync(() -> {
 			List<CodeLensData> symbols = new ArrayList<>();
 			for (String target : targets) {
@@ -128,7 +138,14 @@ public class CodeLensContribution {
 		while (groupsIndex < groups.size() && codeLensIndex < this._lenses.size()) {
 
 			int symbolsLineNumber = groups.get(groupsIndex).get(0).getSymbol().getRange().startLineNumber;
-			int codeLensLineNumber = this._lenses.get(codeLensIndex).getLineNumber();
+			int offset = this._lenses.get(codeLensIndex).getOffsetAtLine();
+			int codeLensLineNumber = -1;
+			try {
+				codeLensLineNumber = offset != -1 ? textViewer.getDocument().getLineOfOffset(offset) + 1 : -1;
+			} catch (BadLocationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // this._lenses.get(codeLensIndex).getLineNumber();
 
 			if (codeLensLineNumber < symbolsLineNumber) {
 				this._lenses.get(codeLensIndex).dispose(helper, accessor);
@@ -151,7 +168,6 @@ public class CodeLensContribution {
 				groupsIndex++;
 			}
 		}
-
 		// Delete extra code lenses
 		while (codeLensIndex < this._lenses.size()) {
 			this._lenses.get(codeLensIndex).dispose(helper, accessor);
@@ -170,7 +186,12 @@ public class CodeLensContribution {
 		}
 
 		// helper.commit(changeAccessor);
-
+		// Display.getDefault().asyncExec(() -> {
+		//// this._lenses.forEach((lens) -> {
+		//// lens.redraw(accessor);
+		//// });
+		// textViewer.getTextWidget().redraw();
+		// });
 		_onViewportChanged();
 	}
 
@@ -178,16 +199,22 @@ public class CodeLensContribution {
 		List<List<CodeLensData>> toResolve = new ArrayList<>();
 		List<CodeLens> lenses = new ArrayList<>();
 
-		this._lenses.forEach((lens) -> {
+		Integer topMargin = null;
+		for (CodeLens lens : _lenses) {
 			List<CodeLensData> request = lens.computeIfNecessary(null);
 			if (request != null) {
 				toResolve.add(request);
 				lenses.add(lens);
+
+				Integer top = lens.getTopMargin();
+				if (top != null) {
+					topMargin = top;
+				}
 			}
-		});
+		}
 
 		if (toResolve.isEmpty()) {
-			return;
+			// return;
 		}
 
 		int i = 0;
@@ -203,19 +230,40 @@ public class CodeLensContribution {
 			i++;
 		}
 
+		final Integer top = topMargin;
 		Display.getDefault().syncExec(() -> {
-			this._lenses.forEach((lens) -> {
-				lens.redraw(accessor);
-			});
+			StyledText styledText = textViewer.getTextWidget();
+			if (invalidateTextPresentation) {
+//				if (top != null && styledText.getTopMargin() != top) {
+//					try {
+//						Field f = styledText.getClass().getDeclaredField("topMargin");
+//						f.setAccessible(true);
+//						f.set(styledText, top);
+//					} catch (Exception e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				} 
+				textViewer.invalidateTextPresentation();
+			} else {
+				if (top != null && styledText.getTopMargin() != top) {
+					styledText.setTopMargin(top);
+				} else {
+					int offset = styledText.getCaretOffset();
+					StyledTextPatcher.setVariableLineHeight(styledText);
+					styledText.redraw();
+					styledText.setCaretOffset(offset);
+				}
+			}
 		});
 	}
 
-	public CodeLensContribution addTarget(String target) {
+	public CodeLensStrategy addTarget(String target) {
 		targets.add(target);
 		return this;
 	}
 
-	public CodeLensContribution removeTarget(String target) {
+	public CodeLensStrategy removeTarget(String target) {
 		targets.remove(target);
 		return this;
 	}
@@ -224,32 +272,20 @@ public class CodeLensContribution {
 
 	}
 
-	/*
-	 * private Collection<CompletableFuture<CodeLensData>>
-	 * getCodeLensData(ITextViewer textViewer) {
-	 * 
-	 * Collection<CodeLensData> symbols = new ArrayList<>(); String
-	 * contentTypeId = "";
-	 * 
-	 * // Collection<CompletableFuture<CodeLensData>> promises =
-	 * registry.all(contentTypeId).stream().map(provider -> { //
-	 * CompletableFuture<CodeLensData> promise =
-	 * CompletableFuture.supplyAsync(() -> { //
-	 * provider.provideCodeLenses(textViewer); // });
-	 * 
-	 * // // // // new CompletableFuture<CodeLensData>(); // //promise. // //
-	 * promise.thenAccept(result -> { // if (result != null) { // for (ICodeLens
-	 * symbol : result) { // symbols.add(new CodeLensData(symbol, provider)); //
-	 * } // } // }) return promise; }).collect(Collectors.toList());
-	 * 
-	 * for (
-	 * 
-	 * ICodeLensProvider provider : providers) { ICodeLens[] result =
-	 * provider.provideCodeLenses(textViewer); if (result != null) { for
-	 * (ICodeLens symbol : result) { symbols.add(new CodeLensData(symbol,
-	 * provider)); } } }
-	 * 
-	 * }
-	 */
+	@Override
+	public void setDocument(IDocument document) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion) {
+		onModelChange();
+	}
+
+	@Override
+	public void reconcile(IRegion partition) {
+		onModelChange();
+	}
 
 }

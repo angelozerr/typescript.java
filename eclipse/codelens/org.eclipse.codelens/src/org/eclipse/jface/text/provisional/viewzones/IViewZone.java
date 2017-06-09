@@ -1,6 +1,7 @@
 package org.eclipse.jface.text.provisional.viewzones;
 
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseEvent;
 
 public interface IViewZone {
 
@@ -23,5 +24,11 @@ public interface IViewZone {
 	boolean isDisposed();
 
 	void dispose();
+
+	void mouseHover(MouseEvent event);
+
+	void mouseExit(MouseEvent event);
+
+	void mouseEnter(MouseEvent event);
 
 }

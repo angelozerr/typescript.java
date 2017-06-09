@@ -21,6 +21,7 @@ public class CodeLensViewZoneRenderer implements IViewZoneRenderer<CodeLensViewZ
 		Rectangle client = styledText.getClientArea();
 		gc.setBackground(styledText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		styledText.drawBackground(gc, paintX, paintY, client.width, viewZone.getHeightInPx());
+		
 		gc.setForeground(styledText.getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
 		String text = viewZone.getText();
@@ -32,7 +33,17 @@ public class CodeLensViewZoneRenderer implements IViewZoneRenderer<CodeLensViewZ
 			}
 			Font font = new Font(styledText.getDisplay(), "Arial", 9, SWT.ITALIC);
 			gc.setFont(font);
-			gc.drawText(text, paintX, paintY + 4);
+			int x = paintX;
+			int y = paintY + 4;
+			gc.drawText(text, x, y);
+			
+			if (viewZone.getHover() != null) {
+				styledText.setCursor(styledText.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+				Point extent = gc.textExtent(text);
+				gc.drawLine(x - 1, y + extent.y - 1, x + extent.x - 1, y + extent.y - 1);
+			} else {
+				styledText.setCursor(null);
+			}
 		}
 	}
 	
