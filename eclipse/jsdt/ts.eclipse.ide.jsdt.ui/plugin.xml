@@ -765,4 +765,24 @@
 	    </snippet>
 	</extension>
 
+	<!-- TypeScript CodeLens providers -->
+	
+	<extension
+      point="org.eclipse.codelens.codeLensProviders">
+	   <codeLensProvider
+	   		 name="%TypeScriptReferencesCodeLensProvider.name"
+	         class="ts.eclipse.ide.jsdt.internal.ui.editor.codelens.TypeScriptReferencesCodeLensProvider"
+	         target="typeScript.codeLens">
+	   </codeLensProvider>
+	</extension>
+
+	<extension
+      point="org.eclipse.codelens.codeLensProviders">
+	   <codeLensProvider
+	   		 name="%TypeScriptImplementationsCodeLensProvider.name"
+	         class="ts.eclipse.ide.jsdt.internal.ui.editor.codelens.TypeScriptImplementationsCodeLensProvider"
+	         target="typeScript.codeLens">
+	   </codeLensProvider>
+	</extension>
+		
 </plugin>        
