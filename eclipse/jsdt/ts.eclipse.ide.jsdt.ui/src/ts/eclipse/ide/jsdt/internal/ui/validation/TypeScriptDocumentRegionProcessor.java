@@ -26,8 +26,8 @@ import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.core.JSDTTypeScriptCorePlugin;
-import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptFoldingStrategy;
+import ts.eclipse.ide.jsdt.internal.ui.editor.codelens.TypeScriptCodeLensStrategy;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.folding.IndentFoldingStrategy;
 import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
@@ -127,9 +127,9 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 		if (getTypeScriptFoldingStrategy() != null) {
 			getTypeScriptFoldingStrategy().reconcile(dirtyRegion, null);
 		}
-		
+
 		super.process(dirtyRegion);
-		
+
 	}
 
 	/**
@@ -180,14 +180,9 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 			return null;
 		}
 		if (codeLensStrategy == null && getDocument() != null) {
-			// String contentTypeId = getContentType(getDocument());
-			// if (contentTypeId == null) {
-			// contentTypeId = IContentTypeManager.CT_TEXT;
-			// }
 			if (getTextViewer() instanceof ISourceViewer) {
 				ISourceViewer viewer = (ISourceViewer) getTextViewer();
-				codeLensStrategy = new CodeLensStrategy(viewer);
-				codeLensStrategy.addTarget(TypeScriptEditor.CODELENS_TARGET);
+				codeLensStrategy = new TypeScriptCodeLensStrategy(viewer);
 				codeLensStrategy.setDocument(getDocument());
 			}
 		}

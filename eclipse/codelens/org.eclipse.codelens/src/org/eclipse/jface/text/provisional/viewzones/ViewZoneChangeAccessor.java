@@ -39,7 +39,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 
 		@Override
 		public void mouseUp(MouseEvent arg0) {
-			System.err.println("mouseUp");
+			//System.err.println("mouseUp");
 			if (hoveredZone != null) {
 
 			}
@@ -54,7 +54,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 
 		@Override
 		public void mouseDoubleClick(MouseEvent arg0) {
-			System.err.println("mouseDoubleClick");
+			// System.err.println("mouseDoubleClick");
 
 		}
 

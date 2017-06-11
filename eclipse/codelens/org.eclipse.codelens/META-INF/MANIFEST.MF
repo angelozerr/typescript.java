@@ -35,3 +35,5 @@ Export-Package: org.eclipse.jface.text.provisional.codelens,
  org.eclipse.jface.text.source.patch,
  org.eclipse.swt.custom.patch,
  org.eclipse.swt.custom.provisional
+Bundle-Name: %pluginName
+Bundle-ActivationPolicy: lazy
