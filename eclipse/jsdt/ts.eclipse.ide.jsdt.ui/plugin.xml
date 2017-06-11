@@ -767,6 +767,7 @@
 
 	<!-- TypeScript CodeLens providers -->
 	
+	<!-- TypeScript "references" CodeLens -->
 	<extension
       point="org.eclipse.codelens.codeLensProviders">
 	   <codeLensProvider
@@ -775,7 +776,8 @@
 	         target="typeScript.codeLens">
 	   </codeLensProvider>
 	</extension>
-
+	
+	<!-- TypeScript "implementations" CodeLens -->
 	<extension
       point="org.eclipse.codelens.codeLensProviders">
 	   <codeLensProvider

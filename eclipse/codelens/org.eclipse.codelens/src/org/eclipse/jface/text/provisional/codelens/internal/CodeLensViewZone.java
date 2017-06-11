@@ -70,39 +70,26 @@ public class CodeLensViewZone extends ViewZone {
 
 		gc.setForeground(styledText.getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
+		Font font = new Font(styledText.getDisplay(), "Arial", 9, SWT.ITALIC);
+		gc.setFont(font);
 		String text = getText(gc);
 		if (text != null) {
+			Point topLeft = null;
 			int leading = getLeadingSpaces(styledText.getLine(super.getAfterLineNumber()));
 			if (leading > 0) {
-				Point topLeft = styledText.getLocationAtOffset(super.getOffsetAtLine() + leading);
+				topLeft = styledText.getLocationAtOffset(super.getOffsetAtLine() + leading);
 				paintX += topLeft.x;
 			}
-			Font font = new Font(styledText.getDisplay(), "Arial", 9, SWT.ITALIC);
-			gc.setFont(font);
 			int x = paintX;
 			int y = paintY + 4;
 			gc.drawText(text, x, y);
 
 			if (hoveredCodeLensEndX != null) {
 				Point extent = gc.textExtent(text);
-				gc.drawLine(hoveredCodeLensStartX, y + extent.y - 1, hoveredCodeLensEndX, y + extent.y - 1);
+				int startX = topLeft != null ? topLeft.x : 0;
+				gc.drawLine(startX + hoveredCodeLensStartX, y + extent.y - 1, startX + hoveredCodeLensEndX,
+						y + extent.y - 1);
 			}
-			// if (getHover() != null && resolvedSymbols != null &&
-			// resolvedSymbols.size() > 0) {
-			// int hoverX = getHover().x;
-			// StringBuilder s = new StringBuilder();
-			// for (ICodeLens symbol : resolvedSymbols) {
-			// Point extent = gc.textExtent(text);
-			// //symbol.getCommand().getTitle()
-			// }
-			// //
-			// styledText.setCursor(styledText.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-			// Point extent = gc.textExtent(text);
-			// gc.drawLine(x - 1, y + extent.y - 1, x + extent.x - 1, y +
-			// extent.y - 1);
-			// } else {
-			// // styledText.setCursor(null);
-			// }
 		}
 	}
 
@@ -148,7 +135,7 @@ public class CodeLensViewZone extends ViewZone {
 						hoveredCodeLensEndX = endX;
 						hoveredCodeLens = codeLens;
 					}
-				}
+				}				
 				i++;
 			}
 			return text.toString();
