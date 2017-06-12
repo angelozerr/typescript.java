@@ -110,9 +110,17 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 
 		textViewer.getDocument().addDocumentListener(new IDocumentListener() {
 
+			private List<IViewZone> toUpdate = new ArrayList<>();
+
 			@Override
 			public void documentChanged(DocumentEvent event) {
-
+				if (!toUpdate.isEmpty()) {
+					textViewer.getTextWidget().getDisplay().asyncExec(() -> {
+						for (IViewZone viewZone : toUpdate) {
+							ViewZoneChangeAccessor.this.layoutZone(viewZone);
+						}
+					});
+				}
 			}
 
 			@Override
@@ -121,20 +129,25 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 				int replaceCharCount = e.getLength();
 				int newCharCount = e.getText().length();
 				synchronized (viewZones) {
+					toUpdate.clear();
 					List<IViewZone> toRemove = new ArrayList<>();
 					for (IViewZone viewZone : viewZones) {
 						// System.err.println("before:" +
 						// viewZone.getAfterLineNumber());
-						int offset = viewZone.getOffsetAtLine();
-						if (start <= offset && offset < start + replaceCharCount) {
+						int oldOffset = viewZone.getOffsetAtLine();
+						int newOffset = oldOffset;
+						if (start <= newOffset && newOffset < start + replaceCharCount) {
 							// this zone is being deleted from the text
 							toRemove.add(viewZone);
-							offset = -1;
+							newOffset = -1;
 						}
-						if (offset != -1 && offset >= start) {
-							offset += newCharCount - replaceCharCount;
+						if (newOffset != -1 && newOffset >= start) {
+							newOffset += newCharCount - replaceCharCount;
 						}
-						viewZone.setOffsetAtLine(offset);
+						if (oldOffset != newOffset) {
+							viewZone.setOffsetAtLine(newOffset);
+							toUpdate.add(viewZone);
+						}
 						// System.err.println("after:" +
 						// viewZone.getAfterLineNumber());
 					}
@@ -280,7 +293,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 			int lineCount = fTextWidget.getLineCount();
 			int x = fTextWidget.getLeftMargin() - fTextWidget.getHorizontalPixel();
 			// leftMargin - horizontalScrollOffset;
-			for (int lineIndex = startLine; y < endY && lineIndex < lineCount; lineIndex++) {
+			for (int lineIndex = startLine - 1; y < endY && lineIndex < lineCount; lineIndex++) {
 				if (lineIndex == 0) {
 					IViewZone viewZone = getViewZone(lineIndex);
 					if (viewZone != null) {
@@ -303,7 +316,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 				if (viewZone != null) {
 					Point topLeft = fTextWidget.getLocationAtOffset(viewZone.getOffsetAtLine());
 					y = topLeft.y; // fTextWidget.getLinePixel(lineIndex);
-					viewZone.draw(x, y - viewZone.getHeightInPx(), gc);
+					viewZone.draw(x, topLeft.x, y - viewZone.getHeightInPx(), gc);
 				}
 			}
 		}

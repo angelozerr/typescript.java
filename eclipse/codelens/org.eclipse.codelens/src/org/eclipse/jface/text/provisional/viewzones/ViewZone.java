@@ -41,9 +41,13 @@ public abstract class ViewZone implements IViewZone {
 
 	public int getOffsetAtLine() {
 		if (offsetAtLine == -1) {
-			offsetAtLine = styledText.getOffsetAtLine(afterLineNumber);
+			offsetAtLine = getOffsetAtLine(afterLineNumber);
 		}
 		return offsetAtLine;
+	}
+
+	protected int getOffsetAtLine(int lineIndex) {
+		return styledText.getOffsetAtLine(lineIndex);
 	}
 
 	public void setOffsetAtLine(int offsetAtLine) {

@@ -62,7 +62,7 @@ public class CodeLensViewZone extends ViewZone {
 	}
 
 	@Override
-	public void draw(int paintX, int paintY, GC gc) {
+	public void draw(int paintX, int paintSpaceLeadingX, int paintY, GC gc) {
 		StyledText styledText = super.getStyledText();
 		Rectangle client = styledText.getClientArea();
 		gc.setBackground(styledText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -72,25 +72,55 @@ public class CodeLensViewZone extends ViewZone {
 
 		Font font = new Font(styledText.getDisplay(), "Arial", 9, SWT.ITALIC);
 		gc.setFont(font);
-		String text = getText(gc);
+		String text = getText(gc, paintSpaceLeadingX);
 		if (text != null) {
-			Point topLeft = null;
-			int leading = getLeadingSpaces(styledText.getLine(super.getAfterLineNumber()));
-			if (leading > 0) {
-				topLeft = styledText.getLocationAtOffset(super.getOffsetAtLine() + leading);
-				paintX += topLeft.x;
-			}
-			int x = paintX;
 			int y = paintY + 4;
-			gc.drawText(text, x, y);
+			gc.drawText(text, paintSpaceLeadingX, y);
 
 			if (hoveredCodeLensEndX != null) {
 				Point extent = gc.textExtent(text);
-				int startX = topLeft != null ? topLeft.x : 0;
-				gc.drawLine(startX + hoveredCodeLensStartX, y + extent.y - 1, startX + hoveredCodeLensEndX,
-						y + extent.y - 1);
+				gc.drawLine(hoveredCodeLensStartX, y + extent.y - 1, hoveredCodeLensEndX, y + extent.y - 1);
 			}
 		}
+	}
+
+	public String getText(GC gc, int x) {
+		hoveredCodeLens = null;
+		hoveredCodeLensStartX = null;
+		hoveredCodeLensEndX = null;
+		if (resolvedSymbols == null || resolvedSymbols.size() < 1) {
+			return "no command";
+		} else {
+			StringBuilder text = new StringBuilder();
+			int i = 0;
+			boolean hasHover = hover != null;
+			for (ICodeLens codeLens : resolvedSymbols) {
+				if (i > 0) {
+					text.append(" | ");
+				}
+				Integer startX = null;
+				if (hasHover && hoveredCodeLens == null) {
+					startX = gc.textExtent(text.toString()).x + x;
+				}
+				text.append(codeLens.getCommand().getTitle());
+				if (hasHover && hoveredCodeLens == null) {
+					int endX = gc.textExtent(text.toString()).x + x;
+					if (hover.x < endX) {
+						hoveredCodeLensStartX = startX;
+						hoveredCodeLensEndX = endX;
+						hoveredCodeLens = codeLens;
+					}
+				}
+				i++;
+			}
+			return text.toString();
+		}
+	}
+
+	@Override
+	protected int getOffsetAtLine(int lineIndex) {
+		String line = getStyledText().getLine(lineIndex);
+		return super.getOffsetAtLine(lineIndex) + getLeadingSpaces(line);
 	}
 
 	private static int getLeadingSpaces(String line) {
@@ -107,39 +137,6 @@ public class CodeLensViewZone extends ViewZone {
 		}
 
 		return counter;
-	}
-
-	public String getText(GC gc) {
-		hoveredCodeLens = null;
-		hoveredCodeLensStartX = null;
-		hoveredCodeLensEndX = null;
-		if (resolvedSymbols == null || resolvedSymbols.size() < 1) {
-			return "no command";
-		} else {
-			StringBuilder text = new StringBuilder();
-			int i = 0;
-			boolean hasHover = hover != null;
-			for (ICodeLens codeLens : resolvedSymbols) {
-				if (i > 0) {
-					text.append(" | ");
-				}
-				Integer startX = null;
-				if (hasHover && hoveredCodeLens == null) {
-					startX = gc.textExtent(text.toString()).x;
-				}
-				text.append(codeLens.getCommand().getTitle());
-				if (hasHover && hoveredCodeLens == null) {
-					int endX = gc.textExtent(text.toString()).x;
-					if (hover.x < endX) {
-						hoveredCodeLensStartX = startX;
-						hoveredCodeLensEndX = endX;
-						hoveredCodeLens = codeLens;
-					}
-				}				
-				i++;
-			}
-			return text.toString();
-		}
 	}
 
 }

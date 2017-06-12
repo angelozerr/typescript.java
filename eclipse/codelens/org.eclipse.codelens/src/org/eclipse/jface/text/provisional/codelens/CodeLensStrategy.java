@@ -20,7 +20,6 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.patch.StyledTextPatcher;
-import org.eclipse.swt.widgets.Display;
 
 // /vscode/src/vs/editor/contrib/codelens/common/codelens.ts
 public class CodeLensStrategy implements IReconcilingStrategy {
@@ -43,19 +42,13 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 		this.textViewer = textViewer;
 		this.invalidateTextPresentation = invalidateTextPresentation;
 		this.targets = new ArrayList<>();
-		textViewer.getTextWidget().getDisplay().syncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				CodeLensStrategy.this.accessor = new ViewZoneChangeAccessor(textViewer);	
-			}
+		// Initialize the view change accessor in the UI Thread because teh
+		// constructor updat ethe StyledTextRenderer which i saccessible only in
+		// an UI Thread.
+		textViewer.getTextWidget().getDisplay().syncExec(() -> {
+			CodeLensStrategy.this.accessor = new ViewZoneChangeAccessor(textViewer);
 		});
-		
 		this._lenses = new ArrayList<>();
-	}
-
-	public void start() {
-		onModelChange();
 	}
 
 	private void onModelChange() {
@@ -69,8 +62,6 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 			e.printStackTrace();
 			return null;
 		});
-		;
-
 	}
 
 	private CompletableFuture<Collection<CodeLensData>> getCodeLensData(ITextViewer textViewer, List<String> targets,
@@ -231,19 +222,20 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 		}
 
 		final Integer top = topMargin;
-		Display.getDefault().syncExec(() -> {
-			StyledText styledText = textViewer.getTextWidget();
+		final StyledText styledText = textViewer.getTextWidget();
+		styledText.getDisplay().syncExec(() -> {
 			if (invalidateTextPresentation) {
-//				if (top != null && styledText.getTopMargin() != top) {
-//					try {
-//						Field f = styledText.getClass().getDeclaredField("topMargin");
-//						f.setAccessible(true);
-//						f.set(styledText, top);
-//					} catch (Exception e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				} 
+				// if (top != null && styledText.getTopMargin() != top) {
+				// try {
+				// Field f =
+				// styledText.getClass().getDeclaredField("topMargin");
+				// f.setAccessible(true);
+				// f.set(styledText, top);
+				// } catch (Exception e) {
+				// // TODO Auto-generated catch block
+				// e.printStackTrace();
+				// }
+				// }
 				textViewer.invalidateTextPresentation();
 			} else {
 				if (top != null && styledText.getTopMargin() != top) {

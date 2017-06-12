@@ -32,5 +32,5 @@ public interface IViewZone {
 
 	void onMouseClick(MouseEvent event);
 
-	void draw(int paintX, int paintY, GC gc);
+	void draw(int paintX, int paintSpaceLeadingX, int paintY, GC gc);
 }

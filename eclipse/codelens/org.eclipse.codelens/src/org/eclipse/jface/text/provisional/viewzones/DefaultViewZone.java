@@ -28,7 +28,7 @@ public class DefaultViewZone extends ViewZone {
 	}
 
 	@Override
-	public void draw(int paintX, int paintY, GC gc) {
+	public void draw(int paintX, int paintSpaceLeadingX, int paintY, GC gc) {
 		StyledText styledText = super.getStyledText();
 		Rectangle client = styledText.getClientArea();
 		gc.setBackground(styledText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
