@@ -15,7 +15,7 @@ import org.eclipse.swt.custom.patch.StyledTextPatcher;
 import org.eclipse.swt.custom.provisional.ILineSpacingProvider;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -33,16 +33,12 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 	private int originalTopMargin;
 	private ViewZoneMouseListener mouseListener;
 
-	private class ViewZoneMouseListener implements MouseListener, MouseTrackListener {
+	private class ViewZoneMouseListener implements MouseListener, MouseMoveListener {
 
 		private IViewZone hoveredZone;
 
 		@Override
-		public void mouseUp(MouseEvent arg0) {
-			//System.err.println("mouseUp");
-			if (hoveredZone != null) {
-
-			}
+		public void mouseUp(MouseEvent event) {
 		}
 
 		@Override
@@ -53,20 +49,23 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 		}
 
 		@Override
-		public void mouseDoubleClick(MouseEvent arg0) {
-			// System.err.println("mouseDoubleClick");
+		public void mouseDoubleClick(MouseEvent event) {
 
 		}
 
 		@Override
-		public void mouseHover(MouseEvent event) {
+		public void mouseMove(MouseEvent event) {
 			int lineIndex = fTextWidget.getLineIndex(event.y);
 			int lineNumber = lineIndex + 1;
 			IViewZone zone = getViewZone(lineNumber);
 			if (zone != null) {
+				// The line which have a zone at end of this line is
+				// hovered.
+				// Check if it's the zone which is hovered or the view zone.
 				int offset = fTextWidget.getOffsetAtLine(lineIndex + 1);
 				Point p = fTextWidget.getLocationAtOffset(offset);
 				if (p.y - zone.getHeightInPx() < event.y) {
+					// Zone is hovered
 					if (zone.equals(hoveredZone)) {
 						hoveredZone.mouseHover(event);
 						layoutZone(hoveredZone);
@@ -92,24 +91,6 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 				hoveredZone = null;
 			}
 		}
-
-		@Override
-		public void mouseExit(MouseEvent event) {
-			if (hoveredZone != null) {
-				hoveredZone.mouseExit(event);
-				layoutZone(hoveredZone);
-				hoveredZone = null;
-			}
-		}
-
-		@Override
-		public void mouseEnter(MouseEvent event) {
-			if (hoveredZone != null) {
-				hoveredZone.mouseExit(event);
-				layoutZone(hoveredZone);
-				hoveredZone = null;
-			}
-		}
 	}
 
 	public ViewZoneChangeAccessor(ITextViewer textViewer) {
@@ -125,16 +106,7 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// try {
-		// Field fixedLineHeight =
-		// fTextWidget.getClass().getDeclaredField("fixedLineHeight");
-		// fixedLineHeight.setAccessible(true);
-		// fixedLineHeight.set(fTextWidget, false);
-		// } catch (Exception e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		synch(fTextWidget);
+		// synch(fTextWidget);
 
 		textViewer.getDocument().addDocumentListener(new IDocumentListener() {
 
@@ -175,10 +147,9 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 			}
 		});
 
-		this.mouseListener = new ViewZoneMouseListener();
+		mouseListener = new ViewZoneMouseListener();
+		textViewer.getTextWidget().addMouseMoveListener(mouseListener);
 		textViewer.getTextWidget().addMouseListener(mouseListener);
-		textViewer.getTextWidget().addMouseTrackListener(mouseListener);
-
 		((ITextViewerExtension2) textViewer).addPainter(this);
 	}
 
@@ -224,74 +195,6 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 		return null;
 	}
 
-	private void synch(StyledText text) {
-		// use a verify listener to keep the offsets up to date
-		// text.addVerifyListener(new VerifyListener() {
-		// public void verifyText(VerifyEvent e) {
-		// int start = e.start;
-		// int replaceCharCount = e.end - e.start;
-		// int newCharCount = e.text.length();
-		// synchronized (viewZones) {
-		// List<IViewZone> toRemove = new ArrayList<>();
-		// for (IViewZone viewZone : viewZones) {
-		// System.err.println("before:" + viewZone.getAfterLineNumber());
-		// int offset = viewZone.getOffsetAtLine();
-		// if (start <= offset && offset < start + replaceCharCount) {
-		// // this zone is being deleted from the text
-		// toRemove.add(viewZone);
-		// offset = -1;
-		// }
-		// if (offset != -1 && offset >= start) {
-		// offset += newCharCount - replaceCharCount;
-		// }
-		// viewZone.setOffsetAtLine(offset);
-		// if (e.text.length() == 0) {
-		// int lineIndex = fTextWidget.getLineAtOffset(e.start);
-		// //int lineOffset = fTextWidget.getOffsetAtLine(lineIndex + 1);
-		// //viewZone.setOffsetAtLine(lineOffset);
-		// }
-		// System.err.println("after:" + viewZone.getAfterLineNumber());
-		// }
-		//
-		// for (IViewZone viewZone : toRemove) {
-		// removeZone(viewZone);
-		// }
-		// }
-		// }
-		// });
-		//
-		// text.addExtendedModifyListener(new ExtendedModifyListener() {
-		//
-		// @Override
-		// public void modifyText(ExtendedModifyEvent e) {
-		// int start = e.start;
-		// int replaceCharCount = e.replacedText.length();
-		// int newCharCount = e.length;
-		// synchronized (viewZones) {
-		// List<IViewZone> toRemove = new ArrayList<>();
-		// for (IViewZone viewZone : viewZones) {
-		// System.err.println("before:" + viewZone.getAfterLineNumber());
-		// int offset = viewZone.getOffsetAtLine();
-		// if (start <= offset && offset < start + replaceCharCount) {
-		// // this zone is being deleted from the text
-		// toRemove.add(viewZone);
-		// offset = -1;
-		// }
-		// if (offset != -1 && offset >= start) {
-		// offset += newCharCount - replaceCharCount;
-		// }
-		// viewZone.setOffsetAtLine(offset);
-		// System.err.println("after:" + viewZone.getAfterLineNumber());
-		// }
-		//
-		// for (IViewZone viewZone : toRemove) {
-		// removeZone(viewZone);
-		// }
-		// }
-		// }
-		// });
-	}
-
 	@Override
 	public int getSize() {
 		return viewZones.size();
@@ -311,8 +214,8 @@ public class ViewZoneChangeAccessor implements IViewZoneChangeAccessor, ILineSpa
 
 	@Override
 	public void dispose() {
-		textViewer.getTextWidget().removeMouseTrackListener(mouseListener);
-		textViewer.getTextWidget().removeMouseListener(mouseListener);
+		fTextWidget.removeMouseMoveListener(mouseListener);
+		fTextWidget.removeMouseListener(mouseListener);
 		fTextWidget = null;
 	}
 
