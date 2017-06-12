@@ -83,46 +83,51 @@ public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvide
 
 		Range range = new Range(span.getStart().getLine(), span.getStart().getOffset());
 
-		
 		// Range range = new Range(
 		// span.getStart().getLine() - 1, span.getStart().getOffset() - 1,
 		// span.getEnd().getLine() - 1, span.getEnd().getOffset()- 1);
 
-		
 		try {
 			IDocument document = tsFile.getDocument();
 			int offset = tsFile.getPosition(span.getStart());
 			int endOffset = tsFile.getPosition(span.getEnd());
 			String text = document.get(offset, span.getLength());
-			
-			String regex = "^(.*?(\\b|\\W))" + (item.getText() != null ? item.getText() :  "").replaceAll("[-[\\\\]{}()*+?.,\\\\^$|#\\s]", "\\\\$&") + "(\\b|\\W)";
+
+			String regex = "^(.*?(\\b|\\W))" + (item.getText() != null ? item.getText() : "")
+					.replaceAll("[-[\\\\]{}()*+?.,\\\\^$|#\\s]", "\\\\$&") + "(\\b|\\W)";
 			Matcher identifierMatch = Pattern.compile(regex, Pattern.MULTILINE).matcher(text);
 			int prefixLength = identifierMatch.find() ? identifierMatch.start() + identifierMatch.end() : 0;
-			
+
 			int position = offset + prefixLength;
-			
+
 			Location location = tsFile.getLocation(position);
 			int newLine = location.getLine();
 			int newOffset = location.getOffset();
-			
+
 			return new Range(newLine, newOffset);
-//			return new Range(
-//				document.positionAt(startOffset),
-//				document.positionAt(startOffset + item.text.length));
-			
-//			new RegExp(`^(.*?(\\b|\\W))${(item.text || '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`, 'gm');
-//			
-//			const identifierMatch = Pattern.compile(".*?(\\b|\\W))${(item.text || '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`, 'gm');
-//			const match = identifierMatch.exec(text);
-//			const prefixLength = match ? match.index + match[1].length : 0;
-			
-			//const identifierMatch = new RegExp(`^(.*?(\\b|\\W))${(item.text || * '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`, 'gm');
+			// return new Range(
+			// document.positionAt(startOffset),
+			// document.positionAt(startOffset + item.text.length));
+
+			// new RegExp(`^(.*?(\\b|\\W))${(item.text ||
+			// '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`,
+			// 'gm');
+			//
+			// const identifierMatch =
+			// Pattern.compile(".*?(\\b|\\W))${(item.text ||
+			// '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`,
+			// 'gm');
+			// const match = identifierMatch.exec(text);
+			// const prefixLength = match ? match.index + match[1].length : 0;
+
+			// const identifierMatch = new RegExp(`^(.*?(\\b|\\W))${(item.text
+			// || * '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`,
+			// 'gm');
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 		/*
 		 * const text = document.getText(range);
 		 * 

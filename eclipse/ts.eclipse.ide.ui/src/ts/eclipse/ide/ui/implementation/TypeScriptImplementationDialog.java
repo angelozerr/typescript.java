@@ -72,4 +72,8 @@ public class TypeScriptImplementationDialog extends AbstractInformationControl {
 		return new TypeScriptImplementationLabelProvider();
 	}
 
+	@Override
+	public void setSize(int width, int height) {
+		super.setSize(width, height);
+	}
 }
