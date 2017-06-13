@@ -607,4 +607,27 @@
 	       <description>%NewClassWizard.desc</description>
 		</wizard>		
 	</extension>
+	
+	<!-- TypeScript CodeLens providers -->
+	
+	<!-- TypeScript "references" CodeLens -->
+	<extension
+      point="org.eclipse.codelens.codeLensProviders">
+	   <codeLensProvider
+	   		 name="%TypeScriptReferencesCodeLensProvider.name"
+	         class="ts.eclipse.ide.internal.ui.codelens.TypeScriptReferencesCodeLensProvider"
+	         target="typeScript.codeLens">
+	   </codeLensProvider>
+	</extension>
+	
+	<!-- TypeScript "implementations" CodeLens -->
+	<extension
+      point="org.eclipse.codelens.codeLensProviders">
+	   <codeLensProvider
+	   		 name="%TypeScriptImplementationsCodeLensProvider.name"
+	         class="ts.eclipse.ide.internal.ui.codelens.TypeScriptImplementationsCodeLensProvider"
+	         target="typeScript.codeLens">
+	   </codeLensProvider>
+	</extension>
+	
 </plugin>        

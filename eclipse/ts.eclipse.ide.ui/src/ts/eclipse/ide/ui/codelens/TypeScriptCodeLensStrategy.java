@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.jsdt.internal.ui.editor.codelens;
+package ts.eclipse.ide.ui.codelens;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.provisional.codelens.CodeLensStrategy;

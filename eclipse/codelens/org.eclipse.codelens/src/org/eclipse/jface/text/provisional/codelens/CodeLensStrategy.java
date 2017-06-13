@@ -73,8 +73,10 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 				if (providers != null) {
 					for (ICodeLensProvider provider : providers) {
 						ICodeLens[] lenses = provider.provideCodeLenses(textViewer);
-						for (int i = 0; i < lenses.length; i++) {
-							symbols.add(new CodeLensData(lenses[i], provider));
+						if (lenses != null) {
+							for (int i = 0; i < lenses.length; i++) {
+								symbols.add(new CodeLensData(lenses[i], provider));
+							}
 						}
 					}
 					Collections.sort(symbols, (a, b) -> {

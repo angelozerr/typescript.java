@@ -1,8 +1,9 @@
-package ts.eclipse.ide.jsdt.internal.ui.editor.codelens;
+package ts.eclipse.ide.internal.ui.codelens;
 
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.provisional.codelens.Command;
@@ -13,6 +14,7 @@ import ts.TypeScriptKind;
 import ts.client.navbar.NavigationBarItem;
 import ts.client.references.ReferencesResponseItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
+import ts.eclipse.ide.ui.codelens.TypeScriptBaseCodeLensProvider;
 
 public class TypeScriptReferencesCodeLensProvider extends TypeScriptBaseCodeLensProvider {
 
@@ -126,6 +128,12 @@ public class TypeScriptReferencesCodeLensProvider extends TypeScriptBaseCodeLens
 		}
 		return null;
 
+	}
+
+	@Override
+	protected ICodeLens[] toCodeLenses(List<Range> referenceableSpans, IIDETypeScriptFile tsFile) {
+		return referenceableSpans.stream().map(span -> new ReferencesCodeLens(tsFile, span))
+				.collect(Collectors.toList()).toArray(new ICodeLens[0]);
 	}
 
 }

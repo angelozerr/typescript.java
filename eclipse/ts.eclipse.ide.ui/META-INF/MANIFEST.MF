@@ -32,11 +32,13 @@ Require-Bundle: org.eclipse.ui,
  com.google.gson,
  ts.eclipse.ide.terminal.interpreter,
  org.eclipse.tm.terminal.view.core,
- org.eclipse.tm.terminal.view.ui
+ org.eclipse.tm.terminal.view.ui,
+ org.eclipse.codelens
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ts.eclipse.ide.ui.TypeScriptUIPlugin
 Import-Package: com.eclipsesource.json;version="[0.9.4,0.9.5)"
 Export-Package: ts.eclipse.ide.ui,
+ ts.eclipse.ide.ui.codelens,
  ts.eclipse.ide.ui.console,
  ts.eclipse.ide.ui.folding,
  ts.eclipse.ide.ui.hover,

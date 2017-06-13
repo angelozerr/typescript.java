@@ -1,11 +1,10 @@
-package ts.eclipse.ide.jsdt.internal.ui.editor.codelens;
+package ts.eclipse.ide.ui.codelens;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,7 +33,7 @@ public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvide
 		if (TypeScriptResourceUtil.canConsumeTsserver(resource)) {
 			// the project of the resource has typescript nature, execute
 			// typescript
-			// hyperlink.
+			// navtree.
 			try {
 				IProject project = resource.getProject();
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
@@ -46,13 +45,12 @@ public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvide
 				if (tree != null && tree.hasChildItems()) {
 					tree.getChildItems().forEach(item -> this.walkNavTree(tsFile, item, null, referenceableSpans));
 				}
-				return referenceableSpans.stream().map(span -> new ReferencesCodeLens(tsFile, span))
-						.collect(Collectors.toList()).toArray(new ICodeLens[0]);
+				return toCodeLenses(referenceableSpans, tsFile);
 			} catch (Exception e) {
 				TypeScriptUIPlugin.log("Error while TypeScript codelens", e);
 			}
 		}
-		return new ICodeLens[0];
+		return null;
 	}
 
 	private void walkNavTree(IIDETypeScriptFile document, NavigationBarItem item, NavigationBarItem parent,
@@ -145,4 +143,6 @@ public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvide
 
 	protected abstract Range extractSymbol(IIDETypeScriptFile document, NavigationBarItem item,
 			NavigationBarItem parent);
+
+	protected abstract ICodeLens[] toCodeLenses(List<Range> referenceableSpans, IIDETypeScriptFile tsFile);
 }

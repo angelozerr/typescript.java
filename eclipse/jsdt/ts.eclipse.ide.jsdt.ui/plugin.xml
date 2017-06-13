@@ -142,11 +142,12 @@
             targetId="org.eclipse.wst.jsdt.ui.javaCode">
       </hyperlinkDetector>
       <hyperlinkDetector
-			class="ts.eclipse.ide.ui.hyperlink.TypeScriptHyperLinkDetector"
-			id="ts.eclipse.ide.ui.hyperlink.htTypeScriptHyperLml.inkDetector"
-			name="%HTMLAngularHyperLinkDetector.name"
-			targetId="org.eclipse.wst.html.core.htmlsource">
-		</hyperlinkDetector>
+            class="ts.eclipse.ide.ui.hyperlink.TypeScriptHyperLinkDetector"
+            id="ts.eclipse.ide.ui.hyperlink.HTMLTypeScriptHyperLinkDetector"
+            name="%HTMLTypeScriptHyperLinkDetector"
+            activate="true"
+            targetId="org.eclipse.wst.html.core.htmlsource">
+      </hyperlinkDetector>      
    </extension>
    
 	<!-- Text Hover for JavaScript (inside JavaScript file) -->
@@ -763,28 +764,6 @@
 	          path="./snippets/JSXSnippet.jsx"
 	          scopeName="source.js">
 	    </snippet>
-	</extension>
-
-	<!-- TypeScript CodeLens providers -->
-	
-	<!-- TypeScript "references" CodeLens -->
-	<extension
-      point="org.eclipse.codelens.codeLensProviders">
-	   <codeLensProvider
-	   		 name="%TypeScriptReferencesCodeLensProvider.name"
-	         class="ts.eclipse.ide.jsdt.internal.ui.editor.codelens.TypeScriptReferencesCodeLensProvider"
-	         target="typeScript.codeLens">
-	   </codeLensProvider>
-	</extension>
-	
-	<!-- TypeScript "implementations" CodeLens -->
-	<extension
-      point="org.eclipse.codelens.codeLensProviders">
-	   <codeLensProvider
-	   		 name="%TypeScriptImplementationsCodeLensProvider.name"
-	         class="ts.eclipse.ide.jsdt.internal.ui.editor.codelens.TypeScriptImplementationsCodeLensProvider"
-	         target="typeScript.codeLens">
-	   </codeLensProvider>
 	</extension>
 		
 </plugin>        
