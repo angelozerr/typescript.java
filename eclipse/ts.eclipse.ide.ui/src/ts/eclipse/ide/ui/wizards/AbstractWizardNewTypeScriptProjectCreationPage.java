@@ -314,6 +314,7 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 			nodeVersion.setText("");
 			nodePath.setText("");
 		}
+		nodeJsChanged(status.getNodeFile());
 		return status;
 	}
 
@@ -403,6 +404,10 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		installedNodeJs.setEnabled(!useEmbeddedNodeJs);
 		browseFileSystemButton.setEnabled(!useEmbeddedNodeJs);
 		browseWorkspaceButton.setEnabled(!useEmbeddedNodeJs);
+	}
+
+	/** The NodeJS-File has changed. */
+	protected void nodeJsChanged(File nodeFile) {
 	}
 
 	/** Updates the Commands, which should be executed after creating the Project. */
