@@ -45,7 +45,7 @@ public class TypeScriptUIPreferenceInitializer extends AbstractPreferenceInitial
 	 * @param node
 	 */
 	private void initializeTextMatePreferences(IEclipsePreferences node) {
-		node.putBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING, false);
+		node.putBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING, true);
 	}
 
 	/**
