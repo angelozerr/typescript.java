@@ -11,6 +11,9 @@
  */
 package ts.eclipse.ide.ui.wizards;
 
+import java.util.List;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -22,6 +25,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.ui.utils.StatusUtil;
 import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 
@@ -79,4 +83,6 @@ public abstract class AbstractWizardPage extends WizardPage implements Listener,
 
 	protected abstract IStatus[] validatePage();
 
+	public void updateCommand(List<LineCommand> commands, IProject project) {
+	}
 }

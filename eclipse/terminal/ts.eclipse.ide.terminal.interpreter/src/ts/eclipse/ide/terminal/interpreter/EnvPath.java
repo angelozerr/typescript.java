@@ -3,6 +3,7 @@ package ts.eclipse.ide.terminal.interpreter;
 import java.io.File;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.tm.terminal.view.core.utils.Env;
 
@@ -59,5 +60,29 @@ public class EnvPath {
 			nativeEnvironmentPathCasePreserved = PATH_ENV;
 			return nativeEnvironmentPathCasePreserved;
 		}
+	}
+
+	/** Creates a OS-Dependent LineCommand to set the Path-Variable. */
+	public static LineCommand createSetPathCommand(String path) {
+		String os = Platform.getOS();
+		String command = null;
+		switch (os) {
+		case Platform.OS_WIN32:
+			command = "SET " + path;
+			break;
+		case Platform.OS_LINUX:
+		case Platform.OS_MACOSX:
+			command = "export " + path;
+			break;
+		//case Platform.OS_AIX:
+		//case Platform.OS_SOLARIS:
+		//case Platform.OS_HPUX:
+		//case Platform.OS_QNX:
+		default:
+			// Verification needed
+			command = "export" + path;
+			break;
+		}
+		return new LineCommand(command);
 	}
 }

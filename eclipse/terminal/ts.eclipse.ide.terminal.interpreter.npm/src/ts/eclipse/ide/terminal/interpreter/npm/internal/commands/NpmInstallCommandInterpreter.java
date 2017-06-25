@@ -22,6 +22,8 @@ public class NpmInstallCommandInterpreter extends AbstractCommandInterpreter {
 
 	private final String NODE_MODULES = "node_modules";
 
+	private final int MAX_REFRESH_FOLDERS	= 20;		// If there are more FOlders, the whole "node_modules" will be refreshed
+
 	private final List<String> folders;
 
 	public NpmInstallCommandInterpreter(String workingDir) {
@@ -52,9 +54,13 @@ public class NpmInstallCommandInterpreter extends AbstractCommandInterpreter {
 
 				private List<IResource> getResources(IProgressMonitor monitor) throws CoreException {
 					List<IResource> resources = new ArrayList<IResource>();
-					if (folders.size() > 0) {
+					int size = folders.size();
+					if (size > 0 && size <= MAX_REFRESH_FOLDERS) {
 						for (String folder : folders) {
-							collectResource(folder, resources, monitor);
+							try {
+								collectResource(folder, resources, monitor);
+							}
+							catch (Exception ignore) {}
 						}
 					} else {
 						collectResource(NODE_MODULES, resources, monitor);

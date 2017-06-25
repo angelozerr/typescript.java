@@ -14,7 +14,6 @@ package ts.eclipse.ide.internal.ui.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +51,6 @@ import com.google.gson.GsonBuilder;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
-import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.terminal.interpreter.EnvPath;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
@@ -178,30 +176,18 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 				// Install TypeScript/tslint if needed
 				List<LineCommand> commands = new ArrayList<>();
-				mainPage.updateCommand(commands, preferences);
+				Map<String, Object> properties = new HashMap<String, Object>();
+				mainPage.updateCommand(commands, newProjectHandle);
 				tslintPage.updateCommand(commands, newProjectHandle);
 
 				if (!commands.isEmpty()) {
-					// Prepare terminal properties
-					String terminalId = "TypeScript Projects";
-					Map<String, Object> properties = new HashMap<String, Object>();
-					properties.put(ITerminalsConnectorConstants.PROP_TITLE, terminalId);
-					properties.put(ITerminalsConnectorConstants.PROP_ENCODING, StandardCharsets.UTF_8.name());
-					properties.put(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR,
-							projectLocationPath.toString());
-					properties.put(ITerminalsConnectorConstants.PROP_DELEGATE_ID,
-							"ts.eclipse.ide.terminal.interpreter.LocalInterpreterLauncherDelegate");
-					properties.put(ITerminalsConnectorConstants.PROP_TERMINAL_CONNECTOR_ID,
-							"org.eclipse.tm.terminal.connector.local.LocalConnector");
-
-					// Prepare environnement Path:
-					// - add nodejs directory
+					properties.put(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR, projectLocationPath.toString());
 					String nodeFilePath = getNodeFilePath();
 					if (!StringUtils.isEmpty(nodeFilePath)) {
 						EnvPath.insertToEnvPath(properties, nodeFilePath);
 					}
-					CommandTerminalService.getInstance().executeCommand(commands, terminalId, properties, null);
-
+					String terminalId = "TypeScript Projects";
+					executeCommandsInTerminal(terminalId, commands, properties);
 				}
 				try {
 					preferences.flush();

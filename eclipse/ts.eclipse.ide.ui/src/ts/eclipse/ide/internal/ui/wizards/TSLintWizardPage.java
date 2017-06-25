@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Combo;
  *
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- * 
+ *
  */
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -308,6 +308,7 @@ public class TSLintWizardPage extends AbstractWizardPage {
 
 	}
 
+	@Override
 	public void updateCommand(List<LineCommand> commands, IProject project) {
 		if (!useEmbeddedTslintRuntime) {
 			commands.add(new LineCommand(installTslintRuntime.getNpmInstallCommand()));
@@ -318,7 +319,7 @@ public class TSLintWizardPage extends AbstractWizardPage {
 					IFile tslintJsonFile = project.getFile("tslint.json");
 					try {
 						tslintJsonFile.refreshLocal(IResource.DEPTH_INFINITE, null);
-					} catch (CoreException e) {						
+					} catch (CoreException e) {
 						e.printStackTrace();
 					}
 				}
