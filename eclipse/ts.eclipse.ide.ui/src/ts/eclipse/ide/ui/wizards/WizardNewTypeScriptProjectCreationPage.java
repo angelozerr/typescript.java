@@ -2,6 +2,8 @@ package ts.eclipse.ide.ui.wizards;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -29,6 +31,7 @@ import ts.eclipse.ide.internal.ui.wizards.TypeScriptRepositoryLabelProvider;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.terminal.interpreter.TerminalCommandAdapter;
 import ts.eclipse.ide.ui.utils.StatusUtil;
+import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
 import ts.eclipse.ide.ui.widgets.NpmInstallWidget;
 import ts.repository.ITypeScriptRepository;
 
@@ -101,7 +104,17 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 				updateTsRuntimeMode();
 			}
 		});
-		installTsRuntime = new NpmInstallWidget("typescript", this, parent, SWT.NONE);
+		installTsRuntime = new NpmInstallWidget(
+			"typescript",
+			new IStatusChangeListener() {
+				@Override
+				public void statusChanged(IStatus status) {
+					setPageComplete(validatePage());
+				}
+			},
+			parent,
+			SWT.NONE
+		);
 		installTsRuntime.getVersionText().addListener(SWT.Modify, this);
 	}
 
@@ -147,7 +160,7 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 	}
 
 	@Override
-	public void updateCommand(List<LineCommand> commands, final IEclipsePreferences preferences) {
+	public void updateCommand(List<LineCommand> commands, final IProject project) {
 		if (!useEmbeddedTsRuntime) {
 			// when TypeScript is installed when "npm install typescript"
 			// command is terminated, update the project Eclispe preferences
@@ -159,6 +172,7 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
 						public void run() {
+							IEclipsePreferences preferences = new ProjectScope(project).getNode(TypeScriptCorePlugin.PLUGIN_ID);
 							preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
 							preferences.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
 									"${project_loc:node_modules/typescript}");

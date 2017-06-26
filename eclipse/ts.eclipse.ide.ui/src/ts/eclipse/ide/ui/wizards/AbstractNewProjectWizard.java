@@ -15,9 +15,11 @@ package ts.eclipse.ide.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -43,6 +45,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IPluginContribution;
@@ -71,6 +74,8 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
+import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
+import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 /**
@@ -306,6 +311,18 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		selectAndReveal(newProject);
 
 		return true;
+	}
+
+	/** Executes the given Commands in a Terminal. */
+	protected void executeCommandsInTerminal(String terminalId, List<LineCommand> commands, Map<String, Object> properties) {
+		// Prepare terminal properties
+		properties.put(ITerminalsConnectorConstants.PROP_TITLE, terminalId);
+		properties.put(ITerminalsConnectorConstants.PROP_ENCODING, StandardCharsets.UTF_8.name());
+		properties.put(ITerminalsConnectorConstants.PROP_DELEGATE_ID,
+				"ts.eclipse.ide.terminal.interpreter.LocalInterpreterLauncherDelegate");
+		properties.put(ITerminalsConnectorConstants.PROP_TERMINAL_CONNECTOR_ID,
+				"org.eclipse.tm.terminal.connector.local.LocalConnector");
+		CommandTerminalService.getInstance().executeCommand(commands, terminalId, properties, null);
 	}
 
 	private static void replaceCurrentPerspective(IPerspectiveDescriptor persp) {

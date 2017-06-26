@@ -13,6 +13,7 @@ package ts.eclipse.ide.ui.wizards;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -314,6 +315,7 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 			nodeVersion.setText("");
 			nodePath.setText("");
 		}
+		nodeJsChanged(status.getNodeFile());
 		return status;
 	}
 
@@ -405,8 +407,12 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		browseWorkspaceButton.setEnabled(!useEmbeddedNodeJs);
 	}
 
+	/** The NodeJS-File has changed. */
+	protected void nodeJsChanged(File nodeFile) {
+	}
+
 	/** Updates the Commands, which should be executed after creating the Project. */
-	public void updateCommand(List<LineCommand> commands, final IEclipsePreferences preferences) {
+	public void updateCommand(List<LineCommand> commands, IProject project) {
 	}
 
 	/** Class for the Status of the selected Node.js. */
