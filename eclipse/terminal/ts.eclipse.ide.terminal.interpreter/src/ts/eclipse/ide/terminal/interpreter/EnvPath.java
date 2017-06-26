@@ -80,7 +80,7 @@ public class EnvPath {
 		//case Platform.OS_QNX:
 		default:
 			// Verification needed
-			command = "export" + path;
+			command = "export " + path;
 			break;
 		}
 		return new LineCommand(command);
