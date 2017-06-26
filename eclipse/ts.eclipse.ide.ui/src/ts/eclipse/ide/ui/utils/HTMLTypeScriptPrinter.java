@@ -3,13 +3,18 @@ package ts.eclipse.ide.ui.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.internal.text.html.HTMLPrinter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tm4e.markdown.TMHTMLRenderer;
@@ -17,15 +22,19 @@ import org.eclipse.tm4e.markdown.marked.HTMLRenderer;
 import org.eclipse.tm4e.markdown.marked.IRenderer;
 import org.eclipse.tm4e.markdown.marked.Marked;
 import org.eclipse.tm4e.ui.TMUIPlugin;
+import org.eclipse.tm4e.ui.text.TMPresentationReconciler;
 import org.eclipse.tm4e.ui.themes.ITheme;
 import org.osgi.framework.Bundle;
 
+import ts.client.completions.CompletionEntryDetails;
 import ts.client.quickinfo.QuickInfo;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.TypeScriptUIImageResource;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.jface.text.HoverLocationListener;
+import ts.utils.FileUtils;
 import ts.utils.StringUtils;
+import ts.utils.TypeScriptHelper;
 
 public class HTMLTypeScriptPrinter {
 
@@ -45,55 +54,85 @@ public class HTMLTypeScriptPrinter {
 		HTMLTypeScriptPrinter.colorInfoForeground = colorInfoForeground;
 	}
 
-	public static String getQuickInfo(QuickInfo quickInfo,
-			IFile tsFile) {
+	public static String getCompletionEntryDetail(List<CompletionEntryDetails> details, String fileName,
+			ITextViewer textViewer) {
+		CompletionEntryDetails firstDetails = details.get(0);
+		String displayString = TypeScriptHelper.text(firstDetails.getDisplayParts(), false);
+		String documentation = TypeScriptHelper.text(firstDetails.getDocumentation(), false);
+		return toHTML(displayString, documentation, textViewer, FileUtils.getFileExtension(fileName));
+
+	}
+
+	public static String getQuickInfo(QuickInfo quickInfo, IFile tsFile, ITextViewer textViewer) {
 		String kind = quickInfo.getKind();
 		String kindModifiers = quickInfo.getKindModifiers();
 		String displayString = quickInfo.getDisplayString();
 		String documentation = quickInfo.getDocumentation();
-		
+		String fileExtension = tsFile.getFileExtension();
+		return toHTML(displayString, documentation, textViewer, fileExtension);
+	}
+
+	private static String toHTML(String displayString, String documentation, ITextViewer textViewer,
+			String fileExtension) {
 		StringBuffer info = new StringBuffer();
 		ImageDescriptor descriptor = null; // TypeScriptImagesRegistry.getTypeScriptImageDescriptor(kind,
 											// kindModifiers, null);
 		startPage(info, null, descriptor);
 		if (!StringUtils.isEmpty(displayString)) {
-			if (tsFile == null) {
+			if (textViewer == null) {
 				info.append("<pre class=\"displayString\">");
 				info.append(displayString);
 				info.append("</pre>");
 			} else {
-				IRenderer renderer = createMarkdownRenderer(tsFile);
-				info.append(Marked.parse("```ts\n" + displayString + "```", renderer));
+				IRenderer renderer = new TMHTMLRenderer(fileExtension);
+				info.append(Marked.parse("```" + fileExtension + "\n" + displayString + "```", renderer));
 			}
 		}
 		if (!StringUtils.isEmpty(documentation)) {
-			IRenderer renderer = createMarkdownRenderer(tsFile);
+			IRenderer renderer = textViewer != null ? new TMHTMLRenderer(fileExtension) : new HTMLRenderer();
 			info.append(Marked.parse(documentation, renderer));
 		}
-		endPage(info);
+		endPage(info, textViewer);
 		return info.toString();
 	}
 
-	private static IRenderer createMarkdownRenderer(IFile file) {
-		return file != null ? new TMHTMLRenderer(file.getFileExtension()) : new HTMLRenderer();
-	}
-
-	public static String getError(String message) {
-		StringBuffer info = new StringBuffer();
-		ImageDescriptor descriptor = null;
-		startPage(info, "", descriptor);
-		if (!StringUtils.isEmpty(message)) {
-			info.append(message);
+	public static void endPage(StringBuffer buffer, ITextViewer textViewer) {
+		ITheme theme = null;
+		if (textViewer != null) {
+			TMPresentationReconciler reconciler = getTMPresentationReconciler(textViewer);
+			if (reconciler != null) {
+				theme = (ITheme) reconciler.getTokenProvider();
+			}
+			if (theme == null) {
+				theme = TMUIPlugin.getThemeManager().getDefaultTheme();
+			}
 		}
-		endPage(info);
-		return info.toString();
+		HTMLPrinter.insertPageProlog(buffer, 0, colorInfoForeground, colorInfoBackround,
+				HTMLTypeScriptPrinter.getStyleSheet() + (theme != null ? theme.toCSSStyleSheet() : ""));
+		HTMLPrinter.addPageEpilog(buffer);
 	}
 
-	public static void endPage(StringBuffer buffer) {
-		ITheme theme = TMUIPlugin.getThemeManager().getDefaultTheme();
-		HTMLPrinter.insertPageProlog(buffer, 0, colorInfoForeground, colorInfoBackround,
-				HTMLTypeScriptPrinter.getStyleSheet() + theme.toCSSStyleSheet());
-		HTMLPrinter.addPageEpilog(buffer);
+	/**
+	 * Returns the {@link TMPresentationReconciler} of the given text viewer and
+	 * null otherwise.
+	 * 
+	 * @param textViewer
+	 * @return the {@link TMPresentationReconciler} of the given text viewer and
+	 *         null otherwise.
+	 */
+	private static TMPresentationReconciler getTMPresentationReconciler(ITextViewer textViewer) {
+		try {
+			Field field = SourceViewer.class.getDeclaredField("fPresentationReconciler");
+			if (field != null) {
+				field.setAccessible(true);
+				IPresentationReconciler presentationReconciler = (IPresentationReconciler) field.get(textViewer);
+				return presentationReconciler instanceof TMPresentationReconciler
+						? (TMPresentationReconciler) presentationReconciler : null;
+			}
+		} catch (Exception e) {
+
+		}
+		return null;
 	}
 
 	/**

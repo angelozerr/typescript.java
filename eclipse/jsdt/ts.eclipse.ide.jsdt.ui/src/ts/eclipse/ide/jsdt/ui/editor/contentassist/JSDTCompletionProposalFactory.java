@@ -12,6 +12,7 @@ package ts.eclipse.ide.jsdt.ui.editor.contentassist;
 
 import java.lang.reflect.Constructor;
 
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposal;
 
@@ -47,10 +48,12 @@ public class JSDTCompletionProposalFactory implements ICompletionEntryFactory {
 
 	private String prefix;
 	private int position;
+	private ITextViewer textViewer;
 
-	public JSDTCompletionProposalFactory(int position, String prefix) {
+	public JSDTCompletionProposalFactory(int position, String prefix, ITextViewer textViewer) {
 		this.prefix = prefix;
 		this.position = position;
+		this.textViewer = textViewer;
 	}
 
 	@Override
@@ -58,12 +61,12 @@ public class JSDTCompletionProposalFactory implements ICompletionEntryFactory {
 			ITypeScriptServiceClient client) {
 		try {
 			if (CONSTRUCTOR_EXTENSION7 != null) {
-				return (CompletionEntry) CONSTRUCTOR_EXTENSION7.newInstance(matcher, fileName, line, offset, client, position, prefix);
+				return (CompletionEntry) CONSTRUCTOR_EXTENSION7.newInstance(matcher, fileName, line, offset, client, position, prefix, textViewer);
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		return new JSDTTypeScriptCompletionProposal(matcher, fileName, line, offset, client, position, prefix);
+		return new JSDTTypeScriptCompletionProposal(matcher, fileName, line, offset, client, position, prefix, textViewer);
 	}
 
 }

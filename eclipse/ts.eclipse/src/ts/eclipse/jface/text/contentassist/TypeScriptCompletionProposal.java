@@ -2,6 +2,7 @@ package ts.eclipse.jface.text.contentassist;
 
 import java.util.List;
 
+import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -43,6 +44,8 @@ import ts.client.completions.CompletionEntryDetails;
 import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.SymbolDisplayPart;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
+import ts.eclipse.jface.text.HoverControlCreator;
+import ts.eclipse.jface.text.PresenterControlCreator;
 import ts.utils.StringUtils;
 import ts.utils.TypeScriptHelper;
 
@@ -73,12 +76,16 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	private int position;
 	private String prefix;
+	private final ITextViewer originalTextViewer;
+
+	private HoverControlCreator tsControlCreator;
 
 	public TypeScriptCompletionProposal(ICompletionEntryMatcher matcher, String fileName, int line, int offset,
-			ITypeScriptServiceClient client, int position, String prefix) {
+			ITypeScriptServiceClient client, int position, String prefix, ITextViewer textViewer) {
 		super(matcher, fileName, line, offset, client);
 		this.position = position;
 		this.prefix = prefix;
+		this.originalTextViewer = textViewer;
 	}
 
 	private void initIfNeeded() {
@@ -369,16 +376,20 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 			if (details == null || details.size() < 1) {
 				return null;
 			}
-			CompletionEntryDetails firstDetails = details.get(0);
-			String html = TypeScriptHelper.text(firstDetails.getDocumentation());
-			if (StringUtils.isEmpty(html)) {
-				html = TypeScriptHelper.text(firstDetails.getDisplayParts());
-			}
-			return html;
+			return toHtml(details);
 		} catch (TypeScriptException e) {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	protected String toHtml(List<CompletionEntryDetails> details) {
+		CompletionEntryDetails firstDetails = details.get(0);
+		String html = TypeScriptHelper.text(firstDetails.getDocumentation(), true);
+		if (StringUtils.isEmpty(html)) {
+			html = TypeScriptHelper.text(firstDetails.getDisplayParts(), true);
+		}
+		return html;
 	}
 
 	@Override
@@ -395,12 +406,11 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		try {
 			String information = null;
 			List<CompletionEntryDetails> entryDetails = super.getEntryDetails();
-			if (entryDetails == null || entryDetails.size()  < 1) {
+			if (entryDetails == null || entryDetails.size() < 1) {
 				return null;
 			}
 			if (isFunction()) {
-				information =
-				TypeScriptHelper.extractFunctionParameters(entryDetails.get(0).getDisplayParts());
+				information = TypeScriptHelper.extractFunctionParameters(entryDetails.get(0).getDisplayParts());
 			}
 			return information != null ? new ContextInformation("", information) : null;
 		} catch (TypeScriptException e) {
@@ -458,18 +468,14 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 
 	@Override
 	public IInformationControlCreator getInformationControlCreator() {
-		// Shell shell = getActiveWorkbenchShell();
-		// if (shell == null || !BrowserInformationControl.isAvailable(shell))
-		// return null;
-		//
-		// if (tsControlCreator == null) {
-		// PresenterControlCreator presenterControlCreator = new
-		// PresenterControlCreator();
-		// tsControlCreator = new HoverControlCreator(presenterControlCreator,
-		// true);
-		// }
-		// return tsControlCreator;
-		return null;
+		Shell shell = getActiveWorkbenchShell();
+		if (shell == null || !BrowserInformationControl.isAvailable(shell))
+			return null;
+		if (tsControlCreator == null) {
+			PresenterControlCreator presenterControlCreator = new PresenterControlCreator();
+			tsControlCreator = new HoverControlCreator(presenterControlCreator, true);
+		}
+		return tsControlCreator;
 	}
 
 	protected Shell getActiveWorkbenchShell() {
@@ -688,4 +694,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		return "TypeScriptCompletionProposal_" + toString(); //$NON-NLS-1$
 	}
 
+	public ITextViewer getOriginalTextViewer() {
+		return originalTextViewer;
+	}
 }

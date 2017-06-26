@@ -11,6 +11,7 @@
 package ts.eclipse.jface.text.contentassist;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension7;
@@ -27,8 +28,8 @@ public class TypeScriptCompletionProposalWithExtension7 extends TypeScriptComple
 		implements ICompletionProposalExtension7 {
 
 	public TypeScriptCompletionProposalWithExtension7(ICompletionEntryMatcher matcher, String fileName, int line,
-			int offset, ITypeScriptServiceClient client, int position, String prefix) {
-		super(matcher, fileName, line, offset, client, position, prefix);
+			int offset, ITypeScriptServiceClient client, int position, String prefix, TextViewer textViewer) {
+		super(matcher, fileName, line, offset, client, position, prefix, textViewer);
 	}
 
 	@Override
@@ -48,4 +49,5 @@ public class TypeScriptCompletionProposalWithExtension7 extends TypeScriptComple
 		}
 		return styledDisplayString;
 	}
+
 }

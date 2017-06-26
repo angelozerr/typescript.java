@@ -51,6 +51,7 @@ public class TypeScriptHover extends AbstractTypeScriptHover implements ITypeScr
 		if (scriptFile == null) {
 			return null;
 		}
+
 		if (TypeScriptResourceUtil.canConsumeTsserver(scriptFile)) {
 			try {
 				IProject project = scriptFile.getProject();
@@ -59,11 +60,10 @@ public class TypeScriptHover extends AbstractTypeScriptHover implements ITypeScr
 				ITypeScriptFile tsFile = tsProject.openFile(scriptFile, textViewer.getDocument());
 
 				QuickInfo quickInfo = tsFile.quickInfo(position).get(5000, TimeUnit.MILLISECONDS);
-				String text = HTMLTypeScriptPrinter
-						.getQuickInfo(quickInfo,
-								TypeScriptUIPlugin.getDefault().getPreferenceStore()
-										.getBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING)
-												? scriptFile : null);
+				boolean useTextMate = TypeScriptUIPlugin.getDefault().getPreferenceStore()
+						.getBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING);
+				String text = HTMLTypeScriptPrinter.getQuickInfo(quickInfo, scriptFile,
+						useTextMate ? textViewer : null);
 				return StringUtils.isEmpty(text) ? null : new TypeScriptBrowserInformationControlInput(null, text, 20);
 			} catch (ExecutionException e) {
 				if (e.getCause() instanceof TypeScriptNoContentAvailableException) {

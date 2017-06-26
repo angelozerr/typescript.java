@@ -88,6 +88,33 @@ public class CompletionEntry implements IKindProvider {
 		this.client = client;
 	}
 
+	/**
+	 * Returns the file name where completion was done.
+	 * 
+	 * @return the file name where completion was done.
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+
+	/**
+	 * Returns the line number where completion was done.
+	 * 
+	 * @return the line number where completion was done.
+	 */
+	public int getLine() {
+		return line;
+	}
+
+	/**
+	 * Returns the offset where completion was done.
+	 * 
+	 * @return the offset where completion was done.
+	 */
+	public int getOffset() {
+		return offset;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -177,4 +204,5 @@ public class CompletionEntry implements IKindProvider {
 	public boolean hasActions() {
 		return hasAction != null && hasAction;
 	}
+
 }

@@ -44,7 +44,7 @@ public class TypeScriptCompletionProposalComputer
 		implements IJavaCompletionProposalComputer/* , ICompletionProposalComputer */ {
 
 	public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-		IResource resource = null;
+		IResource resource = null;		
 		if (context instanceof TypeScriptContentAssistInvocationContext) {
 			TypeScriptContentAssistInvocationContext tsContext = (TypeScriptContentAssistInvocationContext) context;
 			resource = tsContext.getResource();
@@ -66,7 +66,7 @@ public class TypeScriptCompletionProposalComputer
 						CharSequence prefix = context.computeIdentifierPrefix();
 
 						String p = prefix != null ? prefix.toString() : "";
-						return tsFile.completions(position, new JSDTCompletionProposalFactory(position, p))
+						return tsFile.completions(position, new JSDTCompletionProposalFactory(position, p, context.getViewer()))
 								.get(5000, TimeUnit.MILLISECONDS).stream().filter(entry -> entry.updatePrefix(p))
 								.collect(Collectors.toList());
 					}
