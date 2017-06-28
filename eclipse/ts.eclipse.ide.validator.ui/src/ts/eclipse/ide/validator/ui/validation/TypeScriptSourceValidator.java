@@ -8,7 +8,7 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.validator.internal.ui.validation;
+package ts.eclipse.ide.validator.ui.validation;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.OperationCanceledException;
