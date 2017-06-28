@@ -63,12 +63,11 @@ public class HTMLTypeScriptPrinter {
 
 	}
 
-	public static String getQuickInfo(QuickInfo quickInfo, IFile tsFile, ITextViewer textViewer) {
+	public static String getQuickInfo(QuickInfo quickInfo, String fileExtension, ITextViewer textViewer) {
 		String kind = quickInfo.getKind();
 		String kindModifiers = quickInfo.getKindModifiers();
 		String displayString = quickInfo.getDisplayString();
 		String documentation = quickInfo.getDocumentation();
-		String fileExtension = tsFile.getFileExtension();
 		return toHTML(displayString, documentation, textViewer, fileExtension);
 	}
 
