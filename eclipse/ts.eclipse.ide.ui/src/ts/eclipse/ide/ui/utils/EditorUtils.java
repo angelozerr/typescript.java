@@ -29,9 +29,11 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import ts.client.FileSpan;
 import ts.client.TextSpan;
 import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.utils.DocumentUtils;
+import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 
 public class EditorUtils {
@@ -182,6 +184,19 @@ public class EditorUtils {
 				span.getEnd().getOffset(), true);
 
 	}
+	
+	public static void openInEditor(FileSpan span) {
+		IFile file = WorkbenchResourceUtil.findFileFromWorkspace(span.getFile());
+		if (file != null) {
+			EditorUtils.openInEditor(file, span);
+		} else {
+			File fsFile = WorkbenchResourceUtil.findFileFormFileSystem(span.getFile());
+			if (fsFile != null) {
+				EditorUtils.openInEditor(fsFile, span);
+			}
+		}
+	}
+
 
 	public static Position getPosition(IFile file, TextSpan textSpan) throws BadLocationException {
 		ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();

@@ -61,6 +61,11 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 			// the project of the resource has typescript nature, execute
 			// typescript
 			// hyperlink.
+//			ITextEditor textEditor= (ITextEditor)getAdapter(ITextEditor.class);
+//			IAction openAction= textEditor.getAction("OpenEditor"); //$NON-NLS-1$
+//			if (openAction == null)
+//				return null;
+			
 			try {
 				IProject project = resource.getProject();
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);

@@ -98,6 +98,7 @@ import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
 import ts.eclipse.ide.jsdt.internal.ui.actions.CompositeActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.IndentAction;
+import ts.eclipse.ide.jsdt.internal.ui.actions.OpenEditorActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.RefactorActionGroup;
 import ts.eclipse.ide.jsdt.internal.ui.actions.TypeScriptSearchActionGroup;
 import ts.eclipse.ide.jsdt.ui.IContextMenuConstants;
@@ -300,10 +301,13 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	protected void createActions() {
 		super.createActions();
 
+		OpenEditorActionGroup openEditorActionGroup = new OpenEditorActionGroup(this);
 		RefactorActionGroup refactorActionGroup = new RefactorActionGroup(this, ITextEditorActionConstants.GROUP_EDIT);
 		ActionGroup searchActionGroup = new TypeScriptSearchActionGroup(this);
-		fActionGroups = new CompositeActionGroup(new ActionGroup[] { refactorActionGroup, searchActionGroup });
-		fContextMenuGroup = new CompositeActionGroup(new ActionGroup[] { refactorActionGroup, searchActionGroup });
+		fActionGroups = new CompositeActionGroup(
+				new ActionGroup[] { openEditorActionGroup, refactorActionGroup, searchActionGroup });
+		fContextMenuGroup = new CompositeActionGroup(
+				new ActionGroup[] { openEditorActionGroup, refactorActionGroup, searchActionGroup });
 
 		// Format Action
 		IAction action = new TextOperationAction(JSDTTypeScriptUIMessages.getResourceBundle(), "Format.", this, //$NON-NLS-1$

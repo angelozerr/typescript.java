@@ -10,12 +10,19 @@
  */
 package ts.eclipse.ide.jsdt.internal.ui.editor;
 
+import java.util.Iterator;
+
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.actions.RetargetAction;
 import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
 import org.eclipse.ui.texteditor.RetargetTextEditorAction;
 
@@ -71,6 +78,19 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 			TypeScriptEditor tsEditor = (TypeScriptEditor) part;
 			tsEditor.getActionGroup().fillActionBars(getActionBars());
 		}
+		
+		IActionBars actionBars= getActionBars();
+		IStatusLineManager manager= actionBars.getStatusLineManager();
+		manager.setMessage(null);
+		manager.setErrorMessage(null);
+		
+		/** The global actions to be connected with editor actions */
+		IAction action= getAction(textEditor, ITextEditorActionConstants.NEXT);
+		actionBars.setGlobalActionHandler(ITextEditorActionDefinitionIds.GOTO_NEXT_ANNOTATION, action);
+		actionBars.setGlobalActionHandler(ITextEditorActionConstants.NEXT, action);
+		action= getAction(textEditor, ITextEditorActionConstants.PREVIOUS);
+		actionBars.setGlobalActionHandler(ITextEditorActionDefinitionIds.GOTO_PREVIOUS_ANNOTATION, action);
+		actionBars.setGlobalActionHandler(ITextEditorActionConstants.PREVIOUS, action);
 	}
 
 	@Override
@@ -81,5 +101,17 @@ public class TypeScriptEditorActionContributor extends BasicTextEditorActionCont
 		if (navigateMenu != null) {
 			navigateMenu.appendToGroup(IWorkbenchActionConstants.SHOW_EXT, fShowOutline);
 		}
+	}
+
+	@Override
+	public void dispose() {
+
+//		Iterator e= fPartListeners.iterator();
+//		while (e.hasNext())
+//			getPage().removePartListener((RetargetAction) e.next());
+//		fPartListeners.clear();
+
+		setActiveEditor(null);
+		super.dispose();
 	}
 }

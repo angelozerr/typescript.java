@@ -78,4 +78,11 @@ public class TypeScriptActionConstants {
 	 * (value <code>"ts.eclipse.ide.jsdt.ui.actions.Rename"</code>).
 	 */
 	public static final String RENAME= "ts.eclipse.ide.jsdt.ui.actions.Rename"; //$NON-NLS-1$
+	
+	/**
+	 * Navigate menu: name of standard Open global action
+	 * (value <code>"ts.eclipse.ide.jsdt.ui.actions.Open"</code>).
+	 */
+	public static final String OPEN= "ts.eclipse.ide.jsdt.ui.actions.Open"; //$NON-NLS-1$
+
 }

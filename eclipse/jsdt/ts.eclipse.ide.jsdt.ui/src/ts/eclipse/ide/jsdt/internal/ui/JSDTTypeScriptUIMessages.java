@@ -104,6 +104,8 @@ public class JSDTTypeScriptUIMessages extends NLS {
 	public static String EditTemplateDialog_select_all;
 	public static String EditTemplateDialog_content_assist;
 	
+	public static String OpenDefinition_label;
+	
 	public static ResourceBundle getResourceBundle() {
 		try {
 			if (fResourceBundle == null)
