@@ -1032,7 +1032,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 	 * @return an outline page
 	 */
 	public TypeScriptContentOutlinePage getOutlinePage() {
-		if (contentOutlinePage == null) {
+		if (contentOutlinePage == null || contentOutlinePage.isDisposed()) {
 			contentOutlinePage = new TypeScriptContentOutlinePage(this);
 			fOutlineSelectionChangedListener.install(contentOutlinePage);
 			IDocument document = getSourceViewer().getDocument();

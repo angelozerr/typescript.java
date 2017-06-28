@@ -62,6 +62,7 @@ public class TypeScriptContentOutlinePage extends Page
 	private ITextSelection textSelection;
 
 	private final IEditorOutlineFeatures editor;
+	private boolean disposed;
 
 	public TypeScriptContentOutlinePage(IEditorOutlineFeatures editor) {
 		this.editor = editor;
@@ -124,6 +125,9 @@ public class TypeScriptContentOutlinePage extends Page
 
 				@Override
 				public void run() {
+					if (fOutlineViewer.getTree().isDisposed()) {
+						return;
+					}
 					boolean firstRefresh = fOutlineViewer.getInput() == null;
 					List<TreePath> newExpandedTreePaths = !firstRefresh ? mapTreePaths(navbar) : null;
 					// Refresh the tree
@@ -133,11 +137,6 @@ public class TypeScriptContentOutlinePage extends Page
 						if (navbar.isNavTree()) {
 							fOutlineViewer.expandToLevel(2);
 						}
-//						List<NavigationBarItem> childItems = navbar.isNavTree()
-//								? navbar.getChildItems().get(0).getChildItems() : navbar.getChildItems();
-//						if (childItems.size() < 500) {
-//							fOutlineViewer.expandAll();
-//						}
 					} else {
 						// second time, keep the last expansion of the tree
 						fOutlineViewer.setExpandedTreePaths(newExpandedTreePaths.toArray(new TreePath[0]));
@@ -286,6 +285,7 @@ public class TypeScriptContentOutlinePage extends Page
 		fPostSelectionChangedListeners.clear();
 		fPostSelectionChangedListeners = null;
 
+		disposed = true;
 	}
 
 	/**
@@ -358,5 +358,9 @@ public class TypeScriptContentOutlinePage extends Page
 
 	public boolean isLinkingEnabled() {
 		return TypeScriptUIPlugin.getDefault().getPreferenceStore().getBoolean(EDITOR_SYNC_OUTLINE_ON_CURSOR_MOVE);
+	}
+
+	public boolean isDisposed() {
+		return disposed;
 	}
 }
