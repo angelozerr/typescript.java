@@ -16,13 +16,13 @@ package ts;
  */
 public enum TypeScriptKind {
 
-	ALIAS, PRIMITIVE_TYPE, KEYWORD, CLASS, INTERFACE, MODULE, SCRIPT, DIRECTORY, PROPERTY, METHOD, CONSTRUCTOR, FUNCTION, VAR, LET, ENUM, PRIVATE, PUBLIC, STATIC, TYPE, ELEMENT, ATTRIBUTE, COMPONENT, CONST, GETTER, SETTER;
+	ALIAS, PRIMITIVE_TYPE, KEYWORD, CLASS, INTERFACE, MODULE, SCRIPT, DIRECTORY, PROPERTY, METHOD, CONSTRUCTOR, FUNCTION, VAR, LET, ENUM, PRIVATE, PUBLIC, STATIC, TYPE, ELEMENT, ATTRIBUTE, COMPONENT, CONST, GETTER, SETTER, WARNING;
 
 	public static TypeScriptKind getKind(String kind) {
 		try {
 			return TypeScriptKind.valueOf(kind.toUpperCase());
-		} catch (Throwable e) {
-			return null;
+		} catch (Exception e) {
+			return TypeScriptKind.WARNING;
 		}
 	}
 }

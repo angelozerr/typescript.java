@@ -26,6 +26,7 @@ import org.eclipse.wst.jsdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.wst.jsdt.ui.text.java.JavaContentAssistInvocationContext;
 
+import ts.TypeScriptKind;
 import ts.TypeScriptNoContentAvailableException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -44,7 +45,7 @@ public class TypeScriptCompletionProposalComputer
 		implements IJavaCompletionProposalComputer/* , ICompletionProposalComputer */ {
 
 	public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-		IResource resource = null;		
+		IResource resource = null;
 		if (context instanceof TypeScriptContentAssistInvocationContext) {
 			TypeScriptContentAssistInvocationContext tsContext = (TypeScriptContentAssistInvocationContext) context;
 			resource = tsContext.getResource();
@@ -66,8 +67,12 @@ public class TypeScriptCompletionProposalComputer
 						CharSequence prefix = context.computeIdentifierPrefix();
 
 						String p = prefix != null ? prefix.toString() : "";
-						return tsFile.completions(position, new JSDTCompletionProposalFactory(position, p, context.getViewer()))
-								.get(5000, TimeUnit.MILLISECONDS).stream().filter(entry -> entry.updatePrefix(p))
+						return tsFile
+								.completions(position,
+										new JSDTCompletionProposalFactory(position, p, context.getViewer()))
+								.get(5000, TimeUnit.MILLISECONDS).stream()
+								.filter(entry -> entry.updatePrefix(p)
+										&& TypeScriptKind.getKind(entry.getKind()) != TypeScriptKind.WARNING)
 								.collect(Collectors.toList());
 					}
 				}
