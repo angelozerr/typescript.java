@@ -62,7 +62,7 @@ public class TypeScriptHover extends AbstractTypeScriptHover implements ITypeScr
 				QuickInfo quickInfo = tsFile.quickInfo(position).get(5000, TimeUnit.MILLISECONDS);
 				boolean useTextMate = TypeScriptUIPlugin.getDefault().getPreferenceStore()
 						.getBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING);
-				String text = HTMLTypeScriptPrinter.getQuickInfo(quickInfo, scriptFile,
+				String text = HTMLTypeScriptPrinter.getQuickInfo(quickInfo, getFileExtension(scriptFile),
 						useTextMate ? textViewer : null);
 				return StringUtils.isEmpty(text) ? null : new TypeScriptBrowserInformationControlInput(null, text, 20);
 			} catch (ExecutionException e) {
@@ -76,6 +76,10 @@ public class TypeScriptHover extends AbstractTypeScriptHover implements ITypeScr
 			}
 		}
 		return null;
+	}
+
+	protected String getFileExtension(IFile tsFile) {
+		return tsFile.getFileExtension();
 	}
 
 	@Override
