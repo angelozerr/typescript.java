@@ -20,10 +20,15 @@ import ts.client.refactors.ApplicableRefactorInfo;
 /**
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  */
-public class GetApplicableRefactorsRequest extends Request<GetApplicableRefactorsRequestArgs> {
+public class GetApplicableRefactorsRequest extends Request {
 
 	public GetApplicableRefactorsRequest(String file, int line, int offset) {
 		super(CommandNames.GetApplicableRefactors.getName(), new GetApplicableRefactorsRequestArgs(file, line, offset));
+	}
+
+	public GetApplicableRefactorsRequest(String file, int startLine, int startOffset, int endLine, int endOffset) {
+		super(CommandNames.GetApplicableRefactors.getName(),
+				new GetApplicableRefactorsRangeRequestArgs(file, startLine, startOffset, endLine, endOffset));
 	}
 
 	@Override

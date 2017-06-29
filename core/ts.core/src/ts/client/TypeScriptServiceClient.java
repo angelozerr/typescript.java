@@ -44,7 +44,7 @@ import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.refactors.ApplicableRefactorInfo;
-import ts.client.refactors.RefactorCodeActions;
+import ts.client.refactors.RefactorEditInfo;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
@@ -62,7 +62,7 @@ import ts.internal.client.protocol.DefinitionRequest;
 import ts.internal.client.protocol.DocCommentTemplateRequest;
 import ts.internal.client.protocol.FormatRequest;
 import ts.internal.client.protocol.GetApplicableRefactorsRequest;
-import ts.internal.client.protocol.GetRefactorCodeActionsRequest;
+import ts.internal.client.protocol.GetEditsForRefactorRequest;
 import ts.internal.client.protocol.GetSupportedCodeFixesRequest;
 import ts.internal.client.protocol.GeterrForProjectRequest;
 import ts.internal.client.protocol.GeterrRequest;
@@ -303,8 +303,8 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	/**
-	 * Write the buffer of editor content to a temporary file and have the
-	 * server reload it
+	 * Write the buffer of editor content to a temporary file and have the server
+	 * reload it
 	 * 
 	 * @param fileName
 	 * @param newText
@@ -494,9 +494,23 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	@Override
-	public CompletableFuture<RefactorCodeActions> getRefactorCodeActions(String fileName, int line, int offset,
-			String refactorName) throws TypeScriptException {
-		return execute(new GetRefactorCodeActionsRequest(fileName, line, offset, refactorName), true);
+	public CompletableFuture<List<ApplicableRefactorInfo>> getApplicableRefactors(String fileName, int startLine,
+			int startOffset, int endLine, int endOffset) throws TypeScriptException {
+		return execute(new GetApplicableRefactorsRequest(fileName, startLine, startOffset, endLine, endOffset), true);
+	}
+
+	@Override
+	public CompletableFuture<RefactorEditInfo> getEditsForRefactor(String fileName, int line, int offset,
+			String refactor, String action) throws TypeScriptException {
+		return execute(new GetEditsForRefactorRequest(fileName, line, offset, refactor, action), true);
+	}
+
+	@Override
+	public CompletableFuture<RefactorEditInfo> getEditsForRefactor(String fileName, int startLine, int startOffset,
+			int endLine, int endOffset, String refactor, String action) throws TypeScriptException {
+		return execute(
+				new GetEditsForRefactorRequest(fileName, startLine, startOffset, endLine, endOffset, refactor, action),
+				true);
 	}
 
 	private <T> CompletableFuture<T> execute(Request<?> request, boolean expectsResult) throws TypeScriptException {

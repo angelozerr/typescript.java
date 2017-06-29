@@ -29,7 +29,7 @@ import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.refactors.ApplicableRefactorInfo;
-import ts.client.refactors.RefactorCodeActions;
+import ts.client.refactors.RefactorEditInfo;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
@@ -275,8 +275,14 @@ public interface ITypeScriptServiceClient {
 	CompletableFuture<List<ApplicableRefactorInfo>> getApplicableRefactors(String fileName, int line, int offset)
 			throws TypeScriptException;
 
-	CompletableFuture<RefactorCodeActions> getRefactorCodeActions(String fileName, int line, int offset,
-			String refactorName) throws TypeScriptException;
+	CompletableFuture<List<ApplicableRefactorInfo>> getApplicableRefactors(String fileName, int startLine,
+			int startOffset, int endLine, int endOffset) throws TypeScriptException;
+
+	CompletableFuture<RefactorEditInfo> getEditsForRefactor(String fileName, int line, int offset, String refactor,
+			String action) throws TypeScriptException;
+
+	CompletableFuture<RefactorEditInfo> getEditsForRefactor(String fileName, int startLine, int startOffset,
+			int endLine, int endOffset, String refactor, String action) throws TypeScriptException;
 
 	void addClientListener(ITypeScriptClientListener listener);
 

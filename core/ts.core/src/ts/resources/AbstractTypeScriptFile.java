@@ -32,6 +32,8 @@ import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
+import ts.client.refactors.ApplicableRefactorInfo;
+import ts.client.refactors.RefactorEditInfo;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.internal.LocationReader;
@@ -293,6 +295,40 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	}
 
 	@Override
+	public CompletableFuture<List<ApplicableRefactorInfo>> getApplicableRefactors(int startPosition,
+			Integer endPosition) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		Location startLocation = this.getLocation(startPosition);		
+		int line = startLocation.getLine();
+		int offset = startLocation.getOffset();		
+		if (endPosition == null) {			
+			return client.getApplicableRefactors(this.getName(), line, offset);	
+		}
+		Location endLocation = this.getLocation(endPosition);
+		int endLine = endLocation.getLine();
+		int endOffset = endLocation.getOffset();
+		return client.getApplicableRefactors(this.getName(), line, offset, endLine, endOffset);		
+	}
+
+	@Override
+	public CompletableFuture<RefactorEditInfo> getEditsForRefactor(int startPosition, Integer endPosition,
+			String refactor, String action) throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		Location location = this.getLocation(startPosition);
+		int line = location.getLine();
+		int offset = location.getOffset();
+		if (endPosition == null) {
+			return client.getEditsForRefactor(this.getName(), line, offset, refactor, action);
+		}
+		Location endLocation = this.getLocation(endPosition);
+		int endLine = endLocation.getLine();
+		int endOffset = endLocation.getOffset();
+		return client.getEditsForRefactor(this.getName(), line, offset, endLine, endOffset, refactor, action);
+	}
+
+	@Override
 	public void addNavbarListener(INavbarListener listener) {
 		synchronized (listeners) {
 			if (!listeners.contains(listener)) {
@@ -376,11 +412,11 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		}
 
 	}
-	
+
 	public void setDisableChanged(boolean disableChanged) {
 		this.disableChanged = disableChanged;
 	}
-	
+
 	public boolean isDisableChanged() {
 		return disableChanged;
 	}

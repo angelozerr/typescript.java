@@ -1,6 +1,7 @@
 package ts.eclipse.ide.ui.utils;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -31,10 +32,13 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import ts.client.FileSpan;
 import ts.client.TextSpan;
+import ts.client.codefixes.FileCodeEdits;
 import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.utils.DocumentUtils;
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.utils.StringUtils;
 
 public class EditorUtils {
 
@@ -184,7 +188,7 @@ public class EditorUtils {
 				span.getEnd().getOffset(), true);
 
 	}
-	
+
 	public static void openInEditor(FileSpan span) {
 		IFile file = WorkbenchResourceUtil.findFileFromWorkspace(span.getFile());
 		if (file != null) {
@@ -196,7 +200,6 @@ public class EditorUtils {
 			}
 		}
 	}
-
 
 	public static Position getPosition(IFile file, TextSpan textSpan) throws BadLocationException {
 		ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
@@ -229,4 +232,34 @@ public class EditorUtils {
 		return new Position(start, length);
 	}
 
+	public static void applyEdit(List<FileCodeEdits> filesCodeEdits, IDocument document, String originalFileName) {
+		for (FileCodeEdits codeEdits : filesCodeEdits) {
+			EditorUtils.applyEdit(codeEdits, document, originalFileName);
+		}
+	}
+
+	public static void applyEdit(FileCodeEdits codeEdits, IDocument document, String originalFileName) {
+		IDocument documentToUpdate = getDocumentToUpdate(codeEdits.getFileName(), document, originalFileName);
+		if (documentToUpdate != null) {
+			try {
+				DocumentUtils.applyEdits(documentToUpdate, codeEdits.getTextChanges());
+			} catch (Exception e) {
+				TypeScriptUIPlugin.log(e);
+			}
+		}
+	}
+
+	private static IDocument getDocumentToUpdate(String fileName, IDocument document, String originalFileName) {
+		if (StringUtils.isEmpty(fileName) || originalFileName.equals(fileName)) {
+			// Update the document of the fileName which have opened the
+			// QuickFix
+			return document;
+		}
+		IFile file = WorkbenchResourceUtil.findFileFromWorkspace(fileName);
+		if (file != null && file.exists()) {
+			EditorUtils.openInEditor(file, true);
+			return TypeScriptResourceUtil.getDocument(file);
+		}
+		return null;
+	}
 }

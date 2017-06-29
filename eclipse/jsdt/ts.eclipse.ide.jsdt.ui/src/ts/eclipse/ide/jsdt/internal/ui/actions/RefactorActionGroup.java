@@ -3,6 +3,8 @@ package ts.eclipse.ide.jsdt.internal.ui.actions;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -10,6 +12,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -22,12 +25,19 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.wst.jsdt.ui.actions.SelectionDispatchAction;
 
-import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
+import ts.client.CommandNames;
+import ts.client.refactors.ApplicableRefactorInfo;
+import ts.client.refactors.RefactorActionInfo;
+import ts.client.refactors.RefactorEditInfo;
+import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
+import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 import ts.eclipse.ide.jsdt.internal.ui.refactoring.RefactoringMessages;
 import ts.eclipse.ide.jsdt.ui.IContextMenuConstants;
 import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 import ts.eclipse.ide.jsdt.ui.actions.TypeScriptActionConstants;
+import ts.eclipse.ide.ui.utils.EditorUtils;
+import ts.resources.ITypeScriptFile;
 
 /**
  * Action group that adds refactor actions (for example 'Rename', 'Move') to a
@@ -160,7 +170,54 @@ public class RefactorActionGroup extends ActionGroup {
 		int added = 0;
 		refactorSubmenu.add(new Separator(GROUP_REORG));
 		added += addAction(refactorSubmenu, fRenameAction);
+
+		ITextSelection textSelection = (ITextSelection) fEditor.getSelectionProvider().getSelection();
+		try {
+			ITypeScriptFile tsFile = fEditor.getTypeScriptFile();
+			if (tsFile.getProject().canSupport(CommandNames.GetApplicableRefactors)) {
+				int startPosition = textSelection.getOffset();
+				Integer endPosition = textSelection.getOffset() + textSelection.getLength();
+				CompletableFuture<List<ApplicableRefactorInfo>> refactorInfos = tsFile
+						.getApplicableRefactors(startPosition, endPosition);
+				List<ApplicableRefactorInfo> infos = refactorInfos.get(1000, TimeUnit.MILLISECONDS);
+				for (ApplicableRefactorInfo info : infos) {
+					if (info.isInlineable()) {
+						for (RefactorActionInfo action : info.getActions()) {
+							refactorSubmenu.add(createAction(info.getDescription(), info.getName(), action.getName(),
+									startPosition, endPosition, tsFile));
+						}
+					} else {
+						// TODO: support no inlineable
+
+					}
+					// refactorSubmenu.add(createAction(info, startPosition, endPosition, tsFile));
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return added;
+	}
+
+	private IAction createAction(String title, String refactor, String action, int startPosition, Integer endPosition,
+			ITypeScriptFile tsFile) {
+		return new Action(title) {
+			@Override
+			public void run() {
+				try {
+					RefactorEditInfo info = tsFile.getEditsForRefactor(startPosition, endPosition, refactor, action)
+							.get(5000, TimeUnit.MILLISECONDS);
+					EditorUtils.applyEdit(info.getEdits(), ((IIDETypeScriptFile) tsFile).getDocument(),
+							tsFile.getName());
+				} catch (Exception e) {
+					e.printStackTrace();
+//					ErrorDialog.openError(getShell(), TypeScriptUIMessages.TypeScriptBuilder_Error_title,
+//							TypeScriptUIMessages.TypeScriptBuilder_disable_Error_message, e.getStatus());
+				}
+			}
+		};
 	}
 
 	private int addAction(IMenuManager menu, IAction action) {

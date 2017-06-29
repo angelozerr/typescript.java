@@ -19,39 +19,7 @@ import java.util.List;
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
  *
  */
-public class CodeFixRequestArgs extends FileRequestArgs {
-
-	/**
-	 * The line number for the request (1-based).
-	 */
-	private Integer startLine;
-
-	/**
-	 * The character offset (on the line) for the request (1-based).
-	 */
-	private Integer startOffset;
-
-	/**
-	 * Position (can be specified instead of line/offset pair)
-	 */
-	/* @internal */
-	private Integer startPosition;
-
-	/**
-	 * The line number for the request (1-based).
-	 */
-	private Integer endLine;
-
-	/**
-	 * The character offset (on the line) for the request (1-based).
-	 */
-	private Integer endOffset;
-
-	/**
-	 * Position (can be specified instead of line/offset pair)
-	 */
-	/* @internal */
-	private Integer endPosition;
+public class CodeFixRequestArgs extends FileRangeRequestArgs {
 
 	/**
 	 * Errorcodes we want to get the fixes for.
@@ -65,38 +33,8 @@ public class CodeFixRequestArgs extends FileRequestArgs {
 
 	private CodeFixRequestArgs(String file, Integer startLine, Integer startOffset, Integer endLine, Integer endOffset,
 			List<Integer> errorCodes, Integer startPosition, Integer endPosition, String projectName) {
-		super(file, projectName);
-		this.startLine = startLine;
-		this.startOffset = startOffset;
-		this.endLine = endLine;
-		this.endOffset = endOffset;
-		this.startPosition = startPosition;
-		this.endPosition = endPosition;
+		super(file, startLine, startOffset, endLine, endOffset);
 		this.errorCodes = errorCodes;
-	}
-
-	public Integer getStartLine() {
-		return startLine;
-	}
-
-	public Integer getStartOffset() {
-		return startOffset;
-	}
-
-	public Integer getStartPosition() {
-		return startPosition;
-	}
-
-	public Integer getEndLine() {
-		return endLine;
-	}
-
-	public Integer getEndOffset() {
-		return endOffset;
-	}
-
-	public Integer getEndPosition() {
-		return endPosition;
 	}
 
 	public List<Integer> getErrorCodes() {

@@ -28,6 +28,8 @@ import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItemRoot;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
+import ts.client.refactors.ApplicableRefactorInfo;
+import ts.client.refactors.RefactorEditInfo;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 
@@ -53,8 +55,8 @@ public interface ITypeScriptFile extends IPositionProvider {
 
 	/**
 	 * Returns true if the file is flagged as "open" in tsserver side and false
-	 * otherwise. In the case where tsserver is not started and the file is
-	 * opened in the IDE editor, this method returns false.
+	 * otherwise. In the case where tsserver is not started and the file is opened
+	 * in the IDE editor, this method returns false.
 	 * 
 	 * @return true if the file is flagged as "open" in tsserver side and false
 	 *         otherwise.
@@ -101,8 +103,7 @@ public interface ITypeScriptFile extends IPositionProvider {
 	void close() throws TypeScriptException;
 
 	/**
-	 * Synchronize file content with tsserver according the
-	 * {@link SynchStrategy}.
+	 * Synchronize file content with tsserver according the {@link SynchStrategy}.
 	 * 
 	 * @throws TypeScriptException
 	 */
@@ -220,6 +221,12 @@ public interface ITypeScriptFile extends IPositionProvider {
 	 */
 	CompletableFuture<List<CodeAction>> getCodeFixes(int startPosition, int endPosition, List<Integer> errorCodes)
 			throws TypeScriptException;
+
+	CompletableFuture<List<ApplicableRefactorInfo>> getApplicableRefactors(int startPosition, Integer endPosition)
+			throws TypeScriptException;
+
+	CompletableFuture<RefactorEditInfo> getEditsForRefactor(int startPosition, Integer endPosition, String refactor,
+			String action) throws TypeScriptException;
 
 	/**
 	 * Returns the navigation bar root.

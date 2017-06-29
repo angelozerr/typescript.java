@@ -10,13 +10,19 @@
  */
 package ts.internal.client.protocol;
 
-import ts.client.refactors.RefactorCodeActions;
-
 /**
- * Refactor code actions response message.
  * 
  * @see https://github.com/Microsoft/TypeScript/blob/master/src/server/protocol.ts
+ *
  */
-public class GetRefactorCodeActionsResponse extends Response<RefactorCodeActions> {
+public class GetApplicableRefactorsRangeRequestArgs extends FileRangeRequestArgs {
 
+	public GetApplicableRefactorsRangeRequestArgs(String file, int startLine, int startOffset, int endLine,
+			int endOffset) {
+		super(file, startLine, startOffset, endLine, endOffset);
+	}
+
+	public GetApplicableRefactorsRangeRequestArgs(String file, int startPosition, int endPosition) {
+		super(file, startPosition, endPosition);
+	}
 }
