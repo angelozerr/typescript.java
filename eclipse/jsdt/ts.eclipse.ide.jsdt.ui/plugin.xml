@@ -141,13 +141,6 @@
             activate="true"
             targetId="org.eclipse.wst.jsdt.ui.javaCode">
       </hyperlinkDetector>
-      <hyperlinkDetector
-            class="ts.eclipse.ide.ui.hyperlink.TypeScriptHyperLinkDetector"
-            id="ts.eclipse.ide.ui.hyperlink.HTMLTypeScriptHyperLinkDetector"
-            name="%HTMLTypeScriptHyperLinkDetector"
-            activate="true"
-            targetId="org.eclipse.wst.html.core.htmlsource">
-      </hyperlinkDetector>      
    </extension>
    
 	<!-- Text Hover for JavaScript (inside JavaScript file) -->
