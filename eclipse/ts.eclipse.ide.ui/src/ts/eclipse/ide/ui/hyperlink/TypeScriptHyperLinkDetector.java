@@ -13,6 +13,7 @@ package ts.eclipse.ide.ui.hyperlink;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +41,7 @@ import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.ui.JavaWordFinder;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.utils.EditorUtils;
+import ts.utils.CompletableFutureUtils;
 
 /**
  * TypeScript Hyperlink detector.
@@ -47,8 +49,12 @@ import ts.eclipse.ide.ui.utils.EditorUtils;
  */
 public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 
+	private CompletableFuture<List<FileSpan>> definitionPromise;
+
 	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
+		// cancel last hyperlink if needed.
+		CompletableFutureUtils.cancel(definitionPromise);
 		if (region == null || textViewer == null) {
 			return null;
 		}
@@ -61,11 +67,6 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 			// the project of the resource has typescript nature, execute
 			// typescript
 			// hyperlink.
-//			ITextEditor textEditor= (ITextEditor)getAdapter(ITextEditor.class);
-//			IAction openAction= textEditor.getAction("OpenEditor"); //$NON-NLS-1$
-//			if (openAction == null)
-//				return null;
-			
 			try {
 				IProject project = resource.getProject();
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
@@ -77,7 +78,8 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 				}
 				// Consume tsserver "definition" command and create hyperlink
 				// file span are found.
-				List<FileSpan> spans = tsFile.definition(wordRegion.getOffset()).get(5000, TimeUnit.MILLISECONDS);
+				definitionPromise = tsFile.definition(wordRegion.getOffset());
+				List<FileSpan> spans = definitionPromise.get(5000, TimeUnit.MILLISECONDS);
 				return createHyperlinks(spans, wordRegion);
 			} catch (ExecutionException e) {
 				if (e.getCause() instanceof TypeScriptNoContentAvailableException) {
@@ -114,8 +116,8 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 	}
 
 	/**
-	 * Create Hyperlink from the given TypeScript file span and null if file is
-	 * not found.
+	 * Create Hyperlink from the given TypeScript file span and null if file is not
+	 * found.
 	 * 
 	 * @param span
 	 * @param region
@@ -134,12 +136,10 @@ public class TypeScriptHyperLinkDetector extends AbstractHyperlinkDetector {
 	}
 
 	/**
-	 * Returns the {@link IResource} from the given text viewer and null
-	 * otherwise.
+	 * Returns the {@link IResource} from the given text viewer and null otherwise.
 	 * 
 	 * @param textViewer
-	 * @return the {@link IResource} from the given text viewer and null
-	 *         otherwise.
+	 * @return the {@link IResource} from the given text viewer and null otherwise.
 	 */
 	private IResource getResource(ITextViewer textViewer) {
 		ITextEditor textEditor = (ITextEditor) getAdapter(ITextEditor.class);

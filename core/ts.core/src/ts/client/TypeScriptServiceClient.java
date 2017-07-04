@@ -11,6 +11,7 @@
 package ts.client;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -134,6 +135,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		};
 
 	};
+	private String cancellationPipeName;
 
 	private static class PendingRequestInfo {
 		Request<?> requestMessage;
@@ -160,11 +162,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
-		this(projectDir, tsserverFile, nodeFile, false, false, null);
+		this(projectDir, tsserverFile, nodeFile, false, false, null, null);
 	}
 
 	public TypeScriptServiceClient(final File projectDir, File typescriptDir, File nodeFile, boolean enableTelemetry,
-			boolean disableAutomaticTypingAcquisition, File tsserverPluginsFile) throws TypeScriptException {
+			boolean disableAutomaticTypingAcquisition, String cancellationPipeName, File tsserverPluginsFile)
+			throws TypeScriptException {
 		this(NodejsProcessManager.getInstance().create(projectDir,
 				tsserverPluginsFile != null ? tsserverPluginsFile
 						: TypeScriptRepositoryManager.getTsserverFile(typescriptDir),
@@ -185,13 +188,17 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 							args.add("--typescriptDir");
 							args.add(FileUtils.getPath(typescriptDir));
 						}
+						if (cancellationPipeName != null) {
+							args.add("--cancellationPipeName");
+							args.add(cancellationPipeName + "*");
+						}
 						// args.add("--useSingleInferredProject");
 						return args;
 					}
-				}, TSSERVER_FILE_TYPE));
+				}, TSSERVER_FILE_TYPE), cancellationPipeName);
 	}
 
-	public TypeScriptServiceClient(INodejsProcess process) {
+	public TypeScriptServiceClient(INodejsProcess process, String cancellationPipeName) {
 		this.listeners = new ArrayList<>();
 		this.installTypesListener = new ArrayList<>();
 		this.stateLock = new ReentrantReadWriteLock();
@@ -201,6 +208,7 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		this.process = process;
 		process.addProcessListener(listener);
 		setCompletionEntryMatcherProvider(ICompletionEntryMatcherProvider.LCS_PROVIDER);
+		this.cancellationPipeName = cancellationPipeName;
 	}
 
 	private void dispatchMessage(String message) {
@@ -288,14 +296,6 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		execute(new CloseRequest(fileName), false);
 	}
 
-	// @Override
-	// public void changeFile(String fileName, int position, int endPosition,
-	// String insertString)
-	// throws TypeScriptException {
-	// execute(new ChangeRequest(fileName, position, endPosition, insertString),
-	// false);
-	// }
-
 	@Override
 	public void changeFile(String fileName, int line, int offset, int endLine, int endOffset, String insertString)
 			throws TypeScriptException {
@@ -322,13 +322,6 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 			throw new TypeScriptException(e);
 		}
 	}
-
-	// @Override
-	// public CompletableFuture<List<CompletionEntry>> completions(String
-	// fileName, int position)
-	// throws TypeScriptException {
-	// return execute(new CompletionsRequest(fileName, position), true);
-	// }
 
 	@Override
 	public CompletableFuture<List<CompletionEntry>> completions(String fileName, int line, int offset)
@@ -522,6 +515,29 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
+				tryCancelRequest(request);
+				return super.cancel(mayInterruptIfRunning);
+			}
+
+			/**
+			 * Try to cancel the given request:
+			 * 
+			 * <ul>
+			 * <li>on client side : remove request from the received request queue.</li>
+			 * <li>on server side (tsserver) : cancel the request.</li>
+			 * </ul>
+			 * 
+			 * @param request
+			 */
+			private void tryCancelRequest(Request<?> request) {
+				try {
+					cancelServerRequest(request);
+				} finally {
+					cancelClientRequest(request);
+				}
+			}
+
+			private void cancelClientRequest(Request<?> request) {
 				if (request instanceof IRequestEventable) {
 					List<String> keys = ((IRequestEventable) request).getKeys();
 					synchronized (receivedRequestMap) {
@@ -534,8 +550,26 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 						sentRequestMap.remove(request.getSeq());
 					}
 				}
-				return super.cancel(mayInterruptIfRunning);
 			}
+
+			private void cancelServerRequest(Request<?> request) {
+				// Generate en empty file in the temp directory (ex:
+				// $TMP_DIR/eclipse-tscancellation-4df2438b-ca7a-4ef3-9a46-83e8afef61b3.sock844
+				// where 844 is request sequence)
+				// for the given request sequence waited by tsserver
+				// typescript/lib/cancellationToken.js.
+				// to cancel request from tsserver.
+				if (cancellationPipeName != null) {
+					File tempFile = new File(TypeScriptServiceClient.this.cancellationPipeName + request.getSeq());
+					try {
+						tempFile.createNewFile();
+						tempFile.deleteOnExit();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
 		};
 		if (request instanceof IRequestEventable) {
 			Consumer<Event<?>> responseHandler = (event) -> {

@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import ts.TypeScriptException;
-import ts.client.CommandCapability;
 import ts.client.CommandNames;
 import ts.client.ISupportable;
 import ts.client.ITypeScriptClientListener;
@@ -35,6 +35,8 @@ import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tsc.TypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
 import ts.cmd.tslint.TypeScriptLint;
+import ts.utils.FileUtils;
+import ts.utils.VersionHelper;
 
 /**
  * TypeScript project implementation.
@@ -42,6 +44,13 @@ import ts.cmd.tslint.TypeScriptLint;
  */
 public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMatcherProvider {
 
+	private static final ISupportable CANCELLATION_CAPABILITY = new ISupportable() {
+
+		@Override
+		public boolean canSupport(String version) {
+			return VersionHelper.canSupport(version, "2.2.2");
+		}
+	};
 	private final File projectDir;
 	private ITypeScriptProjectSettings projectSettings;
 
@@ -177,9 +186,18 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		File typescriptDir = getProjectSettings().getTypesScriptDir();
 		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), typescriptDir, nodeFile,
 				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(),
-				getProjectSettings().getTsserverPluginsFile());
+				getCancellationPipeName(), getProjectSettings().getTsserverPluginsFile());
 		client.setCompletionEntryMatcherProvider(this);
 		return client;
+	}
+
+	private String getCancellationPipeName() {
+		if (canSupport(CANCELLATION_CAPABILITY)) {
+			String name = new StringBuilder("eclipse-").append("tscancellation-").append(UUID.randomUUID().toString())
+					.append(".sock").toString();
+			return FileUtils.getPath(new File(System.getProperty("java.io.tmpdir"), name));
+		}
+		return null;
 	}
 
 	/**
@@ -337,7 +355,7 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		}
 		return support;
 	}
-		
+
 	@Override
 	public boolean canSupport(CompilerOptionCapability option) {
 		Boolean support = compilerCapabilities.get(option);

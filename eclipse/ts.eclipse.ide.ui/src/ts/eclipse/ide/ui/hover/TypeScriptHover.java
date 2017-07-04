@@ -10,6 +10,7 @@
  */
 package ts.eclipse.ide.ui.hover;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +29,7 @@ import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
 import ts.eclipse.ide.ui.utils.HTMLTypeScriptPrinter;
 import ts.eclipse.jface.text.html.TypeScriptBrowserInformationControlInput;
 import ts.resources.ITypeScriptFile;
+import ts.utils.CompletableFutureUtils;
 import ts.utils.StringUtils;
 
 /**
@@ -42,11 +44,14 @@ public class TypeScriptHover extends AbstractTypeScriptHover implements ITypeScr
 	private Integer offset;
 	private ITypeScriptFile file;
 
+	private CompletableFuture<QuickInfo> quickinfoPromise;
+
 	@Override
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
+		// cancel last hover if needed.
+		CompletableFutureUtils.cancel(quickinfoPromise);
 		this.tsProject = null;
 		this.offset = null;
-
 		IFile scriptFile = getFile(textViewer);
 		if (scriptFile == null) {
 			return null;
@@ -58,8 +63,8 @@ public class TypeScriptHover extends AbstractTypeScriptHover implements ITypeScr
 				tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
 				int position = hoverRegion.getOffset();
 				ITypeScriptFile tsFile = tsProject.openFile(scriptFile, textViewer.getDocument());
-
-				QuickInfo quickInfo = tsFile.quickInfo(position).get(5000, TimeUnit.MILLISECONDS);
+				quickinfoPromise = tsFile.quickInfo(position);
+				QuickInfo quickInfo = quickinfoPromise.get(5000, TimeUnit.MILLISECONDS);
 				boolean useTextMate = TypeScriptUIPlugin.getDefault().getPreferenceStore()
 						.getBoolean(TypeScriptUIPreferenceConstants.USE_TEXMATE_FOR_SYNTAX_COLORING);
 				String text = HTMLTypeScriptPrinter.getQuickInfo(quickInfo, getFileExtension(scriptFile),

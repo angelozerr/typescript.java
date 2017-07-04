@@ -37,6 +37,7 @@ import ts.client.refactors.RefactorEditInfo;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.internal.LocationReader;
+import ts.utils.CompletableFutureUtils;
 
 /**
  * Abstract TypeScript file.
@@ -57,6 +58,8 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 	private boolean configureAlreadyDone;
 	private boolean disableChanged;
 
+	private CompletableFuture navbarPromise;
+	
 	public AbstractTypeScriptFile(ITypeScriptProject tsProject, ScriptKindName scriptKind) {
 		this.tsProject = tsProject;
 		this.scriptKind = scriptKind;
@@ -362,19 +365,23 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		}
 		this.synch();
 		ITypeScriptServiceClient client = tsProject.getClient();
+		// cancel last navigation bar/tree if needed.
+		CompletableFutureUtils.cancel(navbarPromise);
 		if (tsProject.canSupport(CommandNames.NavTree)) {
 			// when TypeScript 2.0.6 is consummed, use "navtree" to fill the
 			// Outline
 			// see
 			// https://github.com/Microsoft/TypeScript/pull/11532#issuecomment-254804923
-			client.navtree(this.getName(), this).thenAccept(item -> {
+			navbarPromise = client.navtree(this.getName(), this).thenAccept(item -> {
 				AbstractTypeScriptFile.this.navbar = new NavigationBarItemRoot(item);
 				fireNavBarListeners(navbar);
+				navbarPromise = null;
 			});
 		} else {
-			client.navbar(this.getName(), this).thenAccept(item -> {
+			navbarPromise = client.navbar(this.getName(), this).thenAccept(item -> {
 				AbstractTypeScriptFile.this.navbar = new NavigationBarItemRoot(item);
 				fireNavBarListeners(navbar);
+				navbarPromise = null;
 			});
 		}
 	}
