@@ -31,6 +31,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
@@ -39,6 +40,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
@@ -50,6 +54,7 @@ import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog;
 import ts.eclipse.ide.internal.ui.dialogs.WorkspaceResourceSelectionDialog.Mode;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
+import ts.eclipse.ide.ui.preferences.ScrolledPageContent;
 import ts.eclipse.ide.ui.preferences.StatusInfo;
 import ts.eclipse.ide.ui.utils.StatusUtil;
 import ts.eclipse.ide.ui.widgets.IStatusChangeListener;
@@ -136,6 +141,48 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		// Path info.
 		createNodePathInfo(group);
 	}
+	
+	protected ExpandableComposite createStyleSection(Composite parent, String label, int nColumns) {
+		ExpandableComposite excomposite= new ExpandableComposite(parent, SWT.NONE, ExpandableComposite.TWISTIE | ExpandableComposite.CLIENT_INDENT);
+		excomposite.setText(label);
+		excomposite.setExpanded(false);
+		excomposite.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+		excomposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false, nColumns, 1));
+		excomposite.addExpansionListener(new ExpansionAdapter() {
+			public void expansionStateChanged(ExpansionEvent e) {
+				expandedStateChanged((ExpandableComposite) e.getSource());
+			}
+		});
+		//fExpandables.add(excomposite);
+		makeScrollableCompositeAware(excomposite);
+		return excomposite;
+	}
+	
+	protected final void expandedStateChanged(ExpandableComposite expandable) {
+		ScrolledPageContent parentScrolledComposite= getParentScrolledComposite(expandable);
+		if (parentScrolledComposite != null) {
+			parentScrolledComposite.reflow(true);
+		}
+	}
+	
+	protected void makeScrollableCompositeAware(Control control) {
+		ScrolledPageContent parentScrolledComposite= getParentScrolledComposite(control);
+		if (parentScrolledComposite != null) {
+			parentScrolledComposite.adaptChild(control);
+		}
+	}
+	
+	protected ScrolledPageContent getParentScrolledComposite(Control control) {
+		Control parent= control.getParent();
+		while (!(parent instanceof ScrolledPageContent) && parent != null) {
+			parent= parent.getParent();
+		}
+		if (parent instanceof ScrolledPageContent) {
+			return (ScrolledPageContent) parent;
+		}
+		return null;
+	}
+
 
 	/** Creates the field for the embedded Node.js. */
 	private void createEmbeddedNodejsField(Composite parent, IEmbeddedNodejs[] installs) {
@@ -233,9 +280,12 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		});
 	}
 
-	/** Creates the Info part, where Node.js path and version is shown. */
+	/** Creates the Info part, where Node.js path and version is shown. 
+	 * @return */
 	private void createNodePathInfo(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
+		ExpandableComposite expandable = createStyleSection(parent, TypeScriptUIMessages.AbstractWizardNewTypeScriptProjectCreationPage_nodejs_info_label, 2);
+		
+		Composite composite = new Composite(expandable, SWT.NONE);
 		composite.setLayout(new GridLayout());
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
@@ -266,6 +316,8 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 200;
 		nodePath.setLayoutData(gridData);
+
+		expandable.setClient(composite);
 	}
 
 	/** Initializes the Widgets with default-values. */

@@ -186,7 +186,8 @@ public class TypeScriptUIMessages extends NLS {
 	public static String AbstractWizardNewTypeScriptProjectCreationPage_nodejs_group_label;
 	public static String AbstractWizardNewTypeScriptProjectCreationPage_useEmbeddedNodeJs_label;
 	public static String AbstractWizardNewTypeScriptProjectCreationPage_useInstalledNodeJs_label;
-
+	public static String AbstractWizardNewTypeScriptProjectCreationPage_nodejs_info_label;
+	
 	public static String WizardNewTypeScriptProjectCreationPage_typescript_group_label;
 	public static String WizardNewTypeScriptProjectCreationPage_useEmbeddedTsRuntime_label;
 	public static String WizardNewTypeScriptProjectCreationPage_useInstallTsRuntime_label;
