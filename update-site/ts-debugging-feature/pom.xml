@@ -2,14 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>fr.opensagres.js</groupId>
-    <artifactId>eclipse</artifactId>
+    <artifactId>update-site</artifactId>
     <version>1.3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>jsdt</artifactId>
-  <packaging>pom</packaging>
-  <modules>
-  		<module>ts.eclipse.ide.jsdt.core</module>
-		<module>ts.eclipse.ide.jsdt.ui</module>
-        <module>ts.eclipse.ide.jsdt.debug</module>
-  </modules>
+  <artifactId>ts-debugging-feature</artifactId>
+  <packaging>eclipse-feature</packaging>
 </project>

@@ -8,6 +8,7 @@
   <artifactId>update-site</artifactId>
   <packaging>pom</packaging>
   <modules>
+    <module>ts-debugging-feature</module>
   	<module>ts-feature</module>
 	<module>ts-jsdt-feature</module>
 	<module>ts-json-feature</module>

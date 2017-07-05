@@ -21,6 +21,9 @@
    <feature id="tm-feature">
       <category name="TypeScript IDE"/>
    </feature>
+   <feature id="ts-debugging-feature">
+      <category name="Debugging"/>
+   </feature>
    <bundle id="minimal-json">
       <category name="Third Party"/>
    </bundle>
@@ -43,10 +46,15 @@
          Embed Node.js switch OS
       </description>
    </category-def>
-   <category-def name="JSON Editors" label="JSON Editors (Ony for &gt; Neon)">
+   <category-def name="JSON Editors" label="JSON Editors (Ony for &gt;= Neon)">
       <description>
          Provide JSON Editor for tsconfig.json based on WTP JSON Editor.
       </description>
    </category-def>
    <category-def name="Third Party" label="Third Party"/>
+   <category-def name="Debugging" label="Debugging (Ony for &gt;= Oxygen)">
+      <description>
+         Provide TypeScript debugging capability with JSDT SourceMap support.
+      </description>
+   </category-def>
 </site>
