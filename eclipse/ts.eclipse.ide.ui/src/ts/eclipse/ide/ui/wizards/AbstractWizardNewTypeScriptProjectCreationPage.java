@@ -463,8 +463,9 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 	protected void nodeJsChanged(File nodeFile) {
 	}
 
-	/** Updates the Commands, which should be executed after creating the Project. */
-	public void updateCommand(List<LineCommand> commands, IProject project) {
+	/** Updates the Commands, which should be executed after creating the Project. 
+	 * @param nodeFilePath */
+	public void updateCommand(List<LineCommand> commands, IProject project, String nodeFilePath) {
 	}
 
 	/** Class for the Status of the selected Node.js. */

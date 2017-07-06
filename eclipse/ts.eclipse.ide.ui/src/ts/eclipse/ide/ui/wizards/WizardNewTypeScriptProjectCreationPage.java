@@ -104,17 +104,12 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 				updateTsRuntimeMode();
 			}
 		});
-		installTsRuntime = new NpmInstallWidget(
-			"typescript",
-			new IStatusChangeListener() {
-				@Override
-				public void statusChanged(IStatus status) {
-					setPageComplete(validatePage());
-				}
-			},
-			parent,
-			SWT.NONE
-		);
+		installTsRuntime = new NpmInstallWidget("typescript", new IStatusChangeListener() {
+			@Override
+			public void statusChanged(IStatus status) {
+				setPageComplete(validatePage());
+			}
+		}, parent, SWT.NONE);
 		installTsRuntime.getVersionText().addListener(SWT.Modify, this);
 	}
 
@@ -160,7 +155,7 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 	}
 
 	@Override
-	public void updateCommand(List<LineCommand> commands, final IProject project) {
+	public void updateCommand(List<LineCommand> commands, final IProject project, String nodeFilePath) {
 		if (!useEmbeddedTsRuntime) {
 			// when TypeScript is installed when "npm install typescript"
 			// command is terminated, update the project Eclispe preferences
@@ -172,7 +167,8 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							IEclipsePreferences preferences = new ProjectScope(project).getNode(TypeScriptCorePlugin.PLUGIN_ID);
+							IEclipsePreferences preferences = new ProjectScope(project)
+									.getNode(TypeScriptCorePlugin.PLUGIN_ID);
 							preferences.putBoolean(TypeScriptCorePreferenceConstants.USE_EMBEDDED_TYPESCRIPT, false);
 							preferences.put(TypeScriptCorePreferenceConstants.INSTALLED_TYPESCRIPT_PATH,
 									"${project_loc:node_modules/typescript}");
@@ -183,7 +179,6 @@ public class WizardNewTypeScriptProjectCreationPage extends AbstractWizardNewTyp
 							}
 						}
 					});
-
 				}
 			}));
 		}

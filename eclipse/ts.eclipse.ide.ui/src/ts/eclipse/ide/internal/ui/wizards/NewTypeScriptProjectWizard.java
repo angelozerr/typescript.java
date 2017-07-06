@@ -177,12 +177,13 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 				// Install TypeScript/tslint if needed
 				List<LineCommand> commands = new ArrayList<>();
 				Map<String, Object> properties = new HashMap<String, Object>();
-				mainPage.updateCommand(commands, newProjectHandle);
+				String nodeFilePath = getNodeFilePath();
+				mainPage.updateCommand(commands, newProjectHandle, nodeFilePath);
 				tslintPage.updateCommand(commands, newProjectHandle);
 
 				if (!commands.isEmpty()) {
-					properties.put(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR, projectLocationPath.toString());
-					String nodeFilePath = getNodeFilePath();
+					properties.put(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR,
+							projectLocationPath.toString());
 					if (!StringUtils.isEmpty(nodeFilePath)) {
 						EnvPath.insertToEnvPath(properties, nodeFilePath);
 					}
