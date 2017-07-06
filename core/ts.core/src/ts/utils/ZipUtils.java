@@ -15,6 +15,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -137,18 +139,22 @@ public class ZipUtils {
 			while ((entry = in.getNextEntry()) != null) {
 				String outFilename = entry.getName();
 
-				// Open the output file
-				File extracted = new File(destination, outFilename);
-				if (entry.isDirectory()) {
-					extracted.mkdirs();
-				} else {
+				switch (entry.getFileType()) {
+				case TarEntry.DIRECTORY:
+					File extractedDir = new File(destination, outFilename);
+					if (extractedDir.isDirectory()) {
+						extractedDir.mkdirs();
+					}
+					break;
+				case TarEntry.FILE:
+					File extractedFile = new File(destination, outFilename);
 					// Be sure that parent file exists
-					File baseDir = extracted.getParentFile();
+					File baseDir = extractedFile.getParentFile();
 					if (!baseDir.exists()) {
 						baseDir.mkdirs();
 					}
 
-					out = new FileOutputStream(extracted);
+					out = new FileOutputStream(extractedFile);
 
 					// Transfer bytes from the ZIP file to the output file
 					byte[] buf = new byte[1024];
@@ -160,9 +166,20 @@ public class ZipUtils {
 
 					// Close the stream
 					out.close();
-					if (extracted.getParent().contains(BIN_FOLDER)) {
-						extracted.setExecutable(true);
+					if (extractedFile.getParent().contains(BIN_FOLDER)) {
+						extractedFile.setExecutable(true);
 					}
+					break;
+				case TarEntry.LINK:
+					File linkFile = new File(destination, outFilename);
+					Path target = new File(linkFile.getParentFile(), entry.getLinkName()).toPath();
+					Files.createLink(linkFile.toPath(), target);
+					break;
+				case TarEntry.SYM_LINK:
+					File symLinkFile = new File(destination, outFilename);
+					Path symTarget = new File(symLinkFile.getParentFile(), entry.getLinkName()).toPath();
+					Files.createSymbolicLink(symLinkFile.toPath(), symTarget);
+					break;
 				}
 			}
 		} catch (TarException e) {

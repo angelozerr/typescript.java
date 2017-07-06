@@ -206,6 +206,8 @@ public class TarInputStream extends FilterInputStream
 		while (pos < 100 && header[pos] != 0) {
 			pos++;
 		}
+		
+		// name
 		String name = new String(header, 0, pos, StandardCharsets.UTF_8);
 		// Prepend the prefix here.
 		pos = 345;
@@ -228,6 +230,7 @@ public class TarInputStream extends FilterInputStream
 			entry.setFileType(header[156]);
 		}
 
+		// mode
 		pos = 100;
 		StringBuffer mode = new StringBuffer();
 		for(i = 0; i < 8; i++) {
@@ -249,6 +252,23 @@ public class TarInputStream extends FilterInputStream
 			throw new TarException("Not a valid tar format" /* DataTransferMessages.TarImport_invalid_tar_format */, nfe);
 		}
 
+	    // linkname
+	    if (entry.isSymbolicLink() || entry.isLink()) {
+	      pos = 157;
+	      StringBuilder linkName = new StringBuilder();
+	      for (i = 0; i < 100; i++) {
+	        if (header[pos + i] == 0) {
+	          break;
+	        }
+	        if (header[pos + i] == ' ') {
+	          continue;
+	        }
+	        linkName.append((char) header[pos + i]);
+	      }
+	      entry.setLinkName(linkName.toString());
+	    }
+
+	    // size
 		pos = 100 + 24;
 		StringBuffer size = new StringBuffer();
 		for(i = 0; i < 12; i++) {

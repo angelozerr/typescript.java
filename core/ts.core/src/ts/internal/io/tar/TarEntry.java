@@ -23,7 +23,8 @@ public class TarEntry implements Cloneable
 	private long mode, time, size;
 	private int type;
 	int filepos;
-
+	private String linkName;
+	
 	/**
 	 * Entry type for normal files.
 	 */
@@ -33,6 +34,16 @@ public class TarEntry implements Cloneable
 	 * Entry type for directories.
 	 */
 	public static final int DIRECTORY = '5';
+
+	/**
+	 * Entry type for links.
+	 */
+	public static final int LINK = '1';
+
+	/**
+	 * Entry type for symbolic link.
+	 */
+	public static final int SYM_LINK = '2';
 
 	/**
 	 * Create a new TarEntry for a file of the given name at the
@@ -145,5 +156,21 @@ public class TarEntry implements Cloneable
 
 	public boolean isDirectory() {
 		return type == DIRECTORY;
+	}
+	
+	public boolean isLink() {
+		return type == LINK;
+	}
+	
+	public boolean isSymbolicLink() {
+		return type == SYM_LINK;
+	}
+		
+	public String getLinkName() {
+		return linkName;
+	}
+	
+	public void setLinkName(String linkName) {
+		this.linkName = linkName;
 	}
 }
