@@ -219,10 +219,6 @@ public class NewTypeScriptProjectWizard extends AbstractNewProjectWizard {
 
 			}
 
-			private String getNodeFilePath() {
-				File nodeFile = TypeScriptResourceUtil.getWorkspaceNodejsInstallPath();
-				return nodeFile != null ? FileUtils.getPath(nodeFile) : null;
-			}
 		};
 	}
 

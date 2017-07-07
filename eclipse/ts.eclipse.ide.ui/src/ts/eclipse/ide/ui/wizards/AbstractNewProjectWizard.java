@@ -13,6 +13,7 @@
  *******************************************************************************/
 package ts.eclipse.ide.ui.wizards;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -74,9 +75,11 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
+import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.terminal.interpreter.CommandTerminalService;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.utils.FileUtils;
 
 /**
  * Standard workbench wizard that creates a new TypeScript project resource in
@@ -549,6 +552,11 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		return result == IDialogConstants.YES_ID;
 	}
 
+	protected String getNodeFilePath() {
+		File nodeFile = TypeScriptResourceUtil.getWorkspaceNodejsInstallPath();
+		return nodeFile != null ? FileUtils.getPath(nodeFile.getParentFile()) : null;
+	}
+	
 	protected abstract IRunnableWithProgress getRunnable(final IProject newProjectHandle,
 			final IProjectDescription description, IPath projectLocation);
 }
