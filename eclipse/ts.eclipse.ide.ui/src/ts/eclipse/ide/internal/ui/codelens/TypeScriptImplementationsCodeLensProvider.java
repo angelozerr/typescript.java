@@ -10,7 +10,7 @@ import org.eclipse.jface.text.provisional.codelens.Command;
 import org.eclipse.jface.text.provisional.codelens.ICodeLens;
 import org.eclipse.jface.text.provisional.codelens.Range;
 
-import ts.TypeScriptKind;
+import ts.ScriptElementKind;
 import ts.client.FileSpan;
 import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
@@ -59,7 +59,7 @@ public class TypeScriptImplementationsCodeLensProvider extends TypeScriptBaseCod
 
 	@Override
 	protected Range extractSymbol(IIDETypeScriptFile document, NavigationBarItem item, NavigationBarItem parent) {
-		TypeScriptKind tsKind = TypeScriptKind.getKind(item.getKind());
+		ScriptElementKind tsKind = ScriptElementKind.getKind(item.getKind());
 		if (tsKind != null) {
 			switch (tsKind) {
 			case INTERFACE:

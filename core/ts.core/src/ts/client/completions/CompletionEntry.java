@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import ts.TypeScriptException;
-import ts.TypeScriptKind;
+import ts.ScriptElementKind;
 import ts.client.IKindProvider;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.TextSpan;
@@ -137,9 +137,9 @@ public class CompletionEntry implements IKindProvider {
 
 	public boolean isFunction() {
 		if (isFunction == null) {
-			TypeScriptKind tsKind = TypeScriptKind.getKind(getKind());
-			isFunction = (tsKind != null && (TypeScriptKind.CONSTRUCTOR == tsKind || TypeScriptKind.FUNCTION == tsKind
-					|| TypeScriptKind.METHOD == tsKind));
+			ScriptElementKind tsKind = ScriptElementKind.getKind(getKind());
+			isFunction = (tsKind != null && (ScriptElementKind.CONSTRUCTOR == tsKind || ScriptElementKind.FUNCTION == tsKind
+					|| ScriptElementKind.METHOD == tsKind));
 		}
 		return isFunction;
 	}

@@ -19,7 +19,8 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.Image;
 
-import ts.TypeScriptKind;
+import ts.ScriptElementKind;
+import ts.ScriptElementKindModifier;
 import ts.client.IKindProvider;
 import ts.utils.StringUtils;
 
@@ -147,13 +148,13 @@ public class TypeScriptImagesRegistry {
 	}
 
 	private static String getImageKey(String kind, String kindModifiers, String containerKind) {
-		TypeScriptKind tsKind = TypeScriptKind.getKind(kind);
+		ScriptElementKind tsKind = ScriptElementKind.getKind(kind);
 		if (tsKind == null) {
 			return null;
 		}
-		List<TypeScriptKind> parts = getParts(kindModifiers);
+		List<ScriptElementKindModifier> parts = getParts(kindModifiers);
 		boolean isInner = !StringUtils.isEmpty(containerKind);
-		boolean isStatic = parts.contains(TypeScriptKind.STATIC);
+		boolean isStatic = parts.contains(ScriptElementKindModifier.staticModifier);
 		String imageKey = null;
 
 		switch (tsKind) {
@@ -211,25 +212,26 @@ public class TypeScriptImagesRegistry {
 		return imageKey;
 	}
 
-	private static List<TypeScriptKind> getParts(String kindModifiers) {
+	private static List<ScriptElementKindModifier> getParts(String kindModifiers) {
 		if (StringUtils.isEmpty(kindModifiers)) {
 			return Collections.emptyList();
 		}
 		String[] parts = kindModifiers.split(",");
-		List<TypeScriptKind> kinds = new ArrayList<TypeScriptKind>();
+		List<ScriptElementKindModifier> kinds = new ArrayList<ScriptElementKindModifier>();
 		for (int i = 0; i < parts.length; i++) {
-			TypeScriptKind tsKind = TypeScriptKind.getKind(parts[i]);
-			if (tsKind != null) {
-				kinds.add(tsKind);
+			ScriptElementKindModifier modifier = ScriptElementKindModifier.getKindModifier(parts[i]);
+			if (modifier != null) {
+				kinds.add(modifier);
 			}
 		}
 		return kinds;
 	}
 
-	private static String getKey(List<TypeScriptKind> parts, String defaultKey, String privateKey, String publicKey) {
-		if (parts.contains(TypeScriptKind.PRIVATE)) {
+	private static String getKey(List<ScriptElementKindModifier> parts, String defaultKey, String privateKey,
+			String publicKey) {
+		if (parts.contains(ScriptElementKindModifier.privateMemberModifier)) {
 			return privateKey;
-		} else if (parts.contains(TypeScriptKind.PUBLIC)) {
+		} else if (parts.contains(ScriptElementKindModifier.publicMemberModifier)) {
 			return publicKey;
 		}
 		return defaultKey;

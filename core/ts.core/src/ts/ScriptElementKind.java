@@ -12,17 +12,19 @@ package ts;
 
 /**
  * TypeScript model kind.
+ * 
+ * @see https://github.com/Microsoft/TypeScript/blob/master/src/services/types.ts
  *
  */
-public enum TypeScriptKind {
+public enum ScriptElementKind {
 
-	ALIAS, PRIMITIVE_TYPE, KEYWORD, CLASS, INTERFACE, MODULE, SCRIPT, DIRECTORY, PROPERTY, METHOD, CONSTRUCTOR, FUNCTION, VAR, LET, ENUM, PRIVATE, PUBLIC, STATIC, TYPE, ELEMENT, ATTRIBUTE, COMPONENT, CONST, GETTER, SETTER, WARNING;
+	ALIAS, PRIMITIVE_TYPE, KEYWORD, CLASS, INTERFACE, MODULE, SCRIPT, DIRECTORY, PROPERTY, METHOD, CONSTRUCTOR, FUNCTION, VAR, LET, ENUM, TYPE, ELEMENT, ATTRIBUTE, COMPONENT, CONST, GETTER, SETTER, WARNING;
 
-	public static TypeScriptKind getKind(String kind) {
+	public static ScriptElementKind getKind(String kind) {
 		try {
-			return TypeScriptKind.valueOf(kind.toUpperCase());
+			return ScriptElementKind.valueOf(kind.toUpperCase());
 		} catch (Exception e) {
-			return TypeScriptKind.WARNING;
+			return ScriptElementKind.WARNING;
 		}
 	}
 }

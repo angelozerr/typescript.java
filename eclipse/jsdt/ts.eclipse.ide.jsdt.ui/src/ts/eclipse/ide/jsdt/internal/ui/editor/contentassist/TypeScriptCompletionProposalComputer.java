@@ -26,7 +26,7 @@ import org.eclipse.wst.jsdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.wst.jsdt.ui.text.java.JavaContentAssistInvocationContext;
 
-import ts.TypeScriptKind;
+import ts.ScriptElementKind;
 import ts.TypeScriptNoContentAvailableException;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
@@ -72,7 +72,7 @@ public class TypeScriptCompletionProposalComputer
 										new JSDTCompletionProposalFactory(position, p, context.getViewer()))
 								.get(5000, TimeUnit.MILLISECONDS).stream()
 								.filter(entry -> entry.updatePrefix(p)
-										&& TypeScriptKind.getKind(entry.getKind()) != TypeScriptKind.WARNING)
+										&& ScriptElementKind.getKind(entry.getKind()) != ScriptElementKind.WARNING)
 								.collect(Collectors.toList());
 					}
 				}
