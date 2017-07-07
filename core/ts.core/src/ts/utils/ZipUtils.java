@@ -103,6 +103,8 @@ public class ZipUtils {
 
 					// Close the stream
 					out.close();
+					// Preserve original modification date
+					extracted.setLastModified(entry.getTime());
 					if (extracted.getParent().contains(BIN_FOLDER)) {
 						extracted.setExecutable(true);
 					}
@@ -167,9 +169,13 @@ public class ZipUtils {
 
 					// Close the stream
 					out.close();
-					if (extractedFile.getParent().contains(BIN_FOLDER)) {
-						extractedFile.setExecutable(true);
-					}
+					// Preserve original modification date
+					extractedFile.setLastModified(entry.getTime());
+					long mode = entry.getMode(); 
+					if ((mode & 00100) > 0) { 
+						// Preserve execute permissions 
+						extractedFile.setExecutable(true, (mode & 00001) == 0); 
+					} 
 					break;
 				case TarEntry.LINK:
 					File linkFile = new File(destination, outFilename);
