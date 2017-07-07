@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -172,12 +173,22 @@ public class ZipUtils {
 					break;
 				case TarEntry.LINK:
 					File linkFile = new File(destination, outFilename);
+					// Be sure that parent file exists
+					File linkBaseDir = linkFile.getParentFile();
+					if (!linkBaseDir.exists()) {
+						linkBaseDir.mkdirs();
+					}
 					Path target = new File(linkFile.getParentFile(), entry.getLinkName()).toPath();
 					Files.createLink(linkFile.toPath(), target);
 					break;
 				case TarEntry.SYM_LINK:
 					File symLinkFile = new File(destination, outFilename);
-					Path symTarget = new File(symLinkFile.getParentFile(), entry.getLinkName()).toPath();
+					// Be sure that parent file exists
+					File symLinkBaseDir = symLinkFile.getParentFile();
+					if (!symLinkBaseDir.exists()) {
+						symLinkBaseDir.mkdirs();
+					}
+					Path symTarget = Paths.get(entry.getLinkName());
 					Files.createSymbolicLink(symLinkFile.toPath(), symTarget);
 					break;
 				}
