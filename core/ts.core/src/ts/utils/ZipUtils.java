@@ -178,7 +178,7 @@ public class ZipUtils {
 					if (!linkBaseDir.exists()) {
 						linkBaseDir.mkdirs();
 					}
-					Path target = new File(linkFile.getParentFile(), entry.getLinkName()).toPath();
+					Path target = Paths.get(entry.getLinkName());
 					Files.createLink(linkFile.toPath(), target);
 					break;
 				case TarEntry.SYM_LINK:
