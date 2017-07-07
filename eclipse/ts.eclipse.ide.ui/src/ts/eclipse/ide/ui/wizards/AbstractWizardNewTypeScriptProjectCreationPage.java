@@ -86,6 +86,8 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 	private Text nodePath;
 	private Text nodeVersion;
 
+	private NodeJsStatus nodejsStatus;
+
 	public AbstractWizardNewTypeScriptProjectCreationPage(String pageName, BasicNewResourceWizard wizard) {
 		super(pageName);
 		this.wizard = wizard;
@@ -189,7 +191,7 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		useEmbeddedNodeJsButton = new Button(parent, SWT.RADIO);
 		useEmbeddedNodeJsButton
 				.setText(TypeScriptUIMessages.AbstractWizardNewTypeScriptProjectCreationPage_useEmbeddedNodeJs_label);
-		useEmbeddedNodeJsButton.addListener(SWT.Selection, this);
+		useEmbeddedNodeJsButton.addListener(SWT.Selection, nodeJsStatusChanged());
 
 		embeddedNodeJs = new Combo(parent, SWT.READ_ONLY);
 		embeddedNodeJs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -205,7 +207,7 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		}
 		embeddedNodeJs.setItems(valueLabels);
 		embeddedNodeJs.setFont(JFaceResources.getDialogFont());
-		embeddedNodeJs.addListener(SWT.Modify, this);
+		embeddedNodeJs.addListener(SWT.Modify, nodeJsStatusChanged());
 		embeddedNodeJs.addModifyListener(new ModifyListener() {
 
 			@Override
@@ -215,19 +217,25 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 		});
 	}
 
+	private Listener nodeJsStatusChanged() {
+		return (event) -> {
+			nodejsStatus = null;
+			handleEvent(event);
+		};
+	}
+
 	/** Creates the field for selecting the installed Node.js. */
 	private void createInstalledNodejsField(Composite parent) {
 		if (hasEmbeddedNodeJs) {
 			Button useInstalledNodejs = new Button(parent, SWT.RADIO);
 			useInstalledNodejs
 					.setText(TypeScriptUIMessages.AbstractWizardNewTypeScriptProjectCreationPage_useInstalledNodeJs_label);
-			useInstalledNodejs.addListener(SWT.Selection, this);
 		}
 		String[] defaultPaths = IDENodejsProcessHelper.getAvailableNodejsPaths();
 		installedNodeJs = new Combo(parent, SWT.NONE);
 		installedNodeJs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		installedNodeJs.setItems(defaultPaths);
-		installedNodeJs.addListener(SWT.Modify, this);
+		installedNodeJs.addListener(SWT.Modify, nodeJsStatusChanged());
 		installedNodeJs.addModifyListener(new ModifyListener() {
 
 			@Override
@@ -357,18 +365,21 @@ public abstract class AbstractWizardNewTypeScriptProjectCreationPage extends Wiz
 	 * @return the validation status of the nodejs path.
 	 */
 	private IStatus validateAndUpdateNodejsPath() {
+		if (nodejsStatus != null) {
+			return nodejsStatus;
+		}
 		// Compute node.j status
-		NodeJsStatus status = validateNodejsPath();
+		nodejsStatus = validateNodejsPath();
 		// Update node version & path
-		if (status.isOK()) {
-			nodeVersion.setText(status.getNodeVersion());
-			nodePath.setText(FileUtils.getPath(status.getNodeFile()));
+		if (nodejsStatus.isOK()) {
+			nodeVersion.setText(nodejsStatus.getNodeVersion());
+			nodePath.setText(FileUtils.getPath(nodejsStatus.getNodeFile()));
 		} else {
 			nodeVersion.setText("");
 			nodePath.setText("");
 		}
-		nodeJsChanged(status.getNodeFile());
-		return status;
+		nodeJsChanged(nodejsStatus.getNodeFile());
+		return nodejsStatus;
 	}
 
 	/**
