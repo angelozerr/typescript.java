@@ -15,10 +15,12 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.osgi.util.NLS;
 
 import ts.client.TextSpan;
 import ts.eclipse.ide.internal.ui.TypeScriptUIMessages;
 import ts.eclipse.ide.ui.utils.EditorUtils;
+import ts.utils.FileUtils;
 
 /**
  * TypeScript hyperlink.
@@ -72,7 +74,13 @@ public class TypeScriptHyperlink implements IHyperlink {
 
 	@Override
 	public String getHyperlinkText() {
-		return TypeScriptUIMessages.TypeScriptHyperlink_text;
+		String fileName = null;
+		if (fsFile != null) {
+			fileName = FileUtils.getPath(fsFile);
+		} else {
+			fileName = file.getFullPath().toString();
+		}
+		return NLS.bind(TypeScriptUIMessages.TypeScriptHyperlink_text, fileName, span.getStart().getLine());
 	}
 
 	@Override
