@@ -3,7 +3,45 @@
 [![Build Status](https://secure.travis-ci.org/angelozerr/typescript.java.png)](http://travis-ci.org/angelozerr/typescript.java)
 [![Eclipse install](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.png)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3037133)
 
-Goal of typescript.java is to provide the capability to consume TypeScript language Service with [tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver in a Java context. Any Java IDE like Eclipse, Netbeans, WebStorm could consume typescript.java.
+Goal of typescript.java is to provide the capability to consume TypeScript language Service with [tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver) in a Java context. Any Java IDE like Eclipse, Netbeans, WebStorm could consume typescript.java.
+
+## TypeScript IDE
+
+On top of `core` module typescript.java provides an **Eclipse IDE** integration with TypeScript. 
+
+![JSDT TypeScript Completion](https://github.com/angelozerr/typescript.java/wiki/images/JSDTTypeScriptCompletion.png)  
+
+TypeScript IDE provides the following features:
+
+  - Wizards:
+    - [New TypeScript Project](https://github.com/angelozerr/typescript.java/wiki/TypeScript-Wizards#project)   
+  - Editors:
+    - [JSX Editor](https://github.com/angelozerr/typescript.java/wiki/JSX-Editor-Features)    
+    - [TypeScript Editor](https://github.com/angelozerr/typescript.java/wiki/Editor-Features)
+      - [Completion](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#completion)
+      - [Templates](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#templates)        
+      - [Hyperlink](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#hyperlink)    
+      - [Hover](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#hover)
+      - [Validation](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#validation)            
+      - [Quick Fixes](https://github.com/angelozerr/typescript.java/wiki/Editor-CodeFixes)
+      - [Code Folding](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#code-folding)
+      - [Code Lens](https://github.com/angelozerr/typescript.java/wiki/Editor-CodeLens)
+      - [Formatting](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#formatting)
+      - [Mark Occurrences](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#mark-occurrences)      
+      - [Find References](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#find-references)
+      - [Refactoring](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#refactoring)
+      - [Outline](https://github.com/angelozerr/typescript.java/wiki/Editor-Features#outline)
+    - [tsconfig.json Editor](https://github.com/angelozerr/typescript.java/wiki/TSConfig-Editor-Features)        
+    - [tslint.json Editor](https://github.com/angelozerr/typescript.java/wiki/TSLint-Editor-Features)      
+  - [Compile on save](https://github.com/angelozerr/typescript.java/wiki/TypeScript-Compiler)
+  - [Debugging](https://github.com/angelozerr/typescript.java/wiki/TypeScript-Debugging)    
+  - [Project Explorer](https://github.com/angelozerr/typescript.java/wiki/Project-Explorer)
+  - [ATA](https://github.com/angelozerr/typescript.java/wiki/ATA)
+    
+To install TypeScript IDE, please start to read [Getting Started](https://github.com/angelozerr/typescript.java/wiki/Getting-Started) section.
+
+This integration looks like [tern.java](https://github.com/angelozerr/tern.java); JSDT was extended (completion, hyperlink, hover, etc) to consumme the official TypeScript server 
+[tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver).
 
 ## Core Features
 
@@ -15,16 +53,6 @@ you will see contentassist available for JavaScript :
 
 ![SWT TypeScript Editor](https://github.com/angelozerr/typescript.java/wiki/images/SWTTypeScriptEditor.png)
 
-## Eclipse IDE
-
-On top of `core` module typescript.java provides an **Eclipse IDE** integration with TypeScript. 
-
-![JSDT TypeScript Completion](https://github.com/angelozerr/typescript.java/wiki/images/JSDTTypeScriptCompletion.png)  
-
-To install TypeScript IDE, please start to read [Getting Started](https://github.com/angelozerr/typescript.java/wiki/Getting-Started) section.
-
-This integration looks like [tern.java](https://github.com/angelozerr/tern.java); JSDT was extended (completion, hyperlink, hover, etc) to consumme the official TypeScript server 
-[tsserver](https://github.com/Microsoft/TypeScript/blob/master/bin/tsserver).
 
 # Similar Project
 
@@ -33,7 +61,6 @@ This integration looks like [tern.java](https://github.com/angelozerr/tern.java)
 See https://github.com/BestSolution-at/java-tsserver which provides the capability to consume tsserver with Java. So why developping an another tsclient?
 
  * java-tsserver requires Java8. Eclipse IDE uses Java7.
- * It uses GSON, I prefer using minimal-json and serialize JSON to Pojo/Collector at hand.
  * Uses tsclient API instead of using TypeScript Language Service API.
 
 ## Eclipse
