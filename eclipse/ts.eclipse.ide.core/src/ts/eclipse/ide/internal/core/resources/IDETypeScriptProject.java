@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IFile;
@@ -27,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 
 import ts.TypeScriptException;
+import ts.TypeScriptNoContentAvailableException;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.compileonsave.CompileOnSaveAffectedFileListSingleProject;
 import ts.client.diagnostics.DiagnosticEventBody;
@@ -286,12 +288,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	}
 
 	/**
-	 * Returns true if the given js, jsx file can be validated and false
-	 * otherwise.
+	 * Returns true if the given js, jsx file can be validated and false otherwise.
 	 * 
 	 * @param file
-	 * @return true if the given js, jsx file can be validated and false
-	 *         otherwise.
+	 * @return true if the given js, jsx file can be validated and false otherwise.
 	 * @throws CoreException
 	 */
 	private boolean isJsFileIsInScope(IFile file, ITsconfigBuildPath tsContainer) throws CoreException {
@@ -316,12 +316,10 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	}
 
 	/**
-	 * Returns true if the given ts, tsx file can be validated and false
-	 * otherwise.
+	 * Returns true if the given ts, tsx file can be validated and false otherwise.
 	 * 
 	 * @param file
-	 * @return true if the given ts, tsx file can be validated and false
-	 *         otherwise.
+	 * @return true if the given ts, tsx file can be validated and false otherwise.
 	 * @throws CoreException
 	 */
 	private boolean isTsFileIsInScope(IFile file, ITsconfigBuildPath tsContainer) throws CoreException {
@@ -466,7 +464,16 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			if (monitor.isCanceled()) {
 				return true;
 			}
-			compileTsFile(filename, client);
+			try {
+				compileTsFile(filename, client);
+			} catch (ExecutionException e) {
+				if (e.getCause() instanceof TypeScriptNoContentAvailableException) {
+					// Ignore "No content available" error.
+				}
+				else {
+					throw e;
+				}
+			}
 		}
 		return false;
 	}
