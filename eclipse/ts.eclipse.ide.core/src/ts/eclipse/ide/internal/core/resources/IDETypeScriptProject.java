@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -476,7 +475,12 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 					List<String> affectedTsFilenames = affectedProject.getFileNames();
 					for (String affectedFilename : affectedTsFilenames) {
 						if (!tsFilesToCompile.contains(affectedFilename)) {
-							tsFilesToCompile.add(affectedFilename);
+							// In some case, tsserver returns *.d.ts files (see
+							// https://github.com/angelozerr/typescript.java/issues/190#issuecomment-317876026)
+							// those *.d.ts files must be ignored for compilation.
+							if (!TypeScriptResourceUtil.isDefinitionTsFile(affectedFilename)) {
+								tsFilesToCompile.add(affectedFilename);
+							}
 						}
 					}
 				}
