@@ -37,6 +37,13 @@ public class TypeScriptCoreMessages extends NLS {
 
 	// Launch
 	public static String TypeScriptCompilerLaunchConfigurationDelegate_invalidBuildPath;
+
+	// TypeScript Compiler builder
+	public static String IDETypeScriptProject_compile_task;
+	public static String IDETypeScriptProject_compile_collecting_step;
+	public static String IDETypeScriptProject_compile_collecting_file;
+	public static String IDETypeScriptProject_compile_compiling_step;
+	public static String IDETypeScriptProject_compile_compiling_file;
 	
 	public static ResourceBundle getResourceBundle() {
 		try {

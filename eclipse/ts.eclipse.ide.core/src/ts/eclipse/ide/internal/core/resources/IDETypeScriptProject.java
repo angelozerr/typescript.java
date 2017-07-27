@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -25,7 +27,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.osgi.util.NLS;
 
 import ts.TypeScriptException;
 import ts.TypeScriptNoContentAvailableException;
@@ -51,6 +56,7 @@ import ts.eclipse.ide.core.tslint.IIDETypeScriptLint;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.internal.core.Trace;
+import ts.eclipse.ide.internal.core.TypeScriptCoreMessages;
 import ts.eclipse.ide.internal.core.compiler.IDETypeScriptCompiler;
 import ts.eclipse.ide.internal.core.console.TypeScriptConsoleConnectorManager;
 import ts.eclipse.ide.internal.core.resources.jsonconfig.JsonConfigResourcesManager;
@@ -376,19 +382,19 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	@Override
 	public void compileWithTsserver(List<IFile> updatedTsFiles, List<IFile> removedTsFiles, IProgressMonitor monitor)
 			throws TypeScriptException {
+		SubMonitor subMonitor = SubMonitor.convert(monitor, TypeScriptCoreMessages.IDETypeScriptProject_compile_task,
+				100);
+		List<IFile> tsFilesToClose = new ArrayList<>();
 		try {
 			List<String> tsFilesToCompile = new ArrayList<>();
 			// Collect ts files to compile by using tsserver to retrieve
 			// dependencies files.
 			// It works only if tsconfig.json declares "compileOnSave: true".
-			if (collectTsFilesToCompile(updatedTsFiles, getClient(), tsFilesToCompile, false, monitor)) {
-				return;
-			}
+			collectTsFilesToCompile(updatedTsFiles, tsFilesToCompile, tsFilesToClose, getClient(), subMonitor);
 
 			// Compile ts files with tsserver.
-			if (compileTsFiles(tsFilesToCompile, getClient(), monitor)) {
-				return;
-			}
+			compileTsFiles(tsFilesToCompile, getClient(), subMonitor);
+
 			if (removedTsFiles.size() > 0) {
 				// ts files was removed, how to get referenced files which must
 				// be recompiled (with errors)?
@@ -397,54 +403,86 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 			throw e;
 		} catch (Exception e) {
 			throw new TypeScriptException(e);
+		} finally {
+			for (IFile tsFile : tsFilesToClose) {
+				closeFile(tsFile);
+			}
+			subMonitor.done();
 		}
 	}
 
 	/**
 	 * Collect ts files to compile from the given ts files list.
 	 * 
-	 * @param tsFiles
-	 * @param client
+	 * @param updatedTsFiles
+	 *            list of TypeScript files which have changed.
 	 * @param tsFilesToCompile
-	 * @param exclude
-	 * @param monitor
+	 *            list of collected ts files to compile.
+	 * @param tsFilesToClose
+	 *            list of ts files to close.
+	 * @param client
+	 * @param subMonitor
 	 * @throws Exception
 	 */
-	private boolean collectTsFilesToCompile(List<IFile> tsFiles, ITypeScriptServiceClient client,
-			List<String> tsFilesToCompile, boolean exclude, IProgressMonitor monitor) throws Exception {
-		for (IFile tsFile : tsFiles) {
-			if (monitor.isCanceled()) {
-				return true;
+	private void collectTsFilesToCompile(List<IFile> updatedTsFiles, List<String> tsFilesToCompile,
+			List<IFile> tsFilesToClose, ITypeScriptServiceClient client, SubMonitor subMonitor) throws Exception {
+		SubMonitor loopMonitor = subMonitor.split(50).setWorkRemaining(updatedTsFiles.size());
+		loopMonitor.subTask(TypeScriptCoreMessages.IDETypeScriptProject_compile_collecting_step);
+		for (IFile tsFile : updatedTsFiles) {
+			if (loopMonitor.isCanceled()) {
+				throw new OperationCanceledException();
 			}
 			String filename = WorkbenchResourceUtil.getFileName(tsFile);
+			loopMonitor
+					.subTask(NLS.bind(TypeScriptCoreMessages.IDETypeScriptProject_compile_collecting_file, filename));
 			if (!tsFilesToCompile.contains(filename)) {
-				collectTsFilesToCompile(filename, client, tsFilesToCompile, exclude);
+				collectTsFilesToCompile(filename, client, tsFilesToCompile, tsFilesToClose, loopMonitor);
 			}
+			loopMonitor.worked(1);
+			// loopMonitor.split(1);
 		}
-		return false;
+		// subMonitor.setWorkRemaining(50);
 	}
 
 	/**
-	 * Collect ts files to compile from the given ts file name.
+	 * Collect ts files to compile from the given TypeScript file.
 	 * 
 	 * @param filename
 	 * @param client
 	 * @param tsFilesToCompile
-	 * @param exclude
+	 * @param tsFilesToClose
+	 * @param monitor
 	 * @throws Exception
 	 */
 	private void collectTsFilesToCompile(String filename, ITypeScriptServiceClient client,
-			List<String> tsFilesToCompile, boolean exclude) throws Exception {
-		// call tsserver compileOnSaveAffectedFileList to retrieve file
-		// dependencies of the given filename
-		List<CompileOnSaveAffectedFileListSingleProject> affectedProjects = client
-				.compileOnSaveAffectedFileList(filename).get(5000, TimeUnit.MILLISECONDS);
-		for (CompileOnSaveAffectedFileListSingleProject affectedProject : affectedProjects) {
-			List<String> affectedTsFilenames = affectedProject.getFileNames();
-			for (String affectedFilename : affectedTsFilenames) {
-				if (!tsFilesToCompile.contains(affectedFilename) && !(exclude && filename.equals(affectedFilename))) {
-					tsFilesToCompile.add(affectedFilename);
+			List<String> tsFilesToCompile, List<IFile> tsFilesToClose, IProgressMonitor monitor) throws Exception {
+		while (!monitor.isCanceled()) {
+			try {
+				// When tsserver is not started, it takes time, we try to collect TypeScript
+				// files every time and stop the search if user stops the builder.
+				List<CompileOnSaveAffectedFileListSingleProject> affectedProjects = client
+						.compileOnSaveAffectedFileList(filename).get(5000, TimeUnit.MILLISECONDS);
+				if (affectedProjects.size() == 0 && getOpenedFile(filename) == null) {
+					// Case when none TypeScript files are opened.
+					// In this case, compileOnSaveAffectedFileList returns null, the tsserver needs
+					// having just one opened TypeScript file
+					// in order to compileOnSaveAffectedFileList returns the well list.
+					IFile tsFile = WorkbenchResourceUtil.findFileFromWorkspace(filename);
+					openFile(tsFile, null);
+					tsFilesToClose.add(tsFile);
+					affectedProjects = client.compileOnSaveAffectedFileList(filename).get(5000, TimeUnit.MILLISECONDS);
 				}
+				for (CompileOnSaveAffectedFileListSingleProject affectedProject : affectedProjects) {
+					List<String> affectedTsFilenames = affectedProject.getFileNames();
+					for (String affectedFilename : affectedTsFilenames) {
+						if (!tsFilesToCompile.contains(affectedFilename)) {
+							tsFilesToCompile.add(affectedFilename);
+						}
+					}
+				}
+				return;
+			} catch (TimeoutException e) {
+				// tsserver is not initialized, retry again...
 			}
 		}
 	}
@@ -454,28 +492,32 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 	 * 
 	 * @param tsFilesToCompile
 	 * @param client
-	 * @param monitor
-	 * @return true if process must be stopped and false otherwise.
+	 * @param subMonitor
 	 * @throws Exception
 	 */
-	private boolean compileTsFiles(List<String> tsFilesToCompile, ITypeScriptServiceClient client,
-			IProgressMonitor monitor) throws Exception {
+	private void compileTsFiles(List<String> tsFilesToCompile, ITypeScriptServiceClient client, SubMonitor subMonitor)
+			throws Exception {
+		SubMonitor loopMonitor = subMonitor.newChild(50).setWorkRemaining(tsFilesToCompile.size());// subMonitor.split(50).setWorkRemaining(tsFilesToCompile.size());
+		loopMonitor.subTask(TypeScriptCoreMessages.IDETypeScriptProject_compile_compiling_step);
 		for (String filename : tsFilesToCompile) {
-			if (monitor.isCanceled()) {
-				return true;
-			}
 			try {
+				if (loopMonitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
+				loopMonitor.subTask(
+						NLS.bind(TypeScriptCoreMessages.IDETypeScriptProject_compile_compiling_file, filename));
 				compileTsFile(filename, client);
+				loopMonitor.worked(1);
+				// loopMonitor.split(1);
 			} catch (ExecutionException e) {
 				if (e.getCause() instanceof TypeScriptNoContentAvailableException) {
 					// Ignore "No content available" error.
-				}
-				else {
+				} else {
 					throw e;
 				}
 			}
 		}
-		return false;
+		// subMonitor.setWorkRemaining(100);
 	}
 
 	/**
@@ -493,7 +535,7 @@ public class IDETypeScriptProject extends TypeScriptProject implements IIDETypeS
 		if (tsFile != null) {
 			// Delete TypeScript error marker
 			TypeScriptResourceUtil.deleteTscMarker(tsFile);
-			// Add TypeScript error marker if there error errors.
+			// Add TypeScript error marker if there are errors.
 			DiagnosticEventBody event = client.syntacticDiagnosticsSync(filename, true).get(5000,
 					TimeUnit.MILLISECONDS);
 			addMarker(tsFile, event);

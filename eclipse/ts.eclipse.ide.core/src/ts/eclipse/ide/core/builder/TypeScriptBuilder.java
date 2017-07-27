@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
 
 import ts.TypeScriptException;
@@ -74,8 +75,8 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		for (int i = 0; i < tsContainers.length; i++) {
 			ITsconfigBuildPath tsContainer = tsContainers[i];
 			/*
-			 * try { IDETsconfigJson tsconfig = tsContainer.getTsconfig(); if
-			 * (tsconfig == null || tsconfig.isCompileOnSave()) {
+			 * try { IDETsconfigJson tsconfig = tsContainer.getTsconfig(); if (tsconfig ==
+			 * null || tsconfig.isCompileOnSave()) {
 			 * tsProject.getCompiler().compile(tsconfig, null); } } catch
 			 * (TypeScriptException e) { Trace.trace(Trace.SEVERE,
 			 * "Error while tsc compilation", e); }
@@ -260,10 +261,22 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		});
 
 		try {
-			tsProject.compileWithTsserver(updatedTsFiles, removedTsFiles, monitor);
+			if (updatedTsFiles.size() > 0 || removedTsFiles.size() > 0) {
+				tsProject.compileWithTsserver(updatedTsFiles, removedTsFiles, getSubMonitor(monitor));
+			}
 		} catch (TypeScriptException e) {
 			throw new CoreException(new Status(IStatus.ERROR, TypeScriptCorePlugin.PLUGIN_ID,
 					"Error while compiling with tsserver", e));
 		}
+	}
+
+	private IProgressMonitor getSubMonitor(IProgressMonitor monitor) {
+		// we need to use the parent SubMonitor otherwise SubMonitor#worked, etc doesn't work?
+		// See article
+		// https://medium.com/@jgwest/debugging-eclipse-subprogressmonitor-and-submonitor-0-work-completed-or-work-not-reported-f482c71cc85c
+		if (monitor instanceof ProgressMonitorWrapper) {
+			return getSubMonitor(((ProgressMonitorWrapper) monitor).getWrappedProgressMonitor());
+		}
+		return monitor;
 	}
 }
