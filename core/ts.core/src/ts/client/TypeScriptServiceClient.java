@@ -41,6 +41,7 @@ import ts.client.installtypes.EndInstallTypesEventBody;
 import ts.client.installtypes.IInstallTypesListener;
 import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItem;
+import ts.client.navto.NavtoItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
@@ -72,6 +73,7 @@ import ts.internal.client.protocol.IRequestEventable;
 import ts.internal.client.protocol.ImplementationRequest;
 import ts.internal.client.protocol.MessageType;
 import ts.internal.client.protocol.NavBarRequest;
+import ts.internal.client.protocol.NavToRequest;
 import ts.internal.client.protocol.NavTreeRequest;
 import ts.internal.client.protocol.OccurrencesRequest;
 import ts.internal.client.protocol.OpenRequest;
@@ -393,6 +395,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	public CompletableFuture<RenameResponseBody> rename(String file, int line, int offset, Boolean findInComments,
 			Boolean findInStrings) throws TypeScriptException {
 		return execute(new RenameRequest(file, line, offset, findInComments, findInStrings), true);
+	}
+
+	@Override
+	public CompletableFuture<List<NavtoItem>> navto(String fileName, String searchValue, Integer maxResultCount,
+			Boolean currentFileOnly, String projectFileName) throws TypeScriptException {
+		return execute(new NavToRequest(fileName, searchValue, maxResultCount, currentFileOnly, projectFileName), true);
 	}
 
 	@Override

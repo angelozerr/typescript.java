@@ -25,6 +25,7 @@ import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.installtypes.IInstallTypesListener;
 import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItem;
+import ts.client.navto.NavtoItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.client.quickinfo.QuickInfo;
@@ -206,6 +207,9 @@ public interface ITypeScriptServiceClient {
 
 	CompletableFuture<RenameResponseBody> rename(String file, int line, int offset, Boolean findInComments,
 			Boolean findInStrings) throws TypeScriptException;
+
+	CompletableFuture<List<NavtoItem>> navto(String fileName, String searchValue, Integer maxResultCount,
+			Boolean currentFileOnly, String projectFileName) throws TypeScriptException;
 
 	CompletableFuture<List<NavigationBarItem>> navbar(String fileName, IPositionProvider positionProvider)
 			throws TypeScriptException;

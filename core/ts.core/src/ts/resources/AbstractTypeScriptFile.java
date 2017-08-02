@@ -30,6 +30,7 @@ import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.format.FormatCodeSettings;
 import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItemRoot;
+import ts.client.navto.NavtoItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.refactors.ApplicableRefactorInfo;
@@ -256,6 +257,15 @@ public abstract class AbstractTypeScriptFile implements ITypeScriptFile {
 		return client.rename(this.getName(), line, offset, findInComments, findInStrings);
 	}
 
+	@Override
+	public CompletableFuture<List<NavtoItem>> navto(String searchValue, Integer maxResultCount,
+			Boolean currentFileOnly, String projectFileName)
+			throws TypeScriptException {
+		this.synch();
+		ITypeScriptServiceClient client = tsProject.getClient();
+		return client.navto(getName(), searchValue, maxResultCount, currentFileOnly, projectFileName);
+	}
+	
 	@Override
 	public CompletableFuture<List<FileSpan>> implementation(int position) throws TypeScriptException {
 		this.synch();

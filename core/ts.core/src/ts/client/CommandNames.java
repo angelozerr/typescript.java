@@ -36,6 +36,7 @@ public enum CommandNames implements ISupportable {
 	Configure("configure"),
 	ProjectInfo("projectInfo"),
 	Rename("rename"),
+	NavTo("navto"),
 	
 	// 2.0.0
 	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.0"), 
