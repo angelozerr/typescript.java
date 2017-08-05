@@ -73,8 +73,8 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	IIDETypeScriptProjectSettings getProjectSettings();
 
 	/**
-	 * Returns true if the given file is in the scope for validation,
-	 * compilation and false otherwise.
+	 * Returns true if the given file is in the scope for validation, compilation
+	 * and false otherwise.
 	 * 
 	 * A file is in the scope if :
 	 * 
@@ -85,8 +85,7 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 * <li>it exists a tsconfig.json in the folder (or parent) of the file and:
 	 * <ul>
 	 * <li>the given file is defined in the "files" config section.</li>
-	 * <li>or the given file is not excluded by the "exclude" config section.
-	 * </li>
+	 * <li>or the given file is not excluded by the "exclude" config section.</li>
 	 * </ul>
 	 * </li>
 	 * </ul>
@@ -109,6 +108,7 @@ public interface IIDETypeScriptProject extends ITypeScriptProject {
 	 * @param removedTsFiles
 	 * @throws TypeScriptException
 	 */
-	void compileWithTsserver(List<IFile> updatedTsFiles, List<IFile> removedTsFiles, IProgressMonitor monitor) throws TypeScriptException;
+	void compileWithTsserver(List<IFile> updatedTsFiles, List<IFile> removedTsFiles, IProgressMonitor monitor)
+			throws TypeScriptException;
 
 }

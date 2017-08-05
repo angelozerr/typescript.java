@@ -8,34 +8,42 @@
  *  Contributors:
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  */
-package ts.eclipse.ide.ui.outline;
+package ts.eclipse.ide.ui.dialogs;
 
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import ts.client.IKindProvider;
-import ts.client.navbar.NavigationBarItem;
+import ts.client.navto.NavtoItem;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
 
 /**
  * TypeScript outline label provider.
  *
  */
-public class TypeScriptOutlineLabelProvider extends LabelProvider {
+public class NavtoItemLabelProvider extends LabelProvider {
+
+	private static final ILabelProvider INSTANCE = new NavtoItemLabelProvider();
+
+	public static ILabelProvider getInstance() {
+		return INSTANCE;
+	}
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof NavigationBarItem) {
-			return ((NavigationBarItem) element).getText();
+		if (element instanceof NavtoItem) {
+			return ((NavtoItem) element).getName();
 		}
 		return super.getText(element);
 	}
 
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof NavigationBarItem) {
+		if (element instanceof IKindProvider) {
 			return TypeScriptImagesRegistry.getImage(((IKindProvider) element));
 		}
 		return super.getImage(element);
 	}
+
 }

@@ -1,7 +1,5 @@
 package ts.eclipse.ide.internal.ui.text;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -46,7 +44,6 @@ import org.eclipse.ui.internal.ide.StringMatcher;
 import ts.client.FileSpan;
 import ts.client.navbar.NavigationBarItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
-import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.ui.outline.TypeScriptOutlineContentProvider;
 import ts.eclipse.ide.ui.outline.TypeScriptOutlineLabelProvider;
 import ts.eclipse.ide.ui.utils.EditorUtils;
@@ -289,8 +286,7 @@ public abstract class AbstractInformationControl extends PopupDialog
 	}
 
 	/**
-	 * Performs passing to selected element with use of outline page
-	 * functionality
+	 * Performs passing to selected element with use of outline page functionality
 	 */
 	private void gotoSelectedElement() {
 		Object selectedElement = getSelectedElement();
@@ -305,33 +301,8 @@ public abstract class AbstractInformationControl extends PopupDialog
 			}
 		} else if (selectedElement instanceof FileSpan) {
 			FileSpan span = (FileSpan) selectedElement;
-			String filemane = span.getFile();
-			IFile file = WorkbenchResourceUtil.findFileFromWorkspace(filemane);
-			if (file == null) {
-				File fs = WorkbenchResourceUtil.findFileFormFileSystem(filemane);
-				if (isFileExists(fs)) {
-					EditorUtils.openInEditor(fs, span);
-				}
-			} else {
-				if (isFileExists(file)) {
-					EditorUtils.openInEditor(file, span);
-				}
-			}
+			EditorUtils.openInEditor(span);
 		}
-	}
-
-	private boolean isFileExists(IFile file) {
-		if (file == null) {
-			return false;
-		}
-		return file.exists();
-	}
-
-	private boolean isFileExists(File file) {
-		if (file == null) {
-			return false;
-		}
-		return file.exists() && file.isFile();
 	}
 
 	@Override
@@ -420,8 +391,8 @@ public abstract class AbstractInformationControl extends PopupDialog
 	/**
 	 * Sets the patterns to filter out for the receiver.
 	 * <p>
-	 * The following characters have special meaning: ? => any character * =>
-	 * any string
+	 * The following characters have special meaning: ? => any character * => any
+	 * string
 	 * </p>
 	 *
 	 * @param pattern
@@ -444,8 +415,8 @@ public abstract class AbstractInformationControl extends PopupDialog
 	}
 
 	/**
-	 * The string matcher has been modified. The default implementation
-	 * refreshes the view and selects the first matched element
+	 * The string matcher has been modified. The default implementation refreshes
+	 * the view and selects the first matched element
 	 */
 	private void stringMatcherUpdated() {
 		// Refresh the tree viewer to re-filter
@@ -471,8 +442,8 @@ public abstract class AbstractInformationControl extends PopupDialog
 	}
 
 	/**
-	 * Recursively searches the first element in the tree which matches the
-	 * current filter pattern.
+	 * Recursively searches the first element in the tree which matches the current
+	 * filter pattern.
 	 * 
 	 * @param items
 	 *            tree root items
@@ -568,16 +539,14 @@ public abstract class AbstractInformationControl extends PopupDialog
 	public void setLocation(Point location) {
 		/*
 		 * If the location is persisted, it gets managed by PopupDialog - fine.
-		 * Otherwise, the location is computed in Window#getInitialLocation,
-		 * which will center it in the parent shell / main monitor, which is
-		 * wrong for two reasons: - we want to center over the editor / subject
-		 * control, not the parent shell - the center is computed via the
-		 * initalSize, which may be also wrong since the size may have been
-		 * updated since via min/max sizing of
-		 * AbstractInformationControlManager. In that case, override the
-		 * location with the one computed by the manager. Note that the call to
-		 * constrainShellSize in PopupDialog.open will still ensure that the
-		 * shell is entirely visible.
+		 * Otherwise, the location is computed in Window#getInitialLocation, which will
+		 * center it in the parent shell / main monitor, which is wrong for two reasons:
+		 * - we want to center over the editor / subject control, not the parent shell -
+		 * the center is computed via the initalSize, which may be also wrong since the
+		 * size may have been updated since via min/max sizing of
+		 * AbstractInformationControlManager. In that case, override the location with
+		 * the one computed by the manager. Note that the call to constrainShellSize in
+		 * PopupDialog.open will still ensure that the shell is entirely visible.
 		 */
 		if (!getPersistLocation() || (getDialogSettings() == null)) {
 			getShell().setLocation(location);

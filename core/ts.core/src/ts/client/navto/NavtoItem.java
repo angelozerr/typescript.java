@@ -10,12 +10,13 @@
  */
 package ts.client.navto;
 
-import ts.client.Location;
+import ts.client.FileSpan;
+import ts.client.IKindProvider;
 
 /**
  * An item found in a navto response.
  */
-public class NavtoItem {
+public class NavtoItem extends FileSpan implements IKindProvider {
 
 	/**
 	 * The symbol's name.
@@ -43,21 +44,6 @@ public class NavtoItem {
 	private String kindModifiers;
 
 	/**
-	 * The file in which the symbol is found.
-	 */
-	private String file;
-
-	/**
-	 * The location within file at which the symbol is found.
-	 */
-	private Location start;
-
-	/**
-	 * One past the last character of the symbol.
-	 */
-	private Location end;
-
-	/**
 	 * Name of symbol's container symbol (if any); for example, the class name if
 	 * symbol is a class member.
 	 */
@@ -72,6 +58,7 @@ public class NavtoItem {
 		return name;
 	}
 
+	@Override
 	public String getKind() {
 		return kind;
 	}
@@ -84,20 +71,9 @@ public class NavtoItem {
 		return isCaseSensitive;
 	}
 
+	@Override
 	public String getKindModifiers() {
 		return kindModifiers;
-	}
-
-	public String getFile() {
-		return file;
-	}
-
-	public Location getStart() {
-		return start;
-	}
-
-	public Location getEnd() {
-		return end;
 	}
 
 	public String getContainerName() {

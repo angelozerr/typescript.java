@@ -18,6 +18,7 @@ import ts.client.ISupportable;
 import ts.client.ITypeScriptClientListener;
 import ts.client.ITypeScriptServiceClient;
 import ts.client.diagnostics.DiagnosticEvent;
+import ts.client.navto.NavtoItem;
 import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.ITypeScriptCompiler;
 import ts.cmd.tslint.ITypeScriptLint;
@@ -29,8 +30,8 @@ import ts.cmd.tslint.ITypeScriptLint;
 public interface ITypeScriptProject {
 
 	/**
-	 * Returns associated tsclient if any. This call may result in creating one
-	 * if it hasn't been created already.
+	 * Returns associated tsclient if any. This call may result in creating one if
+	 * it hasn't been created already.
 	 * 
 	 * @return
 	 * @throws TypeScriptException
@@ -81,26 +82,28 @@ public interface ITypeScriptProject {
 	void disposeTslint();
 
 	/**
-	 * Returns true if the given tsserver command can be supported by the
-	 * TypeScript version configured for the project and false otherwise.
+	 * Returns true if the given tsserver command can be supported by the TypeScript
+	 * version configured for the project and false otherwise.
 	 * 
 	 * @param command
-	 * @return true if the given tsserver command can be supported by the
-	 *         TypeScript version configured for the project and false
-	 *         otherwise.
+	 * @return true if the given tsserver command can be supported by the TypeScript
+	 *         version configured for the project and false otherwise.
 	 */
 	boolean canSupport(ISupportable command);
-	
+
 	/**
 	 * Returns true if the given tsc compiler option can be supported by the
 	 * TypeScript version configured for the project and false otherwise.
 	 * 
 	 * @param option
 	 * @return true if the given tsc compiler option can be supported by the
-	 *         TypeScript version configured for the project and false
-	 *         otherwise.
+	 *         TypeScript version configured for the project and false otherwise.
 	 */
 	boolean canSupport(CompilerOptionCapability option);
 
 	CompletableFuture<List<DiagnosticEvent>> geterrForProject(String file, int delay) throws TypeScriptException;
+
+	CompletableFuture<List<NavtoItem>> navto(String fileName, String searchValue, Integer maxResultCount,
+			Boolean currentFileOnly, String projectFileName) throws TypeScriptException;
+
 }

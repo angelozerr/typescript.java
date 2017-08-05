@@ -29,6 +29,7 @@ import ts.client.TypeScriptServiceClient;
 import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.ICompletionEntryMatcherProvider;
 import ts.client.diagnostics.DiagnosticEvent;
+import ts.client.navto.NavtoItem;
 import ts.client.projectinfo.ProjectInfo;
 import ts.cmd.tsc.CompilerOptionCapability;
 import ts.cmd.tsc.ITypeScriptCompiler;
@@ -394,4 +395,12 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		}
 
 	}
+
+	@Override
+	public CompletableFuture<List<NavtoItem>> navto(String fileName, String searchValue, Integer maxResultCount,
+			Boolean currentFileOnly, String projectFileName) throws TypeScriptException {
+		ITypeScriptServiceClient client = getClient();
+		return client.navto(fileName, searchValue, maxResultCount, currentFileOnly, projectFileName);
+	}
+
 }

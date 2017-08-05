@@ -11,7 +11,7 @@ On top of `core` module typescript.java provides an **Eclipse IDE** integration 
 
 ![JSDT TypeScript Completion](https://github.com/angelozerr/typescript.java/wiki/images/JSDTTypeScriptCompletion.png)  
 
-TypeScript IDE provides the following features:
+`TypeScript IDE` provides the following features:
 
   - Wizards:
     - [New TypeScript Project](https://github.com/angelozerr/typescript.java/wiki/TypeScript-Wizards#project)   

@@ -74,6 +74,10 @@ public class TypeScriptBuilder extends IncrementalProjectBuilder {
 		ITsconfigBuildPath[] tsContainers = buildPath.getTsconfigBuildPaths();
 		for (int i = 0; i < tsContainers.length; i++) {
 			ITsconfigBuildPath tsContainer = tsContainers[i];
+			
+			
+			
+			
 			/*
 			 * try { IDETsconfigJson tsconfig = tsContainer.getTsconfig(); if (tsconfig ==
 			 * null || tsconfig.isCompileOnSave()) {

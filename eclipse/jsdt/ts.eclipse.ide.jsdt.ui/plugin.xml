@@ -178,6 +178,36 @@
       </actionSetPartAssociation>         
    </extension>
    
+<!-- =========================================================================== -->
+<!-- Java and Coding Action Set (Adding the source, refactor and navigate menu)  -->
+<!-- =========================================================================== -->
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="%TypeScriptActionSet.label"
+            description="%TypeScriptActionSet.description"
+            visible="false"
+            id="ts.eclipse.ide.jsdt.ui.TypeScriptActionSet">
+         <action
+               id="openSymbol"
+               toolbarPath="org.eclipse.search.searchActionSet/Search"
+               class="ts.eclipse.ide.jsdt.internal.ui.actions.OpenSymbolAction"
+               definitionId="ts.eclipse.ide.jsdt.ui.navigate.open.symbol"
+               label="%OpenSymbolAction.label"
+               menubarPath="navigate/open.ext2"
+               tooltip="%OpenSymbolAction.tooltip">
+         </action>
+      </actionSet>
+   </extension>
+        <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation
+            targetID="ts.eclipse.ide.jsdt.ui.TypeScriptActionSet">
+         <part
+               id="ts.eclipse.ide.jsdt.ui.editor.TypeScriptEditor">
+         </part>
+      </actionSetPartAssociation>
+   </extension>
 <!-- with an A_                                                                -->
 <!-- the open action set is contributed before the CodeActionSet we prefix it  -->
 <!-- Action sets are contributed after they have been sorted. To enfore that   -->
@@ -487,7 +517,13 @@
             description="%ActionDefinition.open.editor.description"
             categoryId="org.eclipse.ui.category.navigate"
             id="ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor">
-      </command>      
+      </command>
+      <command
+            name="%ActionDefinition.open.symbol.name"
+            description="%ActionDefinition.open.symbol.description"
+            categoryId="org.eclipse.ui.category.navigate"
+            id="ts.eclipse.ide.jsdt.ui.navigate.open.symbol">
+      </command>
 	</extension>
 	
    <extension
@@ -574,7 +610,12 @@
             sequence="F3"
             contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
             commandId="ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>                        
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+      <key
+            sequence="M1+M2+T"
+            contextId="ts.eclipse.ide.jsdt.ui.typeScriptViewScope"
+            commandId="ts.eclipse.ide.jsdt.ui.navigate.open.symbol"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>            
 <!-- refactoring -->
       <key
             sequence="M2+M3+T"

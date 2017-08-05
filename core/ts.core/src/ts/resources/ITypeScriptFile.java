@@ -26,7 +26,6 @@ import ts.client.diagnostics.DiagnosticEventBody;
 import ts.client.format.FormatCodeSettings;
 import ts.client.jsdoc.TextInsertion;
 import ts.client.navbar.NavigationBarItemRoot;
-import ts.client.navto.NavtoItem;
 import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
 import ts.client.refactors.ApplicableRefactorInfo;
@@ -201,9 +200,6 @@ public interface ITypeScriptFile extends IPositionProvider {
 
 	CompletableFuture<RenameResponseBody> rename(int position, Boolean findInComments, Boolean findInStrings)
 			throws TypeScriptException;
-
-	CompletableFuture<List<NavtoItem>> navto(String searchValue, Integer maxResultCount, Boolean currentFileOnly,
-			String projectFileName) throws TypeScriptException;
 
 	/**
 	 * Call implementation from the tsserver.

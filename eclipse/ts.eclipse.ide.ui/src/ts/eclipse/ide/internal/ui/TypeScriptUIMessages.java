@@ -208,6 +208,11 @@ public class TypeScriptUIMessages extends NLS {
 	public static String TSConfigWizardPage_noImplicitReturns;
 	public static String TSConfigWizardPage_strictNullChecks;
 
+	// Open Symbol dialog
+	public static String OpenSymbolSelectionDialog_title;
+	public static String OpenSymbolSelectionDialog_message;
+	public static String OpenSymbolSelectionDialog_searchJob_taskName;
+	
 	// NPM Module Versions
 	public static String NPMModuleVersionsSelectionDialog_title;
 	public static String NPMModuleVersionsSelectionDialog_message;

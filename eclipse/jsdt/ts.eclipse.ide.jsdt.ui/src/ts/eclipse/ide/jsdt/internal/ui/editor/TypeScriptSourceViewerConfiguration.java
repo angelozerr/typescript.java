@@ -143,6 +143,12 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 			assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_ABOVE);
 			assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
+//			assistant.setContextInformationPopupOrientation(ContentAssistant.CONTEXT_INFO_BELOW);
+//			assistant.setProposalPopupOrientation(ContentAssistant.PROPOSAL_REMOVE);
+//			assistant.setAutoActivationDelay(0);
+//			assistant.enableColoredLabels(true);
+//			assistant.enableAutoActivation(true);
+			
 			return assistant;
 		}
 		return null;
