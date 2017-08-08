@@ -8,9 +8,11 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.provisional.codelens.ICodeLens;
+import org.eclipse.jface.text.provisional.codelens.ICodeLensContext;
 import org.eclipse.jface.text.provisional.codelens.ICodeLensProvider;
 import org.eclipse.jface.text.provisional.codelens.Range;
 
@@ -25,7 +27,8 @@ import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvider {
 
 	@Override
-	public ICodeLens[] provideCodeLenses(ITextViewer textViewer) {
+	public ICodeLens[] provideCodeLenses(ICodeLensContext context, IProgressMonitor monitor) {
+		ITextViewer textViewer = context.getViewer();
 		IResource resource = TypeScriptResourceUtil.getFile(textViewer.getDocument());
 		if (resource == null) {
 			return null;

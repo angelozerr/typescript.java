@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.provisional.codelens.Command;
 import org.eclipse.jface.text.provisional.codelens.ICodeLens;
+import org.eclipse.jface.text.provisional.codelens.ICodeLensContext;
 import org.eclipse.jface.text.provisional.codelens.Range;
 
 import ts.ScriptElementKind;
@@ -19,7 +20,7 @@ import ts.eclipse.ide.ui.codelens.TypeScriptBaseCodeLensProvider;
 public class TypeScriptReferencesCodeLensProvider extends TypeScriptBaseCodeLensProvider {
 
 	@Override
-	public ICodeLens resolveCodeLens(ITextViewer textViewer, ICodeLens cl) {
+	public ICodeLens resolveCodeLens(ICodeLensContext context, ICodeLens cl, IProgressMonitor monitor) {
 		ReferencesCodeLens codeLens = (ReferencesCodeLens) cl;
 		// const codeLens = inputCodeLens as ReferencesCodeLens;
 		// const args: Proto.FileLocationRequestArgs = {

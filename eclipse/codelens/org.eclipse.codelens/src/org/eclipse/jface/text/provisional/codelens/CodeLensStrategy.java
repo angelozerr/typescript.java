@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -18,13 +19,14 @@ import org.eclipse.jface.text.provisional.codelens.internal.CodeLensHelper;
 import org.eclipse.jface.text.provisional.viewzones.ViewZoneChangeAccessor;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
+import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.patch.StyledTextPatcher;
 
 // /vscode/src/vs/editor/contrib/codelens/common/codelens.ts
-public class CodeLensStrategy implements IReconcilingStrategy {
+public class CodeLensStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension {
 
-	private final ITextViewer textViewer;
+	private final ICodeLensContext context;
 	private final List<String> targets;
 
 	private AtomicInteger count = new AtomicInteger(0);
@@ -33,18 +35,20 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 	private List<CodeLens> _lenses;
 	private CompletableFuture<Void> symbolsPromise;
 	private boolean invalidateTextPresentation;
+	private IProgressMonitor monitor;
 
-	public CodeLensStrategy(ITextViewer textViewer) {
-		this(textViewer, true);
+	public CodeLensStrategy(ICodeLensContext context) {
+		this(context, true);
 	}
 
-	public CodeLensStrategy(ITextViewer textViewer, boolean invalidateTextPresentation) {
-		this.textViewer = textViewer;
+	public CodeLensStrategy(ICodeLensContext context, boolean invalidateTextPresentation) {
+		this.context = context;
 		this.invalidateTextPresentation = invalidateTextPresentation;
 		this.targets = new ArrayList<>();
-		// Initialize the view change accessor in the UI Thread because teh
-		// constructor updat ethe StyledTextRenderer which i saccessible only in
+		// Initialize the view change accessor in the UI Thread because the
+		// constructor update the StyledTextRenderer which is accessible only in
 		// an UI Thread.
+		ITextViewer textViewer = context.getViewer();
 		textViewer.getTextWidget().getDisplay().syncExec(() -> {
 			CodeLensStrategy.this.accessor = new ViewZoneChangeAccessor(textViewer);
 		});
@@ -56,7 +60,7 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 			symbolsPromise.cancel(true);
 		}
 		int modelCount = count.incrementAndGet();
-		symbolsPromise = getCodeLensData(textViewer, targets, modelCount).thenAccept(symbols -> {
+		symbolsPromise = getCodeLensData(context, targets, modelCount).thenAccept(symbols -> {
 			renderCodeLensSymbols(symbols);
 		}).exceptionally(e -> {
 			e.printStackTrace();
@@ -64,7 +68,7 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 		});
 	}
 
-	private CompletableFuture<Collection<CodeLensData>> getCodeLensData(ITextViewer textViewer, List<String> targets,
+	private CompletableFuture<Collection<CodeLensData>> getCodeLensData(ICodeLensContext context, List<String> targets,
 			int modelCount) {
 		return CompletableFuture.supplyAsync(() -> {
 			List<CodeLensData> symbols = new ArrayList<>();
@@ -72,7 +76,7 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 				List<ICodeLensProvider> providers = CodeLensProviderRegistry.getInstance().all(target);
 				if (providers != null) {
 					for (ICodeLensProvider provider : providers) {
-						ICodeLens[] lenses = provider.provideCodeLenses(textViewer);
+						ICodeLens[] lenses = provider.provideCodeLenses(context, getProgressMonitor());
 						if (lenses != null) {
 							for (int i = 0; i < lenses.length; i++) {
 								symbols.add(new CodeLensData(lenses[i], provider));
@@ -105,7 +109,8 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 	}
 
 	private void renderCodeLensSymbols(Collection<CodeLensData> symbols) {
-		int maxLineNumber = this.textViewer.getDocument().getNumberOfLines();
+		IDocument document = this.context.getViewer().getDocument();
+		int maxLineNumber = document.getNumberOfLines();
 		List<List<CodeLensData>> groups = new ArrayList<>();
 		List<CodeLensData> lastGroup = null;
 
@@ -134,7 +139,7 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 			int offset = this._lenses.get(codeLensIndex).getOffsetAtLine();
 			int codeLensLineNumber = -1;
 			try {
-				codeLensLineNumber = offset != -1 ? textViewer.getDocument().getLineOfOffset(offset) + 1 : -1;
+				codeLensLineNumber = offset != -1 ? document.getLineOfOffset(offset) + 1 : -1;
 			} catch (BadLocationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -169,11 +174,10 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 
 		// Create extra symbols
 		while (groupsIndex < groups.size()) {
-			this._lenses.add(new CodeLens(
-					groups.get(groupsIndex) /* this._editor */, helper,
+			this._lenses.add(new CodeLens(groups.get(groupsIndex) /* this._editor */, helper,
 					accessor/*
-							 * , this._commandService, this._messageService, ()
-							 * => this._detectVisibleLenses.schedule())
+							 * , this._commandService, this._messageService, () =>
+							 * this._detectVisibleLenses.schedule())
 							 */));
 			groupsIndex++;
 		}
@@ -214,7 +218,7 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 		for (List<CodeLensData> request : toResolve) {
 			List<ICodeLens> resolvedSymbols = new ArrayList<ICodeLens>(request.size());
 			for (CodeLensData req : request) {
-				ICodeLens symbol = req.getProvider().resolveCodeLens(textViewer, req.getSymbol());
+				ICodeLens symbol = req.getProvider().resolveCodeLens(context, req.getSymbol(), getProgressMonitor());
 				if (symbol != null) {
 					resolvedSymbols.add(symbol);
 				}
@@ -224,6 +228,7 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 		}
 
 		final Integer top = topMargin;
+		ITextViewer textViewer = context.getViewer();
 		final StyledText styledText = textViewer.getTextWidget();
 		styledText.getDisplay().syncExec(() -> {
 			if (invalidateTextPresentation) {
@@ -279,6 +284,20 @@ public class CodeLensStrategy implements IReconcilingStrategy {
 
 	@Override
 	public void reconcile(IRegion partition) {
+		onModelChange();
+	}
+
+	@Override
+	public void setProgressMonitor(IProgressMonitor monitor) {
+		this.monitor = monitor;
+	}
+
+	public IProgressMonitor getProgressMonitor() {
+		return monitor;
+	}
+
+	@Override
+	public void initialReconcile() {
 		onModelChange();
 	}
 

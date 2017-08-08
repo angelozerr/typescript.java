@@ -12,6 +12,7 @@ package ts.eclipse.ide.ui.codelens;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.provisional.codelens.CodeLensStrategy;
+import org.eclipse.jface.text.provisional.codelens.DefaultCodeLensContext;
 
 /**
  * TypeScript CodeLens strategy.
@@ -22,7 +23,7 @@ public class TypeScriptCodeLensStrategy extends CodeLensStrategy {
 	private static String CODELENS_TARGET = "typeScript.codeLens";
 
 	public TypeScriptCodeLensStrategy(ITextViewer textViewer) {
-		super(textViewer);
+		super(new DefaultCodeLensContext(textViewer));
 		super.addTarget(CODELENS_TARGET);
 	}
 
