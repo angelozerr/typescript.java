@@ -226,6 +226,12 @@
           <layout>p2</layout>
           <url>http://download.eclipse.org/tm4e/snapshots/</url>
         </repository>
+        <repository>
+          <id>codelens</id>
+          <layout>p2</layout>
+          <url>http://oss.opensagres.fr/org.eclipse.codelens.repository/snapshots/</url>
+        </repository>
+        
 	</repositories>
 	<scm>
 		<url>https://github.com/angelozerr/typescript.java</url>
