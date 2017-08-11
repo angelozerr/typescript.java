@@ -214,7 +214,7 @@
 		<repository>
 			<id>orbit</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/orbit/S-builds/S20170306214312/repository</url>
+			<url>http://download.eclipse.org/tools/orbit/downloads/drops/S20170804160030/repository</url>
 		</repository>
 		<repository>
 			<id>license-feature</id>
