@@ -13,6 +13,9 @@
 		<connection>scm:git:https://github.com/angelozerr/typescript.java.git</connection>
 		<developerConnection>scm:git:https://github.com/angelozerr/typescript.java.git</developerConnection>
 	</scm>
+	<properties>
+		<url.suffix>snapshots</url.suffix>
+	</properties>
 	<build>
 		<extensions>
 			<!-- Enabling the use of FTP -->
@@ -30,7 +33,7 @@
 			<properties>
 				<!-- Properties relative to the distant host where to upload the repo -->
 				<ftp.url>ftp://ftp.online.net</ftp.url>
-				<ftp.toDir>/oss/${project.artifactId}/${project.version}</ftp.toDir>
+				<ftp.toDir>/oss/${project.artifactId}/${url.suffix}</ftp.toDir>
 				<!-- Relative path to the repo being uploaded -->
 				<repo.path>${project.build.directory}/repository/</repo.path>
 			</properties>
@@ -63,6 +66,9 @@
 		</profile>
 		<profile>
 			<id>release</id>
+			<properties>
+				<url.suffix>releases</url.suffix>
+			</properties>			
 			<build>
 				<plugins>
 					<plugin>
