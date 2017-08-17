@@ -8,7 +8,6 @@
 	<artifactId>eclipse</artifactId>
 	<packaging>pom</packaging>
 	<modules>
-<!-- 		<module>codelens</module> -->
         <module>embed</module>
 		<module>jsdt</module>
      	<module>json</module>
