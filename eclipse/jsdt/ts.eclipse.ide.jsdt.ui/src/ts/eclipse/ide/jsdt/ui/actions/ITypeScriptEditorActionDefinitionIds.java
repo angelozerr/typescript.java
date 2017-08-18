@@ -65,10 +65,18 @@ public interface ITypeScriptEditorActionDefinitionIds extends ITextEditorActionD
 
 	/**
 	 * Action definition ID of the search -> references in project action (value
-	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"</code>	
+	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"</code>
 	 * ).
 	 */
 	public static final String SEARCH_REFERENCES_IN_PROJECT = "ts.eclipse.ide.jsdt.ui.edit.text.java.search.references.in.project"; //$NON-NLS-1$
+
+	/**
+	 * Action definition ID of the edit -> go to matching bracket action (value
+	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.goto.matching.bracket"</code>).
+	 *
+	 * 
+	 */
+	public static final String GOTO_MATCHING_BRACKET = "ts.eclipse.ide.jsdt.ui.edit.text.java.goto.matching.bracket"; //$NON-NLS-1$
 
 	/**
 	 * Action definition ID of the navigate -> Show Outline action (value
@@ -85,17 +93,17 @@ public interface ITypeScriptEditorActionDefinitionIds extends ITextEditorActionD
 	 * 
 	 */
 	public static final String OPEN_IMPLEMENTATION = "ts.eclipse.ide.jsdt.ui.edit.text.java.open.implementation"; //$NON-NLS-1$
-	
-	/**
-	 * Action definition ID of the navigate -> open action
-	 * (value <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor"</code>).
-	 */
-	public static final String OPEN_EDITOR= "ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor"; //$NON-NLS-1$
 
 	/**
-	 * Action definition ID of the refactor -> rename element action
-	 * (value <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"</code>).
+	 * Action definition ID of the navigate -> open action (value
+	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor"</code>).
 	 */
-	public static final String RENAME_ELEMENT= "ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"; //$NON-NLS-1$
+	public static final String OPEN_EDITOR = "ts.eclipse.ide.jsdt.ui.edit.text.java.open.editor"; //$NON-NLS-1$
+
+	/**
+	 * Action definition ID of the refactor -> rename element action (value
+	 * <code>"ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"</code>).
+	 */
+	public static final String RENAME_ELEMENT = "ts.eclipse.ide.jsdt.ui.edit.text.java.rename.element"; //$NON-NLS-1$
 
 }

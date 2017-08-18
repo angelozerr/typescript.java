@@ -30,7 +30,7 @@ public class GotoMatchingBracketAction extends Action {
 		Assert.isNotNull(editor);
 		fEditor = editor;
 		setEnabled(true);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJavaHelpContextIds.GOTO_MATCHING_BRACKET_ACTION);
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJavaHelpContextIds.GOTO_MATCHING_BRACKET_ACTION);
 	}
 
 	public void run() {

@@ -60,7 +60,6 @@ import org.eclipse.wst.jsdt.internal.ui.javaeditor.JavaSourceViewer;
 import org.eclipse.wst.jsdt.internal.ui.text.JavaPairMatcher;
 import org.eclipse.wst.jsdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.wst.jsdt.ui.PreferenceConstants;
-import org.eclipse.wst.jsdt.ui.actions.IJavaEditorActionDefinitionIds;
 import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptTextTools;
@@ -68,6 +67,7 @@ import org.eclipse.wst.jsdt.ui.text.JavaScriptTextTools;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.jsdt.internal.ui.actions.GotoMatchingBracketAction;
+import ts.eclipse.ide.jsdt.ui.actions.ITypeScriptEditorActionDefinitionIds;
 
 /**
  * TypeScript editor.
@@ -281,7 +281,7 @@ public class JavaScriptLightWeightEditor extends AbstractDecoratedTextEditor {
 		super.createActions();
 
 		Action action = new GotoMatchingBracketAction(this);
-		action.setActionDefinitionId(IJavaEditorActionDefinitionIds.GOTO_MATCHING_BRACKET);
+		action.setActionDefinitionId(ITypeScriptEditorActionDefinitionIds.GOTO_MATCHING_BRACKET);
 		setAction(GotoMatchingBracketAction.GOTO_MATCHING_BRACKET, action);
 
 		/*
