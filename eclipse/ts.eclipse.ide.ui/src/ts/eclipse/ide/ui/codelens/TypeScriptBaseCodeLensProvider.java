@@ -2,7 +2,7 @@ package ts.eclipse.ide.ui.codelens;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +27,7 @@ import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvider {
 
 	@Override
-	public ICodeLens[] provideCodeLenses(ICodeLensContext context, IProgressMonitor monitor) {
+	public CompletableFuture<ICodeLens[]> provideCodeLenses(ICodeLensContext context, IProgressMonitor monitor) {
 		ITextViewer textViewer = context.getViewer();
 		IResource resource = TypeScriptResourceUtil.getFile(textViewer.getDocument());
 		if (resource == null) {
@@ -42,13 +42,13 @@ public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvide
 				IIDETypeScriptProject tsProject = TypeScriptResourceUtil.getTypeScriptProject(project);
 				IDocument document = textViewer.getDocument();
 				IIDETypeScriptFile tsFile = tsProject.openFile(resource, document);
-				NavigationBarItem tree = tsProject.getClient().navtree(tsFile.getName(), tsFile).get(1000,
-						TimeUnit.MILLISECONDS);
-				List<Range> referenceableSpans = new ArrayList<>();
-				if (tree != null && tree.hasChildItems()) {
-					tree.getChildItems().forEach(item -> this.walkNavTree(tsFile, item, null, referenceableSpans));
-				}
-				return toCodeLenses(referenceableSpans, tsFile);
+				return tsProject.getClient().navtree(tsFile.getName(), tsFile).thenApply(tree -> {
+					List<Range> referenceableSpans = new ArrayList<>();
+					if (tree != null && tree.hasChildItems()) {
+						tree.getChildItems().forEach(item -> this.walkNavTree(tsFile, item, null, referenceableSpans));
+					}
+					return toCodeLenses(referenceableSpans, tsFile);
+				});
 			} catch (Exception e) {
 				TypeScriptUIPlugin.log("Error while TypeScript codelens", e);
 			}
@@ -133,12 +133,11 @@ public abstract class TypeScriptBaseCodeLensProvider implements ICodeLensProvide
 		 * const text = document.getText(range);
 		 * 
 		 * const identifierMatch = new RegExp(`^(.*?(\\b|\\W))${(item.text ||
-		 * '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`, 'gm');
-		 * const match = identifierMatch.exec(text); const prefixLength = match
-		 * ? match.index + match[1].length : 0; const startOffset =
-		 * document.offsetAt(new Position(range.start.line,
-		 * range.start.character)) + prefixLength; return new Range(
-		 * document.positionAt(startOffset), document.positionAt(startOffset +
+		 * '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(\\b|\\W)`, 'gm'); const
+		 * match = identifierMatch.exec(text); const prefixLength = match ? match.index
+		 * + match[1].length : 0; const startOffset = document.offsetAt(new
+		 * Position(range.start.line, range.start.character)) + prefixLength; return new
+		 * Range( document.positionAt(startOffset), document.positionAt(startOffset +
 		 * item.text.length));
 		 */
 		return range;

@@ -2,7 +2,7 @@ package ts.eclipse.ide.internal.ui.codelens;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -13,14 +13,14 @@ import org.eclipse.jface.text.provisional.codelens.Range;
 
 import ts.ScriptElementKind;
 import ts.client.navbar.NavigationBarItem;
-import ts.client.references.ReferencesResponseItem;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.ui.codelens.TypeScriptBaseCodeLensProvider;
 
 public class TypeScriptReferencesCodeLensProvider extends TypeScriptBaseCodeLensProvider {
 
 	@Override
-	public ICodeLens resolveCodeLens(ICodeLensContext context, ICodeLens cl, IProgressMonitor monitor) {
+	public CompletableFuture<ICodeLens> resolveCodeLens(ICodeLensContext context, ICodeLens cl,
+			IProgressMonitor monitor) {
 		ReferencesCodeLens codeLens = (ReferencesCodeLens) cl;
 		// const codeLens = inputCodeLens as ReferencesCodeLens;
 		// const args: Proto.FileLocationRequestArgs = {
@@ -31,29 +31,19 @@ public class TypeScriptReferencesCodeLensProvider extends TypeScriptBaseCodeLens
 		IIDETypeScriptFile tsFile = codeLens.getTsFile();
 		try {
 			int position = tsFile.getPosition(codeLens.getRange().startLineNumber, codeLens.getRange().startColumn);
-			List<ReferencesResponseItem> refs = tsFile.references(position).get(1000, TimeUnit.MILLISECONDS).getRefs();
-			int refCount = refs.size() - 1;
-			if (refCount == 1) {
-				codeLens.setCommand(new Command("1 reference", "references"));
-			} else {
-				codeLens.setCommand(new Command(MessageFormat.format("{0} references", refCount), "references"));
-			}
-			// (response -> {
-			// response.getRefs().stream().map(reference -> {
-			// return null;
-			// });
-			// int refCount = response.getRefs().size() - 1;
-			// if (refCount == 1) {
-			// codeLens.setCommand(new Command("1 reference", null));
-			// } else {
-			// codeLens.setCommand(new Command(MessageFormat.format("{0}
-			// references", refCount), null));
-			// }
-			// });
+			return tsFile.references(position).thenApply(body -> {
+				int refCount = body.getRefs().size() - 1;
+				if (refCount == 1) {
+					codeLens.setCommand(new Command("1 reference", "references"));
+				} else {
+					codeLens.setCommand(new Command(MessageFormat.format("{0} references", refCount), "references"));
+				}
+				return codeLens;
+			});
 		} catch (Exception e) {
 			codeLens.setCommand(new Command("Could not determine references", null));
 		}
-		return codeLens;
+		return null;
 		// return this.client.execute('references', args, token).then(response
 		// => {
 		// if (!response || !response.body) {

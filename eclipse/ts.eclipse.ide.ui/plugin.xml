@@ -616,7 +616,7 @@
 	   <codeLensProvider
 	   		 name="%TypeScriptReferencesCodeLensProvider.name"
 	         class="ts.eclipse.ide.internal.ui.codelens.TypeScriptReferencesCodeLensProvider"
-	         target="typeScript.codeLens">
+	         targetId="typeScript.codeLens">
 	   </codeLensProvider>
 	</extension>
 	
@@ -626,7 +626,7 @@
 	   <codeLensProvider
 	   		 name="%TypeScriptImplementationsCodeLensProvider.name"
 	         class="ts.eclipse.ide.internal.ui.codelens.TypeScriptImplementationsCodeLensProvider"
-	         target="typeScript.codeLens">
+	         targetId="typeScript.codeLens">
 	   </codeLensProvider>
 	</extension>
 	

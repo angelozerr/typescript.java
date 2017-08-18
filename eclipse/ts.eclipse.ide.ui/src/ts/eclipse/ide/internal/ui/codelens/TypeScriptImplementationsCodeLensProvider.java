@@ -2,6 +2,7 @@ package ts.eclipse.ide.internal.ui.codelens;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -20,7 +21,7 @@ import ts.eclipse.ide.ui.codelens.TypeScriptBaseCodeLensProvider;
 public class TypeScriptImplementationsCodeLensProvider extends TypeScriptBaseCodeLensProvider {
 
 	@Override
-	public ICodeLens resolveCodeLens(ICodeLensContext context, ICodeLens cl, IProgressMonitor monitor) {
+	public CompletableFuture<ICodeLens> resolveCodeLens(ICodeLensContext context, ICodeLens cl, IProgressMonitor monitor) {
 		ImplementationsCodeLens codeLens = (ImplementationsCodeLens) cl;
 		// const codeLens = inputCodeLens as ReferencesCodeLens;
 		// const args: Proto.FileLocationRequestArgs = {
@@ -31,31 +32,20 @@ public class TypeScriptImplementationsCodeLensProvider extends TypeScriptBaseCod
 		IIDETypeScriptFile tsFile = codeLens.getTsFile();
 		try {
 			int position = tsFile.getPosition(codeLens.getRange().startLineNumber, codeLens.getRange().startColumn);
-			List<FileSpan> refs = tsFile.implementation(position).get(1000, TimeUnit.MILLISECONDS);
-			int refCount = refs.size();
-			if (refCount == 1) {
-				codeLens.setCommand(new Command("1 implementation", "implementation"));
-			} else {
-				codeLens.setCommand(
-						new Command(MessageFormat.format("{0} implementations", refCount), "implementation"));
-			}
-
-			// (response -> {
-			// response.getRefs().stream().map(reference -> {
-			// return null;
-			// });
-			// int refCount = response.getRefs().size() - 1;
-			// if (refCount == 1) {
-			// codeLens.setCommand(new Command("1 reference", null));
-			// } else {
-			// codeLens.setCommand(new Command(MessageFormat.format("{0}
-			// references", refCount), null));
-			// }
-			// });
+			return tsFile.implementation(position).thenApply(refs -> {
+				int refCount = refs.size();
+				if (refCount == 1) {
+					codeLens.setCommand(new Command("1 implementation", "implementation"));
+				} else {
+					codeLens.setCommand(
+							new Command(MessageFormat.format("{0} implementations", refCount), "implementation"));
+				}
+				return codeLens;
+			});
 		} catch (Exception e) {
 			codeLens.setCommand(new Command("Could not determine implementations", null));
 		}
-		return codeLens;
+		return null;
 	}
 
 	@Override
