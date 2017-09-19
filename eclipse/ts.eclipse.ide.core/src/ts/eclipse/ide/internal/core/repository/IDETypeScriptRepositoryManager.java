@@ -82,7 +82,7 @@ public class IDETypeScriptRepositoryManager extends TypeScriptRepositoryManager
 			// ${project_loc:node_modules/typescript
 			String projectPath = path.substring(PROJECT_LOC_TOKEN.length(),
 					path.endsWith(END_TOKEN) ? path.length() - 1 : path.length());
-			IPath location = project.getLocation();
+			IPath location = project != null ? project.getLocation() : null;
 			return location != null ? location.append(projectPath) : null;
 		} else if (path.startsWith(WORKSPACE_LOC_TOKEN)) {
 			String wsPath = path.substring(WORKSPACE_LOC_TOKEN.length(),
