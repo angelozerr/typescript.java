@@ -11,6 +11,7 @@
 package ts.eclipse.ide.jsdt.internal.ui.validation;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
@@ -184,6 +185,7 @@ public class TypeScriptDocumentRegionProcessor extends DocumentRegionProcessor {
 				ISourceViewer viewer = (ISourceViewer) getTextViewer();
 				codeLensStrategy = new TypeScriptCodeLensStrategy(viewer);
 				codeLensStrategy.setDocument(getDocument());
+				codeLensStrategy.setProgressMonitor(new NullProgressMonitor());
 			}
 		}
 		return codeLensStrategy;

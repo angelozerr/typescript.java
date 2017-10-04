@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.AbstractInformationControlManager;
+import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
@@ -36,14 +37,15 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tm4e.ui.text.TMPresentationReconciler;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.jsdt.internal.ui.JavaScriptPlugin;
 import org.eclipse.wst.jsdt.internal.ui.text.AbstractJavaScanner;
 import org.eclipse.wst.jsdt.internal.ui.text.ContentAssistPreference;
+import org.eclipse.wst.jsdt.internal.ui.text.html.HTMLTextPresenter;
 import org.eclipse.wst.jsdt.internal.ui.text.java.ContentAssistProcessor;
 import org.eclipse.wst.jsdt.internal.ui.text.java.JavaStringAutoIndentStrategy;
 import org.eclipse.wst.jsdt.internal.ui.text.java.SmartSemicolonAutoEditStrategy;
-import org.eclipse.wst.jsdt.internal.ui.text.javadoc.JavaDocAutoIndentStrategy;
 import org.eclipse.wst.jsdt.ui.text.IColorManager;
 import org.eclipse.wst.jsdt.ui.text.IJavaScriptPartitions;
 import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
@@ -51,6 +53,7 @@ import org.eclipse.wst.jsdt.ui.text.JavaScriptSourceViewerConfiguration;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.contentassist.TypeScriptJavadocCompletionProcessor;
 import ts.eclipse.ide.jsdt.internal.ui.editor.format.TypeScriptContentFormatter;
+import ts.eclipse.ide.jsdt.internal.ui.editor.hover.TypeScriptInformationProvider;
 import ts.eclipse.ide.jsdt.internal.ui.text.TypeScriptCodeScanner;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.IJSXPartitions;
 import ts.eclipse.ide.jsdt.internal.ui.text.jsx.JSXScanner;
@@ -172,7 +175,8 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 
 	@Override
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
-		return new TypeScriptContentFormatter(EditorUtils.getResource(getEditor()));
+		IEditorInput input = getEditor().getEditorInput();
+		return input != null ? new TypeScriptContentFormatter(EditorUtils.getResource(input)) : null;
 	}
 
 	/**
@@ -427,6 +431,43 @@ public class TypeScriptSourceViewerConfiguration extends JavaScriptSourceViewerC
 		presenter.setInformationProvider(provider, IJavaScriptPartitions.JAVA_CHARACTER);
 		presenter.setSizeConstraints(50, 20, true, false);
 		return presenter;
+	}
+	
+	@Override
+	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
+		InformationPresenter presenter= new InformationPresenter(getInformationPresenterControlCreator(sourceViewer));
+		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+
+		// Register information provider
+		IInformationProvider provider= new TypeScriptInformationProvider(getEditor());
+		String[] contentTypes= getConfiguredContentTypes(sourceViewer);
+		for (int i= 0; i < contentTypes.length; i++)
+			presenter.setInformationProvider(provider, contentTypes[i]);
+
+		// sizes: see org.eclipse.jface.text.TextViewer.TEXT_HOVER_*_CHARS
+		presenter.setSizeConstraints(100, 12, false, true);
+		return presenter;
+	}
+	
+	/**
+	 * Returns the information presenter control creator. The creator is a
+	 * factory creating the presenter controls for the given source viewer.
+	 * This implementation always returns a creator for
+	 * <code>DefaultInformationControl</code> instances.
+	 *
+	 * @param sourceViewer
+	 *            the source viewer to be configured by this configuration
+	 * @return an information control creator
+	 *
+	 */
+	private IInformationControlCreator getInformationPresenterControlCreator(final ISourceViewer sourceViewer) {
+		return new IInformationControlCreator() {
+			public IInformationControl createInformationControl(final Shell parent) {
+				int shellStyle = SWT.RESIZE | SWT.TOOL;
+				int style = SWT.V_SCROLL | SWT.H_SCROLL;
+				return new DefaultInformationControl(parent, shellStyle, style, new HTMLTextPresenter(false));
+			}
+		};
 	}
 
 	/**

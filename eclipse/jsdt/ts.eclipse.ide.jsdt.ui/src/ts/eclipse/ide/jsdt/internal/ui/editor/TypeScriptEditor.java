@@ -108,6 +108,7 @@ import ts.eclipse.ide.ui.outline.IEditorOutlineFeatures;
 import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
 import ts.eclipse.ide.ui.utils.EditorUtils;
 import ts.resources.ITypeScriptFile;
+import ts.utils.CompletableFutureUtils;
 
 /**
  * TypeScript editor.
@@ -875,9 +876,7 @@ public class TypeScriptEditor extends JavaScriptLightWeightEditor implements IEd
 			ITypeScriptFile tsFile = getTypeScriptFile(document);
 			if (tsFile != null) {
 				occurrencesCollector.setSelection(selection);
-				if (occurrencesFuture != null && !occurrencesFuture.isDone()) {
-					occurrencesFuture.cancel(true);
-				}
+				CompletableFutureUtils.cancel(occurrencesFuture);
 				occurrencesFuture = tsFile.occurrences(selection.getOffset());
 				occurrencesFuture.thenAccept(occurrences -> {
 					occurrencesCollector.startCollect();
