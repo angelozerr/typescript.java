@@ -92,7 +92,6 @@ import ts.client.occurrences.OccurrencesResponseItem;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.Trace;
@@ -107,6 +106,7 @@ import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.outline.IEditorOutlineFeatures;
 import ts.eclipse.ide.ui.outline.TypeScriptContentOutlinePage;
 import ts.eclipse.ide.ui.utils.EditorUtils;
+import ts.eclipse.jface.text.DocumentUtils;
 import ts.resources.ITypeScriptFile;
 import ts.utils.CompletableFutureUtils;
 

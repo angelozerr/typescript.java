@@ -48,11 +48,11 @@ import ts.client.CodeEdit;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
 import ts.eclipse.ide.ui.preferences.TypeScriptUIPreferenceConstants;
+import ts.eclipse.jface.text.DocumentUtils;
 
 public class TypeScriptDocumentProvider extends TextFileDocumentProvider {
 

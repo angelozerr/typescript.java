@@ -9,7 +9,7 @@
  *  Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *  Lorenzo Dalla Vecchia <lorenzo.dallavecchia@webratio.com> - made toTextEdit public
  */
-package ts.eclipse.ide.core.utils;
+package ts.eclipse.jface.text;
 
 import java.util.List;
 

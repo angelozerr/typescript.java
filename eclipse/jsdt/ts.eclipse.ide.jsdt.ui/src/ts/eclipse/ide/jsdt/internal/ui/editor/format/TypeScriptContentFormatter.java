@@ -24,10 +24,10 @@ import org.eclipse.ui.PlatformUI;
 
 import ts.eclipse.ide.core.resources.IIDETypeScriptFile;
 import ts.eclipse.ide.core.resources.IIDETypeScriptProject;
-import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIMessages;
 import ts.eclipse.ide.jsdt.internal.ui.JSDTTypeScriptUIPlugin;
+import ts.eclipse.jface.text.DocumentUtils;
 
 /**
  * Content formatter which consumes tsserver "format" command to format a

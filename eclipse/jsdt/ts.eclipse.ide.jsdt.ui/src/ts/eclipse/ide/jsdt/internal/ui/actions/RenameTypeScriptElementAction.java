@@ -19,11 +19,11 @@ import ts.client.occurrences.OccurrencesResponseItem;
 import ts.client.quickinfo.QuickInfo;
 import ts.eclipse.ide.core.TypeScriptCorePlugin;
 import ts.eclipse.ide.core.preferences.TypeScriptCorePreferenceConstants;
-import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.jsdt.internal.ui.editor.TypeScriptEditor;
 import ts.eclipse.ide.jsdt.internal.ui.refactoring.RefactoringMessages;
 import ts.eclipse.ide.jsdt.internal.ui.refactoring.RenameLinkedMode;
 import ts.eclipse.ide.jsdt.internal.ui.refactoring.RenameSupport;
+import ts.eclipse.jface.text.DocumentUtils;
 import ts.resources.ITypeScriptFile;
 
 public class RenameTypeScriptElementAction extends SelectionDispatchAction {

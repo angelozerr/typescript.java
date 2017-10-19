@@ -34,10 +34,10 @@ import ts.client.FileSpan;
 import ts.client.TextSpan;
 import ts.client.codefixes.FileCodeEdits;
 import ts.client.navbar.NavigationBarItem;
-import ts.eclipse.ide.core.utils.DocumentUtils;
 import ts.eclipse.ide.core.utils.TypeScriptResourceUtil;
 import ts.eclipse.ide.core.utils.WorkbenchResourceUtil;
 import ts.eclipse.ide.ui.TypeScriptUIPlugin;
+import ts.eclipse.jface.text.DocumentUtils;
 import ts.utils.StringUtils;
 
 public class EditorUtils {

@@ -1,6 +1,7 @@
 package ts.eclipse.jface.text.contentassist;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.text.BadLocationException;
@@ -35,15 +36,18 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import ts.TypeScriptException;
 import ts.client.ITypeScriptServiceClient;
+import ts.client.codefixes.CodeAction;
 import ts.client.completions.CompletionEntry;
 import ts.client.completions.CompletionEntryDetails;
 import ts.client.completions.ICompletionEntryMatcher;
 import ts.client.completions.SymbolDisplayPart;
 import ts.eclipse.jface.images.TypeScriptImagesRegistry;
+import ts.eclipse.jface.text.DocumentUtils;
 import ts.eclipse.jface.text.HoverControlCreator;
 import ts.eclipse.jface.text.PresenterControlCreator;
 import ts.utils.StringUtils;
@@ -131,7 +135,28 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		// selected the proposal, and where the cursor offset is
 		// but we might in the future...
 		proposal.apply(document);
-		int baseOffset = getReplacementOffset();
+		
+		int oldlength = document.getLength();
+		int newlength = oldlength;
+		try {
+			List<CompletionEntryDetails> entryDetails = super.getEntryDetails();
+			if (entryDetails != null && entryDetails.size() > 0) {
+				List<CodeAction> codeActions = entryDetails.get(0).getCodeActions();
+				if (codeActions != null) {
+					try {
+						DocumentUtils.applyEdits(document, codeActions.get(0).getChanges().stream()
+								.flatMap(f -> f.getTextChanges().stream()).collect(Collectors.toList()));
+						
+						newlength = document.getLength();
+					} catch (Exception e) {						
+						e.printStackTrace();
+					}
+				}
+			}
+		} catch (TypeScriptException e) {
+		}
+		
+		int baseOffset = getReplacementOffset() + newlength - oldlength;
 
 		if (arguments != null && !arguments.isEmpty() && getTextViewer() != null) {
 			try {// adjust offset of the whole arguments
@@ -159,8 +184,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 				model.forceInstall();
 				/*
 				 * JavaEditor editor = getJavaEditor(); if (editor != null) {
-				 * model.addLinkingListener(new EditorHighlightingSynchronizer(
-				 * editor)); }
+				 * model.addLinkingListener(new EditorHighlightingSynchronizer( editor)); }
 				 */
 
 				LinkedModeUI ui = new EditorLinkedModeUI(model, getTextViewer());
@@ -537,21 +561,18 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 		/*
 		 * 
 		 * 
-		 * boolean validated = isMatchWord(document, offset,
-		 * getReplacementString()); if (validated) { StyledString
-		 * styledDisplayString = new StyledString();
-		 * styledDisplayString.append(getName()); String pattern = if (pattern
-		 * != null && pattern.length() > 0) { String displayString =
+		 * boolean validated = isMatchWord(document, offset, getReplacementString()); if
+		 * (validated) { StyledString styledDisplayString = new StyledString();
+		 * styledDisplayString.append(getName()); String pattern = if (pattern != null
+		 * && pattern.length() > 0) { String displayString =
 		 * styledDisplayString.getString(); int[] bestSequence =
-		 * getMatcher().bestSubsequence(displayString, pattern); int
-		 * highlightAdjustment = 0; for (int index : bestSequence) {
-		 * styledDisplayString.setStyle(index + highlightAdjustment, 1, null); }
-		 * } }
+		 * getMatcher().bestSubsequence(displayString, pattern); int highlightAdjustment
+		 * = 0; for (int index : bestSequence) { styledDisplayString.setStyle(index +
+		 * highlightAdjustment, 1, null); } } }
 		 * 
-		 * // if (fUpdateLengthOnValidate && event != null) { //
-		 * replacementLength += event.fText.length() - event.fLength; // adjust
-		 * // the // replacement // length // by // the // event's // text //
-		 * replacement // } return validated;
+		 * // if (fUpdateLengthOnValidate && event != null) { // replacementLength +=
+		 * event.fText.length() - event.fLength; // adjust // the // replacement //
+		 * length // by // the // event's // text // replacement // } return validated;
 		 */
 	}
 
@@ -587,17 +608,16 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 	}
 
 	/**
-	 * Computes the token at the given <code>offset</code> in
-	 * <code>document</code> to emphasize the ranges matching this token in
-	 * proposal's display string.
+	 * Computes the token at the given <code>offset</code> in <code>document</code>
+	 * to emphasize the ranges matching this token in proposal's display string.
 	 * 
 	 * @param document
 	 *            the document where content assist is invoked
 	 * @param offset
 	 *            the offset in the document at current caret location
-	 * @return the token at the given <code>offset</code> in
-	 *         <code>document</code> to be used for emphasizing matching ranges
-	 *         in proposal's display string
+	 * @return the token at the given <code>offset</code> in <code>document</code>
+	 *         to be used for emphasizing matching ranges in proposal's display
+	 *         string
 	 * @since 3.12
 	 */
 	protected String getPatternToEmphasizeMatch(IDocument document, int offset) {
@@ -621,8 +641,7 @@ public class TypeScriptCompletionProposal extends CompletionEntry
 			model.addLinkingListener(new ILinkedModeListener() {
 
 				/*
-				 * @see
-				 * org.eclipse.jface.text.link.ILinkedModeListener#left(org.
+				 * @see org.eclipse.jface.text.link.ILinkedModeListener#left(org.
 				 * eclipse.jface.text.link.LinkedModeModel, int)
 				 */
 				public void left(LinkedModeModel environment, int flags) {
