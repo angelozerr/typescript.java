@@ -10,16 +10,12 @@
  */
 package ts.eclipse.ide.terminal.interpreter.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalServiceOutputStreamMonitorListener;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
 
 import ts.eclipse.ide.terminal.interpreter.ICommandInterpreter;
-import ts.eclipse.ide.terminal.interpreter.ICommandInterpreterFactory;
 import ts.eclipse.ide.terminal.interpreter.LineCommand;
 
 public class CommandInterpreterProcessor extends CommandTerminalTracker
