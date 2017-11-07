@@ -19,7 +19,7 @@
 
 	<extension point="ts.eclipse.ide.core.nodeJSInstalls" >
 		<install
-        id="node-v6.9.4-linux-x86"
+        id="node-v6.9.4"
         name="%nodeJSInstall_v6.9.4.name"
         path="/node-v6.9.4-linux-x86/bin/node"
         zip="/node-v6.9.4-linux-x86.tar.gz"/>
