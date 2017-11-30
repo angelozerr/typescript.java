@@ -16,10 +16,10 @@
 
 	<extension point="ts.eclipse.ide.core.nodeJSInstalls" >
 		<install
-			id="node-v6.9.4"
-			name="%nodeJSInstall_v6.9.4.name"
-			path="/node-v6.9.4-darwin-x64/bin/node"
-			zip="/node-v6.9.4-darwin-x64.tar.gz"/>
+			id="node-v8.9.1"
+			name="%nodeJSInstall.name"
+			path="/node-v8.9.1-darwin-x64/bin/node"
+			zip="/node-v8.9.1-darwin-x64.tar.gz"/>
 	 </extension>
 	  
 </plugin>        

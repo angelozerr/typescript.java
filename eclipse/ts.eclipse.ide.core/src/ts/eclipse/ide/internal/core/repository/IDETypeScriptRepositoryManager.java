@@ -224,7 +224,7 @@ public class IDETypeScriptRepositoryManager extends TypeScriptRepositoryManager
 		} else {
 			zipFile = new File(bundleDir, baseDir + ZipUtils.TAR_GZ_EXTENSION);
 			if (zipFile.exists()) {
-				ZipUtils.extractTar(zipFile, dir);
+				ZipUtils.extractTarGZ(zipFile, dir);
 				return dir;
 			}
 		}

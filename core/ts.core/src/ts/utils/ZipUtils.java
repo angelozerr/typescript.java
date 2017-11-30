@@ -22,6 +22,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.tukaani.xz.XZInputStream;
+
 import ts.internal.io.tar.TarEntry;
 import ts.internal.io.tar.TarException;
 import ts.internal.io.tar.TarInputStream;
@@ -34,6 +36,7 @@ public class ZipUtils {
 
 	public static final String ZIP_EXTENSION = ".zip";
 	public static final String TAR_GZ_EXTENSION = ".tar.gz";
+	public static final String TAR_XZ_EXTENSION = ".tar.xz";
 	private static final String BIN_FOLDER = "/bin";
 
 	private ZipUtils() {
@@ -50,15 +53,25 @@ public class ZipUtils {
 	}
 
 	/**
-	 * Returns true if the given file is a zip file and false otherwise.
+	 * Returns true if the given file is a tar.gz file and false otherwise.
 	 * 
 	 * @param file
-	 * @return true if the given file is a zip file and false otherwise.
+	 * @return true if the given file is a tar.gz file and false otherwise.
 	 */
-	public static boolean isTarFile(File file) {
+	public static boolean isTarGZFile(File file) {
 		return file.isFile() && file.getName().toLowerCase().endsWith(TAR_GZ_EXTENSION);
 	}
 
+	/**
+	 * Returns true if the given file is a tar.xz file and false otherwise.
+	 * 
+	 * @param file
+	 * @return true if the given file is a tar.xz file and false otherwise.
+	 */
+	public static boolean isTarXZFile(File file) {
+		return file.isFile() && file.getName().toLowerCase().endsWith(TAR_XZ_EXTENSION);
+	}
+	
 	/**
 	 * Extract zip file to destination folder.
 	 *
@@ -129,12 +142,37 @@ public class ZipUtils {
 	 * @param destination
 	 *            destination folder
 	 */
-	public static void extractTar(File file, File destination) throws IOException {
+	public static void extractTarGZ(File file, File destination) throws IOException {
+		extractTar(file, destination, true);
+	}
+
+	/**
+	 * Extract tar.xz file to destination folder.
+	 *
+	 * @param file
+	 *            zip file to extract
+	 * @param destination
+	 *            destination folder
+	 */
+	public static void extractTarXZ(File file, File destination) throws IOException {
+		extractTar(file, destination, false);
+	}
+	
+	/**
+	 * Extract tar.gz/tar.xz file to destination folder.
+	 *
+	 * @param file
+	 *            zip file to extract
+	 * @param destination
+	 *            destination folder
+	 */
+	private static void extractTar(File file, File destination, boolean tarGz) throws IOException {
 		TarInputStream in = null;
 		OutputStream out = null;
 		try {
 			// Open the ZIP file
-			in = new TarInputStream(new GZIPInputStream(new FileInputStream(file)));
+			in = new TarInputStream(tarGz ? new GZIPInputStream(new FileInputStream(file))
+					: new XZInputStream(new FileInputStream(file)));
 
 			// Get the first entry
 			TarEntry entry = null;
@@ -171,11 +209,11 @@ public class ZipUtils {
 					out.close();
 					// Preserve original modification date
 					extractedFile.setLastModified(entry.getTime());
-					long mode = entry.getMode(); 
-					if ((mode & 00100) > 0) { 
-						// Preserve execute permissions 
-						extractedFile.setExecutable(true, (mode & 00001) == 0); 
-					} 
+					long mode = entry.getMode();
+					if ((mode & 00100) > 0) {
+						// Preserve execute permissions
+						extractedFile.setExecutable(true, (mode & 00001) == 0);
+					}
 					break;
 				case TarEntry.LINK:
 					File linkFile = new File(destination, outFilename);

@@ -38,4 +38,6 @@ Export-Package: ts,
  ts.resources,
  ts.resources.jsonconfig,
  ts.utils
-Require-Bundle: com.google.gson;bundle-version="2.1.0"
+Require-Bundle: com.google.gson;bundle-version="2.1.0",
+ org.tukaani.xz;resolution:=optional
+
