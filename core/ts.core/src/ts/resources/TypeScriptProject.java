@@ -187,7 +187,7 @@ public class TypeScriptProject implements ITypeScriptProject, ICompletionEntryMa
 		File typescriptDir = getProjectSettings().getTypesScriptDir();
 		TypeScriptServiceClient client = new TypeScriptServiceClient(getProjectDir(), typescriptDir, nodeFile,
 				getProjectSettings().isEnableTelemetry(), getProjectSettings().isDisableAutomaticTypingAcquisition(),
-				getCancellationPipeName(), getProjectSettings().getTsserverPluginsFile());
+				getCancellationPipeName(), getProjectSettings().getTsserverPluginsFile(), null);
 		client.setCompletionEntryMatcherProvider(this);
 		return client;
 	}

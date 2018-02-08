@@ -19,6 +19,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import ts.TypeScriptException;
 import ts.utils.FileUtils;
@@ -136,6 +137,14 @@ public class NodejsProcess extends AbstractNodejsProcess {
 		try {
 			List<String> commands = createCommands();
 			ProcessBuilder builder = new ProcessBuilder(commands);
+
+			Map<String, String> environmentVariables = this.createNodeEnvironmentVariables();
+			if (environmentVariables != null) {
+				for (Map.Entry<String, String> environmentVariableEntry : environmentVariables.entrySet()) {
+					builder.environment().put(environmentVariableEntry.getKey(), environmentVariableEntry.getValue());
+				}
+			}
+
 			builder.directory(getProjectDir());
 
 			this.process = builder.start();

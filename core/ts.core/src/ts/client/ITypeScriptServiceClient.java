@@ -34,6 +34,8 @@ import ts.client.refactors.RefactorEditInfo;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
+import ts.cmd.tsc.CompilerOptions;
+import ts.internal.client.protocol.OpenExternalProjectRequestArgs.ExternalFile;
 
 /**
  * TypeScript client API which communicates with tsserver.
@@ -62,6 +64,9 @@ public interface ITypeScriptServiceClient {
 	 */
 	void openFile(String fileName, String content, ScriptKindName scriptKindName) throws TypeScriptException;
 
+	void openExternalProject(String projectFileName, List<ExternalFile> rootFiles,
+			CompilerOptions options) throws TypeScriptException;
+	
 	/**
 	 * Close the given file name.
 	 * 

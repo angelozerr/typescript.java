@@ -13,6 +13,7 @@ package ts.nodejs;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ts.TypeScriptException;
 import ts.utils.FileUtils;
@@ -88,6 +89,13 @@ public abstract class AbstractNodejsProcess implements INodejsProcess {
 			return null;
 		}
 		return launchConfiguration.createNodeArgs();
+	}
+	
+	protected Map<String, String> createNodeEnvironmentVariables() {
+		if (launchConfiguration == null) {
+			return null;
+		}
+		return launchConfiguration.createNodeEnvironmentVariables();
 	}
 
 	/**

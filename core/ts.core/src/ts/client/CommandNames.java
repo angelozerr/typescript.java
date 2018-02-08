@@ -37,7 +37,7 @@ public enum CommandNames implements ISupportable {
 	ProjectInfo("projectInfo"),
 	Rename("rename"),
 	NavTo("navto"),
-	
+
 	// 2.0.0
 	SemanticDiagnosticsSync("semanticDiagnosticsSync", "2.0.0"), 
 	SyntacticDiagnosticsSync("syntacticDiagnosticsSync", "2.0.0"), 
@@ -57,7 +57,9 @@ public enum CommandNames implements ISupportable {
 
 	// 2.4.0
 	GetApplicableRefactors("getApplicableRefactors", "2.4.0"),
-    GetEditsForRefactor("getEditsForRefactor", "2.4.0");
+    GetEditsForRefactor("getEditsForRefactor", "2.4.0"),
+	
+	OpenExternalProject("openExternalProject");
     
 	private final String name;
 	private final String sinceVersion;

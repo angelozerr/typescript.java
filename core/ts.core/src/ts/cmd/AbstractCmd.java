@@ -3,6 +3,7 @@ package ts.cmd;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ts.TypeScriptException;
 import ts.nodejs.INodejsLaunchConfiguration;
@@ -39,6 +40,11 @@ public class AbstractCmd<T extends IOptions> {
 						List<String> args = new ArrayList<String>();
 						fillOptions(options, filenames, args);
 						return args;
+					}
+					
+					@Override
+					public Map<String, String> createNodeEnvironmentVariables() {
+						return null;
 					}
 				}, binFileType);
 
