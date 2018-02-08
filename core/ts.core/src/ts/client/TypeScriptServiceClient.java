@@ -13,6 +13,7 @@ package ts.client;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import ts.client.refactors.RefactorEditInfo;
 import ts.client.references.ReferencesResponseBody;
 import ts.client.rename.RenameResponseBody;
 import ts.client.signaturehelp.SignatureHelpItems;
+import ts.cmd.tsc.CompilerOptions;
 import ts.internal.FileTempHelper;
 import ts.internal.SequenceHelper;
 import ts.internal.client.protocol.ChangeRequest;
@@ -76,6 +78,7 @@ import ts.internal.client.protocol.NavBarRequest;
 import ts.internal.client.protocol.NavToRequest;
 import ts.internal.client.protocol.NavTreeRequest;
 import ts.internal.client.protocol.OccurrencesRequest;
+import ts.internal.client.protocol.OpenExternalProjectRequest;
 import ts.internal.client.protocol.OpenRequest;
 import ts.internal.client.protocol.ProjectInfoRequest;
 import ts.internal.client.protocol.QuickInfoRequest;
@@ -87,6 +90,7 @@ import ts.internal.client.protocol.Response;
 import ts.internal.client.protocol.SemanticDiagnosticsSyncRequest;
 import ts.internal.client.protocol.SignatureHelpRequest;
 import ts.internal.client.protocol.SyntacticDiagnosticsSyncRequest;
+import ts.internal.client.protocol.OpenExternalProjectRequestArgs.ExternalFile;
 import ts.nodejs.INodejsLaunchConfiguration;
 import ts.nodejs.INodejsProcess;
 import ts.nodejs.INodejsProcessListener;
@@ -164,12 +168,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	public TypeScriptServiceClient(final File projectDir, File tsserverFile, File nodeFile) throws TypeScriptException {
-		this(projectDir, tsserverFile, nodeFile, false, false, null, null);
+		this(projectDir, tsserverFile, nodeFile, false, false, null, null, null);
 	}
 
 	public TypeScriptServiceClient(final File projectDir, File typescriptDir, File nodeFile, boolean enableTelemetry,
-			boolean disableAutomaticTypingAcquisition, String cancellationPipeName, File tsserverPluginsFile)
-			throws TypeScriptException {
+			boolean disableAutomaticTypingAcquisition, String cancellationPipeName, File tsserverPluginsFile,
+			TypeScriptServiceLogConfiguration logConfiguration) throws TypeScriptException {
 		this(NodejsProcessManager.getInstance().create(projectDir,
 				tsserverPluginsFile != null ? tsserverPluginsFile
 						: TypeScriptRepositoryManager.getTsserverFile(typescriptDir),
@@ -197,6 +201,16 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 						// args.add("--useSingleInferredProject");
 						return args;
 					}
+
+					@Override
+					public Map<String, String> createNodeEnvironmentVariables() {
+						Map<String, String> environmentVariables = new HashMap<>();
+						if (logConfiguration != null) {
+							environmentVariables.put("TSS_LOG",
+									"-level " + logConfiguration.level.name() + " -file " + logConfiguration.file);
+						}
+						return environmentVariables;
+					}
 				}, TSSERVER_FILE_TYPE), cancellationPipeName);
 	}
 
@@ -211,6 +225,20 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 		process.addProcessListener(listener);
 		setCompletionEntryMatcherProvider(ICompletionEntryMatcherProvider.LCS_PROVIDER);
 		this.cancellationPipeName = cancellationPipeName;
+	}
+
+	public static enum TypeScriptServiceLogLevel {
+		verbose, normal, terse, requestTime
+	}
+
+	public static class TypeScriptServiceLogConfiguration {
+		String file;
+		TypeScriptServiceLogLevel level;
+
+		public TypeScriptServiceLogConfiguration(String file, TypeScriptServiceLogLevel level) {
+			this.file = file;
+			this.level = level;
+		}
 	}
 
 	private void dispatchMessage(String message) {
@@ -294,6 +322,12 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	}
 
 	@Override
+	public void openExternalProject(String projectFileName, List<ExternalFile> rootFiles, CompilerOptions options)
+			throws TypeScriptException {
+		execute(new OpenExternalProjectRequest(projectFileName, rootFiles, options), false);
+	}
+
+	@Override
 	public void closeFile(String fileName) throws TypeScriptException {
 		execute(new CloseRequest(fileName), false);
 	}
@@ -314,7 +348,10 @@ public class TypeScriptServiceClient implements ITypeScriptServiceClient {
 	@Override
 	public void updateFile(String fileName, String newText) throws TypeScriptException {
 		int seq = SequenceHelper.getRequestSeq();
-		String tempFileName = FileTempHelper.updateTempFile(newText, seq);
+		String tempFileName = null;
+		if (newText != null) {
+			tempFileName = FileTempHelper.updateTempFile(newText, seq);
+		}
 		try {
 			execute(new ReloadRequest(fileName, tempFileName, seq), true).get(5000, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
