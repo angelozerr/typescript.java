@@ -1,3 +1,7 @@
+__⚠️ typescript.java is now OUTDATED, it's recommended to use [Eclipse Wild Web Developer](https://github.com/eclipse/wildwebdeveloper) instead__
+
+
+
 # typescript.java
 
 [![Build Status](https://secure.travis-ci.org/angelozerr/typescript.java.png)](http://travis-ci.org/angelozerr/typescript.java)
